@@ -1,0 +1,29 @@
+    main6(i, j, from, to, k).                     
+    main8(i, j, from, to, k) :- main6(i, j, from, to, k), !(k >= 0).  
+    main9(i, j, from, to, k) :- main6(i, j, from, to, k), k >= 0.  
+    main0(__result) :- main8(i, j, from, to, k).  
+    main7(i, j, from, to, k) :- main9(i, j, from, to, k).  
+    main11(i, j, from, to, k) :- main7(i, j, from, to, k), !(100 >= k).  
+    main12(i, j, from, to, k) :- main7(i, j, from, to, k), 100 >= k.  
+    main0(__result) :- main11(i, j, from, to, k).  
+    main10(i, j, from, to, k) :- main12(i, j, from, to, k).  
+    main14(i, j, from, to, k) :- main10(i, j, from, to, k), !(from >= 0).  
+    main15(i, j, from, to, k) :- main10(i, j, from, to, k), from >= 0.  
+    main0(__result) :- main14(i, j, from, to, k).  
+    main13(i, j, from, to, k) :- main15(i, j, from, to, k).  
+    main17(i, j, from, to, k) :- main13(i, j, from, to, k), !(k >= from).  
+    main18(i, j, from, to, k) :- main13(i, j, from, to, k), k >= from.  
+    main0(__result) :- main17(i, j, from, to, k).  
+    main16(i, j, from, to, k) :- main18(i, j, from, to, k).  
+    main19(from, j, from, to, k) :- main16(i, j, from, to, k).  
+    main20(i, 0, from, to, k) :- main19(i, j, from, to, k).  
+    main22(i, j, from, to, k) :- main20(i, j, from, to, k), k - i >= 1.  
+    main21(i, j, from, to, k) :- main20(i, j, from, to, k), !(k - i >= 1).  
+    main23(i + 1, j, from, to, k) :- main22(i, j, from, to, k).  
+    main20(i, j + 1, from, to, k) :- main23(i, j, from, to, k).  
+    main1 :- main21(i, j, from, to, k).           
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main21(i, j, from, to, k), true & !(100 >= j).
+

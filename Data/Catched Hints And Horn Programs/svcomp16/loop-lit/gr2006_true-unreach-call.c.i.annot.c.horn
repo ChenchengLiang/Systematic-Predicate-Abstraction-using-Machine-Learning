@@ -1,0 +1,20 @@
+    main3(x, y).                                  
+    main4(0, y) :- main3(x, y).                   
+    main5(x, 0) :- main4(x, y).                   
+    main7(x, y) :- main5(x, y).                   
+    main9(x, y) :- main7(x, y), -1*x + 50 >= 1.   
+    main10(x, y) :- main7(x, y), !(-1*x + 50 >= 1).  
+    main8(x, y + 1) :- main9(x, y).               
+    main8(x, y + -1*1) :- main10(x, y).           
+    main12(x, y) :- main8(x, y), -1 >= y.         
+    main13(x, y) :- main8(x, y), !(-1 >= y).      
+    main6(x, y) :- main12(x, y).                  
+    main11(x, y) :- main13(x, y).                 
+    main5(x + 1, y) :- main11(x, y).              
+    main14(x, y) :- main6(x, y).                  
+    main0(0) :- main14(x, y).                     
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main6(x, y), true & x != 100.
+

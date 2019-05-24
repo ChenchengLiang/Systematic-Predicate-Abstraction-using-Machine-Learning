@@ -1,0 +1,11 @@
+    main4(1, 0).                                  
+    main6(x, y) :- main4(x, y), -1*y + 1024 >= 1.  
+    main5(x, y) :- main4(x, y), !(-1*y + 1024 >= 1).  
+    main7(0, y) :- main6(x, y).                   
+    main4(x, y + 1) :- main7(x, y).               
+    main1 :- main5(x, y).                         
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main5(x, y), true & x != 0.
+

@@ -1,0 +1,23 @@
+    main7(100, b, i, j, n).                       
+    main8(k, b, j, j, n) :- main7(k, b, i, j, n).  
+    main10(k, b, i, j, 0) :- main8(k, b, i, j, n).  
+    main11(k, b, i, j, n) :- main10(k, b, i, j, n), 2*k - n >= 1.  
+    main9(k, b, i, j, n) :- main10(k, b, i, j, n), !(2*k - n >= 1).  
+    main14(k, b, i, j, n) :- main11(k, b, i, j, n), b != 0.  
+    main15(k, b, i, j, n) :- main11(k, b, i, j, n), b = 0.  
+    main13(k, b, i + 1, j, n) :- main14(k, b, i, j, n).  
+    main13(k, b, i, j + 1, n) :- main15(k, b, i, j, n).  
+    main12(k, \if (b = 0) \ then (1) \ else (0), i, j, n) :- main13(k, b, i, j, n).  
+    main10(k, b, i, j, n + 1) :- main12(k, b, i, j, n).  
+    main16(k, b, i, j, n) :- main9(k, b, i, j, n), i != j.  
+    main17(k, b, i, j, n) :- main9(k, b, i, j, n), i = j.  
+    main18(k, b, i, j, n) :- main16(k, b, i, j, n).  
+    main20(k, b, i, j, n) :- main18(k, b, i, j, n).  
+    main19(k, b, i, j, n, __result) :- main20(k, b, i, j, n).  
+    main1 :- main19(k, b, i, j, n, __eval67).     
+    main1 :- main17(k, b, i, j, n).               
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main18(k, b, i, j, n), true & true.
+

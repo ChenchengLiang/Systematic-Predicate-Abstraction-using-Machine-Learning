@@ -1,0 +1,32 @@
+    main3(0, 0).                                  
+    main4(x1, x2, c0, c0, c0) :- main3(x1, x2).   
+    main5(x1, x2, c0, c1, c2, t) :- main4(x1, x2, c0, c1, c2).  
+    main6(x1, x2, c0, c1, c2, t, r0, r0, r0) :- main5(x1, x2, c0, c1, c2, t).  
+    main8(x1, x2, c0, c1, c2, t, r0, r1, r2) :- main6(x1, x2, c0, c1, c2, t, r0, r1, r2), t >= 1.  
+    main9(x1, x2, c0, c1, c2, t, r0, r1, r2) :- main6(x1, x2, c0, c1, c2, t, r0, r1, r2), !(t >= 1).  
+    main10(x1, x2, c0, c1, c2, t, r0, r1, r2) :- main8(x1, x2, c0, c1, c2, t, r0, r1, r2), c1 >= 1.  
+    main7(x1, x2, c0, c1, c2, t, r0, r1, r2) :- main8(x1, x2, c0, c1, c2, t, r0, r1, r2), !(c1 >= 1).  
+    main11(x1 + 1, x2, c0, c1, c2, t, r0, r1, r2) :- main10(x1, x2, c0, c1, c2, t, r0, r1, r2).  
+    main8(x1, x2, c0, c1 + -1*1, c2, t, r0, r1, r2) :- main11(x1, x2, c0, c1, c2, t, r0, r1, r2).  
+    main7(x1, x2, c0, c1, c2, t, r0, r1, r2) :- main9(x1, x2, c0, c1, c2, t, r0, r1, r2).  
+    main13(x1, x2, c0, c1, c2, t, r0, r1, r2) :- main7(x1, x2, c0, c1, c2, t, r0, r1, r2), r1 >= 1.  
+    main12(x1, x2, c0, c1, c2, t, r0, r1, r2) :- main7(x1, x2, c0, c1, c2, t, r0, r1, r2), !(r1 >= 1).  
+    main14(x1 + 2, x2, c0, c1, c2, t, r0, r1, r2) :- main13(x1, x2, c0, c1, c2, t, r0, r1, r2).  
+    main7(x1, x2, c0, c1, c2, t, r0, r1 + -1*1, r2) :- main14(x1, x2, c0, c1, c2, t, r0, r1, r2).  
+    main16(x1, x2, c0, c1, c2, t, r0, r1, r2) :- main12(x1, x2, c0, c1, c2, t, r0, r1, r2), c2 >= 1.  
+    main15(x1, x2, c0, c1, c2, t, r0, r1, r2) :- main12(x1, x2, c0, c1, c2, t, r0, r1, r2), !(c2 >= 1).  
+    main18(x1, x2, c0, c1, c2, t, r0, r1, r2) :- main16(x1, x2, c0, c1, c2, t, r0, r1, r2), t >= 1.  
+    main19(x1, x2, c0, c1, c2, t, r0, r1, r2) :- main16(x1, x2, c0, c1, c2, t, r0, r1, r2), !(t >= 1).  
+    main17(x1, x2 + 1, c0, c1, c2, t, r0, r1, r2) :- main18(x1, x2, c0, c1, c2, t, r0, r1, r2).  
+    main17(x1, x2, c0, c1, c2, t, r0, r1, r2) :- main19(x1, x2, c0, c1, c2, t, r0, r1, r2).  
+    main12(x1, x2, c0, c1, c2 + -1*1, t, r0, r1, r2) :- main17(x1, x2, c0, c1, c2, t, r0, r1, r2).  
+    main21(x1, x2, c0, c1, c2, t, r0, r1, r2) :- main15(x1, x2, c0, c1, c2, t, r0, r1, r2), r2 >= 1.  
+    main20(x1, x2, c0, c1, c2, t, r0, r1, r2) :- main15(x1, x2, c0, c1, c2, t, r0, r1, r2), !(r2 >= 1).  
+    main22(x1, x2 + 2, c0, c1, c2, t, r0, r1, r2) :- main21(x1, x2, c0, c1, c2, t, r0, r1, r2).  
+    main15(x1, x2, c0, c1, c2, t, r0, r1, r2 + -1*1) :- main22(x1, x2, c0, c1, c2, t, r0, r1, r2).  
+    main1 :- main20(x1, x2, c0, c1, c2, t, r0, r1, r2).  
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main20(x1, x2, c0, c1, c2, t, r0, r1, r2), true & x1 != x2.
+

@@ -1,0 +1,18 @@
+    main5(0, i, 100).                             
+    main7(j, 0, x) :- main5(j, i, x).             
+    main8(j, i, x) :- main7(j, i, x), x - i >= 1.  
+    main6(j, i, x) :- main7(j, i, x), !(x - i >= 1).  
+    main9(j + 2, i, x) :- main8(j, i, x).         
+    main7(j, i + 1, x) :- main9(j, i, x).         
+    main10(j, i, x) :- main6(j, i, x), j != 2*x.  
+    main11(j, i, x) :- main6(j, i, x), j = 2*x.   
+    main12(j, i, x) :- main10(j, i, x).           
+    main14(j, i, x) :- main12(j, i, x).           
+    main13(j, i, x, __result) :- main14(j, i, x).  
+    main1 :- main13(j, i, x, __eval48).           
+    main1 :- main11(j, i, x).                     
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main12(j, i, x), true & true.
+

@@ -1,0 +1,69 @@
+    main6(invalid, unowned, nonexclusive, exclusive).  
+    main8(invalid, unowned, nonexclusive, exclusive) :- main6(invalid, unowned, nonexclusive, exclusive), exclusive != 0.  
+    main9(invalid, unowned, nonexclusive, exclusive) :- main6(invalid, unowned, nonexclusive, exclusive), exclusive = 0.  
+    main0(__result) :- main8(invalid, unowned, nonexclusive, exclusive).  
+    main7(invalid, unowned, nonexclusive, exclusive) :- main9(invalid, unowned, nonexclusive, exclusive).  
+    main11(invalid, unowned, nonexclusive, exclusive) :- main7(invalid, unowned, nonexclusive, exclusive), nonexclusive != 0.  
+    main12(invalid, unowned, nonexclusive, exclusive) :- main7(invalid, unowned, nonexclusive, exclusive), nonexclusive = 0.  
+    main0(__result) :- main11(invalid, unowned, nonexclusive, exclusive).  
+    main10(invalid, unowned, nonexclusive, exclusive) :- main12(invalid, unowned, nonexclusive, exclusive).  
+    main14(invalid, unowned, nonexclusive, exclusive) :- main10(invalid, unowned, nonexclusive, exclusive), unowned != 0.  
+    main15(invalid, unowned, nonexclusive, exclusive) :- main10(invalid, unowned, nonexclusive, exclusive), unowned = 0.  
+    main0(__result) :- main14(invalid, unowned, nonexclusive, exclusive).  
+    main13(invalid, unowned, nonexclusive, exclusive) :- main15(invalid, unowned, nonexclusive, exclusive).  
+    main17(invalid, unowned, nonexclusive, exclusive) :- main13(invalid, unowned, nonexclusive, exclusive), !(invalid >= 1).  
+    main18(invalid, unowned, nonexclusive, exclusive) :- main13(invalid, unowned, nonexclusive, exclusive), invalid >= 1.  
+    main0(__result) :- main17(invalid, unowned, nonexclusive, exclusive).  
+    main16(invalid, unowned, nonexclusive, exclusive) :- main18(invalid, unowned, nonexclusive, exclusive).  
+    main21(invalid, unowned, nonexclusive, exclusive) :- main16(invalid, unowned, nonexclusive, exclusive).  
+    main24(invalid, unowned, nonexclusive, exclusive, i) :- main21(invalid, unowned, nonexclusive, exclusive).  
+    main22(invalid, unowned, nonexclusive, exclusive, i) :- main24(invalid, unowned, nonexclusive, exclusive, i).  
+    main22(invalid, unowned, nonexclusive, exclusive, __result) :- main23(invalid, unowned, nonexclusive, exclusive).  
+    main20(invalid, unowned, nonexclusive, exclusive) :- main22(invalid, unowned, nonexclusive, exclusive, __eval107), __eval107 != 0.  
+    main19(invalid, unowned, nonexclusive, exclusive) :- main22(invalid, unowned, nonexclusive, exclusive, __eval107), __eval107 = 0.  
+    main27(invalid, unowned, nonexclusive, exclusive) :- main20(invalid, unowned, nonexclusive, exclusive).  
+    main30(invalid, unowned, nonexclusive, exclusive, i) :- main27(invalid, unowned, nonexclusive, exclusive).  
+    main28(invalid, unowned, nonexclusive, exclusive, i) :- main30(invalid, unowned, nonexclusive, exclusive, i).  
+    main28(invalid, unowned, nonexclusive, exclusive, __result) :- main29(invalid, unowned, nonexclusive, exclusive).  
+    main25(invalid, unowned, nonexclusive, exclusive) :- main28(invalid, unowned, nonexclusive, exclusive, __eval109), __eval109 != 0.  
+    main26(invalid, unowned, nonexclusive, exclusive) :- main28(invalid, unowned, nonexclusive, exclusive, __eval109), __eval109 = 0.  
+    main32(invalid, unowned, nonexclusive, exclusive) :- main25(invalid, unowned, nonexclusive, exclusive), !(invalid >= 1).  
+    main33(invalid, unowned, nonexclusive, exclusive) :- main25(invalid, unowned, nonexclusive, exclusive), invalid >= 1.  
+    main0(__result) :- main32(invalid, unowned, nonexclusive, exclusive).  
+    main31(invalid, unowned, nonexclusive, exclusive) :- main33(invalid, unowned, nonexclusive, exclusive).  
+    main34(invalid, unowned, nonexclusive + exclusive, exclusive) :- main31(invalid, unowned, nonexclusive, exclusive).  
+    main35(invalid, unowned, nonexclusive, 0) :- main34(invalid, unowned, nonexclusive, exclusive).  
+    main36(invalid + -1*1, unowned, nonexclusive, exclusive) :- main35(invalid, unowned, nonexclusive, exclusive).  
+    main16(invalid, unowned + 1, nonexclusive, exclusive) :- main36(invalid, unowned, nonexclusive, exclusive).  
+    main39(invalid, unowned, nonexclusive, exclusive) :- main26(invalid, unowned, nonexclusive, exclusive).  
+    main42(invalid, unowned, nonexclusive, exclusive, i) :- main39(invalid, unowned, nonexclusive, exclusive).  
+    main40(invalid, unowned, nonexclusive, exclusive, i) :- main42(invalid, unowned, nonexclusive, exclusive, i).  
+    main40(invalid, unowned, nonexclusive, exclusive, __result) :- main41(invalid, unowned, nonexclusive, exclusive).  
+    main37(invalid, unowned, nonexclusive, exclusive) :- main40(invalid, unowned, nonexclusive, exclusive, __eval125), __eval125 != 0.  
+    main38(invalid, unowned, nonexclusive, exclusive) :- main40(invalid, unowned, nonexclusive, exclusive, __eval125), __eval125 = 0.  
+    main44(invalid, unowned, nonexclusive, exclusive) :- main37(invalid, unowned, nonexclusive, exclusive), !(nonexclusive + unowned >= 1).  
+    main45(invalid, unowned, nonexclusive, exclusive) :- main37(invalid, unowned, nonexclusive, exclusive), nonexclusive + unowned >= 1.  
+    main0(__result) :- main44(invalid, unowned, nonexclusive, exclusive).  
+    main43(invalid, unowned, nonexclusive, exclusive) :- main45(invalid, unowned, nonexclusive, exclusive).  
+    main46(invalid + unowned + nonexclusive + -1*1, unowned, nonexclusive, exclusive) :- main43(invalid, unowned, nonexclusive, exclusive).  
+    main47(invalid, unowned, nonexclusive, exclusive + 1) :- main46(invalid, unowned, nonexclusive, exclusive).  
+    main48(invalid, 0, nonexclusive, exclusive) :- main47(invalid, unowned, nonexclusive, exclusive).  
+    main16(invalid, unowned, 0, exclusive) :- main48(invalid, unowned, nonexclusive, exclusive).  
+    main50(invalid, unowned, nonexclusive, exclusive) :- main38(invalid, unowned, nonexclusive, exclusive), !(invalid >= 1).  
+    main51(invalid, unowned, nonexclusive, exclusive) :- main38(invalid, unowned, nonexclusive, exclusive), invalid >= 1.  
+    main0(__result) :- main50(invalid, unowned, nonexclusive, exclusive).  
+    main49(invalid, unowned, nonexclusive, exclusive) :- main51(invalid, unowned, nonexclusive, exclusive).  
+    main52(invalid, 0, nonexclusive, exclusive) :- main49(invalid, unowned, nonexclusive, exclusive).  
+    main53(invalid, unowned, 0, exclusive) :- main52(invalid, unowned, nonexclusive, exclusive).  
+    main54(invalid, unowned, nonexclusive, 1) :- main53(invalid, unowned, nonexclusive, exclusive).  
+    main16(invalid + unowned + exclusive + nonexclusive + -1*1, unowned, nonexclusive, exclusive) :- main54(invalid, unowned, nonexclusive, exclusive).  
+    main55(invalid, unowned, nonexclusive, exclusive) :- main19(invalid, unowned, nonexclusive, exclusive).  
+    main56(invalid, unowned, nonexclusive, exclusive) :- main55(invalid, unowned, nonexclusive, exclusive).  
+    main1 :- main56(invalid, unowned, nonexclusive, exclusive).  
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main19(invalid, unowned, nonexclusive, exclusive), true & !(exclusive >= 0).
+  false :- main55(invalid, unowned, nonexclusive, exclusive), true & !(unowned >= 0).
+  false :- main56(invalid, unowned, nonexclusive, exclusive), true & !(invalid + unowned + exclusive + nonexclusive >= 1).
+

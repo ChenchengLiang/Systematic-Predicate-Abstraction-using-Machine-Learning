@@ -1,0 +1,100 @@
+    main2.                                        
+    main3 :- main2.                               
+    main5(__eval0) :- main3.                      
+    main6(p1, lk1) :- main5(p1).                  
+    main7(p1, lk1) :- main6(p1, lk1).             
+    main9(p1, lk1, __eval19) :- main7(p1, lk1).   
+    main10(p1, lk1, p2, lk2) :- main9(p1, lk1, p2).  
+    main11(p1, lk1, p2, lk2) :- main10(p1, lk1, p2, lk2).  
+    main13(p1, lk1, p2, lk2, __eval35) :- main11(p1, lk1, p2, lk2).  
+    main14(p1, lk1, p2, lk2, p3, lk3) :- main13(p1, lk1, p2, lk2, p3).  
+    main15(p1, lk1, p2, lk2, p3, lk3) :- main14(p1, lk1, p2, lk2, p3, lk3).  
+    main17(p1, lk1, p2, lk2, p3, lk3, __eval51) :- main15(p1, lk1, p2, lk2, p3, lk3).  
+    main18(p1, lk1, p2, lk2, p3, lk3, p4, lk4) :- main17(p1, lk1, p2, lk2, p3, lk3, p4).  
+    main19(p1, lk1, p2, lk2, p3, lk3, p4, lk4) :- main18(p1, lk1, p2, lk2, p3, lk3, p4, lk4).  
+    main21(p1, lk1, p2, lk2, p3, lk3, p4, lk4, __eval67) :- main19(p1, lk1, p2, lk2, p3, lk3, p4, lk4).  
+    main22(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5) :- main21(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5).  
+    main23(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main22(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5).  
+    main25(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main23(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main27(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main25(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main26(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, __eval90) :- main27(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main30(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main26(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), cond = 0.  
+    main31(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main26(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), cond != 0.  
+    main24(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main30(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main29(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main31(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main32(p1, 0, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main29(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main33(p1, lk1, p2, 0, p3, lk3, p4, lk4, p5, lk5, cond) :- main32(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main34(p1, lk1, p2, lk2, p3, 0, p4, lk4, p5, lk5, cond) :- main33(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main35(p1, lk1, p2, lk2, p3, lk3, p4, 0, p5, lk5, cond) :- main34(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main36(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, 0, cond) :- main35(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main38(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main36(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p1 != 0.  
+    main39(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main36(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p1 = 0.  
+    main37(p1, 1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main38(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main37(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main39(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main41(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main37(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p2 != 0.  
+    main42(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main37(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p2 = 0.  
+    main40(p1, lk1, p2, 1, p3, lk3, p4, lk4, p5, lk5, cond) :- main41(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main40(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main42(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main44(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main40(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p3 != 0.  
+    main45(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main40(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p3 = 0.  
+    main43(p1, lk1, p2, lk2, p3, 1, p4, lk4, p5, lk5, cond) :- main44(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main43(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main45(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main47(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main43(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p4 != 0.  
+    main48(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main43(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p4 = 0.  
+    main46(p1, lk1, p2, lk2, p3, lk3, p4, 1, p5, lk5, cond) :- main47(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main46(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main48(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main50(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main46(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p5 != 0.  
+    main51(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main46(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p5 = 0.  
+    main49(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, 1, cond) :- main50(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main49(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main51(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main53(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main49(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p1 != 0.  
+    main54(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main49(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p1 = 0.  
+    main56(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main53(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), lk1 != 1.  
+    main57(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main53(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), lk1 = 1.  
+    main81(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main56(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main55(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main57(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main52(p1, 0, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main55(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main52(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main54(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main59(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main52(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p2 != 0.  
+    main60(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main52(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p2 = 0.  
+    main62(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main59(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), lk2 != 1.  
+    main63(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main59(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), lk2 = 1.  
+    main81(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main62(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main61(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main63(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main58(p1, lk1, p2, 0, p3, lk3, p4, lk4, p5, lk5, cond) :- main61(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main58(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main60(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main65(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main58(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p3 != 0.  
+    main66(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main58(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p3 = 0.  
+    main68(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main65(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), lk3 != 1.  
+    main69(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main65(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), lk3 = 1.  
+    main81(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main68(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main67(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main69(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main64(p1, lk1, p2, lk2, p3, 0, p4, lk4, p5, lk5, cond) :- main67(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main64(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main66(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main71(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main64(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p4 != 0.  
+    main72(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main64(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p4 = 0.  
+    main74(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main71(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), lk4 != 1.  
+    main75(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main71(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), lk4 = 1.  
+    main81(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main74(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main73(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main75(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main70(p1, lk1, p2, lk2, p3, lk3, p4, 0, p5, lk5, cond) :- main73(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main70(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main72(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main76(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main70(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p5 != 0.  
+    main77(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main70(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), p5 = 0.  
+    main79(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main76(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), lk5 != 1.  
+    main80(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main76(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), lk5 = 1.  
+    main81(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main79(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main78(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main80(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main23(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, 0, cond) :- main78(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main23(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main77(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main0(0) :- main24(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main83(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main81(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main85(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main83(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main84(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond, __result) :- main85(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main82(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond) :- main84(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond, __eval158).  
+    main0(0) :- main82(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond).  
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main83(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, cond), true & true.
+

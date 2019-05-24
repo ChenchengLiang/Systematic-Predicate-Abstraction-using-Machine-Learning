@@ -1,0 +1,148 @@
+    main2.                                        
+    main3 :- main2.                               
+    main5(__eval0) :- main3.                      
+    main6(p1, lk1) :- main5(p1).                  
+    main7(p1, lk1) :- main6(p1, lk1).             
+    main9(p1, lk1, __eval19) :- main7(p1, lk1).   
+    main10(p1, lk1, p2, lk2) :- main9(p1, lk1, p2).  
+    main11(p1, lk1, p2, lk2) :- main10(p1, lk1, p2, lk2).  
+    main13(p1, lk1, p2, lk2, __eval35) :- main11(p1, lk1, p2, lk2).  
+    main14(p1, lk1, p2, lk2, p3, lk3) :- main13(p1, lk1, p2, lk2, p3).  
+    main15(p1, lk1, p2, lk2, p3, lk3) :- main14(p1, lk1, p2, lk2, p3, lk3).  
+    main17(p1, lk1, p2, lk2, p3, lk3, __eval51) :- main15(p1, lk1, p2, lk2, p3, lk3).  
+    main18(p1, lk1, p2, lk2, p3, lk3, p4, lk4) :- main17(p1, lk1, p2, lk2, p3, lk3, p4).  
+    main19(p1, lk1, p2, lk2, p3, lk3, p4, lk4) :- main18(p1, lk1, p2, lk2, p3, lk3, p4, lk4).  
+    main21(p1, lk1, p2, lk2, p3, lk3, p4, lk4, __eval67) :- main19(p1, lk1, p2, lk2, p3, lk3, p4, lk4).  
+    main22(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5) :- main21(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5).  
+    main23(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5) :- main22(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5).  
+    main25(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, __eval83) :- main23(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5).  
+    main26(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6) :- main25(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6).  
+    main27(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6) :- main26(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6).  
+    main29(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, __eval99) :- main27(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6).  
+    main30(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7) :- main29(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7).  
+    main31(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7) :- main30(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7).  
+    main33(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, __eval115) :- main31(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7).  
+    main34(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8) :- main33(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8).  
+    main35(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main34(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8).  
+    main37(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main35(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main39(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main37(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main38(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, __eval138) :- main39(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main42(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main38(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), cond = 0.  
+    main43(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main38(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), cond != 0.  
+    main36(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main42(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main41(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main43(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main44(p1, 0, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main41(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main45(p1, lk1, p2, 0, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main44(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main46(p1, lk1, p2, lk2, p3, 0, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main45(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main47(p1, lk1, p2, lk2, p3, lk3, p4, 0, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main46(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main48(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, 0, p6, lk6, p7, lk7, p8, lk8, cond) :- main47(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main49(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, 0, p7, lk7, p8, lk8, cond) :- main48(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main50(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, 0, p8, lk8, cond) :- main49(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main51(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, 0, cond) :- main50(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main53(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main51(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p1 != 0.  
+    main54(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main51(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p1 = 0.  
+    main52(p1, 1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main53(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main52(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main54(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main56(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main52(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p2 != 0.  
+    main57(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main52(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p2 = 0.  
+    main55(p1, lk1, p2, 1, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main56(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main55(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main57(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main59(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main55(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p3 != 0.  
+    main60(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main55(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p3 = 0.  
+    main58(p1, lk1, p2, lk2, p3, 1, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main59(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main58(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main60(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main62(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main58(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p4 != 0.  
+    main63(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main58(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p4 = 0.  
+    main61(p1, lk1, p2, lk2, p3, lk3, p4, 1, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main62(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main61(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main63(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main65(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main61(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p5 != 0.  
+    main66(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main61(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p5 = 0.  
+    main64(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, 1, p6, lk6, p7, lk7, p8, lk8, cond) :- main65(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main64(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main66(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main68(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main64(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p6 != 0.  
+    main69(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main64(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p6 = 0.  
+    main67(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, 1, p7, lk7, p8, lk8, cond) :- main68(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main67(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main69(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main71(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main67(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p7 != 0.  
+    main72(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main67(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p7 = 0.  
+    main70(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, 1, p8, lk8, cond) :- main71(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main70(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main72(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main74(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main70(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p8 != 0.  
+    main75(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main70(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p8 = 0.  
+    main73(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, 1, cond) :- main74(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main73(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main75(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main77(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main73(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p1 != 0.  
+    main78(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main73(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p1 = 0.  
+    main80(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main77(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), lk1 != 1.  
+    main81(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main77(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), lk1 = 1.  
+    main123(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main80(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main79(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main81(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main76(p1, 0, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main79(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main76(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main78(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main83(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main76(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p2 != 0.  
+    main84(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main76(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p2 = 0.  
+    main86(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main83(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), lk2 != 1.  
+    main87(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main83(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), lk2 = 1.  
+    main123(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main86(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main85(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main87(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main82(p1, lk1, p2, 0, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main85(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main82(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main84(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main89(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main82(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p3 != 0.  
+    main90(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main82(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p3 = 0.  
+    main92(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main89(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), lk3 != 1.  
+    main93(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main89(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), lk3 = 1.  
+    main123(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main92(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main91(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main93(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main88(p1, lk1, p2, lk2, p3, 0, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main91(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main88(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main90(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main95(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main88(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p4 != 0.  
+    main96(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main88(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p4 = 0.  
+    main98(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main95(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), lk4 != 1.  
+    main99(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main95(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), lk4 = 1.  
+    main123(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main98(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main97(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main99(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main94(p1, lk1, p2, lk2, p3, lk3, p4, 0, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main97(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main94(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main96(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main101(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main94(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p5 != 0.  
+    main102(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main94(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p5 = 0.  
+    main104(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main101(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), lk5 != 1.  
+    main105(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main101(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), lk5 = 1.  
+    main123(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main104(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main103(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main105(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main100(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, 0, p6, lk6, p7, lk7, p8, lk8, cond) :- main103(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main100(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main102(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main107(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main100(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p6 != 0.  
+    main108(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main100(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p6 = 0.  
+    main110(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main107(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), lk6 != 1.  
+    main111(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main107(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), lk6 = 1.  
+    main123(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main110(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main109(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main111(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main106(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, 0, p7, lk7, p8, lk8, cond) :- main109(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main106(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main108(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main113(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main106(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p7 != 0.  
+    main114(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main106(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p7 = 0.  
+    main116(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main113(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), lk7 != 1.  
+    main117(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main113(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), lk7 = 1.  
+    main123(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main116(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main115(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main117(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main112(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, 0, p8, lk8, cond) :- main115(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main112(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main114(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main118(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main112(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p8 != 0.  
+    main119(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main112(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), p8 = 0.  
+    main121(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main118(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), lk8 != 1.  
+    main122(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main118(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), lk8 = 1.  
+    main123(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main121(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main120(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main122(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main35(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, 0, cond) :- main120(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main35(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main119(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main0(0) :- main36(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main125(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main123(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main127(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main125(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main126(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond, __result) :- main127(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main124(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond) :- main126(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond, __eval242).  
+    main0(0) :- main124(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond).  
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main125(p1, lk1, p2, lk2, p3, lk3, p4, lk4, p5, lk5, p6, lk6, p7, lk7, p8, lk8, cond), true & true.
+

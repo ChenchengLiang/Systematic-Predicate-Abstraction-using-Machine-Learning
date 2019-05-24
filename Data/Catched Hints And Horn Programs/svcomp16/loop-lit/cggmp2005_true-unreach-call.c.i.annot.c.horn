@@ -1,0 +1,14 @@
+    main3(i, j).                                  
+    main4(1, j) :- main3(i, j).                   
+    main5(i, 10) :- main4(i, j).                  
+    main7(i, j) :- main5(i, j), j >= i.           
+    main6(i, j) :- main5(i, j), !(j >= i).        
+    main8(i + 2, j) :- main7(i, j).               
+    main5(i, -1*1 + j) :- main8(i, j).            
+    main9(i, j) :- main6(i, j).                   
+    main0(0) :- main9(i, j).                      
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main6(i, j), true & j != 6.
+

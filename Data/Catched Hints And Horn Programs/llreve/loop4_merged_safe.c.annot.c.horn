@@ -1,0 +1,18 @@
+    main5(n, 0, 0, 0, 0).                         
+    main7(n, i1, i2, j1, j2) :- main5(n, i1, i2, j1, j2).  
+    main9(n, i1, i2, j1, j2) :- main7(n, i1, i2, j1, j2), n + n - i1 >= 1.  
+    main10(n, i1, i2, j1, j2) :- main7(n, i1, i2, j1, j2), !(n + n - i1 >= 1).  
+    main11(n, i1, i2, j1 + 1, j2) :- main9(n, i1, i2, j1, j2).  
+    main8(n, i1 + 1, i2, j1, j2) :- main11(n, i1, i2, j1, j2).  
+    main8(n, i1, i2, j1, j2) :- main10(n, i1, i2, j1, j2).  
+    main12(n, i1, i2, j1, j2) :- main8(n, i1, i2, j1, j2), n - i2 >= 1.  
+    main13(n, i1, i2, j1, j2) :- main8(n, i1, i2, j1, j2), !(n - i2 >= 1).  
+    main14(n, i1, i2, j1, j2 + 2) :- main12(n, i1, i2, j1, j2).  
+    main5(n, i1, i2 + 1, j1, j2) :- main14(n, i1, i2, j1, j2).  
+    main5(n, i1, i2, j1, j2) :- main13(n, i1, i2, j1, j2).  
+    main1 :- main6(n, i1, i2, j1, j2).            
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main6(n, i1, i2, j1, j2), true & j1 != j2.
+

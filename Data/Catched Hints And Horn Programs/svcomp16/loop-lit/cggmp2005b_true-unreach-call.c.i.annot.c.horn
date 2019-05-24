@@ -1,0 +1,21 @@
+    main3(i, j, k).                               
+    main4(0, j, k) :- main3(i, j, k).             
+    main5(i, j, 9) :- main4(i, j, k).             
+    main6(i, -1*100, k) :- main5(i, j, k).        
+    main8(i, j, k) :- main6(i, j, k), 100 >= i.   
+    main7(i, j, k) :- main6(i, j, k), !(100 >= i).  
+    main9(i + 1, j, k) :- main8(i, j, k).         
+    main11(i, j, k) :- main9(i, j, k), -1*j + 20 >= 1.  
+    main10(i, j, k) :- main9(i, j, k), !(-1*j + 20 >= 1).  
+    main9(i, i + j, k) :- main11(i, j, k).        
+    main12(i, j, 4) :- main10(i, j, k).           
+    main13(i, j, k) :- main12(i, j, k), 3 >= k.   
+    main6(i, j, k) :- main12(i, j, k), !(3 >= k).  
+    main12(i, j, k + 1) :- main13(i, j, k).       
+    main14(i, j, k) :- main7(i, j, k).            
+    main0(0) :- main14(i, j, k).                  
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main7(i, j, k), true & k != 4.
+
