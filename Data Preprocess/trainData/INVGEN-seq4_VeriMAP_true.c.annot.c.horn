@@ -1,0 +1,31 @@
+    main5(n0, n1, 0, 0).                          
+    main7(n0, n1, i0, k) :- main5(n0, n1, i0, k), n0 - i0 >= 1.  
+    main6(n0, n1, i0, k) :- main5(n0, n1, i0, k), !(n0 - i0 >= 1).  
+    main8(n0, n1, i0, k) :- main7(n0, n1, i0, k).  
+    main9(n0, n1, i0 + 1, k) :- main8(n0, n1, i0, k).  
+    main5(n0, n1, i0, k + 1) :- main9(n0, n1, i0, k).  
+    main10(n0, n1, i0, k, 0) :- main6(n0, n1, i0, k).  
+    main12(n0, n1, i0, k, i1) :- main10(n0, n1, i0, k, i1), n1 - i1 >= 1.  
+    main11(n0, n1, i0, k, i1) :- main10(n0, n1, i0, k, i1), !(n1 - i1 >= 1).  
+    main13(n0, n1, i0, k, i1) :- main12(n0, n1, i0, k, i1).  
+    main14(n0, n1, i0, k, i1 + 1) :- main13(n0, n1, i0, k, i1).  
+    main10(n0, n1, i0, k + 1, i1) :- main14(n0, n1, i0, k, i1).  
+    main15(n0, n1, i0, k, i1, 0) :- main11(n0, n1, i0, k, i1).  
+    main17(n0, n1, i0, k, i1, j1) :- main15(n0, n1, i0, k, i1, j1), n1 - j1 >= 1.  
+    main16(n0, n1, i0, k, i1, j1) :- main15(n0, n1, i0, k, i1, j1), !(n1 - j1 >= 1).  
+    main18(n0, n1, i0, k, i1, j1) :- main17(n0, n1, i0, k, i1, j1).  
+    main19(n0, n1, i0, k, i1, j1) :- main18(n0, n1, i0, k, i1, j1).  
+    main20(n0, n1, i0, k, i1, j1 + 1) :- main19(n0, n1, i0, k, i1, j1).  
+    main15(n0, n1, i0, k + -1*1, i1, j1) :- main20(n0, n1, i0, k, i1, j1).  
+    main21(n0, n1, i0, k, i1, j1, 0) :- main16(n0, n1, i0, k, i1, j1).  
+    main23(n0, n1, i0, k, i1, j1, j0) :- main21(n0, n1, i0, k, i1, j1, j0), n0 - j0 >= 1.  
+    main22(n0, n1, i0, k, i1, j1, j0) :- main21(n0, n1, i0, k, i1, j1, j0), !(n0 - j0 >= 1).  
+    main24(n0, n1, i0, k, i1, j1, j0) :- main23(n0, n1, i0, k, i1, j1, j0).  
+    main25(n0, n1, i0, k, i1, j1, j0 + 1) :- main24(n0, n1, i0, k, i1, j1, j0).  
+    main21(n0, n1, i0, k + -1*1, i1, j1, j0) :- main25(n0, n1, i0, k, i1, j1, j0).  
+    main0(0) :- main22(n0, n1, i0, k, i1, j1, j0).  
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main18(n0, n1, i0, k, i1, j1), true & !(k >= 1).
+

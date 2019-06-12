@@ -1,0 +1,18 @@
+    main6(n, c, 0, 0, 0).                         
+    main7(n, c, i, j1, x1, c) :- main6(n, c, i, j1, x1).  
+    main8(n, c, i, j1, x1, j2, 0) :- main7(n, c, i, j1, x1, j2).  
+    main9(n, c, i, j1, x1, j2, x2) :- main8(n, c, i, j1, x1, j2, x2), n - i >= 1.  
+    main1 :- main8(n, c, i, j1, x1, j2, x2), !(n - i >= 1).  
+    main10(n, c, i, 5*i + c, x1, j2, x2) :- main9(n, c, i, j1, x1, j2, x2).  
+    main11(n, c, i, j1, x1, j2, x2) :- main10(n, c, i, j1, x1, j2, x2).  
+    main12(n, c, i, j1, x1 + j1, j2, x2) :- main11(n, c, i, j1, x1, j2, x2).  
+    main13(n, c, i, j1, x1, j2, x2 + j2) :- main12(n, c, i, j1, x1, j2, x2).  
+    main14(n, c, i, j1, x1, j2, x2) :- main13(n, c, i, j1, x1, j2, x2).  
+    main15(n, c, i, j1, x1, j2 + 5, x2) :- main14(n, c, i, j1, x1, j2, x2).  
+    main8(n, c, i + 1, j1, x1, j2, x2) :- main15(n, c, i, j1, x1, j2, x2).  
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main10(n, c, i, j1, x1, j2, x2), true & j1 != j2.
+  false :- main13(n, c, i, j1, x1, j2, x2), true & x1 != x2.
+

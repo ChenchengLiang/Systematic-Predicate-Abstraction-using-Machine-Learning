@@ -1,0 +1,16 @@
+    main7(n, 0, 1, 1, 1, 0, 0).                   
+    main8(n, f1, f2, g1, g2, h1, h2) :- main7(n, f1, f2, g1, g2, h1, h2), n >= 1.  
+    main1 :- main7(n, f1, f2, g1, g2, h1, h2), !(n >= 1).  
+    main9(n, f1, f2, g1, g2, f1 + g1, h2) :- main8(n, f1, f2, g1, g2, h1, h2).  
+    main10(n, g1, f2, g1, g2, h1, h2) :- main9(n, f1, f2, g1, g2, h1, h2).  
+    main11(n, f1, f2, h1, g2, h1, h2) :- main10(n, f1, f2, g1, g2, h1, h2).  
+    main12(n + -1*1, f1, f2, g1, g2, h1, h2) :- main11(n, f1, f2, g1, g2, h1, h2).  
+    main13(n, f1, f2, g1, g2, h1, f2 + g2) :- main12(n, f1, f2, g1, g2, h1, h2).  
+    main14(n, f1, g2, g1, g2, h1, h2) :- main13(n, f1, f2, g1, g2, h1, h2).  
+    main15(n, f1, f2, g1, h2, h1, h2) :- main14(n, f1, f2, g1, g2, h1, h2).  
+    main7(n, f1, f2, g1, g2, h1, h2) :- main15(n, f1, f2, g1, g2, h1, h2).  
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main15(n, f1, f2, g1, g2, h1, h2), true & h2 != h1 + f1.
+

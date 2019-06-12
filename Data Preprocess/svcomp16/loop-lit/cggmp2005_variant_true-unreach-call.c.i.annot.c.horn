@@ -1,0 +1,18 @@
+    main3(lo, mid, hi).                           
+    main4(0, mid, hi) :- main3(lo, mid, hi).      
+    main6(lo, mid, hi) :- main4(lo, mid, hi).     
+    main5(lo, __eval40, hi) :- main6(lo, mid, hi).  
+    main8(lo, mid, hi) :- main5(lo, mid, hi), mid >= 1 & 1000000 >= mid.  
+    main9(lo, mid, 2*mid) :- main8(lo, mid, hi).  
+    main11(lo, mid, hi) :- main9(lo, mid, hi), mid >= 1.  
+    main10(lo, mid, hi) :- main9(lo, mid, hi), !(mid >= 1).  
+    main12(lo + 1, mid, hi) :- main11(lo, mid, hi).  
+    main13(lo, mid, hi + -1*1) :- main12(lo, mid, hi).  
+    main9(lo, mid + -1*1, hi) :- main13(lo, mid, hi).  
+    main14(lo, mid, hi) :- main10(lo, mid, hi).   
+    main0(0) :- main14(lo, mid, hi).              
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main10(lo, mid, hi), true & lo != hi.
+

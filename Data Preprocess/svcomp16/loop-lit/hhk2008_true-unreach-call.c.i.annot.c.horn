@@ -1,0 +1,21 @@
+    main2.                                        
+    main3 :- main2.                               
+    main5(__eval0) :- main3.                      
+    main6(a) :- main5(a).                         
+    main8(a, __eval4) :- main6(a).                
+    main9(a, b, res, cnt) :- main8(a, b).         
+    main10(a, b, res, cnt) :- main9(a, b, res, cnt), 1000000 >= a.  
+    main11(a, b, res, cnt) :- main10(a, b, res, cnt), b >= 0 & 1000000 >= b.  
+    main12(a, b, a, cnt) :- main11(a, b, res, cnt).  
+    main13(a, b, res, b) :- main12(a, b, res, cnt).  
+    main15(a, b, res, cnt) :- main13(a, b, res, cnt), cnt >= 1.  
+    main14(a, b, res, cnt) :- main13(a, b, res, cnt), !(cnt >= 1).  
+    main16(a, b, res, cnt + -1*1) :- main15(a, b, res, cnt).  
+    main13(a, b, res + 1, cnt) :- main16(a, b, res, cnt).  
+    main17(a, b, res, cnt) :- main14(a, b, res, cnt).  
+    main0(0) :- main17(a, b, res, cnt).           
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main14(a, b, res, cnt), true & res != a + b.
+

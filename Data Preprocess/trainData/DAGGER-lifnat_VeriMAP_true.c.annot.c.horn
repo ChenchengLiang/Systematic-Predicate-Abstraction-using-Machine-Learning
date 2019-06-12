@@ -1,0 +1,173 @@
+    main9(I, Sa, Ea, Ma, Sb, Eb, Mb).             
+    main11(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main9(I, Sa, Ea, Ma, Sb, Eb, Mb), !(I >= 1).  
+    main12(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main9(I, Sa, Ea, Ma, Sb, Eb, Mb), I >= 1.  
+    main0(__result) :- main11(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main10(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main12(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main13(I, 0, Ea, Ma, Sb, Eb, Mb) :- main10(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main14(I, Sa, 0, Ma, Sb, Eb, Mb) :- main13(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main15(I, Sa, Ea, 0, Sb, Eb, Mb) :- main14(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main16(I, Sa, Ea, Ma, 0, Eb, Mb) :- main15(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main17(I, Sa, Ea, Ma, Sb, 0, Mb) :- main16(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main18(I, Sa, Ea, Ma, Sb, Eb, 0) :- main17(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main21(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main18(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main24(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main21(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main22(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main24(I, Sa, Ea, Ma, Sb, Eb, Mb, i).  
+    main22(I, Sa, Ea, Ma, Sb, Eb, Mb, __result) :- main23(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main20(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main22(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval264), __eval264 != 0.  
+    main19(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main22(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval264), __eval264 = 0.  
+    main27(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main20(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main30(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main27(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main28(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main30(I, Sa, Ea, Ma, Sb, Eb, Mb, i).  
+    main28(I, Sa, Ea, Ma, Sb, Eb, Mb, __result) :- main29(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main25(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main28(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval266), __eval266 != 0.  
+    main26(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main28(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval266), __eval266 = 0.  
+    main32(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main25(I, Sa, Ea, Ma, Sb, Eb, Mb), !(Eb >= 1).  
+    main33(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main25(I, Sa, Ea, Ma, Sb, Eb, Mb), Eb >= 1.  
+    main0(__result) :- main32(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main31(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main33(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main34(I, Sa, Ea, Ma, Sb, Eb + -1*1, Mb) :- main31(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main18(I, Sa, Ea, Ma, Sb, Eb, Mb + 1) :- main34(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main37(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main26(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main40(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main37(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main38(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main40(I, Sa, Ea, Ma, Sb, Eb, Mb, i).  
+    main38(I, Sa, Ea, Ma, Sb, Eb, Mb, __result) :- main39(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main35(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main38(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval278), __eval278 != 0.  
+    main36(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main38(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval278), __eval278 = 0.  
+    main42(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main35(I, Sa, Ea, Ma, Sb, Eb, Mb), !(Ea >= 1).  
+    main43(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main35(I, Sa, Ea, Ma, Sb, Eb, Mb), Ea >= 1.  
+    main0(__result) :- main42(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main41(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main43(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main44(I, Sa, Ea + -1*1, Ma, Sb, Eb, Mb) :- main41(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main18(I, Sa, Ea, Ma + 1, Sb, Eb, Mb) :- main44(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main47(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main36(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main50(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main47(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main48(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main50(I, Sa, Ea, Ma, Sb, Eb, Mb, i).  
+    main48(I, Sa, Ea, Ma, Sb, Eb, Mb, __result) :- main49(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main45(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main48(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval290), __eval290 != 0.  
+    main46(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main48(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval290), __eval290 = 0.  
+    main52(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main45(I, Sa, Ea, Ma, Sb, Eb, Mb), !(Sa >= 1).  
+    main53(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main45(I, Sa, Ea, Ma, Sb, Eb, Mb), Sa >= 1.  
+    main0(__result) :- main52(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main51(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main53(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main54(I, Sa + -1*1, Ea, Ma, Sb, Eb, Mb) :- main51(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main55(I + Sb + Eb + Mb, Sa, Ea, Ma, Sb, Eb, Mb) :- main54(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main56(I, Sa, Ea, Ma, 0, Eb, Mb) :- main55(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main57(I, Sa, Ea, Ma, Sb, 1, Mb) :- main56(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main18(I, Sa, Ea, Ma, Sb, Eb, 0) :- main57(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main60(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main46(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main63(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main60(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main61(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main63(I, Sa, Ea, Ma, Sb, Eb, Mb, i).  
+    main61(I, Sa, Ea, Ma, Sb, Eb, Mb, __result) :- main62(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main58(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main61(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval309), __eval309 != 0.  
+    main59(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main61(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval309), __eval309 = 0.  
+    main65(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main58(I, Sa, Ea, Ma, Sb, Eb, Mb), !(Sb >= 1).  
+    main66(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main58(I, Sa, Ea, Ma, Sb, Eb, Mb), Sb >= 1.  
+    main0(__result) :- main65(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main64(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main66(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main67(I + Sb + Eb + Mb, Sa, Ea, Ma, Sb, Eb, Mb) :- main64(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main68(I, Sa, Ea, Ma, 0, Eb, Mb) :- main67(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main69(I, Sa, Ea, Ma, Sb, 1, Mb) :- main68(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main18(I, Sa, Ea, Ma, Sb, Eb, 0) :- main69(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main72(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main59(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main75(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main72(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main73(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main75(I, Sa, Ea, Ma, Sb, Eb, Mb, i).  
+    main73(I, Sa, Ea, Ma, Sb, Eb, Mb, __result) :- main74(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main70(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main73(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval325), __eval325 != 0.  
+    main71(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main73(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval325), __eval325 = 0.  
+    main77(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main70(I, Sa, Ea, Ma, Sb, Eb, Mb), !(Sb >= 1).  
+    main78(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main70(I, Sa, Ea, Ma, Sb, Eb, Mb), Sb >= 1.  
+    main0(__result) :- main77(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main76(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main78(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main79(I, Sa, Ea, Ma, Sb + -1*1, Eb, Mb) :- main76(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main80(I + Sa + Ea + Ma, Sa, Ea, Ma, Sb, Eb, Mb) :- main79(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main81(I, 0, Ea, Ma, Sb, Eb, Mb) :- main80(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main82(I, Sa, 1, Ma, Sb, Eb, Mb) :- main81(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main18(I, Sa, Ea, 0, Sb, Eb, Mb) :- main82(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main85(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main71(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main88(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main85(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main86(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main88(I, Sa, Ea, Ma, Sb, Eb, Mb, i).  
+    main86(I, Sa, Ea, Ma, Sb, Eb, Mb, __result) :- main87(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main83(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main86(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval344), __eval344 != 0.  
+    main84(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main86(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval344), __eval344 = 0.  
+    main90(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main83(I, Sa, Ea, Ma, Sb, Eb, Mb), !(Sa >= 1).  
+    main91(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main83(I, Sa, Ea, Ma, Sb, Eb, Mb), Sa >= 1.  
+    main0(__result) :- main90(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main89(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main91(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main92(I + Sa + Ea + Ma, Sa, Ea, Ma, Sb, Eb, Mb) :- main89(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main93(I, 0, Ea, Ma, Sb, Eb, Mb) :- main92(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main94(I, Sa, 1, Ma, Sb, Eb, Mb) :- main93(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main18(I, Sa, Ea, 0, Sb, Eb, Mb) :- main94(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main97(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main84(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main100(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main97(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main98(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main100(I, Sa, Ea, Ma, Sb, Eb, Mb, i).  
+    main98(I, Sa, Ea, Ma, Sb, Eb, Mb, __result) :- main99(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main95(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main98(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval360), __eval360 != 0.  
+    main96(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main98(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval360), __eval360 = 0.  
+    main102(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main95(I, Sa, Ea, Ma, Sb, Eb, Mb), !(Sa >= 1).  
+    main103(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main95(I, Sa, Ea, Ma, Sb, Eb, Mb), Sa >= 1.  
+    main0(__result) :- main102(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main101(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main103(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main104(I, Sa + -1*1, Ea, Ma, Sb, Eb, Mb) :- main101(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main105(I, Sa, Ea, Ma, Sb + Eb + Mb + 1, Eb, Mb) :- main104(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main106(I, Sa, Ea, Ma, Sb, 0, Mb) :- main105(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main18(I, Sa, Ea, Ma, Sb, Eb, 0) :- main106(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main109(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main96(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main112(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main109(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main110(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main112(I, Sa, Ea, Ma, Sb, Eb, Mb, i).  
+    main110(I, Sa, Ea, Ma, Sb, Eb, Mb, __result) :- main111(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main107(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main110(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval378), __eval378 != 0.  
+    main108(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main110(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval378), __eval378 = 0.  
+    main114(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main107(I, Sa, Ea, Ma, Sb, Eb, Mb), !(I >= 1).  
+    main115(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main107(I, Sa, Ea, Ma, Sb, Eb, Mb), I >= 1.  
+    main0(__result) :- main114(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main113(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main115(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main116(I + -1*1, Sa, Ea, Ma, Sb, Eb, Mb) :- main113(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main117(I, Sa, Ea, Ma, Sb + Eb + Mb + 1, Eb, Mb) :- main116(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main118(I, Sa, Ea, Ma, Sb, 0, Mb) :- main117(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main18(I, Sa, Ea, Ma, Sb, Eb, 0) :- main118(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main121(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main108(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main124(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main121(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main122(I, Sa, Ea, Ma, Sb, Eb, Mb, i) :- main124(I, Sa, Ea, Ma, Sb, Eb, Mb, i).  
+    main122(I, Sa, Ea, Ma, Sb, Eb, Mb, __result) :- main123(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main119(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main122(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval396), __eval396 != 0.  
+    main120(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main122(I, Sa, Ea, Ma, Sb, Eb, Mb, __eval396), __eval396 = 0.  
+    main126(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main119(I, Sa, Ea, Ma, Sb, Eb, Mb), !(I >= 1).  
+    main127(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main119(I, Sa, Ea, Ma, Sb, Eb, Mb), I >= 1.  
+    main0(__result) :- main126(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main125(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main127(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main128(I + -1*1, Sa, Ea, Ma, Sb, Eb, Mb) :- main125(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main129(I, Sa + Ea + Ma + 1, Ea, Ma, Sb, Eb, Mb) :- main128(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main130(I, Sa, 0, Ma, Sb, Eb, Mb) :- main129(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main18(I, Sa, Ea, 0, Sb, Eb, Mb) :- main130(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main132(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main120(I, Sa, Ea, Ma, Sb, Eb, Mb), !(Sb >= 1).  
+    main133(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main120(I, Sa, Ea, Ma, Sb, Eb, Mb), Sb >= 1.  
+    main0(__result) :- main132(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main131(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main133(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main134(I, Sa, Ea, Ma, Sb + -1*1, Eb, Mb) :- main131(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main135(I, Ea + Ma + 1, Ea, Ma, Sb, Eb, Mb) :- main134(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main136(I, Sa, 0, Ma, Sb, Eb, Mb) :- main135(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main18(I, Sa, Ea, 0, Sb, Eb, Mb) :- main136(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main137(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main19(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main138(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main137(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main139(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main138(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main140(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main139(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main141(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main140(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main142(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main141(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main143(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main142(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main144(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main143(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main145(I, Sa, Ea, Ma, Sb, Eb, Mb) :- main144(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main1 :- main145(I, Sa, Ea, Ma, Sb, Eb, Mb).  
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main19(I, Sa, Ea, Ma, Sb, Eb, Mb), true & !(-1*(Ea + Ma) >= -1).
+  false :- main137(I, Sa, Ea, Ma, Sb, Eb, Mb), true & !(-1*(Eb + Mb) >= -1).
+  false :- main138(I, Sa, Ea, Ma, Sb, Eb, Mb), true & !(I >= 0).
+  false :- main139(I, Sa, Ea, Ma, Sb, Eb, Mb), true & !(Sa >= 0).
+  false :- main140(I, Sa, Ea, Ma, Sb, Eb, Mb), true & !(Ma >= 0).
+  false :- main141(I, Sa, Ea, Ma, Sb, Eb, Mb), true & !(Ea >= 0).
+  false :- main142(I, Sa, Ea, Ma, Sb, Eb, Mb), true & !(Sb >= 0).
+  false :- main143(I, Sa, Ea, Ma, Sb, Eb, Mb), true & !(Mb >= 0).
+  false :- main144(I, Sa, Ea, Ma, Sb, Eb, Mb), true & !(Eb >= 0).
+  false :- main145(I, Sa, Ea, Ma, Sb, Eb, Mb), true & !(I + Sa + Ea + Ma + Sb + Eb + Mb >= 1).
+

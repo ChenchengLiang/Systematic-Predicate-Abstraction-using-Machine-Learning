@@ -1,0 +1,27 @@
+    main5(n, m, 0, 0).                            
+    main7(n, m, i, k) :- main5(n, m, i, k), n - i >= 1.  
+    main6(n, m, i, k) :- main5(n, m, i, k), !(n - i >= 1).  
+    main8(n, m, i + 1, k) :- main7(n, m, i, k).   
+    main5(n, m, i, k + 1) :- main8(n, m, i, k).   
+    main9(n, m, 0, k) :- main6(n, m, i, k).       
+    main11(n, m, i, k) :- main9(n, m, i, k), m - i >= 1.  
+    main10(n, m, i, k) :- main9(n, m, i, k), !(m - i >= 1).  
+    main12(n, m, i + 1, k) :- main11(n, m, i, k).  
+    main9(n, m, i, k + 1) :- main12(n, m, i, k).  
+    main13(n, m, 0, k) :- main10(n, m, i, k).     
+    main15(n, m, i, k) :- main13(n, m, i, k), m - i >= 1.  
+    main14(n, m, i, k) :- main13(n, m, i, k), !(m - i >= 1).  
+    main16(n, m, i + 1, k) :- main15(n, m, i, k).  
+    main13(n, m, i, k + -1*1) :- main16(n, m, i, k).  
+    main17(n, m, 0, k) :- main14(n, m, i, k).     
+    main19(n, m, i, k) :- main17(n, m, i, k), n - i >= 1.  
+    main18(n, m, i, k) :- main17(n, m, i, k), !(n - i >= 1).  
+    main20(n, m, i, k) :- main19(n, m, i, k).     
+    main21(n, m, i + 1, k) :- main20(n, m, i, k).  
+    main17(n, m, i, k + -1*1) :- main21(n, m, i, k).  
+    main0(0) :- main18(n, m, i, k).               
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main19(n, m, i, k), true & !(k >= 1).
+

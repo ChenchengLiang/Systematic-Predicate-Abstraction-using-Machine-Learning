@@ -1,0 +1,22 @@
+    main7(n, 0, 0, 0, 1).                         
+    main8(n, x1, x2, i1, i2) :- main7(n, x1, x2, i1, i2).  
+    main10(n, x1, x2, i1, i2) :- main8(n, x1, x2, i1, i2), n >= i1.  
+    main11(n, x1, x2, i1, i2) :- main8(n, x1, x2, i1, i2), !(n >= i1).  
+    main12(n, x1 + i1, x2, i1, i2) :- main10(n, x1, x2, i1, i2).  
+    main9(n, x1, x2, i1 + 1, i2) :- main12(n, x1, x2, i1, i2).  
+    main9(n, x1, x2, i1, i2) :- main11(n, x1, x2, i1, i2).  
+    main14(n, x1, x2, i1, i2) :- main9(n, x1, x2, i1, i2), n >= i2.  
+    main15(n, x1, x2, i1, i2) :- main9(n, x1, x2, i1, i2), !(n >= i2).  
+    main16(n, x1, x2 + i2, i1, i2) :- main14(n, x1, x2, i1, i2).  
+    main13(n, x1, x2, i1, i2 + 1) :- main16(n, x1, x2, i1, i2).  
+    main13(n, x1, x2, i1, i2) :- main15(n, x1, x2, i1, i2).  
+    main18(n, x1, x2, i1, i2) :- main13(n, x1, x2, i1, i2), i1 - n >= 1 & i2 - n >= 1.  
+    main19(n, x1, x2, i1, i2) :- main13(n, x1, x2, i1, i2), !(i1 - n >= 1 & i2 - n >= 1).  
+    main1 :- main18(n, x1, x2, i1, i2).           
+    main17(n, x1, x2, i1, i2) :- main19(n, x1, x2, i1, i2).  
+    main7(n, x1, x2, i1, i2) :- main17(n, x1, x2, i1, i2).  
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main17(n, x1, x2, i1, i2), true & x2 != x1 + i1.
+

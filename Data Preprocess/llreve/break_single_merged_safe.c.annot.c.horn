@@ -1,0 +1,18 @@
+    main4(x, 0).                                  
+    main6(x, i1) :- main4(x, i1), 10 >= i1.       
+    main5(x, i1) :- main4(x, i1), !(10 >= i1).    
+    main8(x, i1) :- main6(x, i1), i1 = x.         
+    main9(x, i1) :- main6(x, i1), i1 != x.        
+    main5(x, i1) :- main8(x, i1).                 
+    main7(x, i1) :- main9(x, i1).                 
+    main4(x, i1 + 1) :- main7(x, i1).             
+    main10(x, i1, 0) :- main5(x, i1).             
+    main12(x, i1, i2) :- main10(x, i1, i2), 10 >= i2 & i2 != x.  
+    main11(x, i1, i2) :- main10(x, i1, i2), !(10 >= i2 & i2 != x).  
+    main10(x, i1, i2 + 1) :- main12(x, i1, i2).   
+    main1 :- main11(x, i1, i2).                   
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main11(x, i1, i2), true & i1 != i2.
+

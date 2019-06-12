@@ -1,0 +1,138 @@
+    main11(x1, x2, x3, x4, x5, x6, x7, p, q).     
+    main12(0, x2, x3, x4, x5, x6, x7, p, q) :- main11(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main13(x1, 0, x3, x4, x5, x6, x7, p, q) :- main12(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main14(x1, x2, 0, x4, x5, x6, x7, p, q) :- main13(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main15(x1, x2, x3, 0, x5, x6, x7, p, q) :- main14(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main16(x1, x2, x3, x4, 0, x6, x7, p, q) :- main15(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main18(x1, x2, x3, x4, x5, x6, x7, p, q) :- main16(x1, x2, x3, x4, x5, x6, x7, p, q), x6 != p.  
+    main19(x1, x2, x3, x4, x5, x6, x7, p, q) :- main16(x1, x2, x3, x4, x5, x6, x7, p, q), x6 = p.  
+    main0(__result) :- main18(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main17(x1, x2, x3, x4, x5, x6, x7, p, q) :- main19(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main21(x1, x2, x3, x4, x5, x6, x7, p, q) :- main17(x1, x2, x3, x4, x5, x6, x7, p, q), x7 != q.  
+    main22(x1, x2, x3, x4, x5, x6, x7, p, q) :- main17(x1, x2, x3, x4, x5, x6, x7, p, q), x7 = q.  
+    main0(__result) :- main21(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main20(x1, x2, x3, x4, x5, x6, x7, p, q) :- main22(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main24(x1, x2, x3, x4, x5, x6, x7, p, q) :- main20(x1, x2, x3, x4, x5, x6, x7, p, q), !(p >= 1).  
+    main25(x1, x2, x3, x4, x5, x6, x7, p, q) :- main20(x1, x2, x3, x4, x5, x6, x7, p, q), p >= 1.  
+    main0(__result) :- main24(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main23(x1, x2, x3, x4, x5, x6, x7, p, q) :- main25(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main27(x1, x2, x3, x4, x5, x6, x7, p, q) :- main23(x1, x2, x3, x4, x5, x6, x7, p, q), !(q >= 1).  
+    main28(x1, x2, x3, x4, x5, x6, x7, p, q) :- main23(x1, x2, x3, x4, x5, x6, x7, p, q), q >= 1.  
+    main0(__result) :- main27(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main26(x1, x2, x3, x4, x5, x6, x7, p, q) :- main28(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main31(x1, x2, x3, x4, x5, x6, x7, p, q) :- main26(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main34(x1, x2, x3, x4, x5, x6, x7, p, q, i) :- main31(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main32(x1, x2, x3, x4, x5, x6, x7, p, q, i) :- main34(x1, x2, x3, x4, x5, x6, x7, p, q, i).  
+    main32(x1, x2, x3, x4, x5, x6, x7, p, q, __result) :- main33(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main30(x1, x2, x3, x4, x5, x6, x7, p, q) :- main32(x1, x2, x3, x4, x5, x6, x7, p, q, __eval402), __eval402 != 0.  
+    main29(x1, x2, x3, x4, x5, x6, x7, p, q) :- main32(x1, x2, x3, x4, x5, x6, x7, p, q, __eval402), __eval402 = 0.  
+    main37(x1, x2, x3, x4, x5, x6, x7, p, q) :- main30(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main40(x1, x2, x3, x4, x5, x6, x7, p, q, i) :- main37(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main38(x1, x2, x3, x4, x5, x6, x7, p, q, i) :- main40(x1, x2, x3, x4, x5, x6, x7, p, q, i).  
+    main38(x1, x2, x3, x4, x5, x6, x7, p, q, __result) :- main39(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main35(x1, x2, x3, x4, x5, x6, x7, p, q) :- main38(x1, x2, x3, x4, x5, x6, x7, p, q, __eval404), __eval404 != 0.  
+    main36(x1, x2, x3, x4, x5, x6, x7, p, q) :- main38(x1, x2, x3, x4, x5, x6, x7, p, q, __eval404), __eval404 = 0.  
+    main42(x1, x2, x3, x4, x5, x6, x7, p, q) :- main35(x1, x2, x3, x4, x5, x6, x7, p, q), !(x6 >= 1).  
+    main43(x1, x2, x3, x4, x5, x6, x7, p, q) :- main35(x1, x2, x3, x4, x5, x6, x7, p, q), x6 >= 1.  
+    main0(__result) :- main42(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main41(x1, x2, x3, x4, x5, x6, x7, p, q) :- main43(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main44(x1 + 1, x2, x3, x4, x5, x6, x7, p, q) :- main41(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main26(x1, x2, x3, x4, x5, x6 + -1*1, x7, p, q) :- main44(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main47(x1, x2, x3, x4, x5, x6, x7, p, q) :- main36(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main50(x1, x2, x3, x4, x5, x6, x7, p, q, i) :- main47(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main48(x1, x2, x3, x4, x5, x6, x7, p, q, i) :- main50(x1, x2, x3, x4, x5, x6, x7, p, q, i).  
+    main48(x1, x2, x3, x4, x5, x6, x7, p, q, __result) :- main49(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main45(x1, x2, x3, x4, x5, x6, x7, p, q) :- main48(x1, x2, x3, x4, x5, x6, x7, p, q, __eval416), __eval416 != 0.  
+    main46(x1, x2, x3, x4, x5, x6, x7, p, q) :- main48(x1, x2, x3, x4, x5, x6, x7, p, q, __eval416), __eval416 = 0.  
+    main52(x1, x2, x3, x4, x5, x6, x7, p, q) :- main45(x1, x2, x3, x4, x5, x6, x7, p, q), !(x1 >= 1).  
+    main53(x1, x2, x3, x4, x5, x6, x7, p, q) :- main45(x1, x2, x3, x4, x5, x6, x7, p, q), x1 >= 1.  
+    main0(__result) :- main52(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main51(x1, x2, x3, x4, x5, x6, x7, p, q) :- main53(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main55(x1, x2, x3, x4, x5, x6, x7, p, q) :- main51(x1, x2, x3, x4, x5, x6, x7, p, q), !(x7 >= 1).  
+    main56(x1, x2, x3, x4, x5, x6, x7, p, q) :- main51(x1, x2, x3, x4, x5, x6, x7, p, q), x7 >= 1.  
+    main0(__result) :- main55(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main54(x1, x2, x3, x4, x5, x6, x7, p, q) :- main56(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main57(x1 + -1*1, x2, x3, x4, x5, x6, x7, p, q) :- main54(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main58(x1, x2 + 1, x3, x4, x5, x6, x7, p, q) :- main57(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main26(x1, x2, x3, x4, x5, x6, x7 + -1*1, p, q) :- main58(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main61(x1, x2, x3, x4, x5, x6, x7, p, q) :- main46(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main64(x1, x2, x3, x4, x5, x6, x7, p, q, i) :- main61(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main62(x1, x2, x3, x4, x5, x6, x7, p, q, i) :- main64(x1, x2, x3, x4, x5, x6, x7, p, q, i).  
+    main62(x1, x2, x3, x4, x5, x6, x7, p, q, __result) :- main63(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main59(x1, x2, x3, x4, x5, x6, x7, p, q) :- main62(x1, x2, x3, x4, x5, x6, x7, p, q, __eval435), __eval435 != 0.  
+    main60(x1, x2, x3, x4, x5, x6, x7, p, q) :- main62(x1, x2, x3, x4, x5, x6, x7, p, q, __eval435), __eval435 = 0.  
+    main66(x1, x2, x3, x4, x5, x6, x7, p, q) :- main59(x1, x2, x3, x4, x5, x6, x7, p, q), !(x2 >= 1).  
+    main67(x1, x2, x3, x4, x5, x6, x7, p, q) :- main59(x1, x2, x3, x4, x5, x6, x7, p, q), x2 >= 1.  
+    main0(__result) :- main66(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main65(x1, x2, x3, x4, x5, x6, x7, p, q) :- main67(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main68(x1, x2 + -1*1, x3, x4, x5, x6, x7, p, q) :- main65(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main69(x1, x2, x3 + 1, x4, x5, x6, x7, p, q) :- main68(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main26(x1, x2, x3, x4, x5, x6 + 1, x7, p, q) :- main69(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main72(x1, x2, x3, x4, x5, x6, x7, p, q) :- main60(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main75(x1, x2, x3, x4, x5, x6, x7, p, q, i) :- main72(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main73(x1, x2, x3, x4, x5, x6, x7, p, q, i) :- main75(x1, x2, x3, x4, x5, x6, x7, p, q, i).  
+    main73(x1, x2, x3, x4, x5, x6, x7, p, q, __result) :- main74(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main70(x1, x2, x3, x4, x5, x6, x7, p, q) :- main73(x1, x2, x3, x4, x5, x6, x7, p, q, __eval450), __eval450 != 0.  
+    main71(x1, x2, x3, x4, x5, x6, x7, p, q) :- main73(x1, x2, x3, x4, x5, x6, x7, p, q, __eval450), __eval450 = 0.  
+    main77(x1, x2, x3, x4, x5, x6, x7, p, q) :- main70(x1, x2, x3, x4, x5, x6, x7, p, q), !(x3 >= 1).  
+    main78(x1, x2, x3, x4, x5, x6, x7, p, q) :- main70(x1, x2, x3, x4, x5, x6, x7, p, q), x3 >= 1.  
+    main0(__result) :- main77(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main76(x1, x2, x3, x4, x5, x6, x7, p, q) :- main78(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main80(x1, x2, x3, x4, x5, x6, x7, p, q) :- main76(x1, x2, x3, x4, x5, x6, x7, p, q), !(x6 >= 1).  
+    main81(x1, x2, x3, x4, x5, x6, x7, p, q) :- main76(x1, x2, x3, x4, x5, x6, x7, p, q), x6 >= 1.  
+    main0(__result) :- main80(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main79(x1, x2, x3, x4, x5, x6, x7, p, q) :- main81(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main82(x1, x2, x3 + -1*1, x4, x5, x6, x7, p, q) :- main79(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main83(x1, x2, x3, x4 + 1, x5, x6, x7, p, q) :- main82(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main26(x1, x2, x3, x4, x5, x6 + -1*1, x7, p, q) :- main83(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main86(x1, x2, x3, x4, x5, x6, x7, p, q) :- main71(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main89(x1, x2, x3, x4, x5, x6, x7, p, q, i) :- main86(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main87(x1, x2, x3, x4, x5, x6, x7, p, q, i) :- main89(x1, x2, x3, x4, x5, x6, x7, p, q, i).  
+    main87(x1, x2, x3, x4, x5, x6, x7, p, q, __result) :- main88(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main84(x1, x2, x3, x4, x5, x6, x7, p, q) :- main87(x1, x2, x3, x4, x5, x6, x7, p, q, __eval469), __eval469 != 0.  
+    main85(x1, x2, x3, x4, x5, x6, x7, p, q) :- main87(x1, x2, x3, x4, x5, x6, x7, p, q, __eval469), __eval469 = 0.  
+    main91(x1, x2, x3, x4, x5, x6, x7, p, q) :- main84(x1, x2, x3, x4, x5, x6, x7, p, q), !(x4 >= 1).  
+    main92(x1, x2, x3, x4, x5, x6, x7, p, q) :- main84(x1, x2, x3, x4, x5, x6, x7, p, q), x4 >= 1.  
+    main0(__result) :- main91(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main90(x1, x2, x3, x4, x5, x6, x7, p, q) :- main92(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main93(x1, x2, x3, x4 + -1*1, x5, x6, x7, p, q) :- main90(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main94(x1, x2, x3, x4, x5 + 1, x6, x7, p, q) :- main93(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main26(x1, x2, x3, x4, x5, x6, x7 + 1, p, q) :- main94(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main96(x1, x2, x3, x4, x5, x6, x7, p, q) :- main85(x1, x2, x3, x4, x5, x6, x7, p, q), !(x5 >= 1).  
+    main97(x1, x2, x3, x4, x5, x6, x7, p, q) :- main85(x1, x2, x3, x4, x5, x6, x7, p, q), x5 >= 1.  
+    main0(__result) :- main96(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main95(x1, x2, x3, x4, x5, x6, x7, p, q) :- main97(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main98(x1, x2, x3, x4, x5 + -1*1, x6, x7, p, q) :- main95(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main26(x1, x2, x3, x4, x5, x6 + 1, x7, p, q) :- main98(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main99(x1, x2, x3, x4, x5, x6, x7, p, q) :- main29(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main100(x1, x2, x3, x4, x5, x6, x7, p, q) :- main99(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main101(x1, x2, x3, x4, x5, x6, x7, p, q) :- main100(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main102(x1, x2, x3, x4, x5, x6, x7, p, q) :- main101(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main103(x1, x2, x3, x4, x5, x6, x7, p, q) :- main102(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main104(x1, x2, x3, x4, x5, x6, x7, p, q) :- main103(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main105(x1, x2, x3, x4, x5, x6, x7, p, q) :- main104(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main106(x1, x2, x3, x4, x5, x6, x7, p, q) :- main105(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main107(x1, x2, x3, x4, x5, x6, x7, p, q) :- main106(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main108(x1, x2, x3, x4, x5, x6, x7, p, q) :- main107(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main109(x1, x2, x3, x4, x5, x6, x7, p, q) :- main108(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main110(x1, x2, x3, x4, x5, x6, x7, p, q) :- main109(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main111(x1, x2, x3, x4, x5, x6, x7, p, q) :- main110(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main1 :- main111(x1, x2, x3, x4, x5, x6, x7, p, q).  
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main29(x1, x2, x3, x4, x5, x6, x7, p, q), true & x2 + x3 + x4 + x7 != q.
+  false :- main99(x1, x2, x3, x4, x5, x6, x7, p, q), true & !(x2 + x3 + x4 + x7 >= q).
+  false :- main100(x1, x2, x3, x4, x5, x6, x7, p, q), true & !(x1 + x2 + x4 + x5 + x6 >= p).
+  false :- main101(x1, x2, x3, x4, x5, x6, x7, p, q), true & !(p + -1*(x1 + x2 + x4 + x5 + x6) >= 0).
+  false :- main102(x1, x2, x3, x4, x5, x6, x7, p, q), true & !(x7 >= 0).
+  false :- main103(x1, x2, x3, x4, x5, x6, x7, p, q), true & !(x6 >= 0).
+  false :- main104(x1, x2, x3, x4, x5, x6, x7, p, q), true & !(x5 >= 0).
+  false :- main105(x1, x2, x3, x4, x5, x6, x7, p, q), true & !(x4 >= 0).
+  false :- main106(x1, x2, x3, x4, x5, x6, x7, p, q), true & !(x3 >= 0).
+  false :- main107(x1, x2, x3, x4, x5, x6, x7, p, q), true & !(x2 >= 0).
+  false :- main108(x1, x2, x3, x4, x5, x6, x7, p, q), true & !(x1 >= 0).
+  false :- main109(x1, x2, x3, x4, x5, x6, x7, p, q), true & !(x2 + x3 + x4 + x7 >= 1).
+  false :- main110(x1, x2, x3, x4, x5, x6, x7, p, q), true & !(x1 + x2 + x4 + x5 + x6 >= 1).
+  false :- main111(x1, x2, x3, x4, x5, x6, x7, p, q), true & !(x1 + x2 + x4 + x6 + x7 >= 1).
+

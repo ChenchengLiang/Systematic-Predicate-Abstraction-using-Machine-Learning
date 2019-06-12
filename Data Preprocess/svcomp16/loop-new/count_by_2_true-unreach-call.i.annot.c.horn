@@ -1,0 +1,13 @@
+    main3(i).                                     
+    main5(0) :- main3(i).                         
+    main6(i) :- main5(i), -1*i + 1000000 >= 1.    
+    main4(i) :- main5(i), !(-1*i + 1000000 >= 1).  
+    main7(i) :- main6(i).                         
+    main5(i + 2) :- main7(i).                     
+    main8(i) :- main4(i).                         
+    main0(0) :- main8(i).                         
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main4(i), true & i != 1000000.
+

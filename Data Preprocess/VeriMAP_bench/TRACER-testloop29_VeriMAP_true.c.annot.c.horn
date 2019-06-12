@@ -1,0 +1,14 @@
+    main3(0).                                     
+    main5(x) :- main3(x), -1*x + 100 >= 1.        
+    main4(x) :- main3(x), !(-1*x + 100 >= 1).     
+    main6(x + 1) :- main5(x).                     
+    main7(x) :- main6(x), x = 50.                 
+    main8(x) :- main6(x), x != 50.                
+    main4(x) :- main7(x).                         
+    main3(x) :- main8(x).                         
+    main1 :- main4(x).                            
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main4(x), true & x != 50.
+

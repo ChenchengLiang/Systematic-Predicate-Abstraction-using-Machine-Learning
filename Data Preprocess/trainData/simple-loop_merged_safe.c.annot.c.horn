@@ -1,0 +1,23 @@
+    main3(z).                                     
+    main4(z, z) :- main3(z).                      
+    main7(z, z, 0) :- main4(z, z).                
+    main9(z, z, i) :- main7(z, z, i), 10 >= i.    
+    main8(z, z, i) :- main7(z, z, i), !(10 >= i).  
+    main7(z, z, i + 1) :- main9(z, z, i).         
+    main5(z, i) :- main8(z, z, i).                
+    main5(z, __result) :- main6(z, z).            
+    main10(z, __eval16) :- main5(z, __eval16).    
+    main11(z, res1, z) :- main10(z, res1).        
+    main14(z, res1, z, 1) :- main11(z, res1, z).  
+    main16(z, res1, z, i) :- main14(z, res1, z, i), 10 >= i.  
+    main15(z, res1, z, i) :- main14(z, res1, z, i), !(10 >= i).  
+    main14(z, res1, z, i + 1) :- main16(z, res1, z, i).  
+    main12(z, res1, i) :- main15(z, res1, z, i).  
+    main12(z, res1, __result) :- main13(z, res1, z).  
+    main17(z, res1, __eval30) :- main12(z, res1, __eval30).  
+    main1 :- main17(z, res1, res2).               
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main17(z, res1, res2), true & res1 != res2.
+

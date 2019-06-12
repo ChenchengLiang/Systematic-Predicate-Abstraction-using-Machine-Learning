@@ -1,0 +1,31 @@
+    main6(0, 0, 0, 0).                            
+    main9(x, y, z, k) :- main6(x, y, z, k).       
+    main8(x, y, z, k) :- main9(x, y, z, k), __eval34 != 0.  
+    main7(x, y, z, k) :- main9(x, y, z, k), __eval34 = 0.  
+    main12(x, y, z, k) :- main8(x, y, z, k), (\eps int v0; (-1*v0 + 3 >= 1 & -1*-1*v0 + 3 >= 1 & (!(v0 >= 1) | k >= 1) & (!(-1 >= v0) | -1 >= k) & \exists int v1; k = 3*v1 + v0)) = 0.  
+    main13(x, y, z, k) :- main8(x, y, z, k), \eps int v0; (-1*v0 + 3 >= 1 & -1*-1*v0 + 3 >= 1 & (!(v0 >= 1) | k >= 1) & (!(-1 >= v0) | -1 >= k) & \exists int v1; k = 3*v1 + v0) != 0.  
+    main11(x + 1, y, z, k) :- main12(x, y, z, k).  
+    main11(x, y, z, k) :- main13(x, y, z, k).     
+    main14(x, y + 1, z, k) :- main11(x, y, z, k).  
+    main15(x, y, z + 1, k) :- main14(x, y, z, k).  
+    main6(x, y, z, x + y + z) :- main15(x, y, z, k).  
+    main17(x, y, z, k) :- main7(x, y, z, k), x != y.  
+    main18(x, y, z, k) :- main7(x, y, z, k), x = y.  
+    main19(x, y, z, k) :- main17(x, y, z, k).     
+    main21(x, y, z, k) :- main19(x, y, z, k).     
+    main20(x, y, z, k, __result) :- main21(x, y, z, k).  
+    main16(x, y, z, k) :- main20(x, y, z, k, __eval55).  
+    main16(x, y, z, k) :- main18(x, y, z, k).     
+    main22(x, y, z, k) :- main16(x, y, z, k), y != z.  
+    main23(x, y, z, k) :- main16(x, y, z, k), y = z.  
+    main24(x, y, z, k) :- main22(x, y, z, k).     
+    main26(x, y, z, k) :- main24(x, y, z, k).     
+    main25(x, y, z, k, __result) :- main26(x, y, z, k).  
+    main1 :- main25(x, y, z, k, __eval63).        
+    main1 :- main23(x, y, z, k).                  
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main19(x, y, z, k), true & true.
+  false :- main24(x, y, z, k), true & true.
+

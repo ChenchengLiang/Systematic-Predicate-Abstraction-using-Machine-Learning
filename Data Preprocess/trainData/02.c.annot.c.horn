@@ -1,0 +1,27 @@
+    main4(1, 0).                                  
+    main5(i, j, i - j) :- main4(i, j).            
+    main6(i, j, z, 0) :- main5(i, j, z).          
+    main7(i, j, z, x, 0) :- main6(i, j, z, x).    
+    main8(i, j, z, x, y, 0) :- main7(i, j, z, x, y).  
+    main11(i, j, z, x, y, w) :- main8(i, j, z, x, y, w).  
+    main10(i, j, z, x, y, w) :- main11(i, j, z, x, y, w), __eval75 != 0.  
+    main9(i, j, z, x, y, w) :- main11(i, j, z, x, y, w), __eval75 = 0.  
+    main13(i, j, z + x + y + w, x, y, w) :- main10(i, j, z, x, y, w).  
+    main14(i, j, z, x, y + 1, w) :- main13(i, j, z, x, y, w).  
+    main16(i, j, z, x, y, w) :- main14(i, j, z, x, y, w), (\eps int v0; (-1*v0 + 2 >= 1 & -1*-1*v0 + 2 >= 1 & (!(v0 >= 1) | z >= 1) & (!(-1 >= v0) | -1 >= z) & \exists int v1; z = 2*v1 + v0)) = 1.  
+    main17(i, j, z, x, y, w) :- main14(i, j, z, x, y, w), \eps int v0; (-1*v0 + 2 >= 1 & -1*-1*v0 + 2 >= 1 & (!(v0 >= 1) | z >= 1) & (!(-1 >= v0) | -1 >= z) & \exists int v1; z = 2*v1 + v0) != 1.  
+    main15(i, j, z, x + 1, y, w) :- main16(i, j, z, x, y, w).  
+    main15(i, j, z, x, y, w) :- main17(i, j, z, x, y, w).  
+    main8(i, j, z, x, y, w + 2) :- main15(i, j, z, x, y, w).  
+    main18(i, j, z, x, y, w) :- main9(i, j, z, x, y, w), x != y.  
+    main19(i, j, z, x, y, w) :- main9(i, j, z, x, y, w), x = y.  
+    main20(i, j, z, x, y, w) :- main18(i, j, z, x, y, w).  
+    main22(i, j, z, x, y, w) :- main20(i, j, z, x, y, w).  
+    main21(i, j, z, x, y, w, __result) :- main22(i, j, z, x, y, w).  
+    main1 :- main21(i, j, z, x, y, w, __eval100).  
+    main1 :- main19(i, j, z, x, y, w).            
+    main0(__result) :- main1.                     
+
+Assertions:
+  false :- main20(i, j, z, x, y, w), true & true.
+
