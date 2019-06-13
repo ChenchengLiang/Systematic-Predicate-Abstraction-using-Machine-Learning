@@ -7,8 +7,10 @@ import keras as k
 import os
 from keras.preprocessing.text import text_to_word_sequence,Tokenizer,hashing_trick,one_hot
 from keras.preprocessing.sequence import pad_sequences
-from keras.models import Model
+from keras.models import Model,load_model
 import glob
+import random
+import h5py
 import subprocess
 from os import popen
 import time
@@ -18,7 +20,7 @@ from collections import Counter
 from keras.layers import Conv1D,Concatenate,Dense,Input,concatenate,Embedding,Add,Flatten, Activation, Reshape
 from sklearn.model_selection import train_test_split
 
-import random
+from Miscellaneous import checkSplitData
 
 from extractNegativeTrainData import getRedundantHints
 from plot import plotHistory
@@ -322,7 +324,7 @@ def trainModel(encodedPrograms,encodedHints):
 
     # the first branch operates on the first input
     #x = Dense(8, activation="relu")(inputA)
-    x = Conv1D(filters=10,kernel_size=5, activation="relu")(inputA)
+    x = Conv1D(filters=10,kernel_size=10, activation="relu")(inputA)
     x = Flatten()(x)
     x = Dense(4, activation="relu")(x)
     x = Model(inputs=inputA, outputs=x)
@@ -375,6 +377,8 @@ def train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedH
                         #callbacks=callbacks,
                         validation_data=([encodedPrograms_test, encodedHints_test], y_test),
                         verbose=1)
+
+    model.save('models/my_model.h5')
     return history,model
 
 def predict(model,train_X,verify_X,y_test,X_test):
@@ -448,20 +452,6 @@ def printOnePredictedTextInStringForm(recoverdX,index):
 
 
 
-def checkSplitData(X_train, X_test, y_train, y_test):
-    print("------train-----")
-    print("X_train",len(X_train))
-    print("y_train", len(y_train))
-    for i,j in zip(X_train,y_train):
-        print(i[1])
-        print(j)
-    print("-----test-----")
-    print("X_train", len(X_test))
-    print("y_train", len(y_test))
-    for i,j in zip(X_test,y_test):
-        print(i[1])
-        print(j)
-
 
 
 def main():
@@ -475,7 +465,7 @@ def main():
 
     #transformOneFiletoFeatures(path)
     train_X,train_Y=readHornClausesAndHints(path,'train')
-    test_X, test_Y = readHornClausesAndHints(curpath + '/' + 'testData' + '/','test')
+
     #train_X=train_X[0:40]   #cut training size for debug
     #train_Y = train_Y[0:40] #cut training size for debug
     train_X, verify_X, train_Y, verify_Y = train_test_split(train_X, train_Y, test_size=0.2, random_state=42)
@@ -495,10 +485,11 @@ def main():
 
 
     history,model=train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,train_Y, verify_Y,batch_size,epochs)
+    #model=load_model('models/my_model.h5')
 
 
     #plotHistory(history)
-
+    test_X, test_Y = readHornClausesAndHints(curpath + '/' + 'testData' + '/', 'test')
     predict(model,train_X,verify_X, test_Y,test_X)
 
 
