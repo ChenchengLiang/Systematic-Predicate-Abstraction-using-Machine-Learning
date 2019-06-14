@@ -157,18 +157,22 @@ def verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOpt
 
 
     #try abstract:off
+    abstractOffTimeOut=60
     commandManual= "/home/lcc/Downloads/eldarica-master-unmodified/./eld" + " -abstract:off " + log
     run = commandManual + filePath + benchmark + '/' + fileName
     # flag_manual=run_with_timeout(run,60) #timeout 60 seconds
     # print("flag_manual",flag_manual)
     flag_off=1
     signal.signal(signal.SIGALRM, timeout_handler)
-    signal.alarm(60)
+    signal.alarm(abstractOffTimeOut)
 
     try:
         print("Command:",run)
+        start = time.time()
         p = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         p.communicate()
+        end = time.time()
+        print('Time consume:',end - start)
         p.kill()
     except Exception as ex:
         print("Cannot be solved within 60 seconds (abstract:off)")
@@ -176,7 +180,7 @@ def verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOpt
         flag_off=0
     finally:
         signal.alarm(0)
-
+    abstractOffTimeConsumed=end - start
 
     #try abstract:manual
     commandManual= "/home/lcc/Downloads/eldarica-master-unmodified/./eld" + " -abstract:manual " + log
@@ -189,8 +193,11 @@ def verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOpt
 
     try:
         print("Command:",run)
+        start = time.time()
         p = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         p.communicate()
+        end = time.time()
+        print('Time consume:', end - start)
         flag_manual=1
         p.kill()
     except Exception as ex:
@@ -198,16 +205,16 @@ def verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOpt
         p.kill()
     finally:
         signal.alarm(0)
-
+    abstractManualTimeConsumed = end - start
 
 
     #flag_manual=1
     #flag_off=0
     # run select hints
-    if (flag_off != 1 and flag_manual == 1):
-        print("Abstract:off timeout and abstract:manual not timeout. Try to find optimized hints:")
+    if (abstractManualTimeConsumed<abstractOffTimeConsumed):
+        print("Abstract:off timeout and abstract:manual not timeout or abstractManualTimeConsumed<abstractOffTimeConsumed. \n Try to find optimized hints:")
         command = "/home/lcc/Desktop/eldarica-master/./eld -" + abstractionOption + " -absTimeout:" + str(
-            absTimeout) + log
+            abstractManualTimeConsumed+1) + log
         # print(filePath)
         # print(abstractionOption, " Timeout",Timeout)
 
@@ -267,8 +274,8 @@ def main():
     #benchmarkList.append('svcomp16/loop-new')
     #benchmarkList.append('svcomp16/loops')
     #benchmarkList.append('svcomp16/ntdrivers-simplified')
-    benchmarkList.append('svcomp16/seq-mthreaded')
-    #     benchmarkList.append('svcomp16/ssh-simplified')
+    #benchmarkList.append('svcomp16/seq-mthreaded')
+    benchmarkList.append('svcomp16/ssh-simplified')
     #benchmarkList.append('svcomp16/systemc')
     #benchmarkList.append('VeriMAP_bench')
     #     benchmarkList.append('dillig')

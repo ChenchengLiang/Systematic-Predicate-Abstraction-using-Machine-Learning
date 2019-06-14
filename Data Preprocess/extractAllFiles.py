@@ -11,7 +11,7 @@ def deleteEmptyHintsFile(path, b):
         content=f.read()
         if not content:
             fileName=file[:file.find('.hints')]
-            print("delete",fileName)
+            print("delete",fileName,'.hints/horn.negativeHInts/redundantHints')
             os.remove(fileName+'.hints')
             os.remove(fileName + '.horn')
             os.remove(fileName + '.negativeHints')
