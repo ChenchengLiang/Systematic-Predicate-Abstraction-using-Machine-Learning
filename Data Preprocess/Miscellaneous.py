@@ -1,6 +1,8 @@
 import nltk
+nltk.download('punkt')
 import gensim
 import numpy as np
+import pickle
 def checkSplitData(X_train, X_test, y_train, y_test):
     print("------train-----")
     print("X_train",len(X_train))
@@ -30,15 +32,18 @@ def data2list(X_train):
     return programs_train,hints_train
 
 def transform2TaggedDocument(programs):
-
+    max=0
+    average=0
     programs_trainList=list()
     for program in programs:
         programs_trainList.append(nltk.word_tokenize(program))
     taggeddocument=list()
     for i in range(len(programs_trainList)):
         taggeddocument.append(gensim.models.doc2vec.TaggedDocument(programs_trainList[i],[i]))
-
-    return taggeddocument,programs_trainList
+        average=average+len(taggeddocument[-1][0])
+        if(max<len(taggeddocument[-1][0])):
+            max=len(taggeddocument[-1][0])
+    return taggeddocument,max,int(average/len(taggeddocument))
 
 def nltkTokenize(programsOrHints):
 
@@ -90,25 +95,37 @@ def printOnePredictedTextInStringForm(recoverdX,index):
             print(''.join(str(h)+str('\n') for h in hintsDictionary[head]))
 
 def doc2vecModelInferNewData(test_X,programDoc2VecModel,hintsDoc2VecModel):
-    encodedPrograms_test=list()
-    encodedHints_test=list()
+    encodedPrograms=list()
+    encodedHints=list()
     #separate data to programs and hints
-    programs_test, hints_test = data2list(test_X)
+    programs, hints = data2list(test_X)
+    uniquePrograms=list(set(programs))
+
+
+
     #tokenize programs and hints
-    programs_testList=nltkTokenize(programs_test)
-    hints_testList=nltkTokenize(hints_test)
+    programsList=nltkTokenize(uniquePrograms)
+    hintsList=nltkTokenize(hints)
+
+    #create a directory to store infered programs
+    programDirectory=dict()
+    for i,program in enumerate(uniquePrograms,start=0):
+        programDirectory[program]=programDoc2VecModel.infer_vector(programsList[i])
+        #print('infer count',i)
+
+    print(len(list(programDirectory.keys())),'unique programs')
 
     #infer new text to fixed vector size
-    for program in programs_testList:
-        encodedPrograms_test.append(programDoc2VecModel.infer_vector(program))
-    for hint in hints_testList:
-        encodedHints_test.append(hintsDoc2VecModel.infer_vector(hint))
+    for program in programs:
+        encodedPrograms.append(programDirectory[program])
+    for hint in hintsList:
+        encodedHints.append(hintsDoc2VecModel.infer_vector(hint))
 
     # expand dimention to fit ConviD
-    encodedPrograms_test = np.expand_dims(encodedPrograms_test, axis=2)
-    encodedHints_test = np.expand_dims(encodedHints_test, axis=2)
+    encodedPrograms = np.expand_dims(encodedPrograms, axis=2)
+    encodedHints = np.expand_dims(encodedHints, axis=2)
 
-    return encodedPrograms_test,encodedHints_test
+    return encodedPrograms,encodedHints
 
 def testAccuracy(predictedY,trueY):
     counter=0
@@ -119,6 +136,18 @@ def testAccuracy(predictedY,trueY):
     print("test accuracy:", acc)
     return acc
 
+def pickleWrite(content,name):
+    file='pickleData/'+name+'.txt'
+    print('pickle write to '+file)
+    with open(file,"wb") as fp :
+        pickle.dump(content,fp)
+
+def pickleRead(name):
+    file='pickleData/' + name + '.txt'
+    print('pickle read '+file)
+    with open(file,"rb") as fp :
+        content=pickle.load(fp)
+    return content
 
 
 

@@ -19,13 +19,17 @@ from os import popen
 import time
 from subprocess import Popen, PIPE
 from collections import Counter
+import pickle
 
 from keras.layers import Conv1D,Concatenate,Dense,Input,concatenate,Embedding,Add,Flatten, Activation, Reshape
 from sklearn.model_selection import train_test_split
 
-from Miscellaneous import checkSplitData,data2list,transform2TaggedDocument,nltkTokenize,recoverPredictedText,printOnePredictedTextInStringForm,doc2vecModelInferNewData,testAccuracy
+from Miscellaneous import checkSplitData,data2list,transform2TaggedDocument,\
+    nltkTokenize,recoverPredictedText,printOnePredictedTextInStringForm,\
+    doc2vecModelInferNewData,testAccuracy,pickleWrite,pickleRead
 from extractNegativeTrainData import getRedundantHints
 from plot import plotHistory
+#from trainDoc2VecModel import trainDoc2VectModel
 
 def read_program():
     vocab = list()
@@ -82,7 +86,7 @@ def constructTrainingData(hornText,hintsText):
         #print(hintsList)
     return [hornText, hintsList]
 
-def readHornClausesAndHints(path,dataset):
+def readHornClausesAndHints(path,dataset,discardNegativeData):
     hornVocab = Counter()
     hintVocab = Counter()
     RedundantHintVocab = Counter()
@@ -160,7 +164,7 @@ def readHornClausesAndHints(path,dataset):
 
     print("-----------------")
 
-    if(dataset=='train'):
+    if(dataset=='train' and discardNegativeData==True):
         #cut nagative data size for unbalanced data
         discardNegativeData=len(train_X_negative)-len(train_X_positive)
         print("Discard",discardNegativeData,"row of negative data from",len(train_X_negative))
@@ -218,34 +222,6 @@ def transformOneDatatoFeatures_bagOfWord(path):
     vocab.update(wordSequence)
     print(vocab)
 
-def getWordSequence():
-    print()
-
-
-
-def trainDoc2VectModel(X_train):
-    #create Doc2Vec model
-    #parameters window=2
-    programDoc2VecModel=gensim.models.doc2vec.Doc2Vec(
-        vector_size=1000, min_count=1,window=5, epochs=10)
-    hintsDoc2VecModel = gensim.models.doc2vec.Doc2Vec(
-        vector_size=100, min_count=1, window=5, epochs=10)
-
-    programs_train, hints_train = data2list(X_train)
-
-    #transform to TaggedDocument
-    programs_trainTaggedDocument,programs_trainList=transform2TaggedDocument(programs_train)
-    hints_trainTaggedDocument,hints_trainList = transform2TaggedDocument(hints_train)
-    #build vovabulary
-    programDoc2VecModel.build_vocab(programs_trainTaggedDocument)
-    hintsDoc2VecModel.build_vocab(hints_trainTaggedDocument)
-    #train Doc2Vec model
-    programDoc2VecModel.train(programs_trainTaggedDocument,total_examples=programDoc2VecModel.corpus_count,epochs=programDoc2VecModel.epochs)
-    hintsDoc2VecModel.train(hints_trainTaggedDocument,total_examples=hintsDoc2VecModel.corpus_count,epochs=hintsDoc2VecModel.epochs)
-    #save trained doc2vec models
-    programDoc2VecModel.save('models/programDoc2VecModel')
-    hintsDoc2VecModel.save('models/hintsDoc2VecModel')
-    return programDoc2VecModel,hintsDoc2VecModel
 
 def transformDatatoFeatures_doc2vec(X_train,X_test,programDoc2VecModel,hintsDoc2VecModel):
     #create Doc2Vec model
@@ -256,6 +232,12 @@ def transformDatatoFeatures_doc2vec(X_train,X_test,programDoc2VecModel,hintsDoc2
     encodedPrograms_train,encodedHints_train=doc2vecModelInferNewData(X_train, programDoc2VecModel, hintsDoc2VecModel)
     encodedPrograms_test, encodedHints_test = doc2vecModelInferNewData(X_test, programDoc2VecModel,hintsDoc2VecModel)
     print("Doc2Vec end")
+    print('write infered train and test data to files')
+    pickleWrite(content=encodedPrograms_train,name='encodedPrograms_train')
+    pickleWrite(content=encodedHints_train, name='encodedHints_train')
+    pickleWrite(content=encodedPrograms_test, name='encodedPrograms_test')
+    pickleWrite(content=encodedHints_test, name='encodedHints_test')
+
     return encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test
 
 def transformDatatoFeatures_tokennizer(X_train,X_test):
@@ -484,39 +466,50 @@ def main():
     print(path)
 
     #transformOneFiletoFeatures(path)
-    train_X,train_Y=readHornClausesAndHints(path,'train')
+    #train_X,train_Y=readHornClausesAndHints(path,dataset='train',discardNegativeData=False)
     #train_X=train_X[0:40]   #cut training size for debug
     #train_Y = train_Y[0:40] #cut training size for debug
 
-    #train and save Doc2Vec models
-    #programDoc2VecModel,hintsDoc2VecModel=trainDoc2VectModel(train_X)
+    # # train and save Doc2Vec models
+    # programDoc2VecModel, hintsDoc2VecModel = trainDoc2VectModel(train_X)
+
 
     #load Doc2Vec models
     programDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load('models/programDoc2VecModel')
     hintsDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load('models/hintsDoc2VecModel')
 
     #split data to training and verifiying sets
-    train_X, verify_X, train_Y, verify_Y = train_test_split(train_X, train_Y, test_size=0.2, random_state=42)
+    #train_X, verify_X, train_Y, verify_Y = train_test_split(train_X, train_Y, test_size=0.2, random_state=42)
 
     # checkSplitData(X_train, X_test, y_train, y_test)
 
-    #train
-    # #encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test=transformDatatoFeatures_tokennizer(train_X,verify_X)
+    #feature engineering
+    #encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test=transformDatatoFeatures_tokennizer(train_X,verify_X)
     # encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,\
     #     =transformDatatoFeatures_doc2vec(train_X, verify_X,programDoc2VecModel,hintsDoc2VecModel)
-    #
-    # batch_size=int(encodedPrograms_train.shape[0]/100)
-    # epochs=100
-    # history,model=train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,train_Y, verify_Y,batch_size,epochs)
-    # plotHistory(history)
+
+    #load features
+    encodedPrograms_train = pickleRead('encodedPrograms_train')
+    encodedPrograms_test = pickleRead('encodedPrograms_test')
+    encodedHints_train = pickleRead('encodedHints_train')
+    encodedHints_test = pickleRead('encodedHints_test')
+    train_Y = pickleRead('train_Y')
+    verify_Y = pickleRead('verify_Y')
+
+
+    #train
+    batch_size=int(encodedPrograms_train.shape[0]/100)
+    epochs=100
+    history,model=train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,train_Y, verify_Y,batch_size,epochs)
+    plotHistory(history)
 
 
     # #load models instead of training
-    model=load_model('models/my_model.h5')
-    model.summary()
+    # model=load_model('models/my_model.h5')
+    # model.summary()
 
     #read test data
-    test_X, test_Y = readHornClausesAndHints(curpath + '/' + 'testData' + '/', 'test')
+    test_X, test_Y = readHornClausesAndHints(curpath + '/' + 'testData' + '/', 'test',discardNegativeData=False)
     #predict_tokenization(model,train_X,verify_X, test_Y,test_X)
     predict_doc2vec(model,programDoc2VecModel,hintsDoc2VecModel,test_X,test_Y)
 
