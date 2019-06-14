@@ -10,6 +10,9 @@ from keras.preprocessing.sequence import pad_sequences
 from keras.models import Model,load_model
 import glob
 import random
+import gensim
+import nltk
+nltk.download('punkt')
 import h5py
 import subprocess
 from os import popen
@@ -20,8 +23,7 @@ from collections import Counter
 from keras.layers import Conv1D,Concatenate,Dense,Input,concatenate,Embedding,Add,Flatten, Activation, Reshape
 from sklearn.model_selection import train_test_split
 
-from Miscellaneous import checkSplitData
-
+from Miscellaneous import checkSplitData,data2list,transform2TaggedDocument,nltkTokenize,recoverPredictedText,printOnePredictedTextInStringForm,doc2vecModelInferNewData,testAccuracy
 from extractNegativeTrainData import getRedundantHints
 from plot import plotHistory
 
@@ -193,7 +195,7 @@ def readHornClausesAndHints(path,dataset):
     print("train_X_positive shape", len(train_X_positive),len(train_X_positive[0]))
     print("train_Y_positive shape", np.array(train_Y_positive).shape)
     #print("train_X_negative shape", np.array(train_X_negative).shape)
-    print("train_X_positive shape", len(train_X_negative), len(train_X_negative[0]))
+    print("train_X_negative shape", len(train_X_negative), len(train_X_negative[0]))
     print("train_Y_negative shape", np.array(train_Y_negative).shape)
 #    print("train_X shape", np.array(train_X).shape)
     print("train_X shape", len(train_X),len(train_X[0]))
@@ -219,22 +221,45 @@ def transformOneDatatoFeatures_bagOfWord(path):
 def getWordSequence():
     print()
 
-def transformDatatoFeatures_tokennizer(X_train,X_test):
-    #print(X[0][0])
-    #print(X[0][1])
-    programs_train=list()
-    hints_train=list()
-    programs_test = list()
-    hints_test = list()
-    for p in X_train:
-        programs_train.append(p[0])
-    for h in X_train:
-        hints_train.append(h[1])
 
-    for p in X_test:
-        programs_test.append(p[0])
-    for h in X_test:
-        hints_test.append(h[1])
+
+def trainDoc2VectModel(X_train):
+    #create Doc2Vec model
+    #parameters window=2
+    programDoc2VecModel=gensim.models.doc2vec.Doc2Vec(
+        vector_size=1000, min_count=1,window=5, epochs=10)
+    hintsDoc2VecModel = gensim.models.doc2vec.Doc2Vec(
+        vector_size=100, min_count=1, window=5, epochs=10)
+
+    programs_train, hints_train = data2list(X_train)
+
+    #transform to TaggedDocument
+    programs_trainTaggedDocument,programs_trainList=transform2TaggedDocument(programs_train)
+    hints_trainTaggedDocument,hints_trainList = transform2TaggedDocument(hints_train)
+    #build vovabulary
+    programDoc2VecModel.build_vocab(programs_trainTaggedDocument)
+    hintsDoc2VecModel.build_vocab(hints_trainTaggedDocument)
+    #train Doc2Vec model
+    programDoc2VecModel.train(programs_trainTaggedDocument,total_examples=programDoc2VecModel.corpus_count,epochs=programDoc2VecModel.epochs)
+    hintsDoc2VecModel.train(hints_trainTaggedDocument,total_examples=hintsDoc2VecModel.corpus_count,epochs=hintsDoc2VecModel.epochs)
+    #save trained doc2vec models
+    programDoc2VecModel.save('models/programDoc2VecModel')
+    hintsDoc2VecModel.save('models/hintsDoc2VecModel')
+    return programDoc2VecModel,hintsDoc2VecModel
+
+def transformDatatoFeatures_doc2vec(X_train,X_test,programDoc2VecModel,hintsDoc2VecModel):
+    #create Doc2Vec model
+    #programDoc2VecModel, hintsDoc2VecModel=trainDoc2VectModel(X_train)
+
+    #infer/embedding programs and hints to vectors
+    print("Doc2Vec begin")
+    encodedPrograms_train,encodedHints_train=doc2vecModelInferNewData(X_train, programDoc2VecModel, hintsDoc2VecModel)
+    encodedPrograms_test, encodedHints_test = doc2vecModelInferNewData(X_test, programDoc2VecModel,hintsDoc2VecModel)
+    print("Doc2Vec end")
+    return encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test
+
+def transformDatatoFeatures_tokennizer(X_train,X_test):
+    programs_train, programs_test, hints_train, hints_test=data2list(X_train,X_test)
 
     print("-----program tokenization-----")
 
@@ -315,26 +340,27 @@ def transformDatatoFeatures_tokennizer(X_train,X_test):
     # return sequences_train
 
 
-def trainModel(encodedPrograms,encodedHints):
-
-
+def buildTrainModel(encodedPrograms,encodedHints):
     # define two sets of inputs
     inputA = Input(shape=(encodedPrograms.shape[1],1))
     inputB = Input(shape=(encodedHints.shape[1],1))
 
     # the first branch operates on the first input
     #x = Dense(8, activation="relu")(inputA)
-    x = Conv1D(filters=10,kernel_size=10, activation="relu")(inputA)
+    x = Conv1D(filters=50,kernel_size=5, activation="relu")(inputA)
+    x = Conv1D(filters=25, kernel_size=5, activation="relu")(x)
+    x = Conv1D(filters=10, kernel_size=5, activation="relu")(x)
     x = Flatten()(x)
-    x = Dense(4, activation="relu")(x)
+    #x = Dense(10, activation="relu")(x)
     x = Model(inputs=inputA, outputs=x)
 
     # the second branch opreates on the second input
     #y = Dense(64, activation="relu")(inputB)
-    y = Conv1D(filters=10,kernel_size=5, activation="relu")(inputB)
+    y = Conv1D(filters=20,kernel_size=5, activation="relu")(inputB)
+    y = Conv1D(filters=10, kernel_size=5, activation="relu")(y)
     #y = Dense(32, activation="relu")(y)
     y = Flatten()(y)
-    y = Dense(4, activation="relu")(y)
+    #y = Dense(10, activation="relu")(y)
     y = Model(inputs=inputB, outputs=y)
 
     # combine the output of the two branches
@@ -342,7 +368,9 @@ def trainModel(encodedPrograms,encodedHints):
 
     # apply a FC layer and then a regression prediction on the
     # combined outputs
-    z = Dense(2, activation="relu")(combined)
+    z = Dense(64, activation="relu")(combined)
+    z = Dense(32, activation="relu")(z)
+    z = Dense(16, activation="relu")(z)
     z = Dense(1, activation="sigmoid")(z)
 
     # our model will accept the inputs of the two branches and
@@ -363,8 +391,11 @@ def trainModel(encodedPrograms,encodedHints):
     return model
 
 def train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,y_train, y_test,batch_size,epochs):
-    model=trainModel(encodedPrograms_train, encodedHints_train)
-    model.compile(optimizer=k.optimizers.Adam(), loss='binary_crossentropy',
+    model=buildTrainModel(encodedPrograms_train, encodedHints_train)
+    model.compile(optimizer=k.optimizers.RMSprop(),
+                  #optimizer=k.optimizers.Adam(),
+                  # optimizer=k.optimizers.SGD(),
+                  loss='binary_crossentropy',
                    metrics=['accuracy'])
     model.summary()
     y_train = np.expand_dims(y_train, axis=2)
@@ -381,7 +412,42 @@ def train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedH
     model.save('models/my_model.h5')
     return history,model
 
-def predict(model,train_X,verify_X,y_test,X_test):
+def predict_doc2vec(model,programDoc2VecModel,hintsDoc2VecModel,test_X,test_Y):
+    #embedding test data for prediction
+    encodedPrograms_test,encodedHints_test = doc2vecModelInferNewData(test_X, programDoc2VecModel, hintsDoc2VecModel)
+
+    #predict
+    predicted_y = model.predict([encodedPrograms_test, encodedHints_test])
+    predicted_y[predicted_y > 0.5] = 1  # convert decimals to 0 and 1
+    predicted_y[predicted_y <= 0.5] = 0  # convert decimals to 0 and 1
+
+    acc=testAccuracy(predicted_y,test_Y)
+
+
+    y_test = np.expand_dims(test_Y, axis=2)
+    print('predicted_y shape:', np.array(predicted_y).shape)
+    print('y_test shape:', np.array(y_test).shape)
+    print('encodedPrograms_test', encodedPrograms_test.shape)
+    print('encodedHints_test', encodedHints_test.shape)
+
+    # print predicted y true y
+    print('predicted y vs. true y:')
+    print(np.stack((np.array(predicted_y).T, np.array(y_test).T)))
+
+    # print predicted hints true hints
+    PredixtedHints = recoverPredictedText(test_X, predicted_y)
+    testHints = recoverPredictedText(test_X, y_test)
+    print('predicted hints vs. true hints:')
+    printOnePredictedTextInStringForm(PredixtedHints, 0)
+    printOnePredictedTextInStringForm(testHints, 0)
+    printOnePredictedTextInStringForm(PredixtedHints, 1)
+    printOnePredictedTextInStringForm(testHints, 1)
+    return PredixtedHints
+
+
+    print()
+
+def predict_tokenization(model,train_X,verify_X,y_test,X_test):
         encodedPrograms_train, encodedPrograms_test, encodedHints_train, encodedHints_test = transformDatatoFeatures_tokennizer(
         train_X+verify_X, X_test)
 
@@ -407,52 +473,6 @@ def predict(model,train_X,verify_X,y_test,X_test):
         printOnePredictedTextInStringForm(testHints, 0)
         return PredixtedHints
 
-def recoverPredictedText(predictedX,predictedY):
-    recoverdX=list()
-
-    programList=list()
-    for p in range(len(predictedX)):
-        programList.append(predictedX[p][0])
-    progranList=list(set(programList))  #delete duplication in program list
-    for i in range(len(progranList)):
-        program=progranList[i]
-        hints=list()
-        for j in range(len(predictedX)):
-            if (progranList[i] == predictedX[j][0] and predictedY[j]==1):
-                hints.append(predictedX[j][1])
-        hints=list(set(hints))
-        recoverdX.append([[program],hints])
-    return recoverdX
-
-def printOnePredictedTextInStringForm(recoverdX,index):
-
-        #print in string form
-        strProgram=''.join(str(p) for p in recoverdX[index][0])
-        strHints=''.join(str(h)+str('\n') for h in recoverdX[index][1])
-        #print(strProgram)
-        #print(strHints)
-        hintsDictionary = dict()
-        for head in recoverdX[index][1]:
-            if (head.find('main') != -1):
-                head = head.strip()
-                hintsDictionary[head[:head.find('\n')]]=list()
-        for head in hintsDictionary.keys():
-            for content in recoverdX[index][1]:
-                if (content.find(head) != -1):
-                    hintsDictionary[head].append(content[content.find('\n'):].strip())
-        #print(hintsDictionary)
-
-        print(strProgram)
-        for head in hintsDictionary.keys():
-            #print(head)
-            print(head+'\n'+''.join(str(h)+str('\n') for h in hintsDictionary[head]))
-
-
-
-
-
-
-
 
 def main():
     print("Start")
@@ -465,32 +485,40 @@ def main():
 
     #transformOneFiletoFeatures(path)
     train_X,train_Y=readHornClausesAndHints(path,'train')
-
     #train_X=train_X[0:40]   #cut training size for debug
     #train_Y = train_Y[0:40] #cut training size for debug
+
+    #train and save Doc2Vec models
+    #programDoc2VecModel,hintsDoc2VecModel=trainDoc2VectModel(train_X)
+
+    #load Doc2Vec models
+    programDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load('models/programDoc2VecModel')
+    hintsDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load('models/hintsDoc2VecModel')
+
+    #split data to training and verifiying sets
     train_X, verify_X, train_Y, verify_Y = train_test_split(train_X, train_Y, test_size=0.2, random_state=42)
 
     # checkSplitData(X_train, X_test, y_train, y_test)
 
-    encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test=transformDatatoFeatures_tokennizer(train_X,verify_X)
+    #train
+    # #encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test=transformDatatoFeatures_tokennizer(train_X,verify_X)
+    # encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,\
+    #     =transformDatatoFeatures_doc2vec(train_X, verify_X,programDoc2VecModel,hintsDoc2VecModel)
+    #
+    # batch_size=int(encodedPrograms_train.shape[0]/100)
+    # epochs=100
+    # history,model=train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,train_Y, verify_Y,batch_size,epochs)
+    # plotHistory(history)
 
 
-    batch_size=int(encodedPrograms_train.shape[0]/100)
-    epochs=100
-    # #expand dimention to fit ConviD
-    # encodedPrograms_train = np.expand_dims(encodedPrograms_train, axis=2)
-    # encodedPrograms_test = np.expand_dims(encodedPrograms_test, axis=2)
-    # encodedHints_train = np.expand_dims(encodedHints_train, axis=2)
-    # encodedHints_test = np.expand_dims(encodedHints_test, axis=2)
+    # #load models instead of training
+    model=load_model('models/my_model.h5')
+    model.summary()
 
-
-    history,model=train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,train_Y, verify_Y,batch_size,epochs)
-    #model=load_model('models/my_model.h5')
-
-
-    #plotHistory(history)
+    #read test data
     test_X, test_Y = readHornClausesAndHints(curpath + '/' + 'testData' + '/', 'test')
-    predict(model,train_X,verify_X, test_Y,test_X)
+    #predict_tokenization(model,train_X,verify_X, test_Y,test_X)
+    predict_doc2vec(model,programDoc2VecModel,hintsDoc2VecModel,test_X,test_Y)
 
 
 
