@@ -175,6 +175,7 @@ def verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOpt
         print('Time consume:',end - start)
         p.kill()
     except Exception as ex:
+        end = time.time()
         print("Cannot be solved within 60 seconds (abstract:off)")
         p.kill()
         flag_off=0
@@ -201,6 +202,7 @@ def verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOpt
         flag_manual=1
         p.kill()
     except Exception as ex:
+        end = time.time()
         print("Cannot be solved within 60 seconds (abstract:manual)")
         p.kill()
     finally:
@@ -211,7 +213,7 @@ def verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOpt
     #flag_manual=1
     #flag_off=0
     # run select hints
-    if (abstractManualTimeConsumed<abstractOffTimeConsumed):
+    if (abstractManualTimeConsumed<abstractOffTimeConsumed and flag_manual==1):
         print("Abstract:off timeout and abstract:manual not timeout or abstractManualTimeConsumed<abstractOffTimeConsumed. \n Try to find optimized hints:")
         command = "/home/lcc/Desktop/eldarica-master/./eld -" + abstractionOption + " -absTimeout:" + str(
             abstractManualTimeConsumed+1) + log
@@ -266,7 +268,7 @@ def main():
     # verify_multiple_program_catch_hints(filePath,benchmark,abstractionOption,timeout,log='-log:1')
 
     benchmarkList = list()
-    #benchmarkList.append('dillig')
+    #benchmarkList.append('dillig') #extract finished
     #benchmarkList.append('svcomp16/locks')
     #benchmarkList.append('svcomp16/loop-acceleration')
     #benchmarkList.append('svcomp16/loop-invgen')
@@ -275,11 +277,11 @@ def main():
     #benchmarkList.append('svcomp16/loops')
     #benchmarkList.append('svcomp16/ntdrivers-simplified')
     #benchmarkList.append('svcomp16/seq-mthreaded')
-    benchmarkList.append('svcomp16/ssh-simplified')
+    #benchmarkList.append('svcomp16/ssh-simplified') #extract finished
     #benchmarkList.append('svcomp16/systemc')
-    #benchmarkList.append('VeriMAP_bench')
+    benchmarkList.append('VeriMAP_bench')
     #     benchmarkList.append('dillig')
-    #benchmarkList.append('llreve')
+    #benchmarkList.append('llreve') #extract finished
     for b in benchmarkList:
         verify_multiple_program_catch_hints(filePath, b, abstractionOption, timeout, log=' ')
 
