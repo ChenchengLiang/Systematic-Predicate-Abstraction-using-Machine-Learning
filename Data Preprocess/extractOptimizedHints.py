@@ -25,7 +25,7 @@ def check_verified_result(result):
 def verify_multiple_program_catch_hints(filePath, benchmark, abstractionOption, Timeout, log=' -log:1 '):
     programCount = 0
 
-    for file in glob.glob('/home/lcc/Desktop/benchmarks/' + benchmark + '/*.annot.c'):
+    for file in glob.glob('/home/chencheng/Desktop/benchmarks/' + benchmark + '/*.annot.c'):
         # print(file)
         fileName = file[file.find(benchmark) + len(benchmark) + 1:]
         verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOption, Timeout, log)
@@ -55,7 +55,7 @@ class ThreadWithReturnValue(threading.Thread):
 
 def absOff(filePath, benchmark, fileName, log=' -log:1 '):
     # abstract:off thread
-    commandOff = "/home/lcc/Downloads/eldarica-master-unmodified/./eld" + " -abstract:off " + log
+    commandOff = "/home/chencheng/Downloads/eldarica-master-unmodified/./eld" + " -abstract:off " + log
     run = commandOff + filePath + benchmark + '/' + fileName
     print("command:", run)
 
@@ -72,7 +72,7 @@ def absOff(filePath, benchmark, fileName, log=' -log:1 '):
 
 def absManual(filePath, benchmark, fileName, log=' -log:1 '):
     # abstract:off thread
-    commandOff = "/home/lcc/Downloads/eldarica-master-unmodified/./eld" + " -abstract:manual " + log
+    commandOff = "/home/chencheng/Downloads/eldarica-master-unmodified/./eld" + " -abstract:manual " + log
     run = commandOff + filePath + benchmark + '/' + fileName
     print("command:", run)
 
@@ -158,7 +158,7 @@ def verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOpt
 
     #try abstract:off
     abstractOffTimeOut=60
-    commandManual= "/home/lcc/Downloads/eldarica-master-unmodified/./eld" + " -abstract:off " + log
+    commandManual= "/home/chencheng/Downloads/eldarica-master-unmodified/./eld" + " -abstract:off " + log
     run = commandManual + filePath + benchmark + '/' + fileName
     # flag_manual=run_with_timeout(run,60) #timeout 60 seconds
     # print("flag_manual",flag_manual)
@@ -184,7 +184,7 @@ def verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOpt
     abstractOffTimeConsumed=end - start
 
     #try abstract:manual
-    commandManual= "/home/lcc/Downloads/eldarica-master-unmodified/./eld" + " -abstract:manual " + log
+    commandManual= "/home/chencheng/Downloads/eldarica-master-unmodified/./eld" + " -abstract:manual " + log
     run = commandManual + filePath + benchmark + '/' + fileName
     # flag_manual=run_with_timeout(run,60) #timeout 60 seconds
     # print("flag_manual",flag_manual)
@@ -215,7 +215,7 @@ def verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOpt
     # run select hints
     if (abstractManualTimeConsumed<abstractOffTimeConsumed and flag_manual==1):
         print("Abstract:off timeout and abstract:manual not timeout or abstractManualTimeConsumed<abstractOffTimeConsumed. \n Try to find optimized hints:")
-        command = "/home/lcc/Desktop/eldarica-master/./eld -" + abstractionOption + " -absTimeout:" + str(
+        command = "/home/chencheng/Desktop/eldarica-master/./eld -" + abstractionOption + " -absTimeout:" + str(
             abstractManualTimeConsumed+1) + log
         # print(filePath)
         # print(abstractionOption, " Timeout",Timeout)
@@ -261,7 +261,7 @@ def main():
     # benchmark='VeriMAP_bench'
     # benchmark='dillig'
     # benchmark='llreve'
-    filePath = '/home/lcc/Desktop/benchmarks/'
+    filePath = '/home/chencheng/Desktop/benchmarks/'
     abstractionOption = 'abstract:manual'
     timeout = 10
 
@@ -269,17 +269,17 @@ def main():
 
     benchmarkList = list()
     #benchmarkList.append('dillig') #extract finished
-    #benchmarkList.append('svcomp16/locks')
-    #benchmarkList.append('svcomp16/loop-acceleration')
-    #benchmarkList.append('svcomp16/loop-invgen')
+    #benchmarkList.append('svcomp16/locks') #extract finished
+    #benchmarkList.append('svcomp16/loop-acceleration') #extract finished
+    #benchmarkList.append('svcomp16/loop-invgen') #extract finished with exception
     #benchmarkList.append('svcomp16/loop-lit')
     #benchmarkList.append('svcomp16/loop-new')
     #benchmarkList.append('svcomp16/loops')
     #benchmarkList.append('svcomp16/ntdrivers-simplified')
     #benchmarkList.append('svcomp16/seq-mthreaded')
-    #benchmarkList.append('svcomp16/ssh-simplified') #extract finished
+    benchmarkList.append('svcomp16/ssh-simplified')
     #benchmarkList.append('svcomp16/systemc')
-    benchmarkList.append('VeriMAP_bench')
+    #benchmarkList.append('VeriMAP_bench') #extract finished
     #     benchmarkList.append('dillig')
     #benchmarkList.append('llreve') #extract finished
     for b in benchmarkList:

@@ -9,7 +9,7 @@ from threading import Timer
 import threading
 
 def extractHornClausesFromOneProgram(filePath, benchmark, fileName, abstractionOption):
-    command = "/home/lcc/Downloads/eldarica-master-unmodified/./eld -" + abstractionOption + " -p "
+    command = "/home/chencheng/Downloads/eldarica-master-unmodified/./eld -" + abstractionOption + " -p "
     run = command + filePath + benchmark + '/' + fileName
     print("command:", run)
     eld = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE)
@@ -35,7 +35,7 @@ def extractHornClausesFromOneProgram(filePath, benchmark, fileName, abstractionO
 def extractHornClausesFromMultipleProgram(filePath, benchmark, abstractionOption):
     programCount = 1
 
-    for file in sorted(glob.glob('/home/lcc/Desktop/benchmarks/' + benchmark + '/*.annot.c')):
+    for file in sorted(glob.glob('/home/chencheng/Desktop/benchmarks/' + benchmark + '/*.annot.c')):
         # print(file)
         fileName = file[file.find(benchmark) + len(benchmark) + 1:]
 
@@ -49,7 +49,7 @@ def main():
     print("Start")
 
 
-    filePath = '/home/lcc/Desktop/benchmarks/'
+    filePath = '/home/chencheng/Desktop/benchmarks/'
     abstractionOption = 'abstract:manual'
 
     benchmarkList = list()

@@ -24,7 +24,7 @@ def main():
     print("Start")
 
 
-    filePath = '/home/lcc/Desktop/benchmarks/'
+    filePath = '/home/chencheng/Desktop/benchmarks/'
     abstractionOption = 'abstract:manual'
 
     benchmarkList = list()
@@ -32,16 +32,16 @@ def main():
     #benchmarkList.append('svcomp16/locks')
     #benchmarkList.append('svcomp16/loop-acceleration')
     #     benchmarkList.append('svcomp16/loop-invgen')
-    #benchmarkList.append('svcomp16/loop-lit')
-    #benchmarkList.append('svcomp16/loop-new')
-    #     benchmarkList.append('svcomp16/loops')
-    #benchmarkList.append('svcomp16/ntdrivers-simplified')
-    #     benchmarkList.append('svcomp16/seq-mthreaded')
-    #benchmarkList.append('svcomp16/ssh-simplified')
-    #     benchmarkList.append('svcomp16/systemc')
+    benchmarkList.append('svcomp16/loop-lit')
+    benchmarkList.append('svcomp16/loop-new')
+    benchmarkList.append('svcomp16/loops')
+    benchmarkList.append('svcomp16/ntdrivers-simplified')
+    benchmarkList.append('svcomp16/seq-mthreaded')
+    benchmarkList.append('svcomp16/ssh-simplified')
+    benchmarkList.append('svcomp16/systemc')
     #benchmarkList.append('VeriMAP_bench')
     #     benchmarkList.append('dillig')
-    benchmarkList.append('llreve')
+    #benchmarkList.append('llreve')
     for b in benchmarkList:
         extractHornClausesFromMultipleProgram(filePath, b, abstractionOption)
         extractRedundantHintsFromMultipleProgram(filePath, b, abstractionOption)

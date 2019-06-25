@@ -95,7 +95,7 @@ def main():
     print("Start")
 
 
-    filePath = '/home/lcc/Desktop/benchmarks/'
+    filePath = '/home/chencheng/Desktop/benchmarks/'
     abstractionOption = 'abstract:manual'
 
     benchmarkList = list()

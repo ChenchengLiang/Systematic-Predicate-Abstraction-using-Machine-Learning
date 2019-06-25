@@ -26,9 +26,9 @@ def trainDoc2VectModel(X_train):
     # create Doc2Vec model
     # parameters window=2
     programDoc2VecModel =gensim.models.doc2vec.Doc2Vec(
-        vector_size=1000, min_count=0 ,window=programsAverageLength, epochs=50)
+        vector_size=500, min_count=0 ,window=programsAverageLength, epochs=50)
     hintsDoc2VecModel = gensim.models.doc2vec.Doc2Vec(
-        vector_size=100, min_count=0, window=hintsMaxLength, epochs=50)
+        vector_size=50, min_count=0, window=hintsMaxLength, epochs=50)
 
     # build vovabulary
     programDoc2VecModel.build_vocab(programs_trainTaggedDocument)
