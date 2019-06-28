@@ -1,5 +1,3 @@
-import os
-from extractNegativeTrainData import getRedundantHints
 import numpy as np
 def main():
     print("Start")

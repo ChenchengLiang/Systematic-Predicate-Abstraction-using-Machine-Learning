@@ -1,11 +1,27 @@
 import gensim
-from loadData import transformDatatoFeatures_doc2vec,readHornClausesAndHints
+from src.loadData import readHornClausesAndHints
 import os
 from sklearn.model_selection import train_test_split
-from Miscellaneous import pickleWrite
+from src.Miscellaneous import pickleWrite,doc2vecModelInferNewData
 
 
 
+def transformDatatoFeatures_doc2vec(X_train,X_test,programDoc2VecModel,hintsDoc2VecModel):
+    #create Doc2Vec model
+    #programDoc2VecModel, hintsDoc2VecModel=trainDoc2VectModel(X_train)
+
+    #infer/embedding programs and hints to vectors
+    print("Doc2Vec begin")
+    encodedPrograms_train,encodedHints_train=doc2vecModelInferNewData(X_train, programDoc2VecModel, hintsDoc2VecModel)
+    encodedPrograms_test, encodedHints_test = doc2vecModelInferNewData(X_test, programDoc2VecModel,hintsDoc2VecModel)
+    print("Doc2Vec end")
+    print('write infered train and test data to files')
+    pickleWrite(content=encodedPrograms_train,name='encodedPrograms_train')
+    pickleWrite(content=encodedHints_train, name='encodedHints_train')
+    pickleWrite(content=encodedPrograms_test, name='encodedPrograms_test')
+    pickleWrite(content=encodedHints_test, name='encodedHints_test')
+
+    return encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test
 
 
 def Doc2vecFeatureEngineering():

@@ -277,8 +277,8 @@ def main():
     #benchmarkList.append('svcomp16/loops')
     #benchmarkList.append('svcomp16/ntdrivers-simplified')
     #benchmarkList.append('svcomp16/seq-mthreaded')
-    benchmarkList.append('svcomp16/ssh-simplified')
-    #benchmarkList.append('svcomp16/systemc')
+    #benchmarkList.append('svcomp16/ssh-simplified')
+    benchmarkList.append('svcomp16/systemc')
     #benchmarkList.append('VeriMAP_bench') #extract finished
     #     benchmarkList.append('dillig')
     #benchmarkList.append('llreve') #extract finished

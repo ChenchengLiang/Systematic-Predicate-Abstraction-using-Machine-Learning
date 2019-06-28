@@ -71,10 +71,14 @@ def recoverPredictedText(predictedX,predictedY):
         recoverdX.append([[program],hints])
     return recoverdX
 
-def printOnePredictedTextInStringForm(recoverdX,index):
+def printOnePredictedTextInStringForm(recoverdX,index,printProgram):
 
-        #print in string form
-        strProgram=''.join(str(p) for p in recoverdX[index][0])
+        #print program in string form
+        if(printProgram == True):
+            print('program in horn format:')
+            strProgram=''.join(str(p) for p in recoverdX[index][0])
+            print(strProgram)
+
         strHints=''.join(str(h)+str('\n') for h in recoverdX[index][1])
         #print(strProgram)
         #print(strHints)
@@ -89,7 +93,7 @@ def printOnePredictedTextInStringForm(recoverdX,index):
                     hintsDictionary[head].append(content[content.find('\n'):].strip())
         #print(hintsDictionary)
 
-        print(strProgram)
+        # print hints in string form
         for head in hintsDictionary.keys():
             print(head)
             print(''.join(str(h)+str('\n') for h in hintsDictionary[head]))

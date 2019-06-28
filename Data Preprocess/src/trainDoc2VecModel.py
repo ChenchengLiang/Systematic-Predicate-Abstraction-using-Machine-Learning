@@ -4,8 +4,8 @@ import gensim
 import nltk
 nltk.download('punkt')
 
-from loadData import readHornClausesAndHints
-from Miscellaneous import data2list,transform2TaggedDocument
+from src.loadData import readHornClausesAndHints
+from src.Miscellaneous import data2list,transform2TaggedDocument
 
 def trainDoc2VectModel(X_train):
 
