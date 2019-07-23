@@ -39,8 +39,9 @@ def trainDoc2VectModel(X_train):
     hintsDoc2VecModel.train(hints_trainTaggedDocument ,total_examples=hintsDoc2VecModel.corpus_count
                             ,epochs=hintsDoc2VecModel.epochs)
     # save trained doc2vec models
-    programDoc2VecModel.save('models/programDoc2VecModel')
-    hintsDoc2VecModel.save('models/hintsDoc2VecModel')
+    parenDir = os.path.abspath(os.path.pardir)
+    programDoc2VecModel.save(parenDir+'/models/programDoc2VecModel')
+    hintsDoc2VecModel.save(parenDir+'/models/hintsDoc2VecModel')
     return programDoc2VecModel ,hintsDoc2VecModel
 
 
@@ -52,7 +53,8 @@ def main():
     #benchmark='dillig'
     benchmark = 'trainData'
     curpath = os.path.abspath(os.curdir)
-    path = curpath + '/' + benchmark + '/'
+    parenDir=os.path.abspath(os.path.pardir)
+    path = parenDir + '/' + benchmark + '/'
     print(path)
 
     #transformOneFiletoFeatures(path)

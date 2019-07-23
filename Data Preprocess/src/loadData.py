@@ -18,7 +18,7 @@ from keras.layers import Conv1D, Dense,Input,concatenate, Flatten
 
 from src.Miscellaneous import data2list, recoverPredictedText,printOnePredictedTextInStringForm,\
     doc2vecModelInferNewData,testAccuracy,pickleWrite,pickleRead
-
+from src.plot import plotHistory
 
 #from trainDoc2VecModel import trainDoc2VectModel
 
@@ -365,7 +365,8 @@ def train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedH
                         validation_data=([encodedPrograms_test, encodedHints_test], y_test),
                         verbose=1)
     pickleWrite(history,'history')
-    model.save('models/my_model.h5')
+    parenDir = os.path.abspath(os.path.pardir)
+    model.save(parenDir+'/models/my_model.h5')
     return history,model
 
 def predict_doc2vec(model,programDoc2VecModel,hintsDoc2VecModel,test_X,test_Y):
@@ -439,7 +440,8 @@ def main():
     #benchmark='dillig'
     benchmark = 'trainData'
     curpath = os.path.abspath(os.curdir)
-    path = curpath + '/' + benchmark + '/'
+    parenDir = os.path.abspath(os.path.pardir)
+    path = parenDir + '/' + benchmark + '/'
     print(path)
 
     #transformOneFiletoFeatures(path)
@@ -452,8 +454,8 @@ def main():
 
 
     #load Doc2Vec models
-    programDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load('models/programDoc2VecModel')
-    hintsDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load('models/hintsDoc2VecModel')
+    programDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/programDoc2VecModel')
+    hintsDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/hintsDoc2VecModel')
 
     #split data to training and verifiying sets
     #train_X, verify_X, train_Y, verify_Y = train_test_split(train_X, train_Y, test_size=0.2, random_state=42)
@@ -475,25 +477,25 @@ def main():
 
 
     #train
-    # batch_size=int(encodedPrograms_train.shape[0]/100)
-    # epochs=100
-    # history,model=train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,train_Y, verify_Y,batch_size,epochs)
-    # plotHistory(history)
+    batch_size=int(encodedPrograms_train.shape[0]/100)
+    epochs=100
+    history,model=train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,train_Y, verify_Y,batch_size,epochs)
+    plotHistory(history)
 
 
     # #load models instead of training
     # history=pickleRead('history')
     # plotHistory(history)
-    model=load_model('models/my_model.h5')
-    model.summary()
+    # model=load_model(parenDir+'/models/my_model.h5')
+    # model.summary()
 
     #read test data
-    test_X, test_Y = readHornClausesAndHints(curpath + '/' + 'testData' + '/', 'test',discardNegativeData=False)
-    #predict_tokenization(model,train_X,verify_X, test_Y,test_X)
-    predict_doc2vec(model,programDoc2VecModel,hintsDoc2VecModel,test_X,test_Y)
-
-
-
+    # test_X, test_Y = readHornClausesAndHints(parenDir + '/' + 'testData' + '/', 'test',discardNegativeData=False)
+    # #predict_tokenization(model,train_X,verify_X, test_Y,test_X)
+    # predict_doc2vec(model,programDoc2VecModel,hintsDoc2VecModel,test_X,test_Y)
+    #
+    #
+    #
 
 
 

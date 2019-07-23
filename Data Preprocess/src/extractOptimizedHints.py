@@ -165,7 +165,7 @@ def verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOpt
     flag_off=1
     signal.signal(signal.SIGALRM, timeout_handler)
     signal.alarm(abstractOffTimeOut)
-
+    #p = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     try:
         print("Command:",run)
         start = time.time()
@@ -177,7 +177,7 @@ def verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOpt
     except Exception as ex:
         end = time.time()
         print("Cannot be solved within 60 seconds (abstract:off)")
-        p.kill()
+        #p.kill()
         flag_off=0
     finally:
         signal.alarm(0)
@@ -191,7 +191,7 @@ def verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOpt
     flag_manual=0
     signal.signal(signal.SIGALRM, timeout_handler)
     signal.alarm(60)
-
+    #p = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     try:
         print("Command:",run)
         start = time.time()
@@ -204,7 +204,7 @@ def verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOpt
     except Exception as ex:
         end = time.time()
         print("Cannot be solved within 60 seconds (abstract:manual)")
-        p.kill()
+        #p.kill()
     finally:
         signal.alarm(0)
     abstractManualTimeConsumed = end - start

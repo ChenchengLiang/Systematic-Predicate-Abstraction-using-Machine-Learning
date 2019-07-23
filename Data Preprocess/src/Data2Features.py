@@ -27,7 +27,8 @@ def transformDatatoFeatures_doc2vec(X_train,X_test,programDoc2VecModel,hintsDoc2
 def Doc2vecFeatureEngineering():
     benchmark = 'trainData'
     curpath = os.path.abspath(os.curdir)
-    path = curpath + '/' + benchmark + '/'
+    parenDir = os.path.abspath(os.path.pardir)
+    path = parenDir + '/' + benchmark + '/'
     print(path)
     train_X, train_Y = readHornClausesAndHints(path, dataset='train', discardNegativeData=True)
     # train_X=train_X[0:10]   #cut training size for debug
@@ -38,8 +39,9 @@ def Doc2vecFeatureEngineering():
     train_X, verify_X, train_Y, verify_Y = train_test_split(train_X, train_Y, test_size=0.2, random_state=42)
 
     #load Doc2vec model
-    programDoc2VecModel = gensim.models.doc2vec.Doc2Vec.load('models/programDoc2VecModel')
-    hintsDoc2VecModel = gensim.models.doc2vec.Doc2Vec.load('models/hintsDoc2VecModel')
+
+    programDoc2VecModel = gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/programDoc2VecModel')
+    hintsDoc2VecModel = gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/hintsDoc2VecModel')
     transformDatatoFeatures_doc2vec(train_X, verify_X, programDoc2VecModel, hintsDoc2VecModel)
 
     pickleWrite(train_Y,'train_Y')

@@ -3,6 +3,7 @@ nltk.download('punkt')
 import gensim
 import numpy as np
 import pickle
+import os
 def checkSplitData(X_train, X_test, y_train, y_test):
     print("------train-----")
     print("X_train",len(X_train))
@@ -141,13 +142,15 @@ def testAccuracy(predictedY,trueY):
     return acc
 
 def pickleWrite(content,name):
-    file='pickleData/'+name+'.txt'
+    parenDir = os.path.abspath(os.path.pardir)
+    file=parenDir+'/pickleData/'+name+'.txt'
     print('pickle write to '+file)
     with open(file,"wb") as fp :
         pickle.dump(content,fp)
 
 def pickleRead(name):
-    file='pickleData/' + name + '.txt'
+    parenDir = os.path.abspath(os.path.pardir)
+    file=parenDir+'/pickleData/' + name + '.txt'
     print('pickle read '+file)
     with open(file,"rb") as fp :
         content=pickle.load(fp)
