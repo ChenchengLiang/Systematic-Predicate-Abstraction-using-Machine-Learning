@@ -15,7 +15,8 @@ def extractRedundantHintsFromOneProgram(filePath, benchmark, fileName, abstracti
     eld = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE)
     stdout = eld.communicate()
     lines=stdout[0].decode("utf-8").rstrip("\n")
-    filename = os.getcwd() + '/' + benchmark + '/' + fileName + ".redundantHints"
+    parenDir = os.path.abspath(os.path.pardir)
+    filename = parenDir + '/' + benchmark + '/' + fileName + ".redundantHints"
     f = open(filename, "w+")
 
     beginFlag=False
@@ -39,7 +40,8 @@ def extractRedundantHintsFromMultipleProgram(filePath, benchmark, abstractionOpt
     for file in sorted(glob.glob('/home/chencheng/Desktop/benchmarks/' + benchmark + '/*.annot.c')):
         # print(file)
         fileName = file[file.find(benchmark) + len(benchmark) + 1:]
-        hintPath = str(os.getcwd() + '/' + benchmark + '/' + fileName + '.hints')
+        parenDir = os.path.abspath(os.path.pardir)
+        hintPath = str(parenDir + '/' + benchmark + '/' + fileName + '.hints')
         exists = os.path.isfile(hintPath)
         if exists:
             extractRedundantHintsFromOneProgram(filePath, benchmark, fileName, abstractionOption)

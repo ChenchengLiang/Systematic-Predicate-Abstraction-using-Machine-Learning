@@ -16,7 +16,8 @@ def extractHornClausesFromOneProgram(filePath, benchmark, fileName, abstractionO
     stdout = eld.communicate()
     lines=stdout[0].decode("utf-8").rstrip("\n")
     printBegin=False
-    filename = os.getcwd() + '/' + benchmark + '/' + fileName + ".horn"
+    parenDir = os.path.abspath(os.path.pardir)
+    filename = parenDir + '/' + benchmark + '/' + fileName + ".horn"
     f = open(filename, "w+")
 
     for line in lines.splitlines():
@@ -37,9 +38,11 @@ def extractHornClausesFromMultipleProgram(filePath, benchmark, abstractionOption
     for file in sorted(glob.glob('/home/chencheng/Desktop/benchmarks/' + benchmark + '/*.annot.c')):
         # print(file)
         fileName = file[file.find(benchmark) + len(benchmark) + 1:]
-        hintPath=str(os.getcwd()+'/'+benchmark+'/'+fileName+'.hints')
+        parenDir = os.path.abspath(os.path.pardir)
+        hintPath=str(parenDir+'/'+benchmark+'/'+fileName+'.hints')
 
         exists = os.path.isfile(hintPath)
+        print(hintPath)
         if exists:
             extractHornClausesFromOneProgram(filePath, benchmark, fileName, abstractionOption)
             print('----------------------------', 'Program count: ', programCount, '--------------------------')
