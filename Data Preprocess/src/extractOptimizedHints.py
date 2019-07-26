@@ -113,8 +113,9 @@ def timeout_handler(num, stack):
 
 
 def verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOption, absTimeout, log=' -log:1 '):
-    curpath = os.path.abspath(os.curdir)
-    filename = curpath + '/' + benchmark + '/' + fileName + ".hints"
+    #curpath = os.path.abspath(os.curdir)
+    parenDir = os.path.abspath(os.path.pardir)
+    filename = parenDir + '/' + benchmark + '/' + fileName + ".hints"
     '''
     # Try abstract:off first to see if it needs hints
     print("Try abstract:off. Timeout 60 seconds")
