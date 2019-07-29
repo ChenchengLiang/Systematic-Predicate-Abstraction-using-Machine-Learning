@@ -23,7 +23,7 @@ def main():
     #read test data
     test_X, test_Y = readHornClausesAndHints(parenDir + '/' + 'testData' + '/', 'test',discardNegativeData=False)
     #predict_tokenization(model,train_X,verify_X, test_Y,test_X)
-    predict_doc2vec(model,programDoc2VecModel,hintsDoc2VecModel,test_X,test_Y)
+    predict_doc2vec(model,programDoc2VecModel,hintsDoc2VecModel,test_X,test_Y,printExample=False)
 
 
 

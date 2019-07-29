@@ -77,6 +77,132 @@ def constructTrainingData(hornText,hintsText):
         #print(hintsList)
     return [hornText, hintsList]
 
+
+def constructUnsplitedData(hornText,hintsText,negativeHintsText,discardNegativeData=True):
+    # construct positive training data
+    heads = list()
+    hintsList = list()
+    negativeList=list()
+    if hintsText:
+        for line in hintsText.splitlines():
+            if (line.find('main') != -1):
+                heads.append(line)
+        # print(heads)
+        for head in heads:
+            storeFlag = False
+            for line in hintsText.splitlines():
+                # print(line)
+                if (line.find('main') != -1 and storeFlag == True):
+                    break
+                if (storeFlag == True):
+                    hintsList.append([head, line])
+                if (line.find(head) != -1):
+                    storeFlag = True
+        #print(hintsList)
+    if negativeHintsText:
+        for line in negativeHintsText.splitlines():
+            if (line.find('main') != -1):
+                heads.append(line)
+        # print(heads)
+        for head in heads:
+            storeFlag = False
+            for line in negativeHintsText.splitlines():
+                # print(line)
+                if (line.find('main') != -1 and storeFlag == True):
+                    break
+                if (storeFlag == True):
+                    negativeList.append([head, line])
+                if (line.find(head) != -1):
+                    storeFlag = True
+
+    if (discardNegativeData==True and len(negativeList)-len(hintsList)>0):
+        random.shuffle(negativeList)
+        negativeList=negativeList[0:len(hintsList)]
+
+
+
+    return [hornText, hintsList,negativeList]
+
+def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,discardNegativeData):
+
+    print("horn file", len(sorted(glob.glob(path + '*.horn'))))
+    print("hints file", len(sorted(glob.glob(path + '*.hints'))))
+    print("negativeHints file", len(sorted(glob.glob(path + '*.negativeHints'))))
+
+    unsplitedData = list()
+    for fileHorn, fileHints, fileNegativeHints in zip(sorted(glob.glob(path + '*.horn')),
+                                                      sorted(glob.glob(path + '*.hints')),
+                                                      sorted(glob.glob(path + '*.negativeHints'))):
+        # readp program
+        print(fileHorn)
+        f = open(fileHorn, "r")
+        hornText = f.read()
+        f.close()
+
+        # read optimized hints
+        print(fileHints)
+        f = open(fileHints, "r")
+        hintsText = f.read()
+        f.close()
+        hintsText = hintsText.replace('inv_', '')
+
+        # read redundant hints
+        print(fileNegativeHints)
+        f = open(fileNegativeHints, "r")
+        negativeHintsText = f.read()
+        f.close()
+
+        unsplitedData.append(constructUnsplitedData(hornText, hintsText, negativeHintsText, discardNegativeData))
+        # print(unsplitedData[-1][0])
+        # print(unsplitedData[-1][1])
+        # print(unsplitedData[-1][2])
+
+    print(len(glob.glob(path + '*.horn')), "programs' information read")
+
+    #print("unsplitedData length", len(unsplitedData))
+    random.shuffle(unsplitedData)
+    splitPoint = int(0.8 * len(unsplitedData))
+    trainData = unsplitedData[:splitPoint]
+    verifyData = unsplitedData[splitPoint:]
+
+
+    trainData_X = list()
+    trainData_Y = list()
+    verifyData_X = list()
+    verifyData_Y = list()
+
+    for program in trainData:
+        for positiveHint in program[1]:
+            trainData_X.append([program[0], positiveHint[0] + '\n' + positiveHint[1]])
+            trainData_Y.append(1)
+        for negativeHint in program[2]:
+            trainData_X.append([program[0], negativeHint[0] + '\n' + negativeHint[1]])
+            trainData_Y.append(0)
+    for program in verifyData:
+        for positiveHint in program[1]:
+            verifyData_X.append([program[0], positiveHint[0] + '\n' + positiveHint[1]])
+            verifyData_Y.append(1)
+        for negativeHint in program[2]:
+            verifyData_X.append([program[0], negativeHint[0] + '\n' + negativeHint[1]])
+            verifyData_Y.append(0)
+
+    if(len(trainData_X)>0):
+        shuf = list(zip(trainData_X, trainData_Y))
+        random.shuffle(shuf)
+        trainData_X, trainData_Y = zip(*shuf)
+    if (len(verifyData_X)>0):
+        shuf1 = list(zip(verifyData_X, verifyData_Y))
+        random.shuffle(shuf1)
+        verifyData_X, verifyData_Y = zip(*shuf1)
+
+
+    print("trainData_X",len(trainData_X))
+    print("trainData_Y",len(trainData_Y))
+    print("verifyData_X",len(verifyData_X))
+    print("verifyData_Y",len(verifyData_Y))
+    return trainData_X,trainData_Y,verifyData_X,verifyData_Y
+
+
 def readHornClausesAndHints(path,dataset,discardNegativeData):
     hornVocab = Counter()
     hintVocab = Counter()
@@ -92,7 +218,8 @@ def readHornClausesAndHints(path,dataset,discardNegativeData):
     print("hints file", len(sorted(glob.glob(path + '*.hints'))))
     print("negativeHints file", len(sorted(glob.glob(path + '*.negativeHints'))))
 
-    for fileHorn,fileHints,fileRedundantHints in zip(sorted(glob.glob(path+'*.horn')),sorted(glob.glob(path+'*.hints')),sorted(glob.glob(path+'*.negativeHints'))):
+
+    for fileHorn,fileHints,fileNegativeHints in zip(sorted(glob.glob(path+'*.horn')),sorted(glob.glob(path+'*.hints')),sorted(glob.glob(path+'*.negativeHints'))):
         #readp program
         print(fileHorn)
         f = open(fileHorn, "r")
@@ -113,22 +240,22 @@ def readHornClausesAndHints(path,dataset,discardNegativeData):
         #hintVocab.update(wordSequence)
 
         # read redundant hints
-        print(fileRedundantHints)
-        f = open(fileRedundantHints, "r")
-        redundantHintsText = f.read()
+        print(fileNegativeHints)
+        f = open(fileNegativeHints, "r")
+        negativeHintsText = f.read()
         f.close()
         #redundantHintsText=getRedundantHints(hintsText, redundantHintsText)
         #print(redundantHintsText)
         #wordSequence = text_to_word_sequence(redundantHintsText, filters=redundantHintFilter, split=' ')
         #RedundantHintVocab.update(wordSequence)
 
+
         # construct positive training data
         trainDataPositive.append(constructTrainingData(hornText, hintsText))
         # construct negative training data
-        trainDataNegative.append(constructTrainingData(hornText, redundantHintsText))
+        trainDataNegative.append(constructTrainingData(hornText, negativeHintsText))
     print(len(glob.glob(path+'*.horn')),"programs' information read")
-    #print(hornVocab)
-    #print(hintVocab)
+
 
     #read negative and positive data
     train_X_positive = list()
@@ -369,7 +496,7 @@ def train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedH
     model.save(parenDir+'/models/my_model.h5')
     return history,model
 
-def predict_doc2vec(model,programDoc2VecModel,hintsDoc2VecModel,test_X,test_Y):
+def predict_doc2vec(model,programDoc2VecModel,hintsDoc2VecModel,test_X,test_Y,printExample=True):
     #embedding test data for prediction
     encodedPrograms_test,encodedHints_test = doc2vecModelInferNewData(test_X, programDoc2VecModel, hintsDoc2VecModel)
 
@@ -391,21 +518,22 @@ def predict_doc2vec(model,programDoc2VecModel,hintsDoc2VecModel,test_X,test_Y):
     print('predicted y vs. true y:')
     print(np.stack((np.array(predicted_y).T, np.array(y_test).T)))
 
-    # print predicted hints true hints
     PredixtedHints = recoverPredictedText(test_X, predicted_y)
     testHints = recoverPredictedText(test_X, y_test)
-    print('predicted hints vs. true hints:')
-    printOnePredictedTextInStringForm(PredixtedHints, 0,True)
-    print('--------------True hints---------')
-    printOnePredictedTextInStringForm(testHints, 0,False)
-    print('--------------------------------------')
-    printOnePredictedTextInStringForm(PredixtedHints, 1,True)
-    print('-------------True hints-------------')
-    printOnePredictedTextInStringForm(testHints, 1,False)
+    if(printExample==True):
+        # print predicted hints and true hints
+
+        print('predicted hints vs. true hints:')
+        printOnePredictedTextInStringForm(PredixtedHints, 0,True)
+        print('--------------True hints---------')
+        printOnePredictedTextInStringForm(testHints, 0,False)
+        print('--------------------------------------')
+        printOnePredictedTextInStringForm(PredixtedHints, 1,True)
+        print('-------------True hints-------------')
+        printOnePredictedTextInStringForm(testHints, 1,False)
     return PredixtedHints
 
 
-    print()
 
 def predict_tokenization(model,train_X,verify_X,y_test,X_test):
         encodedPrograms_train, encodedPrograms_test, encodedHints_train, encodedHints_test = transformDatatoFeatures_tokennizer(
@@ -438,7 +566,7 @@ def main():
     print("Start")
 
     #benchmark='dillig'
-    benchmark = 'trainData'
+    benchmark = 'testData'
     curpath = os.path.abspath(os.curdir)
     parenDir = os.path.abspath(os.path.pardir)
     path = parenDir + '/' + benchmark + '/'
@@ -454,8 +582,8 @@ def main():
 
 
     #load Doc2Vec models
-    programDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/programDoc2VecModel')
-    hintsDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/hintsDoc2VecModel')
+    # programDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/programDoc2VecModel')
+    # hintsDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/hintsDoc2VecModel')
 
     #split data to training and verifiying sets
     #train_X, verify_X, train_Y, verify_Y = train_test_split(train_X, train_Y, test_size=0.2, random_state=42)
@@ -468,19 +596,19 @@ def main():
     #     =transformDatatoFeatures_doc2vec(train_X, verify_X,programDoc2VecModel,hintsDoc2VecModel)
 
     #load features
-    encodedPrograms_train = pickleRead('encodedPrograms_train')
-    encodedPrograms_test = pickleRead('encodedPrograms_test')
-    encodedHints_train = pickleRead('encodedHints_train')
-    encodedHints_test = pickleRead('encodedHints_test')
-    train_Y = pickleRead('train_Y')
-    verify_Y = pickleRead('verify_Y')
+    # encodedPrograms_train = pickleRead('encodedPrograms_train')
+    # encodedPrograms_test = pickleRead('encodedPrograms_test')
+    # encodedHints_train = pickleRead('encodedHints_train')
+    # encodedHints_test = pickleRead('encodedHints_test')
+    # train_Y = pickleRead('train_Y')
+    # verify_Y = pickleRead('verify_Y')
 
 
     #train
-    batch_size=int(encodedPrograms_train.shape[0]/100)
-    epochs=100
-    history,model=train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,train_Y, verify_Y,batch_size,epochs)
-    plotHistory(history)
+    # batch_size=int(encodedPrograms_train.shape[0]/100)
+    # epochs=100
+    # history,model=train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,train_Y, verify_Y,batch_size,epochs)
+    # plotHistory(history)
 
 
     # #load models instead of training
@@ -497,6 +625,7 @@ def main():
     #
     #
 
+    train_X,train_Y,verify_X,verify_Y = readHornClausesAndHints_resplitTrainAndVerifyData(path, dataset='train', discardNegativeData=True)
 
 
 

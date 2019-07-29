@@ -167,9 +167,9 @@ def verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOpt
     signal.signal(signal.SIGALRM, timeout_handler)
     signal.alarm(abstractOffTimeOut)
     #p = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    start = time.time()
     try:
         print("Command:",run)
-        start = time.time()
         p = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         p.communicate()
         end = time.time()
@@ -193,9 +193,9 @@ def verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOpt
     signal.signal(signal.SIGALRM, timeout_handler)
     signal.alarm(60)
     #p = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    start = time.time()
     try:
         print("Command:",run)
-        start = time.time()
         p = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         p.communicate()
         end = time.time()
@@ -273,12 +273,12 @@ def main():
     #benchmarkList.append('svcomp16/locks') #extract finished
     #benchmarkList.append('svcomp16/loop-acceleration') #extract finished
     #benchmarkList.append('svcomp16/loop-invgen') #extract finished with exception
-    benchmarkList.append('svcomp16/loop-lit')
-    benchmarkList.append('svcomp16/loop-new')
-    benchmarkList.append('svcomp16/loops')
-    benchmarkList.append('svcomp16/ntdrivers-simplified')
+    #benchmarkList.append('svcomp16/loop-lit')
+    #benchmarkList.append('svcomp16/loop-new')
+    #benchmarkList.append('svcomp16/loops')
+    #benchmarkList.append('svcomp16/ntdrivers-simplified')
     benchmarkList.append('svcomp16/seq-mthreaded')
-    benchmarkList.append('svcomp16/ssh-simplified')
+    #benchmarkList.append('svcomp16/ssh-simplified')
     benchmarkList.append('svcomp16/systemc')
     #benchmarkList.append('VeriMAP_bench') #extract finished
     #     benchmarkList.append('dillig')
@@ -300,7 +300,7 @@ def main():
 
     # fileName='02.c.annot.c'
     # verify_one_program_catch_hints(filePath,benchmark,fileName,'abstract:manual',timeout)
-
+    print("Finished")
 
 if __name__ == '__main__':
     main()

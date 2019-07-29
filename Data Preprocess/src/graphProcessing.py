@@ -36,7 +36,7 @@ def readGraphFromGraphviz(fileName,vitualize=True):
 
 def main():
     print("Start")
-    readGraphFromGraphviz(fileName='g.gv',vitualize=True)
+    readGraphFromGraphviz(fileName='controlFlowGraph.gv',vitualize=True)
 
     print("finished")
 

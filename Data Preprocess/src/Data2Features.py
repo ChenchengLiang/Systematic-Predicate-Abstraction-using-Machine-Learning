@@ -1,5 +1,5 @@
 import gensim
-from src.loadData import readHornClausesAndHints
+from src.loadData import readHornClausesAndHints,readHornClausesAndHints_resplitTrainAndVerifyData
 import os
 from sklearn.model_selection import train_test_split
 from src.Miscellaneous import pickleWrite,doc2vecModelInferNewData
@@ -13,15 +13,15 @@ def transformDatatoFeatures_doc2vec(X_train,X_test,programDoc2VecModel,hintsDoc2
     #infer/embedding programs and hints to vectors
     print("Doc2Vec begin")
     encodedPrograms_train,encodedHints_train=doc2vecModelInferNewData(X_train, programDoc2VecModel, hintsDoc2VecModel)
-    encodedPrograms_test, encodedHints_test = doc2vecModelInferNewData(X_test, programDoc2VecModel,hintsDoc2VecModel)
+    encodedPrograms_verify, encodedHints_verify = doc2vecModelInferNewData(X_test, programDoc2VecModel,hintsDoc2VecModel)
     print("Doc2Vec end")
     print('write infered train and test data to files')
     pickleWrite(content=encodedPrograms_train,name='encodedPrograms_train')
     pickleWrite(content=encodedHints_train, name='encodedHints_train')
-    pickleWrite(content=encodedPrograms_test, name='encodedPrograms_test')
-    pickleWrite(content=encodedHints_test, name='encodedHints_test')
+    pickleWrite(content=encodedPrograms_verify, name='encodedPrograms_test')
+    pickleWrite(content=encodedHints_verify, name='encodedHints_test')
 
-    return encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test
+    return encodedPrograms_train,encodedPrograms_verify,encodedHints_train,encodedHints_verify
 
 
 def Doc2vecFeatureEngineering():
@@ -30,13 +30,13 @@ def Doc2vecFeatureEngineering():
     parenDir = os.path.abspath(os.path.pardir)
     path = parenDir + '/' + benchmark + '/'
     print(path)
-    train_X, train_Y = readHornClausesAndHints(path, dataset='train', discardNegativeData=True)
+    train_X,train_Y,verify_X,verify_Y = readHornClausesAndHints_resplitTrainAndVerifyData(path, dataset='train', discardNegativeData=True)
     # train_X=train_X[0:10]   #cut training size for debug
     # train_Y = train_Y[0:10] #cut training size for debug
 
 
     # split data to training and verifiying sets
-    train_X, verify_X, train_Y, verify_Y = train_test_split(train_X, train_Y, test_size=0.2, random_state=42)
+    #train_X, verify_X, train_Y, verify_Y = train_test_split(train_X, train_Y, test_size=0.2, random_state=42)
 
     #load Doc2vec model
 
