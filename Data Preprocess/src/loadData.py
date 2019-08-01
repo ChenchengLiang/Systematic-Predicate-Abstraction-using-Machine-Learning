@@ -15,9 +15,8 @@ nltk.download('punkt')
 from collections import Counter
 
 from keras.layers import Conv1D, Dense,Input,concatenate, Flatten
-
 from src.Miscellaneous import data2list, recoverPredictedText,printOnePredictedTextInStringForm,\
-    doc2vecModelInferNewData,testAccuracy,pickleWrite,pickleRead
+    doc2vecModelInferNewData,testAccuracy,pickleWrite,pickleRead,printList,sortHints
 from src.plot import plotHistory
 
 #from trainDoc2VecModel import trainDoc2VectModel
@@ -124,7 +123,7 @@ def constructUnsplitedData(hornText,hintsText,negativeHintsText,discardNegativeD
     return [hornText, hintsList,negativeList]
 
 def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,discardNegativeData):
-
+    trainDataSplitRate=0.8
     print("horn file", len(sorted(glob.glob(path + '*.horn'))))
     print("hints file", len(sorted(glob.glob(path + '*.hints'))))
     print("negativeHints file", len(sorted(glob.glob(path + '*.negativeHints'))))
@@ -161,7 +160,7 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,discardNegati
 
     #print("unsplitedData length", len(unsplitedData))
     random.shuffle(unsplitedData)
-    splitPoint = int(0.8 * len(unsplitedData))
+    splitPoint = int(trainDataSplitRate * len(unsplitedData))
     trainData = unsplitedData[:splitPoint]
     verifyData = unsplitedData[splitPoint:]
 
@@ -200,6 +199,13 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,discardNegati
     print("trainData_Y",len(trainData_Y))
     print("verifyData_X",len(verifyData_X))
     print("verifyData_Y",len(verifyData_Y))
+    pickleWrite(trainData_X,'trainData_X')
+    pickleWrite(trainData_Y, 'trainData_Y')
+    pickleWrite(verifyData_X, 'verifyData_X')
+    pickleWrite(verifyData_Y, 'verifyData_Y')
+    encodedPrograms_train = pickleRead('encodedPrograms_train')
+
+
     return trainData_X,trainData_Y,verifyData_X,verifyData_Y
 
 
@@ -424,6 +430,7 @@ def transformDatatoFeatures_tokennizer(X_train,X_test):
 
 
 def buildTrainModel(encodedPrograms,encodedHints):
+
     # define two sets of inputs
     inputA = Input(shape=(encodedPrograms.shape[1],1))
     inputB = Input(shape=(encodedHints.shape[1],1))
@@ -440,6 +447,7 @@ def buildTrainModel(encodedPrograms,encodedHints):
     # the second branch opreates on the second input
     #y = Dense(64, activation="relu")(inputB)
     y = Conv1D(filters=20,kernel_size=5, activation="relu")(inputB)
+    y = Conv1D(filters=15, kernel_size=5, activation="relu")(y)
     y = Conv1D(filters=10, kernel_size=5, activation="relu")(y)
     #y = Dense(32, activation="relu")(y)
     y = Flatten()(y)
@@ -451,10 +459,22 @@ def buildTrainModel(encodedPrograms,encodedHints):
 
     # apply a FC layer and then a regression prediction on the
     # combined outputs
-    z = Dense(64, activation="relu")(combined)
+    z = Dense(64, activation="relu",\
+              #activity_regularizer=k.regularizers.l1(0.01),\
+              #kernel_regularizer=k.regularizers.l2(0.01)\
+              )(combined)
     z = Dense(32, activation="relu")(z)
     z = Dense(16, activation="relu")(z)
-    z = Dense(1, activation="sigmoid")(z)
+
+    '''
+    z = Dense(2, activation="softmax",\
+              #activity_regularizer=k.regularizers.l1(0.0001)\
+              )(z)
+    '''
+
+    z = Dense(1, activation="sigmoid", \
+              # activity_regularizer=k.regularizers.l1(0.0001)\
+              )(z)
 
     # our model will accept the inputs of the two branches and
     # then output a single value
@@ -486,6 +506,8 @@ def train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedH
     print('encodedPrograms_train',np.array(encodedPrograms_train).shape)
     print('encodedHints_train',np.array(encodedHints_train).shape)
     print('y_train',np.array(y_train).shape)
+    #y_train=k.utils.to_categorical(y_train,num_classes=2)
+    #y_test = k.utils.to_categorical(y_test, num_classes=2)
     history = model.fit([encodedPrograms_train, encodedHints_train],y_train,
                         batch_size=batch_size, epochs=epochs,
                         #callbacks=callbacks,
@@ -495,6 +517,7 @@ def train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedH
     parenDir = os.path.abspath(os.path.pardir)
     model.save(parenDir+'/models/my_model.h5')
     return history,model
+
 
 def predict_doc2vec(model,programDoc2VecModel,hintsDoc2VecModel,test_X,test_Y,printExample=True):
     #embedding test data for prediction
@@ -516,21 +539,22 @@ def predict_doc2vec(model,programDoc2VecModel,hintsDoc2VecModel,test_X,test_Y,pr
 
     # print predicted y true y
     print('predicted y vs. true y:')
-    print(np.stack((np.array(predicted_y).T, np.array(y_test).T)))
-
+    print(np.stack((np.array(predicted_y).T,np.array(y_test).T)))
     PredixtedHints = recoverPredictedText(test_X, predicted_y)
     testHints = recoverPredictedText(test_X, y_test)
     if(printExample==True):
         # print predicted hints and true hints
 
         print('predicted hints vs. true hints:')
-        printOnePredictedTextInStringForm(PredixtedHints, 0,True)
+        printOnePredictedTextInStringForm(PredixtedHints, index=0,printProgram=True)
         print('--------------True hints---------')
         printOnePredictedTextInStringForm(testHints, 0,False)
         print('--------------------------------------')
         printOnePredictedTextInStringForm(PredixtedHints, 1,True)
         print('-------------True hints-------------')
         printOnePredictedTextInStringForm(testHints, 1,False)
+
+
     return PredixtedHints
 
 
@@ -573,17 +597,18 @@ def main():
     print(path)
 
     #transformOneFiletoFeatures(path)
-    #train_X,train_Y=readHornClausesAndHints(path,dataset='train',discardNegativeData=False)
+    train_X,train_Y,verify_X,verify_Y=readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset='train',discardNegativeData=True)
     #train_X=train_X[0:40]   #cut training size for debug
     #train_Y = train_Y[0:40] #cut training size for debug
 
     # # train and save Doc2Vec models
-    # programDoc2VecModel, hintsDoc2VecModel = trainDoc2VectModel(train_X)
-
+    # trainProgramDoc2VecModel,trainHintsDoc2VecModel = trainDoc2VecModelfunction(train_X)
+    # trainProgramDoc2VecModel.save(parenDir + '/models/programDoc2VecModel')
+    # trainHintsDoc2VecModel.save(parenDir + '/models/hintsDoc2VecModel')
 
     #load Doc2Vec models
-    # programDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/programDoc2VecModel')
-    # hintsDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/hintsDoc2VecModel')
+    programDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/programDoc2VecModel')
+    hintsDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/hintsDoc2VecModel')
 
     #split data to training and verifiying sets
     #train_X, verify_X, train_Y, verify_Y = train_test_split(train_X, train_Y, test_size=0.2, random_state=42)
@@ -594,22 +619,24 @@ def main():
     #encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test=transformDatatoFeatures_tokennizer(train_X,verify_X)
     # encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,\
     #     =transformDatatoFeatures_doc2vec(train_X, verify_X,programDoc2VecModel,hintsDoc2VecModel)
+    from src.Data2Features import Doc2vecFeatureEngineering
+    Doc2vecFeatureEngineering()
+
 
     #load features
-    # encodedPrograms_train = pickleRead('encodedPrograms_train')
-    # encodedPrograms_test = pickleRead('encodedPrograms_test')
-    # encodedHints_train = pickleRead('encodedHints_train')
-    # encodedHints_test = pickleRead('encodedHints_test')
-    # train_Y = pickleRead('train_Y')
-    # verify_Y = pickleRead('verify_Y')
+    encodedPrograms_train = pickleRead('encodedPrograms_train')
+    encodedPrograms_test = pickleRead('encodedPrograms_test')
+    encodedHints_train = pickleRead('encodedHints_train')
+    encodedHints_test = pickleRead('encodedHints_test')
+    train_Y = pickleRead('train_Y')
+    verify_Y = pickleRead('verify_Y')
 
 
     #train
-    # batch_size=int(encodedPrograms_train.shape[0]/100)
-    # epochs=100
-    # history,model=train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,train_Y, verify_Y,batch_size,epochs)
-    # plotHistory(history)
-
+    batch_size=int(encodedPrograms_train.shape[0]/100)
+    epochs=100
+    history,model=train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,train_Y, verify_Y,batch_size,epochs)
+    plotHistory(history)
 
     # #load models instead of training
     # history=pickleRead('history')
@@ -625,9 +652,7 @@ def main():
     #
     #
 
-    train_X,train_Y,verify_X,verify_Y = readHornClausesAndHints_resplitTrainAndVerifyData(path, dataset='train', discardNegativeData=True)
-
-
 
 if __name__ == '__main__':
     main()
+

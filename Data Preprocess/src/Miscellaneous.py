@@ -72,7 +72,7 @@ def recoverPredictedText(predictedX,predictedY):
         recoverdX.append([[program],hints])
     return recoverdX
 
-def printOnePredictedTextInStringForm(recoverdX,index,printProgram):
+def printOnePredictedTextInStringForm(recoverdX,index,printProgram=False):
 
         #print program in string form
         if(printProgram == True):
@@ -155,6 +155,18 @@ def pickleRead(name):
     with open(file,"rb") as fp :
         content=pickle.load(fp)
     return content
+
+def printList(l):
+    for i in l:
+        print(i)
+
+def sortHints(unsortedList):
+    def sortSecond(val):
+        return val[1]
+    unsortedList.sort(key=sortSecond,reverse=True)
+    #printList(unsortedList)
+    return unsortedList
+
 
 
 

@@ -4,10 +4,10 @@ import gensim
 import nltk
 nltk.download('punkt')
 
-from src.loadData import readHornClausesAndHints,readHornClausesAndHints_resplitTrainAndVerifyData
+from src.loadData import readHornClausesAndHints_resplitTrainAndVerifyData
 from src.Miscellaneous import data2list,transform2TaggedDocument
 
-def trainDoc2VectModel(X_train):
+def trainDoc2VecModelfunction(X_train):
 
     # extract programs and hints from dataset
     programs_train, hints_train = data2list(X_train)
@@ -62,7 +62,7 @@ def main():
     #train_Y = train_Y[0:40] #cut training size for debug
 
     #train and save Doc2Vec models
-    trainProgramDoc2VecModel,trainHintsDoc2VecModel=trainDoc2VectModel(train_X)
+    trainProgramDoc2VecModel,trainHintsDoc2VecModel=trainDoc2VecModelfunction(train_X)
     trainProgramDoc2VecModel.save(parenDir + '/models/programDoc2VecModel')
     trainHintsDoc2VecModel.save(parenDir + '/models/hintsDoc2VecModel')
 

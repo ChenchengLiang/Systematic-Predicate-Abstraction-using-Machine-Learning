@@ -2,7 +2,7 @@ import gensim
 from src.loadData import readHornClausesAndHints,readHornClausesAndHints_resplitTrainAndVerifyData
 import os
 from sklearn.model_selection import train_test_split
-from src.Miscellaneous import pickleWrite,doc2vecModelInferNewData
+from src.Miscellaneous import pickleWrite,doc2vecModelInferNewData,pickleRead
 
 
 
@@ -30,7 +30,11 @@ def Doc2vecFeatureEngineering():
     parenDir = os.path.abspath(os.path.pardir)
     path = parenDir + '/' + benchmark + '/'
     print(path)
-    train_X,train_Y,verify_X,verify_Y = readHornClausesAndHints_resplitTrainAndVerifyData(path, dataset='train', discardNegativeData=True)
+    #train_X,train_Y,verify_X,verify_Y = readHornClausesAndHints_resplitTrainAndVerifyData(path, dataset='train', discardNegativeData=True)
+    train_X=pickleRead('trainData_X')
+    train_Y = pickleRead('trainData_Y')
+    verify_X = pickleRead('verifyData_X')
+    verify_Y = pickleRead('verifyData_Y')
     # train_X=train_X[0:10]   #cut training size for debug
     # train_Y = train_Y[0:10] #cut training size for debug
 

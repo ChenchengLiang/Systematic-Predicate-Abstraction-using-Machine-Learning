@@ -13,7 +13,7 @@ def readGraphFromGraphviz(fileName,vitualize=True):
 
     print(hornGraph.source)
 
-    edges=G.edges
+    edges=list(set(G.edges))
     nodes=G.nodes
     print("edges:",edges)
     print("nodes:",nodes)

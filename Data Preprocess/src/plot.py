@@ -1,7 +1,8 @@
-
+import os
 import matplotlib.pyplot as plt
 plt.style.use("ggplot")
 def plotHistory(history):
+    parenDir = os.path.abspath(os.path.pardir)
     print(history.history.keys())
     # summarize history for accuracy
     plt.figure(1)
@@ -11,6 +12,7 @@ def plotHistory(history):
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
     plt.legend(['train', 'test'], loc='upper left')
+    plt.savefig(parenDir + '/pickleData/trainingResults-accuracy')
     # summarize history for loss
     plt.figure(2)
     plt.plot(history.history['loss'], '-b')
@@ -19,4 +21,7 @@ def plotHistory(history):
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.legend(['train', 'test'], loc='upper left')
+    plt.savefig(parenDir + '/pickleData/trainingResults-loss')
     plt.show()
+
+
