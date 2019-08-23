@@ -508,8 +508,10 @@ def train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedH
     print('y_train',np.array(y_train).shape)
     #y_train=k.utils.to_categorical(y_train,num_classes=2)
     #y_test = k.utils.to_categorical(y_test, num_classes=2)
+    earlyStop=k.callbacks.EarlyStopping(monitor='val_acc',min_delta=0.005,patience=5)
     history = model.fit([encodedPrograms_train, encodedHints_train],y_train,
                         batch_size=batch_size, epochs=epochs,
+                        callbacks=[earlyStop],
                         #callbacks=callbacks,
                         validation_data=([encodedPrograms_test, encodedHints_test], y_test),
                         verbose=1)

@@ -156,9 +156,10 @@ def verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOpt
     print('------')
     '''
 
+    timeLimit=858
 
     #try abstract:off
-    abstractOffTimeOut=60
+    abstractOffTimeOut=timeLimit
     commandManual= "/home/chencheng/Downloads/eldarica-master-unmodified/./eld" + " -abstract:off " + log
     run = commandManual + filePath + benchmark + '/' + fileName
     # flag_manual=run_with_timeout(run,60) #timeout 60 seconds
@@ -185,13 +186,14 @@ def verify_one_program_catch_hints(filePath, benchmark, fileName, abstractionOpt
     abstractOffTimeConsumed=end - start
 
     #try abstract:manual
+    abstractManualTimeOut = timeLimit
     commandManual= "/home/chencheng/Downloads/eldarica-master-unmodified/./eld" + " -abstract:manual " + log
     run = commandManual + filePath + benchmark + '/' + fileName
     # flag_manual=run_with_timeout(run,60) #timeout 60 seconds
     # print("flag_manual",flag_manual)
     flag_manual=0
     signal.signal(signal.SIGALRM, timeout_handler)
-    signal.alarm(60)
+    signal.alarm(abstractManualTimeOut)
     #p = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     start = time.time()
     try:
@@ -277,10 +279,11 @@ def main():
     #benchmarkList.append('svcomp16/loop-new')
     #benchmarkList.append('svcomp16/loops')
     #benchmarkList.append('svcomp16/ntdrivers-simplified')
-    benchmarkList.append('svcomp16/seq-mthreaded')
+    #benchmarkList.append('svcomp16/seq-mthreaded')
     #benchmarkList.append('svcomp16/ssh-simplified')
     benchmarkList.append('svcomp16/systemc')
     #benchmarkList.append('VeriMAP_bench') #extract finished
+    benchmarkList.append('problematicExample')
     #     benchmarkList.append('dillig')
     #benchmarkList.append('llreve') #extract finished
     for b in benchmarkList:
