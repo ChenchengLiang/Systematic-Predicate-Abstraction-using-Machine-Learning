@@ -7,7 +7,7 @@ nltk.download('punkt')
 from src.loadData import readHornClausesAndHints_resplitTrainAndVerifyData
 from src.Miscellaneous import data2list,transform2TaggedDocument
 
-def trainDoc2VecModelfunction(X_train):
+def trainDoc2VecModelfunction(X_train,program_dim=100,hint_dim=20):
 
     # extract programs and hints from dataset
     programs_train, hints_train = data2list(X_train)
@@ -26,9 +26,9 @@ def trainDoc2VecModelfunction(X_train):
     # create Doc2Vec model
     # parameters window=2
     programDoc2VecModel =gensim.models.doc2vec.Doc2Vec(
-        vector_size=500, min_count=0 ,window=programsAverageLength, epochs=50)
+        vector_size=program_dim, min_count=0 ,window=programsAverageLength, epochs=50)
     hintsDoc2VecModel = gensim.models.doc2vec.Doc2Vec(
-        vector_size=50, min_count=0, window=hintsMaxLength, epochs=50)
+        vector_size=hint_dim, min_count=0, window=hintsMaxLength, epochs=50)
 
     # build vovabulary
     programDoc2VecModel.build_vocab(programs_trainTaggedDocument)

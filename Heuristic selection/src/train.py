@@ -26,6 +26,10 @@ def main():
     encodedPrograms_test = pickleRead('encodedPrograms_test')
     encodedHints_train = pickleRead('encodedHints_train')
     encodedHints_test = pickleRead('encodedHints_test')
+
+    graphEncodedPrograms_train = pickleRead('graphEncodedPrograms_train')
+    graphEncodedPrograms_test = pickleRead('graphEncodedPrograms_test')
+
     train_Y = pickleRead('train_Y')
     verify_Y = pickleRead('verify_Y')
 
@@ -33,7 +37,9 @@ def main():
     #train
     batch_size=int(encodedPrograms_train.shape[0]/100)
     epochs=100
-    history,model=train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,train_Y, verify_Y,batch_size,epochs)
+    #history,model=train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,train_Y, verify_Y,batch_size,epochs)
+    history, model = train(encodedPrograms_train, encodedPrograms_test,graphEncodedPrograms_train,graphEncodedPrograms_test, encodedHints_train, encodedHints_test, train_Y,
+                           verify_Y, batch_size, epochs)
     plotHistory(history)
 
 

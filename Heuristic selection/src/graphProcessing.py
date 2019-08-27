@@ -6,6 +6,7 @@ from node2vec.edges import  HadamardEmbedder
 import gensim
 from src.Miscellaneous import data2list,transform2TaggedDocument
 import glob
+import subprocess
 def prerryPrintOneGraph(G):
     edges=list(set(G.edges))
     nodes=G.nodes
@@ -24,6 +25,38 @@ def prerryPrintOneGraph(G):
         print("Successors:")
         for successor in G.successors(node):
             print(successor)
+
+
+
+
+def readGraphFromGraphvizFromTrainData(fileName,vitualize=True):
+    hornGraph=Source.from_file(fileName)
+    #read gv to networkx
+    G=nx.DiGraph(nx.drawing.nx_pydot.read_dot(fileName))
+    #view by graphviz
+    if(vitualize==True):
+        hornGraph.view()
+
+    #print(hornGraph.source)
+    '''
+    for node,content in nodes.items():
+        print("-----------")
+        print(node,content['label'])
+        print("Neighbors:")
+        for neighbor in G.neighbors(node):
+            print(neighbor,nodes[neighbor]['label'])
+        print("Predecessors:")
+        for predecessor in G.predecessors(node):
+            print(predecessor,nodes[predecessor]['label'])
+        print("Successors:")
+        for successor in G.successors(node):
+            print(successor, nodes[successor]['label'])
+    '''
+    G = nodeRelabel(G)
+    #prerryPrintOneGraph(G)
+
+    return G
+
 
 
 
@@ -58,13 +91,13 @@ def readGraphFromGraphviz(fileName,vitualize=True):
 
     return G
 
-def readAndEmbedAllGraphs():
+def readAndEmbedAllGraphs(dimension=3):
     graphs=list()
     aggregatedEmbeddingList=list()
-    for file in glob.glob("../graph/*.gv"):
-        print(file)
+    for count,file in enumerate(glob.glob("../graph/*.gv")):
+        print(count,":",file)
         graph=readGraphFromGraphviz(file, vitualize=False)
-        aggregatedEmbeddingList.append(getGraphEmbeddingNode2vec(graph, dimension=3))
+        aggregatedEmbeddingList.append(getGraphEmbeddingNode2vec(graph, dimension=dimension))
         graphs.append(graph)
         print("-----")
 
@@ -80,88 +113,56 @@ def nodeRelabel(graph): #relabel node name 1,2,3 to main1 ,main2, main3
         mapping[node]=content['label'].replace('"','')
     G = nx.relabel_nodes(G, mapping)
     return G
-def getNodeEmbedding(node2vecModel,graph): #output every node's embedding
+def getNodeEmbedding(node2vecModel,graph,p=True): #output every node's embedding
     embedding=list()
     embeddingDict=dict()
     for node in graph.nodes:
         embedding.append(node2vecModel.wv.get_vector(node))
         embeddingDict[node]=embedding[-1]
-    for node,embed in embeddingDict.items():
-        print("node: ",node," embeddings: ",embed)
+    if(p==True):
+        for node,embed in embeddingDict.items():
+            print("node: ",node," embeddings: ",embed)
     return embedding,embeddingDict
 
-def getGraphEmbeddingNode2vec(graph,dimension=3):
-    node2vec = Node2Vec(graph, dimensions=3, walk_length=10, num_walks=20, workers=4)
+def getGraphEmbeddingNode2vec(graph,dimension=3,p=True):
+    node2vec = Node2Vec(graph, dimensions=dimension, walk_length=10, num_walks=20, workers=4)
     node2vecModel = node2vec.fit(window=10, min_count=1, batch_words=4)
-    embedding,embeddingDict=getNodeEmbedding(node2vecModel,graph)
+    embedding,embeddingDict=getNodeEmbedding(node2vecModel,graph,p=p)
     AggregatedEmbedding=[0]*dimension
     for node in embedding:
         AggregatedEmbedding=AggregatedEmbedding+node
-    print("AggregatedEmbedding: ",AggregatedEmbedding)
+    if (p == True):
+        print("AggregatedEmbedding: ",AggregatedEmbedding)
 
     return AggregatedEmbedding
 
-def graphEmbeddingModelNode2vecSamplingDoc2vec(X_train):
+def callEldaricaGenerateGraphs():
+    count=0;
+    for file in glob.glob("../trainData/*.hints"): #if the program needs hints call and generate graph
+        file=file[0:file.find('.hints')]
+        fileName = file[file.find('/trainData')+11:]
+        #print(fileName)
+        fileName='/home/chencheng/Desktop/benchmarks/allInOneFile/'+fileName
+        if(os.path.isfile(fileName)):
+            command = "/home/chencheng/Downloads/eldarica-graph-generation/./eld "
+            run = command + fileName + " -p"
+            print("command:", run)
+            #os.popen(run)
+            #p = subprocess.Popen(run, shell=True)
+            #p.wait()
+            eld = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE)
+            stdout = eld.communicate()
+            count=count+1
+            print()
 
-
-
-    # extract programs and hints from dataset
-    programs_train, hints_train = data2list(X_train)
-    programs_train=list(set(programs_train))
-
-
-    # transform to TaggedDocument
-    programs_trainTaggedDocument,programsMaxLength,programsAverageLength  =transform2TaggedDocument(programs_train)
-    hints_trainTaggedDocument,hintsMaxLength,hintsAverageLength  = transform2TaggedDocument(hints_train)
-    # print('programsMaxLength',programsMaxLength)
-    # print('programsAverageLength',programsAverageLength)
-    # print('hintsMaxLength',hintsMaxLength)
-    # print('hintsAverageLength',hintsAverageLength)
-
-
-    # create Doc2Vec model
-    # parameters window=2
-    programDoc2VecModel =gensim.models.doc2vec.Doc2Vec(
-        vector_size=500, min_count=0 ,window=programsAverageLength, epochs=50)
-    hintsDoc2VecModel = gensim.models.doc2vec.Doc2Vec(
-        vector_size=50, min_count=0, window=hintsMaxLength, epochs=50)
-
-    # build vovabulary
-    programDoc2VecModel.build_vocab(programs_trainTaggedDocument)
-    hintsDoc2VecModel.build_vocab(hints_trainTaggedDocument)
-    # train Doc2Vec model
-    programDoc2VecModel.train(programs_trainTaggedDocument ,total_examples=programDoc2VecModel.corpus_count
-                              ,epochs=programDoc2VecModel.epochs)
-    hintsDoc2VecModel.train(hints_trainTaggedDocument ,total_examples=hintsDoc2VecModel.corpus_count
-                            ,epochs=hintsDoc2VecModel.epochs)
-    # save trained doc2vec models
-    parenDir = os.path.abspath(os.path.pardir)
-    return programDoc2VecModel ,hintsDoc2VecModel
-    return model
-
+    print(count," program transfomed")
 
 def main():
     print("Start")
-    '''
-    graph=readGraphFromGraphviz(fileName='controlFlowGraph.gv',vitualize=True)
-    node2vec= Node2Vec(graph,dimensions=3,walk_length=2,num_walks=10,workers=4)
-    print(len(node2vec.walks))
-    print(node2vec.walks)
-    node2vecModel=node2vec.fit(window=10,min_count=1,batch_words=4)
-
-    embedding,embeddingDict=getNodeEmbedding(node2vecModel, graph)
-    getGraphEmbeddingNode2vec(graph)
-
-    edgeEmbedding=HadamardEmbedder(keyed_vectors=node2vecModel.wv)
-    print("edges:")
-    for edge in graph.edges:
-        print(edge)
-    print(edgeEmbedding[('inv_main4', 'inv_main8')])
-    '''
-
-
-    aggregatedEmbeddingList=readAndEmbedAllGraphs()
-
+    readGraphFromGraphviz("break_single_merged_safe.c.annot.c.gv", vitualize=True)
+    #callEldaricaGenerateGraphs()
+    #aggregatedEmbeddingList=readAndEmbedAllGraphs(dimension=100)#text level program=500 dimension hint=50
+    print("---------")
 
 
 
