@@ -136,31 +136,50 @@ def getGraphEmbeddingNode2vec(graph,dimension=3,p=True):
 
     return AggregatedEmbedding
 
-def callEldaricaGenerateGraphs():
+def callEldaricaGenerateGraphs(dataset='trainData'):
     count=0;
-    for file in glob.glob("../trainData/*.hints"): #if the program needs hints call and generate graph
+    for file in glob.glob("../"+dataset+"/*.hints"): #if the program needs hints call and generate graph
         file=file[0:file.find('.hints')]
-        fileName = file[file.find('/trainData')+11:]
-        #print(fileName)
-        fileName='/home/chencheng/Desktop/benchmarks/allInOneFile/'+fileName
-        if(os.path.isfile(fileName)):
-            command = "/home/chencheng/Downloads/eldarica-graph-generation/./eld "
-            run = command + fileName + " -p"
-            print("command:", run)
-            #os.popen(run)
-            #p = subprocess.Popen(run, shell=True)
-            #p.wait()
-            eld = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE)
-            stdout = eld.communicate()
-            count=count+1
-            print()
+        if(dataset=='trainData'):
+            fileName = file[file.find('/trainData')+11:]
+            #print(fileName)
+            fileName='/home/chencheng/Desktop/benchmarks/allInOneFile/'+fileName
+            if(os.path.isfile(fileName)):
+                command = "/home/chencheng/Downloads/eldarica-graph-generation/./eld "
+                run = command + fileName + " -p"
+                print("command:", run)
+                #os.popen(run)
+                #p = subprocess.Popen(run, shell=True)
+                #p.wait()
+                eld = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE)
+                stdout = eld.communicate()
+                count=count+1
+                print()
+        else:
+            fileName = file[file.find('/testData')+10:]
+            #print(fileName)
+            fileName='/home/chencheng/Desktop/benchmarks/allInOneFile/'+fileName
+            if(os.path.isfile(fileName)):
+                command = "/home/chencheng/Downloads/eldarica-graph-generation/./eld "
+                run = command + fileName + " -p"
+                print("command:", run)
+                #os.popen(run)
+                #p = subprocess.Popen(run, shell=True)
+                #p.wait()
+                eld = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE)
+                stdout = eld.communicate()
+                count=count+1
+                print()
+
 
     print(count," program transfomed")
 
 def main():
     print("Start")
-    readGraphFromGraphviz("break_single_merged_safe.c.annot.c.gv", vitualize=True)
-    #callEldaricaGenerateGraphs()
+    #graph=readGraphFromGraphviz("break_single_merged_safe.c.annot.c.gv", vitualize=True)
+    #getGraphEmbeddingNode2vec(graph, dimension=3, p=True)
+
+    callEldaricaGenerateGraphs('testData')
     #aggregatedEmbeddingList=readAndEmbedAllGraphs(dimension=100)#text level program=500 dimension hint=50
     print("---------")
 

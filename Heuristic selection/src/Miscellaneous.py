@@ -25,12 +25,15 @@ def data2list(X_train):
     #extract data to programs and hints
     programs_train = list()
     hints_train = list()
+    graph_train = list()
     for p in X_train:
         programs_train.append(p[0])
     for h in X_train:
         hints_train.append(h[1])
+    for g in X_train:
+        graph_train.append(g[2])
 
-    return programs_train,hints_train
+    return programs_train,hints_train,graph_train
 
 def transform2TaggedDocument(programs):
     max=0
@@ -102,8 +105,9 @@ def printOnePredictedTextInStringForm(recoverdX,index,printProgram=False):
 def doc2vecModelInferNewData(test_X,programDoc2VecModel,hintsDoc2VecModel):
     encodedPrograms=list()
     encodedHints=list()
+    graphEncodedPrograms=list()
     #separate data to programs and hints
-    programs, hints = data2list(test_X)
+    programs, hints, graphs = data2list(test_X)
     uniquePrograms=list(set(programs))
 
 
@@ -125,12 +129,15 @@ def doc2vecModelInferNewData(test_X,programDoc2VecModel,hintsDoc2VecModel):
         encodedPrograms.append(programDirectory[program])
     for hint in hintsList:
         encodedHints.append(hintsDoc2VecModel.infer_vector(hint))
+    for graph in graphs:
+        graphEncodedPrograms.append(graph)
 
     # expand dimention to fit ConviD
     encodedPrograms = np.expand_dims(encodedPrograms, axis=2)
     encodedHints = np.expand_dims(encodedHints, axis=2)
+    graphEncodedPrograms = np.expand_dims(graphEncodedPrograms, axis=2)
 
-    return encodedPrograms,encodedHints
+    return encodedPrograms,encodedHints,graphEncodedPrograms
 
 def testAccuracy(predictedY,trueY):
     counter=0

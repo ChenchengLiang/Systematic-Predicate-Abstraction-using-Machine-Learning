@@ -25,7 +25,7 @@ def main():
     # transformOneFiletoFeatures(path)
     train_X ,train_Y ,verify_X ,verify_Y =\
         readHornClausesAndHints_resplitTrainAndVerifyData(path ,\
-        dataset='train',discardNegativeData=True,smallTrain=True,smallTrainSize=50)
+        dataset='train',discardNegativeData=True,smallTrain=False,smallTrainSize=50)
     # train_X=pickleRead('trainData_X')
     # train_Y = pickleRead('trainData_Y')
     # verify_X = pickleRead('verifyData_X')
@@ -54,7 +54,7 @@ def main():
     # encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,\
     #     =transformDatatoFeatures_doc2vec(train_X, verify_X,programDoc2VecModel,hintsDoc2VecModel)
     from src.Data2Features import Doc2vecFeatureEngineering,Node2vecFeatureEngineering
-    #Doc2vecFeatureEngineering()
+    Doc2vecFeatureEngineering()
     Node2vecFeatureEngineering()
 
     # load features

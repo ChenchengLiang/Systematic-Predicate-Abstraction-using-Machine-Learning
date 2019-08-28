@@ -13,8 +13,8 @@ def transformDatatoFeatures_doc2vec(X_train,X_test,programDoc2VecModel,hintsDoc2
 
     #infer/embedding programs and hints to vectors
     print("Doc2Vec inferring begin")
-    encodedPrograms_train,encodedHints_train=doc2vecModelInferNewData(X_train, programDoc2VecModel, hintsDoc2VecModel)
-    encodedPrograms_verify, encodedHints_verify = doc2vecModelInferNewData(X_test, programDoc2VecModel,hintsDoc2VecModel)
+    encodedPrograms_train,encodedHints_train,EncodedPrograms_train=doc2vecModelInferNewData(X_train, programDoc2VecModel, hintsDoc2VecModel)
+    encodedPrograms_verify, encodedHints_verify,graphEncodedPrograms_verify = doc2vecModelInferNewData(X_test, programDoc2VecModel,hintsDoc2VecModel)
     print("Doc2Vec inferring end")
     print('write infered train and test data to files')
     pickleWrite(content=encodedPrograms_train,name='encodedPrograms_train')

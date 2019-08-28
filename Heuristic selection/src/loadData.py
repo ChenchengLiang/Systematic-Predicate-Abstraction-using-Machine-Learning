@@ -131,7 +131,8 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
     unsplitedData = list()
     for fileHorn, fileHints, fileNegativeHints,fileGraph in zip(sorted(glob.glob(path + '*.horn')),
                                                       sorted(glob.glob(path + '*.hints')),
-                                                      sorted(glob.glob(path + '*.negativeHints')),sorted(glob.glob(path + '*.gv'))):
+                                                      sorted(glob.glob(path + '*.negativeHints')),\
+                                                                sorted(glob.glob(path + '*.gv'))):
         # read program
         print(fileHorn)
         f = open(fileHorn, "r")
@@ -231,7 +232,7 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
     return trainData_X,trainData_Y,verifyData_X,verifyData_Y
 
 
-def readHornClausesAndHints(path,dataset,discardNegativeData):
+def readHornClausesAndHints_graph(path,dataset,discardNegativeData):
     hornVocab = Counter()
     hintVocab = Counter()
     RedundantHintVocab = Counter()
@@ -243,6 +244,89 @@ def readHornClausesAndHints(path,dataset,discardNegativeData):
     trainDataNegative = list()
 
     print("horn file",len(sorted(glob.glob(path+'*.horn'))))
+    print("hints file", len(sorted(glob.glob(path + '*.hints'))))
+    print("negativeHints file", len(sorted(glob.glob(path + '*.negativeHints'))))
+    print("graph file", len(sorted(glob.glob(path + '*.gv'))))
+    unsplitedData = list()
+    for fileHorn, fileHints, fileNegativeHints,fileGraph in zip(sorted(glob.glob(path + '*.horn')),
+                                                      sorted(glob.glob(path + '*.hints')),
+                                                      sorted(glob.glob(path + '*.negativeHints')),\
+                                                                sorted(glob.glob(path + '*.gv'))):
+        # read program
+        print(fileHorn)
+        f = open(fileHorn, "r")
+        hornText = f.read()
+        f.close()
+
+        # read optimized hints
+        print(fileHints)
+        f = open(fileHints, "r")
+        hintsText = f.read()
+        f.close()
+        hintsText = hintsText.replace('inv_', '')
+
+        # read redundant hints
+        print(fileNegativeHints)
+        f = open(fileNegativeHints, "r")
+        negativeHintsText = f.read()
+        f.close()
+
+        # read program graph
+        print(fileGraph)
+        from src.graphProcessing import readGraphFromGraphvizFromTrainData,getGraphEmbeddingNode2vec
+        graph = readGraphFromGraphvizFromTrainData(fileGraph, vitualize=False)
+        graphEmbededProgram=getGraphEmbeddingNode2vec(graph, dimension=100,p=False)
+
+        unsplitedData.append(constructUnsplitedData(hornText, hintsText, negativeHintsText, graphEmbededProgram,discardNegativeData))
+        # print(unsplitedData[-1][0])
+        # print(unsplitedData[-1][1])
+        # print(unsplitedData[-1][2])
+        # print(unsplitedData[-1][3])
+
+    print(len(glob.glob(path + '*.horn')), "programs' information read")
+    print(len(glob.glob(path + '*.gv')), "program graphs' information read")
+    trainData_X = list()
+    trainData_Y = list()
+
+
+    for program in unsplitedData:
+        for positiveHint in program[1]:
+            trainData_X.append([program[0], positiveHint[0] + '\n' + positiveHint[1],program[3]])
+            trainData_Y.append(1)
+        for negativeHint in program[2]:
+            trainData_X.append([program[0], negativeHint[0] + '\n' + negativeHint[1],program[3]])
+            trainData_Y.append(0)
+
+
+
+    if(len(trainData_X)>0):
+        shuf = list(zip(trainData_X, trainData_Y))
+        random.shuffle(shuf)
+        trainData_X, trainData_Y = zip(*shuf)
+    print("-----------------")
+
+
+    print("trainData_X",np.array(trainData_X).shape)
+    print("trainData_Y",np.array(trainData_Y).shape)
+
+    pickleWrite(trainData_X,'trainData_X')
+    pickleWrite(trainData_Y, 'trainData_Y')
+    return trainData_X,trainData_Y
+
+
+
+def readHornClausesAndHints(path, dataset, discardNegativeData):
+    hornVocab = Counter()
+    hintVocab = Counter()
+    RedundantHintVocab = Counter()
+    hornFilter = '\n,().'
+    hintFilter = '\n,().'
+    redundantHintFilter = '\n,().'
+
+    trainDataPositive = list()
+    trainDataNegative = list()
+
+    print("horn file", len(sorted(glob.glob(path + '*.horn'))))
     print("hints file", len(sorted(glob.glob(path + '*.hints'))))
     print("negativeHints file", len(sorted(glob.glob(path + '*.negativeHints'))))
 
@@ -308,19 +392,8 @@ def readHornClausesAndHints(path,dataset,discardNegativeData):
             train_Y_negative.append(0)
 
 
-    print("-----------------")
 
-    if(dataset=='train' and discardNegativeData==True):
-        #cut nagative data size for unbalanced data
-        discardNegativeData=len(train_X_negative)-len(train_X_positive)
-        print("Discard",discardNegativeData,"row of negative data from",len(train_X_negative))
-        negativeData=list(zip(train_X_negative,train_Y_negative))
-        random.shuffle(negativeData)
-        for i in range(discardNegativeData):
-            negativeData.pop()
-        train_X_negative, train_Y_negative=zip(*negativeData)
-        train_X_negative=list(train_X_negative)
-        train_Y_negative=list(train_Y_negative)
+    print("-----------------")
 
     #merge positive and negative data togather
     train_X = train_X_positive + train_X_negative
@@ -352,6 +425,7 @@ def readHornClausesAndHints(path,dataset,discardNegativeData):
     print("train_Y shape", np.array(train_Y).shape)
 
     return train_X,train_Y
+
 def transformOneDatatoFeatures_bagOfWord(path):
     # define vocab
     vocab = Counter()
@@ -451,7 +525,7 @@ def transformDatatoFeatures_tokennizer(X_train,X_test):
     # return sequences_train
 
 
-def buildTrainModel(encodedPrograms,encodedHints):
+def buildTrainModel(encodedPrograms,encodedHints):#text level
 
     # define two sets of inputs
     inputA = Input(shape=(encodedPrograms.shape[1],1))
@@ -514,7 +588,7 @@ def buildTrainModel(encodedPrograms,encodedHints):
     model = Model(inputs=[input1, input2], outputs=out)
 '''
     return model
-def buildTrainModel(encodedPrograms,encodedHints,graphEncodedPrograms_train):
+def buildTrainModel(encodedPrograms,encodedHints,graphEncodedPrograms_train): #include program graph
 
     # define three sets of inputs
     inputA = Input(shape=(encodedPrograms.shape[1],1))
@@ -577,7 +651,8 @@ def buildTrainModel(encodedPrograms,encodedHints,graphEncodedPrograms_train):
     model = Model(inputs=[x.input, y.input,x1.input], outputs=z)
 
     return model
-def train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,y_train, y_test,batch_size,epochs):
+def train(encodedPrograms_train,encodedPrograms_test,\
+          encodedHints_train,encodedHints_test,y_train, y_test,batch_size,epochs):#text level
     model=buildTrainModel(encodedPrograms_train, encodedHints_train)
     model.compile(optimizer=k.optimizers.RMSprop(),
                   #optimizer=k.optimizers.Adam(),
@@ -606,7 +681,7 @@ def train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedH
 
 def train(encodedPrograms_train,encodedPrograms_test,\
           graphEncodedPrograms_train,graphEncodedPrograms_test,\
-          encodedHints_train,encodedHints_test,y_train, y_test,batch_size,epochs):
+          encodedHints_train,encodedHints_test,y_train, y_test,batch_size,epochs): #include program graph
     print('encodedPrograms_train',np.array(encodedPrograms_train).shape)
     print('graphEncodedPrograms_train', np.array(graphEncodedPrograms_train).shape)
     print('encodedHints_train',np.array(encodedHints_train).shape)
@@ -626,6 +701,7 @@ def train(encodedPrograms_train,encodedPrograms_test,\
     #y_train=k.utils.to_categorical(y_train,num_classes=2)
     #y_test = k.utils.to_categorical(y_test, num_classes=2)
     earlyStop=k.callbacks.EarlyStopping(monitor='val_acc',min_delta=0.005,patience=5)
+    callbacks=[earlyStop]
     history = model.fit([encodedPrograms_train, encodedHints_train,graphEncodedPrograms_train],y_train,
                         batch_size=batch_size, epochs=epochs,
                         #callbacks=[earlyStop],
