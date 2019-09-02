@@ -1,9 +1,5 @@
-
-
-
-
 import os
-
+from src.graphProcessing import callEldaricaGenerateGraphs
 
 from src.loadData import train,readHornClausesAndHints_resplitTrainAndVerifyData
 from src.trainDoc2VecModel import trainDoc2VecModelfunction
@@ -22,14 +18,17 @@ def main():
     path = parenDir + '/' + benchmark + '/'
     print(path)
 
+    # get graph data
+    #callEldaricaGenerateGraphs('trainData')
+
     # transformOneFiletoFeatures(path)
     train_X ,train_Y ,verify_X ,verify_Y =\
         readHornClausesAndHints_resplitTrainAndVerifyData(path ,\
-        dataset='train',discardNegativeData=True,smallTrain=False,smallTrainSize=50)
-    # train_X=pickleRead('trainData_X')
-    # train_Y = pickleRead('trainData_Y')
-    # verify_X = pickleRead('verifyData_X')
-    # verify_X = pickleRead('verifyData_Y')
+        dataset='train',discardNegativeData=True,smallTrain=True,smallTrainSize=50)
+    train_X=pickleRead('trainData_X')
+    train_Y = pickleRead('trainData_Y')
+    verify_X = pickleRead('verifyData_X')
+    verify_X = pickleRead('verifyData_Y')
     #train_X=train_X[0:40]   #cut training size for debug
     #train_Y = train_Y[0:40] #cut training size for debug
 
@@ -41,8 +40,8 @@ def main():
     # print("train Doc2Vec model end")
 
     # load Doc2Vec models
-    #programDoc2VecModel =gensim.models.doc2vec.Doc2Vec.load(parenDir +'/models/programDoc2VecModel')
-    #hintsDoc2VecModel =gensim.models.doc2vec.Doc2Vec.load(parenDir +'/models/hintsDoc2VecModel')
+    programDoc2VecModel =gensim.models.doc2vec.Doc2Vec.load(parenDir +'/models/programDoc2VecModel')
+    hintsDoc2VecModel =gensim.models.doc2vec.Doc2Vec.load(parenDir +'/models/hintsDoc2VecModel')
 
     # split data to training and verifiying sets
     # train_X, verify_X, train_Y, verify_Y = train_test_split(train_X, train_Y, test_size=0.2, random_state=42)
@@ -66,6 +65,10 @@ def main():
 
     encodedHints_train = pickleRead('encodedHints_train')
     encodedHints_test = pickleRead('encodedHints_test')
+
+    graphencodedHints_train = pickleRead('graphEncodedHints_train')
+    graphencodedHints_test = pickleRead('graphEncodedHints_test')
+
     train_Y = pickleRead('train_Y')
     verify_Y = pickleRead('verify_Y')
 
@@ -78,8 +81,9 @@ def main():
     #                       verify_Y, batch_size, epochs)
     history, model = train(encodedPrograms_train, encodedPrograms_test,\
                            graphEncodedPrograms_train,graphEncodedPrograms_test,\
-                           encodedHints_train, encodedHints_test, train_Y,
-                           verify_Y, batch_size, epochs)
+                           encodedHints_train, encodedHints_test,\
+                           graphencodedHints_train,graphencodedHints_test,\
+                           train_Y,verify_Y, batch_size, epochs)
     plotHistory(history)
 
     # #load models instead of training

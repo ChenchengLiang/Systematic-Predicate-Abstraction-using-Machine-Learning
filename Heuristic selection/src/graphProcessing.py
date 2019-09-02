@@ -128,7 +128,7 @@ def getGraphEmbeddingNode2vec(graph,dimension=3,p=True):
     node2vec = Node2Vec(graph, dimensions=dimension, walk_length=10, num_walks=20, workers=4)
     node2vecModel = node2vec.fit(window=10, min_count=1, batch_words=4)
     embedding,embeddingDict=getNodeEmbedding(node2vecModel,graph,p=p)
-    AggregatedEmbedding=[0]*dimension
+    AggregatedEmbedding=[0]*dimension #create 0 list 0 with dimensions' list
     for node in embedding:
         AggregatedEmbedding=AggregatedEmbedding+node
     if (p == True):
@@ -146,7 +146,7 @@ def callEldaricaGenerateGraphs(dataset='trainData'):
             fileName='/home/chencheng/Desktop/benchmarks/allInOneFile/'+fileName
             if(os.path.isfile(fileName)):
                 command = "/home/chencheng/Downloads/eldarica-graph-generation/./eld "
-                run = command + fileName + " -p"
+                run = command + fileName + " -p" + " -abstract:manual"
                 print("command:", run)
                 #os.popen(run)
                 #p = subprocess.Popen(run, shell=True)
@@ -154,14 +154,13 @@ def callEldaricaGenerateGraphs(dataset='trainData'):
                 eld = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE)
                 stdout = eld.communicate()
                 count=count+1
-                print()
-        else:
+        if (dataset == 'testData'):
             fileName = file[file.find('/testData')+10:]
             #print(fileName)
             fileName='/home/chencheng/Desktop/benchmarks/allInOneFile/'+fileName
             if(os.path.isfile(fileName)):
                 command = "/home/chencheng/Downloads/eldarica-graph-generation/./eld "
-                run = command + fileName + " -p"
+                run = command + fileName + " -p" + " -abstract:manual"
                 print("command:", run)
                 #os.popen(run)
                 #p = subprocess.Popen(run, shell=True)
@@ -169,7 +168,7 @@ def callEldaricaGenerateGraphs(dataset='trainData'):
                 eld = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE)
                 stdout = eld.communicate()
                 count=count+1
-                print()
+
 
 
     print(count," program transfomed")

@@ -1,6 +1,6 @@
 from src.Miscellaneous import data2list, recoverPredictedText,printOnePredictedTextInStringForm,\
     doc2vecModelInferNewData,testAccuracy,pickleWrite,pickleRead,sortHints,printList
-from src.loadData import load_model,readHornClausesAndHints,readHornClausesAndHints_graph,predict_doc2vec,readHornClausesAndHints_resplitTrainAndVerifyData
+from src.loadData import load_model,readHornClausesAndHints,readHornClausesAndHints_graph_predict,predict_doc2vec,readHornClausesAndHints_resplitTrainAndVerifyData
 import gensim
 import os
 import numpy as np
@@ -55,10 +55,10 @@ def printRankNHints(predictedDataWithUnsortedHints,index,topN=3):
     return RankedHintList
 def predict_doc2vec_rank(model, programDoc2VecModel, hintsDoc2VecModel, test_X, test_Y, printExample=True):
     # embedding test data for prediction
-    encodedPrograms_test, encodedHints_test,graphEncodedHints_test= doc2vecModelInferNewData(test_X, programDoc2VecModel, hintsDoc2VecModel)
+    encodedPrograms_test, encodedHints_test,graphEncodedPrograms_test,graphEncodedHints_test= doc2vecModelInferNewData(test_X, programDoc2VecModel, hintsDoc2VecModel)
 
     # predict
-    sigmoidOutput = model.predict([encodedPrograms_test, encodedHints_test,graphEncodedHints_test])
+    sigmoidOutput = model.predict([encodedPrograms_test, encodedHints_test,graphEncodedPrograms_test,graphEncodedHints_test])
     #text_X[][0]=program text_X[][1]=hint
 
     predictedDataWithUnsortedHints=getRankedResults(test_X,test_Y,sigmoidOutput,printOneExample=False)
@@ -76,7 +76,8 @@ def predict_doc2vec_rank(model, programDoc2VecModel, hintsDoc2VecModel, test_X, 
     print('y_test shape:', np.array(y_test).shape)
     print('encodedPrograms_test', encodedPrograms_test.shape)
     print('encodedHints_test', encodedHints_test.shape)
-    print('graphEncodedHints',graphEncodedHints_test.shape)
+    print('graphEncodedPrograms_test',graphEncodedPrograms_test.shape)
+    print('graphEncodedHints', graphEncodedHints_test.shape)
 
     # print predicted y true y
     print('predicted y vs. true y:')
@@ -127,7 +128,7 @@ def main():
 
 
     #read test data
-    test_X, test_Y = readHornClausesAndHints_graph(parenDir + '/' + 'testData' + '/', 'test',discardNegativeData=False)
+    test_X, test_Y = readHornClausesAndHints_graph_predict(parenDir + '/' + 'testData' + '/', 'test',discardNegativeData=False)
 
     #predict_tokenization(model,train_X,verify_X, test_Y,test_X)
     #predict_doc2vec(model,programDoc2VecModel,hintsDoc2VecModel,test_X,test_Y,printExample=False)

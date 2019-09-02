@@ -16,18 +16,21 @@ def extractHornClausesFromOneProgram(filePath, benchmark, fileName, abstractionO
     stdout = eld.communicate()
     lines=stdout[0].decode("utf-8").rstrip("\n")
     printBegin=False
+    printSimple=False
     parenDir = os.path.abspath(os.path.pardir)
     filename = parenDir + '/' + benchmark + '/' + fileName + ".horn"
     f = open(filename, "w+")
 
     for line in lines.splitlines():
-        if line.find('Verification hints:')!=-1:
+        if line.find('Verification hints:')!=-1 and printSimple==True:
             print("Write to", filename)
             break
         if printBegin == True:
             f.write(line + "\n")
             #print(line)
-        if line.find('Singleton') !=-1:
+        if line.find('After')!=-1:
+            printSimple=True
+        if line.find('Singleton') !=-1 and printSimple==True:
             printBegin=True
             #print("DEBUG")
     f.close()

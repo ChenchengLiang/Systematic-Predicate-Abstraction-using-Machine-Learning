@@ -13,8 +13,8 @@ def transformDatatoFeatures_doc2vec(X_train,X_test,programDoc2VecModel,hintsDoc2
 
     #infer/embedding programs and hints to vectors
     print("Doc2Vec inferring begin")
-    encodedPrograms_train,encodedHints_train,EncodedPrograms_train=doc2vecModelInferNewData(X_train, programDoc2VecModel, hintsDoc2VecModel)
-    encodedPrograms_verify, encodedHints_verify,graphEncodedPrograms_verify = doc2vecModelInferNewData(X_test, programDoc2VecModel,hintsDoc2VecModel)
+    encodedPrograms_train,encodedHints_train,EncodedPrograms_train,graphEncodedHints_train=doc2vecModelInferNewData(X_train, programDoc2VecModel, hintsDoc2VecModel)
+    encodedPrograms_verify, encodedHints_verify,graphEncodedPrograms_verify,graphEncodedHints_verify = doc2vecModelInferNewData(X_test, programDoc2VecModel,hintsDoc2VecModel)
     print("Doc2Vec inferring end")
     print('write infered train and test data to files')
     pickleWrite(content=encodedPrograms_train,name='encodedPrograms_train')
@@ -39,8 +39,23 @@ def transformDatatoFeatures_node2vec(X_train,X_test):
     pickleWrite(content=graphEncodedPrograms_train,name='graphEncodedPrograms_train')
     pickleWrite(content=graphEncodedPrograms_verify, name='graphEncodedPrograms_test')
 
+    graphEncodedHints_train = list()
+    for graph in X_train:
+        graphEncodedHints_train.append(graph[3])
+    graphEncodedHints_train = np.expand_dims(graphEncodedHints_train, axis=2)
+    #graphEncodedHints_train=np.array(graphEncodedHints_train)
 
-    return graphEncodedPrograms_train,graphEncodedPrograms_verify
+    graphEncodedHints_verify = list()
+    for graph in X_test:
+        graphEncodedHints_verify.append(graph[3])
+    graphEncodedHints_verify = np.expand_dims(graphEncodedHints_verify, axis=2)
+    #graphEncodedHints_verify=np.array(graphEncodedHints_verify)
+
+    pickleWrite(content=graphEncodedHints_train, name='graphEncodedHints_train')
+    pickleWrite(content=graphEncodedHints_verify, name='graphEncodedHints_test')
+
+
+    return graphEncodedPrograms_train,graphEncodedPrograms_verify,graphEncodedHints_train,graphEncodedHints_verify
 
 
 

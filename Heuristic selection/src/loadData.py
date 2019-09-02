@@ -11,6 +11,7 @@ import glob
 import random
 import gensim
 import nltk
+from src.graphProcessing import readGraphFromGraphvizFromTrainData,getGraphEmbeddingNode2vec
 nltk.download('punkt')
 from collections import Counter
 
@@ -18,7 +19,7 @@ from keras.layers import Conv1D, Dense,Input,concatenate, Flatten
 from src.Miscellaneous import data2list, recoverPredictedText,printOnePredictedTextInStringForm,\
     doc2vecModelInferNewData,testAccuracy,pickleWrite,pickleRead,printList,sortHints
 from src.plot import plotHistory
-
+from src.graphProcessing import callEldaricaGenerateGraphs
 #from trainDoc2VecModel import trainDoc2VectModel
 
 def read_program():
@@ -77,11 +78,13 @@ def constructTrainingData(hornText,hintsText):
     return [hornText, hintsList]
 
 
-def constructUnsplitedData(hornText,hintsText,negativeHintsText,graphEmbededProgram,discardNegativeData=True):
-    # construct positive training data
+def constructUnsplitedData(fileName,hornText,hintsText,negativeHintsText,graphEmbededProgram,discardNegativeData=True):
+    # construct positive and negative training data
     heads = list()
-    hintsList = list()
-    negativeList=list()
+    positiveHintList = list()
+    negativeHIntList=list()
+    positiveHintsList_tree=list()
+    negativeHintsList_tree = list()
     if hintsText:
         for line in hintsText.splitlines():
             if (line.find('main') != -1):
@@ -89,13 +92,29 @@ def constructUnsplitedData(hornText,hintsText,negativeHintsText,graphEmbededProg
         # print(heads)
         for head in heads:
             storeFlag = False
+            head_temp = head[:head.find("/")]
+            head_temp = "inv_" + head_temp
             for line in hintsText.splitlines():
-                # print(line)
+
                 if (line.find('main') != -1 and storeFlag == True):
                     break
                 if (storeFlag == True):
-                    hintsList.append([head, line])
-                if (line.find(head) != -1):
+                    print("positive hint: ", line)
+                    #positiveHintList.append([head, line])
+                    #get hint file name
+                    hintFilePath=fileName+".hints.graphs/"
+                    hintFileName=head_temp+":"+line+".gv"
+                    if(os.path.isfile(hintFilePath+hintFileName)):
+                        positiveHintList.append([head, line])
+                        graph = readGraphFromGraphvizFromTrainData(hintFilePath+hintFileName, vitualize=False)
+                        graphEmbededHint = getGraphEmbeddingNode2vec(graph, dimension=20, p=False)
+                        positiveHintsList_tree.append(graphEmbededHint)
+
+                        print(graphEmbededHint)
+                    else:
+                        print("cannot find file",hintFilePath+hintFileName)
+                if (line.find(head[head.find("/")]) != -1):
+                    print("positive hint head: ", line)
                     storeFlag = True
         #print(hintsList)
     if negativeHintsText:
@@ -105,34 +124,63 @@ def constructUnsplitedData(hornText,hintsText,negativeHintsText,graphEmbededProg
         # print(heads)
         for head in heads:
             storeFlag = False
+            head_temp = head[:head.find("/")]
+            head_temp = "inv_" + head_temp
+            storeFlag = False
             for line in negativeHintsText.splitlines():
-                # print(line)
+                #print("negative hint: ", line)
                 if (line.find('main') != -1 and storeFlag == True):
                     break
                 if (storeFlag == True):
-                    negativeList.append([head, line])
-                if (line.find(head) != -1):
+                    print("negative hint: ", line)
+                    hintFilePath=fileName+".hints.graphs/"
+                    hintFileName=head_temp+":"+line+".gv"
+                    if(os.path.isfile(hintFilePath+hintFileName)):
+                        negativeHIntList.append([head, line])
+                        graph = readGraphFromGraphvizFromTrainData(hintFilePath+hintFileName, vitualize=False)
+                        graphEmbededHint = getGraphEmbeddingNode2vec(graph, dimension=20, p=False)
+                        negativeHintsList_tree.append(graphEmbededHint)
+
+                        print(graphEmbededHint)
+                    else:
+                        print("cannot find file",hintFilePath+hintFileName)
+
+                if (line.find(head[head.find("/")]) != -1):
+                    print("negative hint head: ", line)
                     storeFlag = True
+    print("positive hints text:",len(positiveHintList))
+    print("negative hints text:", len(negativeHIntList))
+    print("positive hints graph:", len(positiveHintsList_tree))
+    print("negative hints graph:", len(negativeHintsList_tree))
+    if (discardNegativeData==True and len(negativeHIntList)-len(positiveHintList)>0):
+        shuf = list(zip(negativeHIntList, negativeHintsList_tree))
+        random.shuffle(shuf)
+        negativeHIntList, negativeHintsList_tree = zip(*shuf)
+        negativeHIntList=negativeHIntList[0:len(positiveHintList)]
+        negativeHintsList_tree = negativeHintsList_tree[0:len(positiveHintList)]
+    print("After delete some nagative hints:")
+    print("positive hints text:", len(positiveHintList))
+    print("negative hints text:", len(negativeHIntList))
+    print("positive hints graph:", len(positiveHintsList_tree))
+    print("negative hints graph:", len(negativeHintsList_tree))
 
-    if (discardNegativeData==True and len(negativeList)-len(hintsList)>0):
-        random.shuffle(negativeList)
-        negativeList=negativeList[0:len(hintsList)]
-
-    return [hornText, hintsList,negativeList,graphEmbededProgram]
+    return [hornText, positiveHintList,negativeHIntList,graphEmbededProgram,positiveHintsList_tree,negativeHintsList_tree]
 
 def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
-                  discardNegativeData,smallTrain=False,smallTrainSize=50):
+                  discardNegativeData,smallTrain=False,smallTrainSize=50,smallTrainProgramNumber=4):
     trainDataSplitRate=0.8
     print("horn file", len(sorted(glob.glob(path + '*.horn'))))
     print("hints file", len(sorted(glob.glob(path + '*.hints'))))
     print("negativeHints file", len(sorted(glob.glob(path + '*.negativeHints'))))
     print("graph file", len(sorted(glob.glob(path + '*.gv'))))
-
+    programCOunt=0
     unsplitedData = list()
     for fileHorn, fileHints, fileNegativeHints,fileGraph in zip(sorted(glob.glob(path + '*.horn')),
                                                       sorted(glob.glob(path + '*.hints')),
                                                       sorted(glob.glob(path + '*.negativeHints')),\
                                                                 sorted(glob.glob(path + '*.gv'))):
+        fileName=fileHorn[:fileHorn.find(".horn")]
+        print(fileName)
         # read program
         print(fileHorn)
         f = open(fileHorn, "r")
@@ -154,18 +202,22 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
 
         # read program graph
         print(fileGraph)
-        from src.graphProcessing import readGraphFromGraphvizFromTrainData,getGraphEmbeddingNode2vec
         graph = readGraphFromGraphvizFromTrainData(fileGraph, vitualize=False)
         graphEmbededProgram=getGraphEmbeddingNode2vec(graph, dimension=100,p=False)
 
-        unsplitedData.append(constructUnsplitedData(hornText, hintsText, negativeHintsText, graphEmbededProgram,discardNegativeData))
-        # print(unsplitedData[-1][0])
-        # print(unsplitedData[-1][1])
-        # print(unsplitedData[-1][2])
-        # print(unsplitedData[-1][3])
+        unsplitedData.append(constructUnsplitedData(fileName,hornText, hintsText, negativeHintsText, graphEmbededProgram,discardNegativeData))
+        # print(unsplitedData[-1][0]) hornclauses
+        # print(unsplitedData[-1][1]) positive hint
+        # print(unsplitedData[-1][2]) negative hint
+        # print(unsplitedData[-1][3]) program graph
+        # print(unsplitedData[-1][4]) positive hint graph
+        # print(unsplitedData[-1][5]) negative hint graph
+        programCOunt=programCOunt+1
+        if (smallTrain == True and programCOunt==smallTrainProgramNumber): # only use one program for debug
+            break
 
-    print(len(glob.glob(path + '*.horn')), "programs' information read")
-    print(len(glob.glob(path + '*.gv')), "program graphs' information read")
+    print(programCOunt, "programs' information read")
+    print(programCOunt, "program graphs' information read")
 
     #print("unsplitedData length", len(unsplitedData))
     random.shuffle(unsplitedData)
@@ -179,19 +231,19 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
     verifyData_X = list()
     verifyData_Y = list()
 
-    for program in trainData:
-        for positiveHint in program[1]:
-            trainData_X.append([program[0], positiveHint[0] + '\n' + positiveHint[1],program[3]])
+    for program in trainData: #form train_Y by positive and negative hint
+        for positiveHint,graphPositiveHint in zip(program[1],program[4]):
+            trainData_X.append([program[0], positiveHint[0] + '\n' + positiveHint[1],program[3],graphPositiveHint])
             trainData_Y.append(1)
-        for negativeHint in program[2]:
-            trainData_X.append([program[0], negativeHint[0] + '\n' + negativeHint[1],program[3]])
+        for negativeHint,graphNegativeHint in zip(program[2],program[5]):
+            trainData_X.append([program[0], negativeHint[0] + '\n' + negativeHint[1],program[3],graphNegativeHint])
             trainData_Y.append(0)
     for program in verifyData:
-        for positiveHint in program[1]:
-            verifyData_X.append([program[0], positiveHint[0] + '\n' + positiveHint[1],program[3]])
+        for positiveHint,graphPositiveHint in zip(program[1],program[4]):
+            verifyData_X.append([program[0], positiveHint[0] + '\n' + positiveHint[1],program[3],graphPositiveHint])
             verifyData_Y.append(1)
-        for negativeHint in program[2]:
-            verifyData_X.append([program[0], negativeHint[0] + '\n' + negativeHint[1],program[3]])
+        for negativeHint,graphNegativeHint in zip(program[2],program[5]):
+            verifyData_X.append([program[0], negativeHint[0] + '\n' + negativeHint[1],program[3],graphNegativeHint])
             verifyData_Y.append(0)
 
 
@@ -206,8 +258,9 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
 
     # print("debug")
     # print("trainData_X[0][0]",trainData_X[0][0]) #program
-    # print("trainData_X[0][1]", trainData_X[0][1]) #hint
+    # print("trainData_X[0][1]", trainData_X[0][1]) #hint text (head \n hint)
     # print("trainData_X[0][2]", trainData_X[0][2]) #progran graph embedding
+    # print("trainData_X[0][3]", trainData_X[0][3]) #hint graph
     # print("trainData_X len:", len(trainData_X))
 
 
@@ -232,7 +285,7 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
     return trainData_X,trainData_Y,verifyData_X,verifyData_Y
 
 
-def readHornClausesAndHints_graph(path,dataset,discardNegativeData):
+def readHornClausesAndHints_graph_predict(path,dataset,discardNegativeData):
     hornVocab = Counter()
     hintVocab = Counter()
     RedundantHintVocab = Counter()
@@ -252,6 +305,8 @@ def readHornClausesAndHints_graph(path,dataset,discardNegativeData):
                                                       sorted(glob.glob(path + '*.hints')),
                                                       sorted(glob.glob(path + '*.negativeHints')),\
                                                                 sorted(glob.glob(path + '*.gv'))):
+        fileName = fileHorn[:fileHorn.find(".horn")]
+        print(fileName)
         # read program
         print(fileHorn)
         f = open(fileHorn, "r")
@@ -277,7 +332,7 @@ def readHornClausesAndHints_graph(path,dataset,discardNegativeData):
         graph = readGraphFromGraphvizFromTrainData(fileGraph, vitualize=False)
         graphEmbededProgram=getGraphEmbeddingNode2vec(graph, dimension=100,p=False)
 
-        unsplitedData.append(constructUnsplitedData(hornText, hintsText, negativeHintsText, graphEmbededProgram,discardNegativeData))
+        unsplitedData.append(constructUnsplitedData(fileName,hornText, hintsText, negativeHintsText, graphEmbededProgram,discardNegativeData))
         # print(unsplitedData[-1][0])
         # print(unsplitedData[-1][1])
         # print(unsplitedData[-1][2])
@@ -285,32 +340,33 @@ def readHornClausesAndHints_graph(path,dataset,discardNegativeData):
 
     print(len(glob.glob(path + '*.horn')), "programs' information read")
     print(len(glob.glob(path + '*.gv')), "program graphs' information read")
-    trainData_X = list()
-    trainData_Y = list()
+    testData_X = list()
+    testData_Y = list()
 
 
     for program in unsplitedData:
-        for positiveHint in program[1]:
-            trainData_X.append([program[0], positiveHint[0] + '\n' + positiveHint[1],program[3]])
-            trainData_Y.append(1)
-        for negativeHint in program[2]:
-            trainData_X.append([program[0], negativeHint[0] + '\n' + negativeHint[1],program[3]])
-            trainData_Y.append(0)
+        for positiveHint,graphPositiveHint in zip(program[1],program[4]):
+            testData_X.append([program[0], positiveHint[0] + '\n' + positiveHint[1],program[3],graphPositiveHint])
+            testData_Y.append(1)
+        for negativeHint,graphNegativeHint in zip(program[2],program[5]):
+            testData_X.append([program[0], negativeHint[0] + '\n' + negativeHint[1],program[3],graphNegativeHint])
+            testData_Y.append(0)
 
 
 
-    if(len(trainData_X)>0):
-        shuf = list(zip(trainData_X, trainData_Y))
+
+    if(len(testData_X)>0):
+        shuf = list(zip(testData_X, testData_Y))
         random.shuffle(shuf)
         trainData_X, trainData_Y = zip(*shuf)
     print("-----------------")
 
 
-    print("trainData_X",np.array(trainData_X).shape)
-    print("trainData_Y",np.array(trainData_Y).shape)
-
-    pickleWrite(trainData_X,'trainData_X')
-    pickleWrite(trainData_Y, 'trainData_Y')
+    print("testData_X",np.array(testData_X).shape)
+    print("testData_y",np.array(testData_Y).shape)
+    #
+    # pickleWrite(trainData_X,'trainData_X')
+    # pickleWrite(trainData_Y, 'trainData_Y')
     return trainData_X,trainData_Y
 
 
@@ -651,8 +707,85 @@ def buildTrainModel(encodedPrograms,encodedHints,graphEncodedPrograms_train): #i
     model = Model(inputs=[x.input, y.input,x1.input], outputs=z)
 
     return model
+
+
+def buildTrainModel(encodedPrograms,encodedHints,graphEncodedPrograms_train,graphencodedHints_train): #include program graph and hint graph
+
+    # define three sets of inputs
+    inputA = Input(shape=(encodedPrograms.shape[1],1))
+    inputB = Input(shape=(encodedHints.shape[1],1))
+    inputC = Input(shape=(graphEncodedPrograms_train.shape[1], 1))
+    inputD = Input(shape=(graphencodedHints_train.shape[1], 1))
+
+    # the first branch operates on the first input
+    #x = Dense(8, activation="relu")(inputA)
+    x = Conv1D(filters=50,kernel_size=5, activation="relu")(inputA)
+    x = Conv1D(filters=25, kernel_size=5, activation="relu")(x)
+    x = Conv1D(filters=10, kernel_size=5, activation="relu")(x)
+    x = Flatten()(x)
+    #x = Dense(10, activation="relu")(x)
+    x = Model(inputs=inputA, outputs=x)
+
+    # the second branch opreates on the second input
+    #y = Dense(64, activation="relu")(inputB)
+    y = Conv1D(filters=20,kernel_size=5, activation="relu")(inputB)
+    y = Conv1D(filters=15, kernel_size=5, activation="relu")(y)
+    y = Conv1D(filters=10, kernel_size=5, activation="relu")(y)
+    #y = Dense(32, activation="relu")(y)
+    y = Flatten()(y)
+    #y = Dense(10, activation="relu")(y)
+    y = Model(inputs=inputB, outputs=y)
+
+    # the third branch opreates on the third input
+    #x1 = Dense(64, activation="relu")(inputC)
+    x1 = Conv1D(filters=20,kernel_size=5, activation="relu")(inputC)
+    x1 = Conv1D(filters=15, kernel_size=5, activation="relu")(x1)
+    x1 = Conv1D(filters=10, kernel_size=5, activation="relu")(x1)
+    #x1 = Dense(32, activation="relu")(x1)
+    x1 = Flatten()(x1)
+    #y = Dense(10, activation="relu")(x1)
+    x1 = Model(inputs=inputC, outputs=x1)
+
+    # the forth branch opreates on the forth input
+    # x2 = Dense(64, activation="relu")(inputD)
+    x2 = Conv1D(filters=20, kernel_size=5, activation="relu")(inputD)
+    x2 = Conv1D(filters=15, kernel_size=5, activation="relu")(x2)
+    x2 = Conv1D(filters=10, kernel_size=5, activation="relu")(x2)
+    # x2 = Dense(32, activation="relu")(x2)
+    x2 = Flatten()(x2)
+    # y = Dense(10, activation="relu")(x2)
+    x2 = Model(inputs=inputD, outputs=x2)
+
+    # combine the output of the two branches
+    combined = concatenate([x.output, y.output,x1.output,x2.output])
+
+    # apply a FC layer and then a regression prediction on the
+    # combined outputs
+    z = Dense(64, activation="relu",\
+              #activity_regularizer=k.regularizers.l1(0.01),\
+              #kernel_regularizer=k.regularizers.l2(0.01)\
+              )(combined)
+    z = Dense(32, activation="relu")(z)
+    z = Dense(16, activation="relu")(z)
+
+    '''
+    z = Dense(2, activation="softmax",\
+              #activity_regularizer=k.regularizers.l1(0.0001)\
+              )(z)
+    '''
+
+    z = Dense(1, activation="sigmoid", \
+              # activity_regularizer=k.regularizers.l1(0.0001)\
+              )(z)
+
+    # our model will accept the inputs of the two branches and
+    # then output a single value
+    model = Model(inputs=[x.input, y.input,x1.input,x2.input], outputs=z)
+
+    return model
 def train(encodedPrograms_train,encodedPrograms_test,\
-          encodedHints_train,encodedHints_test,y_train, y_test,batch_size,epochs):#text level
+          encodedHints_train,encodedHints_test,\
+          y_train, y_test,batch_size,epochs):#text level
     model=buildTrainModel(encodedPrograms_train, encodedHints_train)
     model.compile(optimizer=k.optimizers.RMSprop(),
                   #optimizer=k.optimizers.Adam(),
@@ -681,7 +814,8 @@ def train(encodedPrograms_train,encodedPrograms_test,\
 
 def train(encodedPrograms_train,encodedPrograms_test,\
           graphEncodedPrograms_train,graphEncodedPrograms_test,\
-          encodedHints_train,encodedHints_test,y_train, y_test,batch_size,epochs): #include program graph
+          encodedHints_train,encodedHints_test,\
+          y_train, y_test,batch_size,epochs): #include program graph
     print('encodedPrograms_train',np.array(encodedPrograms_train).shape)
     print('graphEncodedPrograms_train', np.array(graphEncodedPrograms_train).shape)
     print('encodedHints_train',np.array(encodedHints_train).shape)
@@ -713,7 +847,43 @@ def train(encodedPrograms_train,encodedPrograms_test,\
     model.save(parenDir+'/models/my_model.h5')
     return history,model
 
-
+def train(encodedPrograms_train,encodedPrograms_test,\
+          graphEncodedPrograms_train,graphEncodedPrograms_test,\
+          encodedHints_train,encodedHints_test,\
+          graphencodedHints_train,graphencodedHints_test,\
+          y_train, y_test,batch_size,epochs): #include program graph
+    print('encodedPrograms_train',np.array(encodedPrograms_train).shape)
+    print('graphEncodedPrograms_train', np.array(graphEncodedPrograms_train).shape)
+    print('encodedHints_train',np.array(encodedHints_train).shape)
+    print('graphencodedHints_train', np.array(graphencodedHints_train).shape)
+    model=buildTrainModel(encodedPrograms_train, encodedHints_train,graphEncodedPrograms_train,graphencodedHints_train)
+    model.compile(optimizer=k.optimizers.RMSprop(),
+                  #optimizer=k.optimizers.Adam(),
+                  # optimizer=k.optimizers.SGD(),
+                  loss='binary_crossentropy',
+                   metrics=['accuracy'])
+    model.summary()
+    y_train = np.expand_dims(y_train, axis=2)
+    y_test = np.expand_dims(y_test, axis=2)
+    print('encodedPrograms_train',np.array(encodedPrograms_train).shape)
+    print('graphEncodedPrograms_train', np.array(graphEncodedPrograms_train).shape)
+    print('encodedHints_train',np.array(encodedHints_train).shape)
+    print('graphencodedHints_train', np.array(graphencodedHints_train).shape)
+    print('y_train',np.array(y_train).shape)
+    #y_train=k.utils.to_categorical(y_train,num_classes=2)
+    #y_test = k.utils.to_categorical(y_test, num_classes=2)
+    earlyStop=k.callbacks.EarlyStopping(monitor='val_acc',min_delta=0.005,patience=5)
+    callbacks=[earlyStop]
+    history = model.fit([encodedPrograms_train, encodedHints_train,graphEncodedPrograms_train,graphencodedHints_train],y_train,
+                        batch_size=batch_size, epochs=epochs,
+                        #callbacks=[earlyStop],
+                        #callbacks=callbacks,
+                        validation_data=([encodedPrograms_test, encodedHints_test,graphEncodedPrograms_test,graphencodedHints_test], y_test),
+                        verbose=1)
+    pickleWrite(history,'history')
+    parenDir = os.path.abspath(os.path.pardir)
+    model.save(parenDir+'/models/my_model.h5')
+    return history,model
 def predict_doc2vec(model,programDoc2VecModel,hintsDoc2VecModel,test_X,test_Y,printExample=True):
     #embedding test data for prediction
     encodedPrograms_test,encodedHints_test = doc2vecModelInferNewData(test_X, programDoc2VecModel, hintsDoc2VecModel)
@@ -785,14 +955,19 @@ def main():
     print("Start")
 
     #benchmark='dillig'
-    benchmark = 'testData'
+    benchmark = 'trainData'
     curpath = os.path.abspath(os.curdir)
     parenDir = os.path.abspath(os.path.pardir)
     path = parenDir + '/' + benchmark + '/'
     print(path)
 
+    #get graph data
+    #callEldaricaGenerateGraphs('trainData')
+
     #transformOneFiletoFeatures(path)
-    train_X,train_Y,verify_X,verify_Y=readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset='train',discardNegativeData=True)
+    readHornClausesAndHints_resplitTrainAndVerifyData(path, \
+                                                      dataset='train', discardNegativeData=True, smallTrain=True,
+                                                      smallTrainSize=50,smallTrainProgramNumber=4)
     #train_X=train_X[0:40]   #cut training size for debug
     #train_Y = train_Y[0:40] #cut training size for debug
 
@@ -802,8 +977,8 @@ def main():
     # trainHintsDoc2VecModel.save(parenDir + '/models/hintsDoc2VecModel')
 
     #load Doc2Vec models
-    programDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/programDoc2VecModel')
-    hintsDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/hintsDoc2VecModel')
+    # programDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/programDoc2VecModel')
+    # hintsDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/hintsDoc2VecModel')
 
     #split data to training and verifiying sets
     #train_X, verify_X, train_Y, verify_Y = train_test_split(train_X, train_Y, test_size=0.2, random_state=42)
@@ -814,24 +989,24 @@ def main():
     #encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test=transformDatatoFeatures_tokennizer(train_X,verify_X)
     # encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,\
     #     =transformDatatoFeatures_doc2vec(train_X, verify_X,programDoc2VecModel,hintsDoc2VecModel)
-    from src.Data2Features import Doc2vecFeatureEngineering
-    Doc2vecFeatureEngineering()
+    # from src.Data2Features import Doc2vecFeatureEngineering
+    # Doc2vecFeatureEngineering()
 
 
     #load features
-    encodedPrograms_train = pickleRead('encodedPrograms_train')
-    encodedPrograms_test = pickleRead('encodedPrograms_test')
-    encodedHints_train = pickleRead('encodedHints_train')
-    encodedHints_test = pickleRead('encodedHints_test')
-    train_Y = pickleRead('train_Y')
-    verify_Y = pickleRead('verify_Y')
+    # encodedPrograms_train = pickleRead('encodedPrograms_train')
+    # encodedPrograms_test = pickleRead('encodedPrograms_test')
+    # encodedHints_train = pickleRead('encodedHints_train')
+    # encodedHints_test = pickleRead('encodedHints_test')
+    # train_Y = pickleRead('train_Y')
+    # verify_Y = pickleRead('verify_Y')
 
 
     #train
-    batch_size=int(encodedPrograms_train.shape[0]/100)
-    epochs=100
-    history,model=train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,train_Y, verify_Y,batch_size,epochs)
-    plotHistory(history)
+    # batch_size=int(encodedPrograms_train.shape[0]/100)
+    # epochs=100
+    # history,model=train(encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,train_Y, verify_Y,batch_size,epochs)
+    # plotHistory(history)
 
     # #load models instead of training
     # history=pickleRead('history')
