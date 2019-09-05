@@ -125,7 +125,7 @@ def getNodeEmbedding(node2vecModel,graph,p=True): #output every node's embedding
     return embedding,embeddingDict
 
 def getGraphEmbeddingNode2vec(graph,dimension=3,p=True):
-    node2vec = Node2Vec(graph, dimensions=dimension, walk_length=10, num_walks=20, workers=4)
+    node2vec = Node2Vec(graph, dimensions=dimension, walk_length=10, num_walks=20, workers=4,quiet=True)
     node2vecModel = node2vec.fit(window=10, min_count=1, batch_words=4)
     embedding,embeddingDict=getNodeEmbedding(node2vecModel,graph,p=p)
     AggregatedEmbedding=[0]*dimension #create 0 list 0 with dimensions' list
@@ -139,6 +139,7 @@ def getGraphEmbeddingNode2vec(graph,dimension=3,p=True):
 def callEldaricaGenerateGraphs(dataset='trainData'):
     count=0;
     for file in glob.glob("../"+dataset+"/*.hints"): #if the program needs hints call and generate graph
+        print(file)
         file=file[0:file.find('.hints')]
         if(dataset=='trainData'):
             fileName = file[file.find('/trainData')+11:]
@@ -177,7 +178,7 @@ def main():
     print("Start")
     #graph=readGraphFromGraphviz("break_single_merged_safe.c.annot.c.gv", vitualize=True)
     #getGraphEmbeddingNode2vec(graph, dimension=3, p=True)
-
+    #callEldaricaGenerateGraphs('trainData')
     callEldaricaGenerateGraphs('testData')
     #aggregatedEmbeddingList=readAndEmbedAllGraphs(dimension=100)#text level program=500 dimension hint=50
     print("---------")

@@ -1,7 +1,7 @@
 import os
 from src.graphProcessing import callEldaricaGenerateGraphs
 
-from src.loadData import train,readHornClausesAndHints_resplitTrainAndVerifyData
+from src.loadData import train2,train3,train4,readHornClausesAndHints_resplitTrainAndVerifyData
 from src.trainDoc2VecModel import trainDoc2VecModelfunction
 from src.plot import plotHistory
 import gensim
@@ -22,9 +22,9 @@ def main():
     #callEldaricaGenerateGraphs('trainData')
 
     # transformOneFiletoFeatures(path)
-    train_X ,train_Y ,verify_X ,verify_Y =\
-        readHornClausesAndHints_resplitTrainAndVerifyData(path ,\
-        dataset='train',discardNegativeData=True,smallTrain=True,smallTrainSize=50)
+    # train_X ,train_Y ,verify_X ,verify_Y =\
+    #     readHornClausesAndHints_resplitTrainAndVerifyData(path ,\
+    #     dataset='train',discardNegativeData=True,smallTrain=False,smallTrainSize=50)
     train_X=pickleRead('trainData_X')
     train_Y = pickleRead('trainData_Y')
     verify_X = pickleRead('verifyData_X')
@@ -40,8 +40,8 @@ def main():
     # print("train Doc2Vec model end")
 
     # load Doc2Vec models
-    programDoc2VecModel =gensim.models.doc2vec.Doc2Vec.load(parenDir +'/models/programDoc2VecModel')
-    hintsDoc2VecModel =gensim.models.doc2vec.Doc2Vec.load(parenDir +'/models/hintsDoc2VecModel')
+    #programDoc2VecModel =gensim.models.doc2vec.Doc2Vec.load(parenDir +'/models/programDoc2VecModel')
+    #hintsDoc2VecModel =gensim.models.doc2vec.Doc2Vec.load(parenDir +'/models/hintsDoc2VecModel')
 
     # split data to training and verifiying sets
     # train_X, verify_X, train_Y, verify_Y = train_test_split(train_X, train_Y, test_size=0.2, random_state=42)
@@ -53,8 +53,8 @@ def main():
     # encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,\
     #     =transformDatatoFeatures_doc2vec(train_X, verify_X,programDoc2VecModel,hintsDoc2VecModel)
     from src.Data2Features import Doc2vecFeatureEngineering,Node2vecFeatureEngineering
-    Doc2vecFeatureEngineering()
-    Node2vecFeatureEngineering()
+    # Doc2vecFeatureEngineering()
+    # Node2vecFeatureEngineering()
 
     # load features
     encodedPrograms_train = pickleRead('encodedPrograms_train')
@@ -77,14 +77,25 @@ def main():
     if(batch_size<1):
         batch_size=1
     epochs = 100
-    #history, model = train(encodedPrograms_train, encodedPrograms_test, encodedHints_train, encodedHints_test, train_Y,
-    #                       verify_Y, batch_size, epochs)
-    history, model = train(encodedPrograms_train, encodedPrograms_test,\
+    #without graph
+    history, model = train2(encodedPrograms_train, encodedPrograms_test,\
+                            encodedHints_train, encodedHints_test, train_Y,\
+                            verify_Y, batch_size, epochs)
+    #with program graph
+
+    history, model = train3(encodedPrograms_train, encodedPrograms_test,\
+                           graphEncodedPrograms_train,graphEncodedPrograms_test,\
+                           encodedHints_train, encodedHints_test,\
+                           train_Y,verify_Y, batch_size, epochs)
+    #with program graph and hint graph
+    history, model = train4(encodedPrograms_train, encodedPrograms_test,\
                            graphEncodedPrograms_train,graphEncodedPrograms_test,\
                            encodedHints_train, encodedHints_test,\
                            graphencodedHints_train,graphencodedHints_test,\
                            train_Y,verify_Y, batch_size, epochs)
-    plotHistory(history)
+
+
+    #plotHistory(history)
 
     # #load models instead of training
     # history=pickleRead('history')

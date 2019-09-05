@@ -285,7 +285,7 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
     return trainData_X,trainData_Y,verifyData_X,verifyData_Y
 
 
-def readHornClausesAndHints_graph_predict(path,dataset,discardNegativeData):
+def readHornClausesAndHints_graph_predict(path,dataset,discardNegativeData=False,shuf=True):
     hornVocab = Counter()
     hintVocab = Counter()
     RedundantHintVocab = Counter()
@@ -354,20 +354,20 @@ def readHornClausesAndHints_graph_predict(path,dataset,discardNegativeData):
 
 
 
-
-    if(len(testData_X)>0):
+    #shuffle data
+    if(len(testData_X)>0 and shuf==True):
         shuf = list(zip(testData_X, testData_Y))
         random.shuffle(shuf)
-        trainData_X, trainData_Y = zip(*shuf)
+        testData_X, testData_Y = zip(*shuf)
     print("-----------------")
 
 
     print("testData_X",np.array(testData_X).shape)
     print("testData_y",np.array(testData_Y).shape)
-    #
-    # pickleWrite(trainData_X,'trainData_X')
-    # pickleWrite(trainData_Y, 'trainData_Y')
-    return trainData_X,trainData_Y
+    #Store read data to pickle file
+    pickleWrite(testData_X,'testData_X')
+    pickleWrite(testData_Y, 'testData_Y')
+    return testData_X,testData_Y
 
 
 
@@ -581,7 +581,7 @@ def transformDatatoFeatures_tokennizer(X_train,X_test):
     # return sequences_train
 
 
-def buildTrainModel(encodedPrograms,encodedHints):#text level
+def buildTrainModel2(encodedPrograms,encodedHints):#text level
 
     # define two sets of inputs
     inputA = Input(shape=(encodedPrograms.shape[1],1))
@@ -644,7 +644,7 @@ def buildTrainModel(encodedPrograms,encodedHints):#text level
     model = Model(inputs=[input1, input2], outputs=out)
 '''
     return model
-def buildTrainModel(encodedPrograms,encodedHints,graphEncodedPrograms_train): #include program graph
+def buildTrainModel3(encodedPrograms,encodedHints,graphEncodedPrograms_train): #include program graph
 
     # define three sets of inputs
     inputA = Input(shape=(encodedPrograms.shape[1],1))
@@ -709,7 +709,7 @@ def buildTrainModel(encodedPrograms,encodedHints,graphEncodedPrograms_train): #i
     return model
 
 
-def buildTrainModel(encodedPrograms,encodedHints,graphEncodedPrograms_train,graphencodedHints_train): #include program graph and hint graph
+def buildTrainModel4(encodedPrograms,encodedHints,graphEncodedPrograms_train,graphencodedHints_train): #include program graph and hint graph
 
     # define three sets of inputs
     inputA = Input(shape=(encodedPrograms.shape[1],1))
@@ -783,10 +783,10 @@ def buildTrainModel(encodedPrograms,encodedHints,graphEncodedPrograms_train,grap
     model = Model(inputs=[x.input, y.input,x1.input,x2.input], outputs=z)
 
     return model
-def train(encodedPrograms_train,encodedPrograms_test,\
+def train2(encodedPrograms_train,encodedPrograms_test,\
           encodedHints_train,encodedHints_test,\
           y_train, y_test,batch_size,epochs):#text level
-    model=buildTrainModel(encodedPrograms_train, encodedHints_train)
+    model=buildTrainModel2(encodedPrograms_train, encodedHints_train)
     model.compile(optimizer=k.optimizers.RMSprop(),
                   #optimizer=k.optimizers.Adam(),
                   # optimizer=k.optimizers.SGD(),
@@ -803,23 +803,24 @@ def train(encodedPrograms_train,encodedPrograms_test,\
     earlyStop=k.callbacks.EarlyStopping(monitor='val_acc',min_delta=0.005,patience=5)
     history = model.fit([encodedPrograms_train, encodedHints_train],y_train,
                         batch_size=batch_size, epochs=epochs,
-                        callbacks=[earlyStop],
+                        #callbacks=[earlyStop],
                         #callbacks=callbacks,
                         validation_data=([encodedPrograms_test, encodedHints_test], y_test),
                         verbose=1)
     pickleWrite(history,'history')
     parenDir = os.path.abspath(os.path.pardir)
     model.save(parenDir+'/models/my_model.h5')
+    plotHistory(history, fileName="text",show=False)
     return history,model
 
-def train(encodedPrograms_train,encodedPrograms_test,\
+def train3(encodedPrograms_train,encodedPrograms_test,\
           graphEncodedPrograms_train,graphEncodedPrograms_test,\
           encodedHints_train,encodedHints_test,\
           y_train, y_test,batch_size,epochs): #include program graph
     print('encodedPrograms_train',np.array(encodedPrograms_train).shape)
     print('graphEncodedPrograms_train', np.array(graphEncodedPrograms_train).shape)
     print('encodedHints_train',np.array(encodedHints_train).shape)
-    model=buildTrainModel(encodedPrograms_train, encodedHints_train,graphEncodedPrograms_train)
+    model=buildTrainModel3(encodedPrograms_train, encodedHints_train,graphEncodedPrograms_train)
     model.compile(optimizer=k.optimizers.RMSprop(),
                   #optimizer=k.optimizers.Adam(),
                   # optimizer=k.optimizers.SGD(),
@@ -845,9 +846,10 @@ def train(encodedPrograms_train,encodedPrograms_test,\
     pickleWrite(history,'history')
     parenDir = os.path.abspath(os.path.pardir)
     model.save(parenDir+'/models/my_model.h5')
+    plotHistory(history, fileName="text+program graph",show=False)
     return history,model
 
-def train(encodedPrograms_train,encodedPrograms_test,\
+def train4(encodedPrograms_train,encodedPrograms_test,\
           graphEncodedPrograms_train,graphEncodedPrograms_test,\
           encodedHints_train,encodedHints_test,\
           graphencodedHints_train,graphencodedHints_test,\
@@ -856,7 +858,7 @@ def train(encodedPrograms_train,encodedPrograms_test,\
     print('graphEncodedPrograms_train', np.array(graphEncodedPrograms_train).shape)
     print('encodedHints_train',np.array(encodedHints_train).shape)
     print('graphencodedHints_train', np.array(graphencodedHints_train).shape)
-    model=buildTrainModel(encodedPrograms_train, encodedHints_train,graphEncodedPrograms_train,graphencodedHints_train)
+    model=buildTrainModel4(encodedPrograms_train, encodedHints_train,graphEncodedPrograms_train,graphencodedHints_train)
     model.compile(optimizer=k.optimizers.RMSprop(),
                   #optimizer=k.optimizers.Adam(),
                   # optimizer=k.optimizers.SGD(),
@@ -883,6 +885,7 @@ def train(encodedPrograms_train,encodedPrograms_test,\
     pickleWrite(history,'history')
     parenDir = os.path.abspath(os.path.pardir)
     model.save(parenDir+'/models/my_model.h5')
+    plotHistory(history,fileName="text+program graph+hint graph",show=False)
     return history,model
 def predict_doc2vec(model,programDoc2VecModel,hintsDoc2VecModel,test_X,test_Y,printExample=True):
     #embedding test data for prediction

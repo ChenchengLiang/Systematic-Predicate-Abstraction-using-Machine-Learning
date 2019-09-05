@@ -10,7 +10,7 @@ from src.Miscellaneous import data2list,transform2TaggedDocument
 def trainDoc2VecModelfunction(X_train,program_dim=100,hint_dim=20):
 
     # extract programs and hints from dataset
-    programs_train, hints_train,graphs_train = data2list(X_train)
+    programs_train, hints_train,graphProgram_train,graphHint_train= data2list(X_train)
     programs_train=list(set(programs_train))
 
 

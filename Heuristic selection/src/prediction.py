@@ -53,12 +53,16 @@ def printRankNHints(predictedDataWithUnsortedHints,index,topN=3):
             print(hint)
             RankedHintList.append(hint)
     return RankedHintList
-def predict_doc2vec_rank(model, programDoc2VecModel, hintsDoc2VecModel, test_X, test_Y, printExample=True):
+def predict_rank(model, programDoc2VecModel, hintsDoc2VecModel, test_X, test_Y, printExample=True,predictFlag=2):
     # embedding test data for prediction
     encodedPrograms_test, encodedHints_test,graphEncodedPrograms_test,graphEncodedHints_test= doc2vecModelInferNewData(test_X, programDoc2VecModel, hintsDoc2VecModel)
 
-    # predict
-    sigmoidOutput = model.predict([encodedPrograms_test, encodedHints_test,graphEncodedPrograms_test,graphEncodedHints_test])
+    if(predictFlag==2):# predict with text
+        sigmoidOutput = model.predict([encodedPrograms_test, encodedHints_test])
+    if(predictFlag==3):# predict with text and program graph
+        sigmoidOutput = model.predict([encodedPrograms_test, encodedHints_test, graphEncodedPrograms_test])
+    if(predictFlag==4):# predict with text, program graph, and hint graph
+        sigmoidOutput = model.predict([encodedPrograms_test, encodedHints_test, graphEncodedPrograms_test,graphEncodedHints_test])
     #text_X[][0]=program text_X[][1]=hint
 
     predictedDataWithUnsortedHints=getRankedResults(test_X,test_Y,sigmoidOutput,printOneExample=False)
@@ -128,12 +132,21 @@ def main():
 
 
     #read test data
-    test_X, test_Y = readHornClausesAndHints_graph_predict(parenDir + '/' + 'testData' + '/', 'test',discardNegativeData=False)
-
+    test_X, test_Y = readHornClausesAndHints_graph_predict(parenDir + '/' + 'testData' + '/', 'test',discardNegativeData=True,shuf=True)
+    #read from file
+    test_X= pickleRead('testData_X')
+    test_Y= pickleRead('testData_Y')
     #predict_tokenization(model,train_X,verify_X, test_Y,test_X)
-    #predict_doc2vec(model,programDoc2VecModel,hintsDoc2VecModel,test_X,test_Y,printExample=False)
-    predict_doc2vec_rank(model, programDoc2VecModel, hintsDoc2VecModel, test_X, test_Y,\
-                         printExample=True)
+
+    #with text
+    predict_rank(model, programDoc2VecModel, hintsDoc2VecModel, test_X, test_Y, \
+                         printExample=True, predictFlag=2)
+    # with text and program graph
+    predict_rank(model, programDoc2VecModel, hintsDoc2VecModel, test_X, test_Y,\
+                         printExample=True,predictFlag=3)
+    # with text, program graph and hint graph
+    predict_rank(model, programDoc2VecModel, hintsDoc2VecModel, test_X, test_Y, \
+                 printExample=True, predictFlag=4)
 
 
 
