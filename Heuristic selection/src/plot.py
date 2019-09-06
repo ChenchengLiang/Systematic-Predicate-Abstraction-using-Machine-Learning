@@ -5,7 +5,7 @@ def plotHistory(history,fileName,show=True):
     parenDir = os.path.abspath(os.path.pardir)
     print(history.history.keys())
     # summarize history for accuracy
-    plt.figure(1)
+    #plt.figure(1)
     plt.plot(history.history['acc'], '-b')
     plt.plot(history.history['val_acc'], '-g')
     plt.title('keras model accuracy')
@@ -13,8 +13,11 @@ def plotHistory(history,fileName,show=True):
     plt.xlabel('epoch')
     plt.legend(['train', 'test'], loc='upper left')
     plt.savefig(parenDir + '/pickleData/'+fileName+'-accuracy')
+    if (show == True):
+        plt.show()
+    plt.close()
     # summarize history for loss
-    plt.figure(2)
+    #plt.figure(2)
     plt.plot(history.history['loss'], '-b')
     plt.plot(history.history['val_loss'], '-g')
     plt.title('keras model loss')
@@ -22,8 +25,8 @@ def plotHistory(history,fileName,show=True):
     plt.xlabel('epoch')
     plt.legend(['train', 'test'], loc='upper left')
     plt.savefig(parenDir + '/pickleData/'+fileName+'-loss')
-    plt.close()
+
     if(show==True):
         plt.show()
-
+    plt.close()
 

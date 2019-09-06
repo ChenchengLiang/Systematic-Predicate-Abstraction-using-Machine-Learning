@@ -125,7 +125,7 @@ def getNodeEmbedding(node2vecModel,graph,p=True): #output every node's embedding
     return embedding,embeddingDict
 
 def getGraphEmbeddingNode2vec(graph,dimension=3,p=True):
-    node2vec = Node2Vec(graph, dimensions=dimension, walk_length=10, num_walks=20, workers=4,quiet=True)
+    node2vec = Node2Vec(graph, dimensions=dimension, walk_length=30, num_walks=200, workers=4,quiet=True)
     node2vecModel = node2vec.fit(window=10, min_count=1, batch_words=4)
     embedding,embeddingDict=getNodeEmbedding(node2vecModel,graph,p=p)
     AggregatedEmbedding=[0]*dimension #create 0 list 0 with dimensions' list
@@ -135,6 +135,10 @@ def getGraphEmbeddingNode2vec(graph,dimension=3,p=True):
         print("AggregatedEmbedding: ",AggregatedEmbedding)
 
     return AggregatedEmbedding
+
+def getGraphNode2vecWalks(graph,dimension=3):
+    node2vec = Node2Vec(graph, dimensions=dimension, walk_length=5, num_walks=5, workers=4, quiet=True)
+    return node2vec.walks
 
 def callEldaricaGenerateGraphs(dataset='trainData'):
     count=0;
@@ -176,10 +180,12 @@ def callEldaricaGenerateGraphs(dataset='trainData'):
 
 def main():
     print("Start")
-    #graph=readGraphFromGraphviz("break_single_merged_safe.c.annot.c.gv", vitualize=True)
+    graph=readGraphFromGraphviz("02.c.annot.c.gv", vitualize=False)
     #getGraphEmbeddingNode2vec(graph, dimension=3, p=True)
+    # walks=getGraphNode2vecWalks(graph, dimension=3)
+    # print(walks)
     #callEldaricaGenerateGraphs('trainData')
-    callEldaricaGenerateGraphs('testData')
+    #callEldaricaGenerateGraphs('testData')
     #aggregatedEmbeddingList=readAndEmbedAllGraphs(dimension=100)#text level program=500 dimension hint=50
     print("---------")
 

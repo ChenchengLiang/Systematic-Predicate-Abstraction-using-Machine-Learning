@@ -5,17 +5,32 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from src.Miscellaneous import pickleWrite,doc2vecModelInferNewData,pickleRead
 
+def transformDatatoFeatures_graph2vec(X_train,X_test,programGraph2VecModel,hintsGraph2VecModel):
+    #create Doc2Vec model
+    #programDoc2VecModel, hintsDoc2VecModel=trainDoc2VectModel(X_train)
 
+    #infer/embedding programs and hints to vectors
+    print("Doc2Vec (graph) inferring begin")
+    encodedPrograms_train,encodedHints_train,graphEncodedPrograms_train,graphEncodedHints_train=doc2vecModelInferNewData(X_train, programGraph2VecModel, hintsGraph2VecModel)
+    encodedPrograms_verify, encodedHints_verify,graphEncodedPrograms_verify,graphEncodedHints_verify = doc2vecModelInferNewData(X_test, programGraph2VecModel,hintsGraph2VecModel)
+    print("Doc2Vec (graph) inferring end")
+    print('write infered train and test data to files')
+    pickleWrite(content=graphEncodedPrograms_train,name='graphEncodedPrograms_train')
+    pickleWrite(content=graphEncodedHints_train, name='graphEncodedHints_train')
+    pickleWrite(content=graphEncodedPrograms_verify, name='graphEncodedPrograms_verify')
+    pickleWrite(content=graphEncodedHints_verify, name='graphEncodedHints_verify')
+
+    return encodedPrograms_train,encodedPrograms_verify,encodedHints_train,encodedHints_verify
 
 def transformDatatoFeatures_doc2vec(X_train,X_test,programDoc2VecModel,hintsDoc2VecModel):
     #create Doc2Vec model
     #programDoc2VecModel, hintsDoc2VecModel=trainDoc2VectModel(X_train)
 
     #infer/embedding programs and hints to vectors
-    print("Doc2Vec inferring begin")
-    encodedPrograms_train,encodedHints_train,EncodedPrograms_train,graphEncodedHints_train=doc2vecModelInferNewData(X_train, programDoc2VecModel, hintsDoc2VecModel)
+    print("Doc2Vec (text) inferring begin")
+    encodedPrograms_train,encodedHints_train,graphEncodedPrograms_train,graphEncodedHints_train=doc2vecModelInferNewData(X_train, programDoc2VecModel, hintsDoc2VecModel)
     encodedPrograms_verify, encodedHints_verify,graphEncodedPrograms_verify,graphEncodedHints_verify = doc2vecModelInferNewData(X_test, programDoc2VecModel,hintsDoc2VecModel)
-    print("Doc2Vec inferring end")
+    print("Doc2Vec (text) inferring end")
     print('write infered train and test data to files')
     pickleWrite(content=encodedPrograms_train,name='encodedPrograms_train')
     pickleWrite(content=encodedHints_train, name='encodedHints_train')
@@ -101,6 +116,21 @@ def Node2vecFeatureEngineering():
     pickleWrite(train_Y,'train_Y')
     pickleWrite(verify_Y, 'verify_Y')
 
+def Graph2vecFeatureEngineering():
+    benchmark = 'trainData'
+    curpath = os.path.abspath(os.curdir)
+    parenDir = os.path.abspath(os.path.pardir)
+    path = parenDir + '/' + benchmark + '/'
+    print(path)
+    #train_X,train_Y,verify_X,verify_Y = readHornClausesAndHints_resplitTrainAndVerifyData(path, dataset='train', discardNegativeData=True)
+    train_X=pickleRead('trainData_X')
+    train_Y = pickleRead('trainData_Y')
+    verify_X = pickleRead('verifyData_X')
+    verify_Y = pickleRead('verifyData_Y')
+    transformDatatoFeatures_graph2vec(train_X, verify_X)
+    pickleWrite(train_Y,'train_Y')
+    pickleWrite(verify_Y, 'verify_Y')
+
 
 
 
@@ -108,6 +138,7 @@ def main():
     print("Start")
 
     Doc2vecFeatureEngineering()
+    Graph2vecFeatureEngineering()
 
     print('finished')
 

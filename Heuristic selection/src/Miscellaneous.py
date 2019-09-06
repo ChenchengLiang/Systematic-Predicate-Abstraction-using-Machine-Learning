@@ -133,9 +133,9 @@ def doc2vecModelInferNewData(test_X,programDoc2VecModel,hintsDoc2VecModel):
     for hint in hintsList:
         encodedHints.append(hintsDoc2VecModel.infer_vector(hint))
     for graph in graphs:
-        graphEncodedPrograms.append(graph)
+        graphEncodedPrograms.append(programDoc2VecModel.infer_vector(graph))
     for graphHint in grapHints:
-        graphEncodedHints_test.append(graphHint)
+        graphEncodedHints_test.append(hintsDoc2VecModel.infer_vector(graphHint))
 
 
     # expand dimention to fit ConviD

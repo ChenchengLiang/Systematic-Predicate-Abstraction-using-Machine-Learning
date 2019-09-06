@@ -19,7 +19,7 @@ from keras.layers import Conv1D, Dense,Input,concatenate, Flatten
 from src.Miscellaneous import data2list, recoverPredictedText,printOnePredictedTextInStringForm,\
     doc2vecModelInferNewData,testAccuracy,pickleWrite,pickleRead,printList,sortHints
 from src.plot import plotHistory
-from src.graphProcessing import callEldaricaGenerateGraphs
+from src.graphProcessing import callEldaricaGenerateGraphs,getGraphNode2vecWalks
 #from trainDoc2VecModel import trainDoc2VectModel
 
 def read_program():
@@ -107,10 +107,11 @@ def constructUnsplitedData(fileName,hornText,hintsText,negativeHintsText,graphEm
                     if(os.path.isfile(hintFilePath+hintFileName)):
                         positiveHintList.append([head, line])
                         graph = readGraphFromGraphvizFromTrainData(hintFilePath+hintFileName, vitualize=False)
-                        graphEmbededHint = getGraphEmbeddingNode2vec(graph, dimension=20, p=False)
-                        positiveHintsList_tree.append(graphEmbededHint)
+                        positiveHintGraphWalks = getGraphNode2vecWalks(graph, dimension=20, p=False)
+                        #graphEmbededHint = getGraphEmbeddingNode2vec(graph, dimension=20, p=False)
+                        positiveHintsList_tree.append(positiveHintGraphWalks)
 
-                        print(graphEmbededHint)
+                        print(positiveHintGraphWalks)
                     else:
                         print("cannot find file",hintFilePath+hintFileName)
                 if (line.find(head[head.find("/")]) != -1):
@@ -138,10 +139,11 @@ def constructUnsplitedData(fileName,hornText,hintsText,negativeHintsText,graphEm
                     if(os.path.isfile(hintFilePath+hintFileName)):
                         negativeHIntList.append([head, line])
                         graph = readGraphFromGraphvizFromTrainData(hintFilePath+hintFileName, vitualize=False)
-                        graphEmbededHint = getGraphEmbeddingNode2vec(graph, dimension=20, p=False)
-                        negativeHintsList_tree.append(graphEmbededHint)
+                        negativeHintGraphWalks = getGraphNode2vecWalks(graph, dimension=20, p=False)
+                        #graphEmbededHint = getGraphEmbeddingNode2vec(graph, dimension=20, p=False)
+                        negativeHintsList_tree.append(negativeHintGraphWalks)
 
-                        print(graphEmbededHint)
+                        print(negativeHintGraphWalks)
                     else:
                         print("cannot find file",hintFilePath+hintFileName)
 
@@ -203,15 +205,17 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
         # read program graph
         print(fileGraph)
         graph = readGraphFromGraphvizFromTrainData(fileGraph, vitualize=False)
-        graphEmbededProgram=getGraphEmbeddingNode2vec(graph, dimension=100,p=False)
 
-        unsplitedData.append(constructUnsplitedData(fileName,hornText, hintsText, negativeHintsText, graphEmbededProgram,discardNegativeData))
+        programGraphWalks=getGraphNode2vecWalks(graph, dimension=100, p=False)
+        #graphEmbededProgram=getGraphEmbeddingNode2vec(graph, dimension=100,p=False)
+
+        unsplitedData.append(constructUnsplitedData(fileName,hornText, hintsText, negativeHintsText, programGraphWalks,discardNegativeData))
         # print(unsplitedData[-1][0]) hornclauses
         # print(unsplitedData[-1][1]) positive hint
         # print(unsplitedData[-1][2]) negative hint
-        # print(unsplitedData[-1][3]) program graph
-        # print(unsplitedData[-1][4]) positive hint graph
-        # print(unsplitedData[-1][5]) negative hint graph
+        # print(unsplitedData[-1][3]) program graph walks
+        # print(unsplitedData[-1][4]) positive hint graph walks
+        # print(unsplitedData[-1][5]) negative hint graph walks
         programCOunt=programCOunt+1
         if (smallTrain == True and programCOunt==smallTrainProgramNumber): # only use one program for debug
             break
