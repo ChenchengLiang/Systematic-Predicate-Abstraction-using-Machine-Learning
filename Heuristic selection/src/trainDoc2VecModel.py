@@ -50,9 +50,6 @@ def trainGraph2VecModelfunction(program_dim=100,hint_dim=20):
     X_train = pickleRead('trainData_X')
     # extract programs and hints from dataset
     programs_train, hints_train,graphProgram_train,graphHint_train= data2list(X_train)
-    graphProgram_train=list(set(graphProgram_train))
-    graphHint_train = list(set(graphHint_train))
-
 
     # transform to TaggedDocument
     programs_trainTaggedDocument,programsMaxLength,programsAverageLength  =transform2TaggedDocument(graphProgram_train)

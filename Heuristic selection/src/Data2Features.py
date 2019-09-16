@@ -3,7 +3,7 @@ from src.loadData import readHornClausesAndHints,readHornClausesAndHints_resplit
 import os
 import numpy as np
 from sklearn.model_selection import train_test_split
-from src.Miscellaneous import pickleWrite,doc2vecModelInferNewData,pickleRead
+from src.Miscellaneous import pickleWrite,doc2vecModelInferNewData,pickleRead,graph2vecModelInferNewData
 
 def transformDatatoFeatures_graph2vec(X_train,X_test,programGraph2VecModel,hintsGraph2VecModel):
     #create Doc2Vec model
@@ -11,16 +11,15 @@ def transformDatatoFeatures_graph2vec(X_train,X_test,programGraph2VecModel,hints
 
     #infer/embedding programs and hints to vectors
     print("Doc2Vec (graph) inferring begin")
-    encodedPrograms_train,encodedHints_train,graphEncodedPrograms_train,graphEncodedHints_train=doc2vecModelInferNewData(X_train, programGraph2VecModel, hintsGraph2VecModel)
-    encodedPrograms_verify, encodedHints_verify,graphEncodedPrograms_verify,graphEncodedHints_verify = doc2vecModelInferNewData(X_test, programGraph2VecModel,hintsGraph2VecModel)
-    print("Doc2Vec (graph) inferring end")
+    graphEncodedPrograms_train,graphEncodedHints_train=graph2vecModelInferNewData(X_train, programGraph2VecModel, hintsGraph2VecModel)
+    graphEncodedPrograms_verify,graphEncodedHints_verify = graph2vecModelInferNewData(X_test, programGraph2VecModel,hintsGraph2VecModel)
     print('write infered train and test data to files')
     pickleWrite(content=graphEncodedPrograms_train,name='graphEncodedPrograms_train')
     pickleWrite(content=graphEncodedHints_train, name='graphEncodedHints_train')
     pickleWrite(content=graphEncodedPrograms_verify, name='graphEncodedPrograms_verify')
     pickleWrite(content=graphEncodedHints_verify, name='graphEncodedHints_verify')
 
-    return encodedPrograms_train,encodedPrograms_verify,encodedHints_train,encodedHints_verify
+    return graphEncodedPrograms_train,graphEncodedPrograms_verify,graphEncodedHints_train,graphEncodedHints_verify
 
 def transformDatatoFeatures_doc2vec(X_train,X_test,programDoc2VecModel,hintsDoc2VecModel):
     #create Doc2Vec model
@@ -28,14 +27,14 @@ def transformDatatoFeatures_doc2vec(X_train,X_test,programDoc2VecModel,hintsDoc2
 
     #infer/embedding programs and hints to vectors
     print("Doc2Vec (text) inferring begin")
-    encodedPrograms_train,encodedHints_train,graphEncodedPrograms_train,graphEncodedHints_train=doc2vecModelInferNewData(X_train, programDoc2VecModel, hintsDoc2VecModel)
-    encodedPrograms_verify, encodedHints_verify,graphEncodedPrograms_verify,graphEncodedHints_verify = doc2vecModelInferNewData(X_test, programDoc2VecModel,hintsDoc2VecModel)
+    encodedPrograms_train,encodedHints_train=doc2vecModelInferNewData(X_train, programDoc2VecModel, hintsDoc2VecModel)
+    encodedPrograms_verify, encodedHints_verify = doc2vecModelInferNewData(X_test, programDoc2VecModel,hintsDoc2VecModel)
     print("Doc2Vec (text) inferring end")
     print('write infered train and test data to files')
     pickleWrite(content=encodedPrograms_train,name='encodedPrograms_train')
     pickleWrite(content=encodedHints_train, name='encodedHints_train')
-    pickleWrite(content=encodedPrograms_verify, name='encodedPrograms_test')
-    pickleWrite(content=encodedHints_verify, name='encodedHints_test')
+    pickleWrite(content=encodedPrograms_verify, name='encodedPrograms_verify')
+    pickleWrite(content=encodedHints_verify, name='encodedHints_verify')
 
     return encodedPrograms_train,encodedPrograms_verify,encodedHints_train,encodedHints_verify
 
@@ -127,7 +126,9 @@ def Graph2vecFeatureEngineering():
     train_Y = pickleRead('trainData_Y')
     verify_X = pickleRead('verifyData_X')
     verify_Y = pickleRead('verifyData_Y')
-    transformDatatoFeatures_graph2vec(train_X, verify_X)
+    programGraph2VecModel = gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/programGraph2VecModel')
+    hintsGraph2VecModel = gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/hintsGraph2VecModel')
+    transformDatatoFeatures_graph2vec(train_X, verify_X,programGraph2VecModel,hintsGraph2VecModel)
     pickleWrite(train_Y,'train_Y')
     pickleWrite(verify_Y, 'verify_Y')
 

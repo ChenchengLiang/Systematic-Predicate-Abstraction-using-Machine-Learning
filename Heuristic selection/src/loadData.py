@@ -99,7 +99,7 @@ def constructUnsplitedData(fileName,hornText,hintsText,negativeHintsText,graphEm
                 if (line.find('main') != -1 and storeFlag == True):
                     break
                 if (storeFlag == True):
-                    print("positive hint: ", line)
+                    #print("positive hint: ", line)
                     #positiveHintList.append([head, line])
                     #get hint file name
                     hintFilePath=fileName+".hints.graphs/"
@@ -107,15 +107,15 @@ def constructUnsplitedData(fileName,hornText,hintsText,negativeHintsText,graphEm
                     if(os.path.isfile(hintFilePath+hintFileName)):
                         positiveHintList.append([head, line])
                         graph = readGraphFromGraphvizFromTrainData(hintFilePath+hintFileName, vitualize=False)
-                        positiveHintGraphWalks = getGraphNode2vecWalks(graph, dimension=20, p=False)
+                        positiveHintGraphWalks = getGraphNode2vecWalks(graph, dimension=20)
                         #graphEmbededHint = getGraphEmbeddingNode2vec(graph, dimension=20, p=False)
                         positiveHintsList_tree.append(positiveHintGraphWalks)
 
-                        print(positiveHintGraphWalks)
+                        #print(positiveHintGraphWalks)
                     else:
                         print("cannot find file",hintFilePath+hintFileName)
                 if (line.find(head[head.find("/")]) != -1):
-                    print("positive hint head: ", line)
+                    #print("positive hint head: ", line)
                     storeFlag = True
         #print(hintsList)
     if negativeHintsText:
@@ -133,22 +133,22 @@ def constructUnsplitedData(fileName,hornText,hintsText,negativeHintsText,graphEm
                 if (line.find('main') != -1 and storeFlag == True):
                     break
                 if (storeFlag == True):
-                    print("negative hint: ", line)
+                    #print("negative hint: ", line)
                     hintFilePath=fileName+".hints.graphs/"
                     hintFileName=head_temp+":"+line+".gv"
                     if(os.path.isfile(hintFilePath+hintFileName)):
                         negativeHIntList.append([head, line])
                         graph = readGraphFromGraphvizFromTrainData(hintFilePath+hintFileName, vitualize=False)
-                        negativeHintGraphWalks = getGraphNode2vecWalks(graph, dimension=20, p=False)
+                        negativeHintGraphWalks = getGraphNode2vecWalks(graph, dimension=20)
                         #graphEmbededHint = getGraphEmbeddingNode2vec(graph, dimension=20, p=False)
                         negativeHintsList_tree.append(negativeHintGraphWalks)
 
-                        print(negativeHintGraphWalks)
+                        #print(negativeHintGraphWalks)
                     else:
                         print("cannot find file",hintFilePath+hintFileName)
 
                 if (line.find(head[head.find("/")]) != -1):
-                    print("negative hint head: ", line)
+                    #print("negative hint head: ", line)
                     storeFlag = True
     print("positive hints text:",len(positiveHintList))
     print("negative hints text:", len(negativeHIntList))
@@ -206,7 +206,7 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
         print(fileGraph)
         graph = readGraphFromGraphvizFromTrainData(fileGraph, vitualize=False)
 
-        programGraphWalks=getGraphNode2vecWalks(graph, dimension=100, p=False)
+        programGraphWalks=getGraphNode2vecWalks(graph, dimension=100)
         #graphEmbededProgram=getGraphEmbeddingNode2vec(graph, dimension=100,p=False)
 
         unsplitedData.append(constructUnsplitedData(fileName,hornText, hintsText, negativeHintsText, programGraphWalks,discardNegativeData))
@@ -837,6 +837,10 @@ def train3(encodedPrograms_train,encodedPrograms_test,\
     print('graphEncodedPrograms_train', np.array(graphEncodedPrograms_train).shape)
     print('encodedHints_train',np.array(encodedHints_train).shape)
     print('y_train',np.array(y_train).shape)
+    print('encodedPrograms_test',np.array(encodedPrograms_test).shape)
+    print('graphEncodedPrograms_test', np.array(graphEncodedPrograms_test).shape)
+    print('encodedHints_test',np.array(encodedHints_test).shape)
+    print('y_test',np.array(y_test).shape)
     #y_train=k.utils.to_categorical(y_train,num_classes=2)
     #y_test = k.utils.to_categorical(y_test, num_classes=2)
     earlyStop=k.callbacks.EarlyStopping(monitor='val_acc',min_delta=0.005,patience=5)
@@ -973,7 +977,7 @@ def main():
 
     #transformOneFiletoFeatures(path)
     readHornClausesAndHints_resplitTrainAndVerifyData(path, \
-                                                      dataset='train', discardNegativeData=True, smallTrain=True,
+                                                      dataset='train', discardNegativeData=True, smallTrain=False,
                                                       smallTrainSize=50,smallTrainProgramNumber=4)
     #train_X=train_X[0:40]   #cut training size for debug
     #train_Y = train_Y[0:40] #cut training size for debug
