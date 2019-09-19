@@ -142,9 +142,10 @@ def getGraphNode2vecWalks(graph,dimension=3):
 
 def callEldaricaGenerateGraphs(dataset='trainData'):
     count=0;
-    for file in glob.glob("../"+dataset+"/*.hints"): #if the program needs hints call and generate graph
+    for file in glob.glob("../"+dataset+"/*Hints"): #if the program needs hints call and generate graph
+        file = file[0:file.find('t.c.') + 3]
         print(file)
-        file=file[0:file.find('.hints')]
+
         if(dataset=='trainData'):
             fileName = file[file.find('/trainData')+11:]
             #print(fileName)
@@ -180,11 +181,11 @@ def callEldaricaGenerateGraphs(dataset='trainData'):
 
 def main():
     print("Start")
-    graph=readGraphFromGraphviz("02.c.annot.c.gv", vitualize=False)
+    #graph=readGraphFromGraphviz("02.c.annot.c.gv", vitualize=False)
     #getGraphEmbeddingNode2vec(graph, dimension=3, p=True)
     # walks=getGraphNode2vecWalks(graph, dimension=3)
     # print(walks)
-    #callEldaricaGenerateGraphs('trainData')
+    callEldaricaGenerateGraphs('trainData')
     #callEldaricaGenerateGraphs('testData')
     #aggregatedEmbeddingList=readAndEmbedAllGraphs(dimension=100)#text level program=500 dimension hint=50
     print("---------")

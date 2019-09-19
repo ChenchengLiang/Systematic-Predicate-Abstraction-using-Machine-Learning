@@ -1,5 +1,5 @@
 from src.Miscellaneous import data2list, recoverPredictedText,printOnePredictedTextInStringForm,\
-    doc2vecModelInferNewData,testAccuracy,pickleWrite,pickleRead,sortHints,printList
+    doc2vecModelInferNewData,graph2vecModelInferNewData,testAccuracy,pickleWrite,pickleRead,sortHints,printList
 from src.loadData import load_model,readHornClausesAndHints,readHornClausesAndHints_graph_predict,predict_doc2vec,readHornClausesAndHints_resplitTrainAndVerifyData
 import gensim
 import os
@@ -53,10 +53,10 @@ def printRankNHints(predictedDataWithUnsortedHints,index,topN=3):
             print(hint)
             RankedHintList.append(hint)
     return RankedHintList
-def predict_rank(model, programDoc2VecModel, hintsDoc2VecModel, test_X, test_Y, printExample=True,predictFlag=2):
+def predict_rank(model, programDoc2VecModel, hintsDoc2VecModel,programGraph2VecModel,hintsGraph2VecModel,test_X, test_Y, printExample=True,predictFlag=2):
     # embedding test data for prediction
-    encodedPrograms_test, encodedHints_test,graphEncodedPrograms_test,graphEncodedHints_test= doc2vecModelInferNewData(test_X, programDoc2VecModel, hintsDoc2VecModel)
-
+    encodedPrograms_test, encodedHints_test= doc2vecModelInferNewData(test_X, programDoc2VecModel, hintsDoc2VecModel)
+    graphEncodedPrograms_test, graphEncodedHints_test=graph2vecModelInferNewData(test_X,programGraph2VecModel,hintsGraph2VecModel)
     if(predictFlag==2):# predict with text
         sigmoidOutput = model.predict([encodedPrograms_test, encodedHints_test])
     if(predictFlag==3):# predict with text and program graph
@@ -88,6 +88,18 @@ def predict_rank(model, programDoc2VecModel, hintsDoc2VecModel, test_X, test_Y, 
     print(np.stack((np.array(predicted_y).T, np.array(y_test).T)))
     PredixtedHints = recoverPredictedText(test_X, predicted_y)
     testHints = recoverPredictedText(test_X, y_test)
+
+    # print("debug")
+    # print("test_X[0][0]", test_X[0][0])  # program
+    # print("test_X[0][1]", test_X[0][1])  # hint text (head \n hint)
+    # print("test_X[0][2]", test_X[0][2])  # progran graph embedding
+    # print("test_X[0][3]", test_X[0][3])  # hint graph
+    # print("test_X[0][4]", test_X[0][4])  # hint ID
+    # print("test_X len:", len(test_X))
+    # print(predicted_y[0])
+    # print(y_test[0])
+
+
     if (printExample == True):
         # print predicted hints and true hints
         Top=5
@@ -111,6 +123,50 @@ def predict_rank(model, programDoc2VecModel, hintsDoc2VecModel, test_X, test_Y, 
     return PredixtedHints, sigmoidOutput
 
 
+def predictAndOutputHints(model, programDoc2VecModel, hintsDoc2VecModel,programGraph2VecModel,hintsGraph2VecModel):
+    test_X = pickleRead('testData_X')
+    parenDir = os.path.abspath(os.path.pardir)
+    path=parenDir+"/predictedHints/"
+    #embedding
+    encodedPrograms_test, encodedHints_test= doc2vecModelInferNewData(test_X, programDoc2VecModel, hintsDoc2VecModel)
+    graphEncodedPrograms_test, graphEncodedHints_test=graph2vecModelInferNewData(test_X,programGraph2VecModel,hintsGraph2VecModel)
+
+    #predict
+    sigmoidOutput = model.predict(
+        [encodedPrograms_test, encodedHints_test, graphEncodedPrograms_test, graphEncodedHints_test])
+    #transform probability to binary classification
+    predicted_y = sigmoidOutput.copy()
+    predicted_y[predicted_y > 0.5] = int(1)  # convert decimals to 0 and 1
+    predicted_y[predicted_y <= 0.5] = int(0)  # convert decimals to 0 and 1
+
+    print("debug")
+    print("test_X[0][0]", test_X[0][0])  # program
+    print("test_X[0][1]", test_X[0][1])  # hint text (head \n hint)
+    print("test_X[0][2]", test_X[0][2])  # progran graph embedding
+    print("test_X[0][3]", test_X[0][3])  # hint graph
+    print("test_X[0][4]", test_X[0][4])  # hint ID
+    print("test_X len:", len(test_X))
+    print(predicted_y[0])
+
+    #write results to file
+    fileList=list()
+    for X in test_X:
+        fileList.append(X[5])
+    fileList=list(set(fileList))
+    for fileName in fileList:
+        predictedHintListWithID = list()
+        print(fileName)
+        f = open(path + fileName+".optimizedHints", "w+")
+        for X,y,score in zip(test_X,predicted_y,sigmoidOutput):
+            if(X[5]==fileName):
+                predictedHintListWithID.append([X[4],X[1][0], X[1][1],y,score])
+                # ID,head,hint,predicted result,score
+                head=X[1][:X[1].find("\n")]
+                head=head[:head.find("/")]
+                hint=X[1][X[1].find("\n")+1:]
+                content =X[4]+":"+ head+ ":" + hint+ ":" + str(y) + ":" + str(score)+"\n"
+                f.write(content)
+        f.close()
 
 
 def main():
@@ -121,7 +177,9 @@ def main():
     #load Doc2Vec models
     programDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/programDoc2VecModel')
     hintsDoc2VecModel=gensim.models.doc2vec.Doc2Vec.load(parenDir+'/models/hintsDoc2VecModel')
-
+    # load Graph2Vec models
+    programGraph2VecModel = gensim.models.doc2vec.Doc2Vec.load(parenDir + '/models/programGraph2VecModel')
+    hintsGraph2VecModel = gensim.models.doc2vec.Doc2Vec.load(parenDir + '/models/hintsGraph2VecModel')
 
 
     # #load models instead of training
@@ -132,21 +190,23 @@ def main():
 
 
     #read test data
-    test_X, test_Y = readHornClausesAndHints_graph_predict(parenDir + '/' + 'testData' + '/', 'test',discardNegativeData=True,shuf=True)
+    test_X, test_Y = readHornClausesAndHints_graph_predict(parenDir + '/' + 'testData' + '/', 'test',discardNegativeData=False,shuf=True)
     #read from file
-    test_X= pickleRead('testData_X')
-    test_Y= pickleRead('testData_Y')
+    # test_X= pickleRead('testData_X')
+    # test_Y= pickleRead('testData_Y')
     #predict_tokenization(model,train_X,verify_X, test_Y,test_X)
 
-    #with text
-    predict_rank(model, programDoc2VecModel, hintsDoc2VecModel, test_X, test_Y, \
-                         printExample=True, predictFlag=2)
-    # with text and program graph
-    predict_rank(model, programDoc2VecModel, hintsDoc2VecModel, test_X, test_Y,\
-                         printExample=True,predictFlag=3)
+    # #with text
+    # predict_rank(model, programDoc2VecModel, hintsDoc2VecModel,programGraph2VecModel,hintsGraph2VecModel, test_X, test_Y, \
+    #                      printExample=True, predictFlag=2)
+    # # with text and program graph
+    # predict_rank(model, programDoc2VecModel, hintsDoc2VecModel,programGraph2VecModel,hintsGraph2VecModel,test_X, test_Y,\
+    #                      printExample=True,predictFlag=3)
     # with text, program graph and hint graph
-    predict_rank(model, programDoc2VecModel, hintsDoc2VecModel, test_X, test_Y, \
-                 printExample=True, predictFlag=4)
+    # predict_rank(model, programDoc2VecModel, hintsDoc2VecModel,programGraph2VecModel,hintsGraph2VecModel, test_X, test_Y, \
+    #              printExample=True, predictFlag=4)
+
+    predictAndOutputHints(model, programDoc2VecModel, hintsDoc2VecModel,programGraph2VecModel,hintsGraph2VecModel)
 
 
 

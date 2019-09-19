@@ -32,13 +32,13 @@ def main():
     #train_X=train_X[0:40]   #cut training size for debug
     #train_Y = train_Y[0:40] #cut training size for debug
 
-    # train and save Doc2Vec models
-    # print("train Doc2Vec model (text) begin")
-    # trainDoc2VecModelfunction(program_dim=100,hint_dim=20)
-    # print("train Doc2Vec model (text) end")
-    # print("train Doc2Vec model (graph) begin")
-    # trainGraph2VecModelfunction(program_dim=100,hint_dim=20)
-    # print("train Doc2Vec model (graph) end")
+    #train and save Doc2Vec models
+    print("train Doc2Vec model (text) begin")
+    trainDoc2VecModelfunction(program_dim=100,hint_dim=20)
+    print("train Doc2Vec model (text) end")
+    print("train Doc2Vec model (graph) begin")
+    trainGraph2VecModelfunction(program_dim=100,hint_dim=20)
+    print("train Doc2Vec model (graph) end")
     # load Doc2Vec models
     #programDoc2VecModel =gensim.models.doc2vec.Doc2Vec.load(parenDir +'/models/programDoc2VecModel')
     #hintsDoc2VecModel =gensim.models.doc2vec.Doc2Vec.load(parenDir +'/models/hintsDoc2VecModel')
@@ -56,7 +56,7 @@ def main():
     #     =transformDatatoFeatures_doc2vec(train_X, verify_X,programDoc2VecModel,hintsDoc2VecModel)
     from src.Data2Features import Doc2vecFeatureEngineering,Node2vecFeatureEngineering,Graph2vecFeatureEngineering
     Doc2vecFeatureEngineering()
-    #Graph2vecFeatureEngineering()
+    Graph2vecFeatureEngineering()
     #Node2vecFeatureEngineering()
 
     # load features
@@ -80,15 +80,15 @@ def main():
     if(batch_size<1):
         batch_size=1
     epochs = 100
-    #without graph
-    history, model = train2(encodedPrograms_train, encodedPrograms_test,\
-                            encodedHints_train, encodedHints_test, train_Y,\
-                            verify_Y, batch_size, epochs)
-    #with program graph
-    history, model = train3(encodedPrograms_train, encodedPrograms_test,\
-                           graphEncodedPrograms_train,graphEncodedPrograms_test,\
-                           encodedHints_train, encodedHints_test,\
-                           train_Y,verify_Y, batch_size, epochs)
+    # #without graph
+    # history, model = train2(encodedPrograms_train, encodedPrograms_test,\
+    #                         encodedHints_train, encodedHints_test, train_Y,\
+    #                         verify_Y, batch_size, epochs)
+    # #with program graph
+    # history, model = train3(encodedPrograms_train, encodedPrograms_test,\
+    #                        graphEncodedPrograms_train,graphEncodedPrograms_test,\
+    #                        encodedHints_train, encodedHints_test,\
+    #                        train_Y,verify_Y, batch_size, epochs)
     #with program graph and hint graph
     history, model = train4(encodedPrograms_train, encodedPrograms_test,\
                            graphEncodedPrograms_train,graphEncodedPrograms_test,\
@@ -99,19 +99,6 @@ def main():
 
     #plotHistory(history)
 
-    # #load models instead of training
-    # history=pickleRead('history')
-    # plotHistory(history)
-    # model=load_model(parenDir+'/models/my_model.h5')
-    # model.summary()
-
-    # read test data
-    # test_X, test_Y = readHornClausesAndHints(parenDir + '/' + 'testData' + '/', 'test',discardNegativeData=False)
-    # #predict_tokenization(model,train_X,verify_X, test_Y,test_X)
-    # predict_doc2vec(model,programDoc2VecModel,hintsDoc2VecModel,test_X,test_Y)
-    #
-    #
-    #
 
 
 if __name__ == '__main__':
