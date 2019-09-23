@@ -4,7 +4,7 @@ import os
 from node2vec import Node2Vec
 from node2vec.edges import  HadamardEmbedder
 import gensim
-from src.Miscellaneous import data2list,transform2TaggedDocument
+from Miscellaneous import data2list,transform2TaggedDocument
 import glob
 import subprocess
 def prerryPrintOneGraph(G):

@@ -11,15 +11,15 @@ import glob
 import random
 import gensim
 import nltk
-from src.graphProcessing import readGraphFromGraphvizFromTrainData,getGraphEmbeddingNode2vec
+from graphProcessing import readGraphFromGraphvizFromTrainData,getGraphEmbeddingNode2vec
 nltk.download('punkt')
 from collections import Counter
 
 from keras.layers import Conv1D, Dense,Input,concatenate, Flatten
-from src.Miscellaneous import data2list, recoverPredictedText,printOnePredictedTextInStringForm,\
+from Miscellaneous import data2list, recoverPredictedText,printOnePredictedTextInStringForm,\
     doc2vecModelInferNewData,testAccuracy,pickleWrite,pickleRead,printList,sortHints
-from src.plot import plotHistory
-from src.graphProcessing import callEldaricaGenerateGraphs,getGraphNode2vecWalks
+from plot import plotHistory
+from graphProcessing import callEldaricaGenerateGraphs,getGraphNode2vecWalks
 #from trainDoc2VecModel import trainDoc2VectModel
 
 def read_program():
@@ -98,9 +98,8 @@ def constructUnsplitedData_Ver1(fileName,hornText,positiveHintsText,negativeHint
     if positiveHintsText:
         for line in positiveHintsText.splitlines():
             ID,head,hint=separateIDHeadAndHint(line)
-            head_temp = head[:head.find("/")]
             hintFilePath = fileName + ".hints.graphs/"
-            hintFileName = head_temp+":"+hint+".gv"
+            hintFileName = head+":"+hint+".gv"
             positiveHintList.append([head, line])
             graph = readGraphFromGraphvizFromTrainData(hintFilePath +hintFileName, vitualize=False)
             positiveHintGraphWalks = getGraphNode2vecWalks(graph, dimension=20)
@@ -111,9 +110,8 @@ def constructUnsplitedData_Ver1(fileName,hornText,positiveHintsText,negativeHint
     if negativeHintsText:
         for line in negativeHintsText.splitlines():
             ID,head,hint=separateIDHeadAndHint(line)
-            head_temp = head[:head.find("/")]
             hintFilePath = fileName + ".hints.graphs/"
-            hintFileName = head_temp+":"+hint+".gv"
+            hintFileName = head+":"+hint+".gv"
             negativeHintList.append([head, line])
             graph = readGraphFromGraphvizFromTrainData(hintFilePath + hintFileName, vitualize=False)
             negativeHintGraphWalks = getGraphNode2vecWalks(graph, dimension=20)
@@ -133,12 +131,12 @@ def constructUnsplitedData_Ver1(fileName,hornText,positiveHintsText,negativeHint
         negativeHIntList, negativeHintsList_tree = zip(*shuf)
         negativeHIntList=negativeHIntList[0:len(positiveHintList)]
         negativeHintsList_tree = negativeHintsList_tree[0:len(positiveHintList)]
-    print("After delete some nagative hints:")
-    print("positive hints text:", len(positiveHintList))
-    print("negative hints text:", len(negativeHintList))
-    print("positive hints graph:", len(positiveHintsList_tree))
-    print("negative hints graph:", len(negativeHintsList_tree))
-    print("IDList:", len(IDList))
+        print("After delete some nagative hints:")
+        print("positive hints text:", len(positiveHintList))
+        print("negative hints text:", len(negativeHintList))
+        print("positive hints graph:", len(positiveHintsList_tree))
+        print("negative hints graph:", len(negativeHintsList_tree))
+        print("IDList:", len(IDList))
 
     fileName=fileName[fileName.rfind("/")+1:]
     return [hornText, positiveHintList,negativeHintList,graphEmbededProgram,positiveHintsList_tree,negativeHintsList_tree,IDList,fileName]
@@ -297,13 +295,13 @@ def readHornClausesAndHints_graph_predict(path,dataset,discardNegativeData=False
         hornText = f.read()
         f.close()
 
-        # read optimized hints
+        # read positive hints
         print(fileHints)
         f = open(fileHints, "r")
         hintsText = f.read()
         f.close()
 
-        # read redundant hints
+        # read negative hints
         print(fileNegativeHints)
         f = open(fileNegativeHints, "r")
         negativeHintsText = f.read()
@@ -311,7 +309,7 @@ def readHornClausesAndHints_graph_predict(path,dataset,discardNegativeData=False
 
         # read program graph
         print(fileGraph)
-        from src.graphProcessing import readGraphFromGraphvizFromTrainData,getGraphEmbeddingNode2vec
+        from graphProcessing import readGraphFromGraphvizFromTrainData,getGraphEmbeddingNode2vec
         graph = readGraphFromGraphvizFromTrainData(fileGraph, vitualize=False)
         #graphEmbededProgram=getGraphEmbeddingNode2vec(graph, dimension=100,p=False)
         programGraphWalks = getGraphNode2vecWalks(graph, dimension=100)

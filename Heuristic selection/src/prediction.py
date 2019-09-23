@@ -1,10 +1,12 @@
-from src.Miscellaneous import data2list, recoverPredictedText,printOnePredictedTextInStringForm,\
+from Miscellaneous import data2list, recoverPredictedText,printOnePredictedTextInStringForm,\
     doc2vecModelInferNewData,graph2vecModelInferNewData,testAccuracy,pickleWrite,pickleRead,sortHints,printList
-from src.loadData import load_model,readHornClausesAndHints,readHornClausesAndHints_graph_predict,predict_doc2vec,readHornClausesAndHints_resplitTrainAndVerifyData
+from loadData import load_model,readHornClausesAndHints,readHornClausesAndHints_graph_predict,predict_doc2vec,readHornClausesAndHints_resplitTrainAndVerifyData
 import gensim
-import os
+import os,glob,shutil
 import numpy as np
+from decimal import Decimal
 from keras import backend as K
+from distutils.dir_util import copy_tree
 
 def getRankedResults(test_X,test_Y,sigmoidOutput,printOneExample=False):
     # get unique program list
@@ -162,9 +164,9 @@ def predictAndOutputHints(model, programDoc2VecModel, hintsDoc2VecModel,programG
                 predictedHintListWithID.append([X[4],X[1][0], X[1][1],y,score])
                 # ID,head,hint,predicted result,score
                 head=X[1][:X[1].find("\n")]
-                head=head[:head.find("/")]
+                #head=head[:head.find("/")]
                 hint=X[1][X[1].find("\n")+1:]
-                content =X[4]+":"+ head+ ":" + hint+ ":" + str(y) + ":" + str(score)+"\n"
+                content =X[4]+":"+ head+ ":" + hint+ ":" + "".join(map(str,np.around(y,0))) + ":" + "".join(map(str,score))+"\n"
                 f.write(content)
         f.close()
 
@@ -209,7 +211,8 @@ def main():
     predictAndOutputHints(model, programDoc2VecModel, hintsDoc2VecModel,programGraph2VecModel,hintsGraph2VecModel)
 
 
-
+    for txt_file in glob.iglob("../trainData/*.initialHints"):
+        shutil.copy2(txt_file, "../predictedHints/")
 
 
     print("finished")

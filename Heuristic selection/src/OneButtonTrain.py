@@ -1,12 +1,12 @@
 import os
-from src.graphProcessing import callEldaricaGenerateGraphs
+from graphProcessing import callEldaricaGenerateGraphs
 
-from src.loadData import train2,train3,train4,readHornClausesAndHints_resplitTrainAndVerifyData
-from src.trainDoc2VecModel import trainDoc2VecModelfunction,trainGraph2VecModelfunction
-from src.plot import plotHistory
+from loadData import train2,train3,train4,readHornClausesAndHints_resplitTrainAndVerifyData
+from trainDoc2VecModel import trainDoc2VecModelfunction,trainGraph2VecModelfunction
+from plot import plotHistory
 import gensim
-from src.Miscellaneous import pickleRead,pickleWrite
-
+from Miscellaneous import pickleRead,pickleWrite
+import glob,shutil
 
 def main():
     print("Start")
@@ -22,9 +22,9 @@ def main():
     #callEldaricaGenerateGraphs('trainData')
 
     # transformOneFiletoFeatures(path)
-    # train_X ,train_Y ,verify_X ,verify_Y =\
-    #     readHornClausesAndHints_resplitTrainAndVerifyData(path ,\
-    #     dataset='train',discardNegativeData=True,smallTrain=False,smallTrainSize=50)
+    train_X ,train_Y ,verify_X ,verify_Y =\
+        readHornClausesAndHints_resplitTrainAndVerifyData(path ,\
+        dataset='train',discardNegativeData=True,smallTrain=False,smallTrainSize=50)
     # train_X=pickleRead('trainData_X')
     # train_Y = pickleRead('trainData_Y')
     # verify_X = pickleRead('verifyData_X')
@@ -54,7 +54,7 @@ def main():
     # encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test=transformDatatoFeatures_tokennizer(train_X,verify_X)
     # encodedPrograms_train,encodedPrograms_test,encodedHints_train,encodedHints_test,\
     #     =transformDatatoFeatures_doc2vec(train_X, verify_X,programDoc2VecModel,hintsDoc2VecModel)
-    from src.Data2Features import Doc2vecFeatureEngineering,Node2vecFeatureEngineering,Graph2vecFeatureEngineering
+    from Data2Features import Doc2vecFeatureEngineering,Node2vecFeatureEngineering,Graph2vecFeatureEngineering
     Doc2vecFeatureEngineering()
     Graph2vecFeatureEngineering()
     #Node2vecFeatureEngineering()

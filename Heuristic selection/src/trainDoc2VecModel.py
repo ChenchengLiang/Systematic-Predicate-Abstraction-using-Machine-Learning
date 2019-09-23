@@ -4,8 +4,8 @@ import gensim
 import nltk
 nltk.download('punkt')
 
-from src.loadData import readHornClausesAndHints_resplitTrainAndVerifyData
-from src.Miscellaneous import data2list,transform2TaggedDocument,pickleRead
+from loadData import readHornClausesAndHints_resplitTrainAndVerifyData
+from Miscellaneous import data2list,transform2TaggedDocument,pickleRead
 
 def trainDoc2VecModelfunction(program_dim=100,hint_dim=20):
     X_train = pickleRead('trainData_X')

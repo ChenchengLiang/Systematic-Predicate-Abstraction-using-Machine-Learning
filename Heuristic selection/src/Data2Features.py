@@ -1,9 +1,9 @@
 import gensim
-from src.loadData import readHornClausesAndHints,readHornClausesAndHints_resplitTrainAndVerifyData
+from loadData import readHornClausesAndHints,readHornClausesAndHints_resplitTrainAndVerifyData
 import os
 import numpy as np
 from sklearn.model_selection import train_test_split
-from src.Miscellaneous import pickleWrite,doc2vecModelInferNewData,pickleRead,graph2vecModelInferNewData
+from Miscellaneous import pickleWrite,doc2vecModelInferNewData,pickleRead,graph2vecModelInferNewData
 
 def transformDatatoFeatures_graph2vec(X_train,X_test,programGraph2VecModel,hintsGraph2VecModel):
     #create Doc2Vec model
