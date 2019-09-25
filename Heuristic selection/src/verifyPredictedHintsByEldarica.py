@@ -58,14 +58,14 @@ def verifySelectedHintsInOneProgram(filePath,timeOut,solvedProgramCount,abstract
 
 
 
-def verifySelectedHintsInMultiplePrograms(benchmark,timeOut,abstractionOption):
+def verifySelectedHintsInMultiplePrograms(timeOut,abstractionOption):
     programCount = 0
     solvedProgramCount=0
 
-    for file in sorted(glob.glob('../benchmarks/' + benchmark + '/*.annot.c')):
-        fileName = file[file.find(benchmark) + len(benchmark) + 1:]
+    for file in sorted(glob.glob('../benchmarks/allInOneFile/' + '/*.annot.c')):
+        fileName = file[file.find("allInOneFile") + len("allInOneFile") + 1:]
         #parenDir = os.path.abspath(os.path.pardir)
-        if(os.path.exists("../trainData/"+fileName+".horn")):
+        if(os.path.exists("../testData/"+fileName+".horn")):
             print(fileName)
             solvedProgramCount = verifySelectedHintsInOneProgram(file,timeOut,solvedProgramCount,abstractionOption)
             programCount = programCount + 1
@@ -83,6 +83,7 @@ def main():
 
 
     abstractionOption = 'abstract:manual'
+
     timeOut=60
     benchmarkList = list()
     benchmarkList.append('dillig')
@@ -99,9 +100,8 @@ def main():
     # benchmarkList.append('svcomp16/ssh-simplified')
     # benchmarkList.append('svcomp16/systemc')
 
+    verifySelectedHintsInMultiplePrograms(timeOut, abstractionOption)
 
-    for b in benchmarkList:
-        verifySelectedHintsInMultiplePrograms(b,timeOut,abstractionOption)
 
 
 if __name__ == '__main__':

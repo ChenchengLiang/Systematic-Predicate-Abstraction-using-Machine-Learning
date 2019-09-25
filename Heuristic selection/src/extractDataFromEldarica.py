@@ -4,23 +4,55 @@ import subprocess
 from distutils.dir_util import copy_tree
 import shutil
 from os import popen
-import time
+import time,signal
 from subprocess import Popen, PIPE
 from subprocess import STDOUT, check_output
 from threading import Timer
+
+def timeout_handler(num, stack):
+    print("Received SIGALRM")
+    print("timeout")
+    raise Exception()
+
+def checkSolvability(timeOut,run):
+    #determine solvability
+    signal.signal(signal.SIGALRM, timeout_handler)
+    signal.alarm(timeOut)
+
+    start = time.time()
+    try:
+        print("Check solvability. Command:",run)
+        p = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE)
+        p.communicate()
+        end = time.time()
+        solvability=True
+        print('Solvable. Time consumption:',end - start)
+        p.kill()
+    except Exception as ex:
+        solvability=False
+        print("Cannot be solved within "+str(timeOut)+" seconds ")
+
+    finally:
+        signal.alarm(0)
+
+    return solvability
 
 def extractDataFromOneProgram(filePath,abstractionOption,timeOut):
     absParentPath=os.path.abspath(os.path.pardir)
     command = "../eldarica-graph-generation/./eld -" \
               + abstractionOption + " -p " + "-absTimeout:"+str(timeOut)+" "
     run = command + filePath
-    print("command:", run)
-    eld = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE)
-    stdout = eld.communicate()
-    #os.system(run)
+    #print("command:", run)
+    solvability=checkSolvability(timeOut,run)
+
+    if(solvability==True):#if the program can be solved in timeout time
+        print("Extract training data. Command:", run)
+        eld = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE)
+        stdout = eld.communicate()
+        #os.system(run)
 
 def extractDataFromMultipleProgram(filePath, benchmark, abstractionOption,timeOut):
-    programCount = 1
+    programCount = 0
     parenDir = os.path.abspath(os.path.pardir)
     for file in sorted(glob.glob('../benchmarks/' + benchmark + '/*.annot.c')):
         # print(file)
@@ -28,41 +60,40 @@ def extractDataFromMultipleProgram(filePath, benchmark, abstractionOption,timeOu
 
         print(file)
         extractDataFromOneProgram(file,abstractionOption,timeOut)
-        print('----------------------------', 'Program count: ', programCount, '--------------------------')
         programCount = programCount + 1
-        #extractHornClausesFromOneProgram(filePath, benchmark, fileName, abstractionOption)
+        print('----------------------------', 'Program count: ', programCount, '--------------------------')
 
-
-
-    print()
 
 def main():
     print("Start")
 
 
     filePath = '/home/chencheng/Desktop/benchmarks/'
-    abstractionOption = 'abstract:manual'
+    abstractionOptionManual = 'abstract:manual'
+    abstractionOptionList = ["abstract:manual","abstract:term","abstract:oct",\
+                             "abstract:relEqs","abstract:relIneqs"]
     timeOut=60
     benchmarkList = list()
-    #benchmarkList.append('dillig')
-    benchmarkList.append('llreve')
+    # benchmarkList.append('dillig')
+    # benchmarkList.append('llreve')
     # benchmarkList.append('VeriMAP_bench')
-    # benchmarkList.append('svcomp16/locks')
-    # benchmarkList.append('svcomp16/loop-acceleration')
-    # benchmarkList.append('svcomp16/loop-invgen')
-    # benchmarkList.append('svcomp16/loop-lit')
-    # benchmarkList.append('svcomp16/loop-new')
-    # benchmarkList.append('svcomp16/loops')
-    # benchmarkList.append('svcomp16/ntdrivers-simplified')
-    # benchmarkList.append('svcomp16/seq-mthreaded')
-    # benchmarkList.append('svcomp16/ssh-simplified')
-    # benchmarkList.append('svcomp16/systemc')
-
-
-    for b in benchmarkList:
-        extractDataFromMultipleProgram(filePath, b, abstractionOption,timeOut)
+    benchmarkList.append('svcomp16/locks')
+    benchmarkList.append('svcomp16/loop-acceleration')
+    benchmarkList.append('svcomp16/loop-invgen')
+    benchmarkList.append('svcomp16/loop-lit')
+    benchmarkList.append('svcomp16/loop-new')
+    benchmarkList.append('svcomp16/loops')
+    benchmarkList.append('svcomp16/ntdrivers-simplified')
+    benchmarkList.append('svcomp16/seq-mthreaded')
+    benchmarkList.append('svcomp16/ssh-simplified')
+    benchmarkList.append('svcomp16/systemc')
+    for abstractionOption in abstractionOptionList:
+        for b in benchmarkList:
+            extractDataFromMultipleProgram(filePath, b, abstractionOption,timeOut)
 
     #copy graph to trainData file
-    copy_tree("../graphs/", "../temp/")
+    copy_tree("../graphs/", "../trainData/")
+
+    print("Finished")
 if __name__ == '__main__':
     main()
