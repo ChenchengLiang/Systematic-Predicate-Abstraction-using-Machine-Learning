@@ -141,7 +141,7 @@ def predictAndOutputHints(model, programDoc2VecModel, hintsDoc2VecModel,programG
     predicted_y[predicted_y > 0.5] = int(1)  # convert decimals to 0 and 1
     predicted_y[predicted_y <= 0.5] = int(0)  # convert decimals to 0 and 1
 
-    print("debug")
+    print("Show one example")
     print("test_X[0][0]", test_X[0][0])  # program
     print("test_X[0][1]", test_X[0][1])  # hint text (head \n hint)
     print("test_X[0][2]", test_X[0][2])  # progran graph embedding
@@ -159,17 +159,24 @@ def predictAndOutputHints(model, programDoc2VecModel, hintsDoc2VecModel,programG
         predictedHintListWithID = list()
         print(fileName)
         f = open(path + fileName+".optimizedHints", "w+")
-        for X,y,score in zip(test_X,predicted_y,sigmoidOutput):
+
+        #print("sorted")
+        for X,y,score in sorted(zip(test_X,predicted_y,sigmoidOutput),key=lambda t:t[2],reverse=True):
+            #print(X[4],X[1],y,score)
             if(X[5]==fileName):
-                predictedHintListWithID.append([X[4],X[1][0], X[1][1],y,score])
+                #predictedHintListWithID.append([X[4],X[1], X[1],y,score])
                 # ID,head,hint,predicted result,score
                 head=X[1][:X[1].find("\n")]
                 #head=head[:head.find("/")]
                 hint=X[1][X[1].find("\n")+1:]
+                predictedHintListWithID.append([X[4], head, hint, y, score])
                 content =X[4]+":"+ head+ ":" + hint+ ":" + "".join(map(str,np.around(y,0))) + ":" + "".join(map(str,score))+"\n"
                 f.write(content)
         f.close()
-
+        #verify sorted and not sorted results
+        # print("not sorted")
+        # for X, y, score in zip(test_X, predicted_y, sigmoidOutput):
+        #     print(X[4],X[1],y,score)
 
 def main():
     print("Start")
@@ -211,7 +218,7 @@ def main():
     predictAndOutputHints(model, programDoc2VecModel, hintsDoc2VecModel,programGraph2VecModel,hintsGraph2VecModel)
 
 
-    for txt_file in glob.iglob("../trainData/*.initialHints"):
+    for txt_file in glob.iglob("../testData/*.initialHints"):
         shutil.copy2(txt_file, "../predictedHints/")
 
 

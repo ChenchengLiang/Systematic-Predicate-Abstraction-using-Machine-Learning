@@ -24,7 +24,8 @@ def main():
     # transformOneFiletoFeatures(path)
     train_X ,train_Y ,verify_X ,verify_Y =\
         readHornClausesAndHints_resplitTrainAndVerifyData(path ,\
-        dataset='train',discardNegativeData=True,smallTrain=False,smallTrainSize=50)
+        dataset='train',discardNegativeData=True,smallTrain=False,smallTrainSize=50,\
+                                                          trainDataSplitRate=0.8)
     # train_X=pickleRead('trainData_X')
     # train_Y = pickleRead('trainData_Y')
     # verify_X = pickleRead('verifyData_X')
@@ -96,7 +97,7 @@ def main():
                            graphencodedHints_train,graphencodedHints_test,\
                            train_Y,verify_Y, batch_size, epochs)
 
-
+    #graphs already been in file
     #plotHistory(history)
 
 

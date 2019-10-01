@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 plt.style.use("ggplot")
 import keras as k
-import os
+import os,shutil
 from keras.preprocessing.text import text_to_word_sequence,Tokenizer,hashing_trick,one_hot
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import Model,load_model
@@ -21,6 +21,7 @@ from Miscellaneous import data2list, recoverPredictedText,printOnePredictedTextI
 from plot import plotHistory
 from graphProcessing import callEldaricaGenerateGraphs,getGraphNode2vecWalks
 #from trainDoc2VecModel import trainDoc2VectModel
+from distutils.dir_util import copy_tree
 
 def read_program():
     vocab = list()
@@ -85,6 +86,24 @@ def separateIDHeadAndHint(S):
     hint = S[S.find(":")+1:]
     return ID,head,hint
 
+def writeTestDataToFile(trainData,verifyData):
+    #Store test data to testData file
+    print("---train programs---:")
+    for trainItem in trainData:
+        trainDataName=trainItem[7]
+        print(trainDataName)
+    print("---test programs---:")
+    for testItem in verifyData:
+        testDataName=testItem[7]
+        print(testDataName)
+        for txt_file in glob.iglob("../trainData/"+testDataName+".*"):
+            graphDir="../testData/"+testDataName+".hints.graphs"
+            if os.path.isfile(txt_file):
+                shutil.copy2(txt_file, "../testData/")
+            if os.path.isdir(txt_file) and not os.path.exists(graphDir):
+                #print("create a dir "+"../testData/"+testDataName+".hints.graphs")
+                os.makedirs(graphDir)
+                copy_tree(txt_file, graphDir+"/")
 
 
 def constructUnsplitedData_Ver1(fileName,hornText,positiveHintsText,negativeHintsText,graphEmbededProgram,discardNegativeData=True):
@@ -144,8 +163,8 @@ def constructUnsplitedData_Ver1(fileName,hornText,positiveHintsText,negativeHint
 
 
 def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
-                  discardNegativeData,smallTrain=False,smallTrainSize=50,smallTrainProgramNumber=4):
-    trainDataSplitRate=0.8
+                  discardNegativeData,smallTrain=False,smallTrainSize=50,smallTrainProgramNumber=4,trainDataSplitRate=0.8):
+    #trainDataSplitRate=0.8
     print("horn file", len(sorted(glob.glob(path + '*.horn'))))
     print("hints file", len(sorted(glob.glob(path + '*.positiveHints'))))
     print("negativeHints file", len(sorted(glob.glob(path + '*.negativeHints'))))
@@ -208,6 +227,8 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
     trainData = unsplitedData[:splitPoint]
     verifyData = unsplitedData[splitPoint:]
 
+    #Store test data to testData file
+    writeTestDataToFile(trainData,verifyData)
 
 
     trainData_X = list()

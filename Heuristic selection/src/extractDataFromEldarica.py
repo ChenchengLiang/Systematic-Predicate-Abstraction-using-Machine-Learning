@@ -4,7 +4,7 @@ import subprocess
 from distutils.dir_util import copy_tree
 import shutil
 from os import popen
-import time,signal
+import time,signal,gc
 from subprocess import Popen, PIPE
 from subprocess import STDOUT, check_output
 from threading import Timer
@@ -41,16 +41,19 @@ def extractDataFromOneProgram(filePath,abstractionOption,timeOut):
     absParentPath=os.path.abspath(os.path.pardir)
     command = "../eldarica-graph-generation/./eld -" \
               + abstractionOption + " -p " + "-absTimeout:"+str(timeOut)+" "
-    run = command + filePath
+    run_p = command + filePath
     #print("command:", run)
-    solvability=checkSolvability(timeOut,run)
+    run_normal = "../eldarica-graph-generation/./eld -" \
+              + abstractionOption  + " -absTimeout:"+str(timeOut)+" " +filePath
+    solvability=checkSolvability(timeOut,run_normal)
 
     if(solvability==True):#if the program can be solved in timeout time
-        print("Extract training data. Command:", run)
-        eld = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE)
+        print("Extract training data. Command:", run_p)
+        gc.collect()#clear memory
+        eld = subprocess.Popen(run_p, shell=True, stdout=subprocess.PIPE)
         stdout = eld.communicate()
         #os.system(run)
-
+        gc.collect()  # clear memory
 def extractDataFromMultipleProgram(filePath, benchmark, abstractionOption,timeOut):
     programCount = 0
     parenDir = os.path.abspath(os.path.pardir)
@@ -74,9 +77,9 @@ def main():
                              "abstract:relEqs","abstract:relIneqs"]
     timeOut=60
     benchmarkList = list()
-    # benchmarkList.append('dillig')
-    # benchmarkList.append('llreve')
-    # benchmarkList.append('VeriMAP_bench')
+    benchmarkList.append('dillig')
+    benchmarkList.append('llreve')
+    benchmarkList.append('VeriMAP_bench')
     benchmarkList.append('svcomp16/locks')
     benchmarkList.append('svcomp16/loop-acceleration')
     benchmarkList.append('svcomp16/loop-invgen')

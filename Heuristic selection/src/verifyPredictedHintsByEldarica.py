@@ -10,8 +10,7 @@ def timeout_handler(num, stack):
     raise Exception()
 
 def verifySelectedHintsInOneProgram(filePath,timeOut,solvedProgramCount,abstractionOption):
-    command = "../eldarica-graph-generation/./eld " \
-              + "-absTimeout:"+str(timeOut)+" "
+    command = "../eldarica-graph-generation/./eld "
     run = command + filePath
 
 
@@ -86,7 +85,7 @@ def main():
 
     timeOut=60
     benchmarkList = list()
-    benchmarkList.append('dillig')
+    # benchmarkList.append('dillig')
     # benchmarkList.append('llreve')
     # benchmarkList.append('VeriMAP_bench')
     # benchmarkList.append('svcomp16/locks')
