@@ -77,9 +77,9 @@ def main():
                              "abstract:relEqs","abstract:relIneqs"]
     timeOut=60
     benchmarkList = list()
-    benchmarkList.append('dillig')
-    benchmarkList.append('llreve')
-    benchmarkList.append('VeriMAP_bench')
+    # benchmarkList.append('dillig')
+    # benchmarkList.append('llreve')
+    # benchmarkList.append('VeriMAP_bench')
     benchmarkList.append('svcomp16/locks')
     benchmarkList.append('svcomp16/loop-acceleration')
     benchmarkList.append('svcomp16/loop-invgen')

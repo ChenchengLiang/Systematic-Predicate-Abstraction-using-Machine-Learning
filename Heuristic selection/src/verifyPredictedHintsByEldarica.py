@@ -9,7 +9,7 @@ def timeout_handler(num, stack):
     print("timeout")
     raise Exception()
 
-def verifySelectedHintsInOneProgram(filePath,timeOut,solvedProgramCount,abstractionOption):
+def verifySelectedHintsInOneProgram(filePath,timeOut,solvedProgramCount,abstractionOption,rankOption):
     command = "../eldarica-graph-generation/./eld "
     run = command + filePath
 
@@ -20,8 +20,9 @@ def verifySelectedHintsInOneProgram(filePath,timeOut,solvedProgramCount,abstract
 
     start = time.time()
     try:
+        run = run + " -" + abstractionOption
         print("Command:",run)
-        p = subprocess.Popen(run+ " -"+abstractionOption, shell=True, stdout=subprocess.PIPE)
+        p = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE)
         p.communicate()
         end = time.time()
         solvedProgramCount=solvedProgramCount+1
@@ -36,13 +37,15 @@ def verifySelectedHintsInOneProgram(filePath,timeOut,solvedProgramCount,abstract
     #verify program by abstract:manual
     signal.signal(signal.SIGALRM, timeout_handler)
     signal.alarm(timeOut)
-
     start = time.time()
     try:
-        print("Command:",run+" "+abstractionOption)
-        p = subprocess.Popen(run+" -"+abstractionOption, shell=True, stdout=subprocess.PIPE)
+        run = run  + " " + rankOption
+        print("Command:",run)
+        p = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE)
         p.communicate()
         end = time.time()
+        if rankOption :
+          print(rankOption)
         print("Time consumption ("+abstractionOption+"):",end - start)
         p.kill()
     except Exception as ex:
@@ -57,7 +60,7 @@ def verifySelectedHintsInOneProgram(filePath,timeOut,solvedProgramCount,abstract
 
 
 
-def verifySelectedHintsInMultiplePrograms(timeOut,abstractionOption):
+def verifySelectedHintsInMultiplePrograms(timeOut,abstractionOption,rankOption):
     programCount = 0
     solvedProgramCount=0
 
@@ -66,7 +69,7 @@ def verifySelectedHintsInMultiplePrograms(timeOut,abstractionOption):
         #parenDir = os.path.abspath(os.path.pardir)
         if(os.path.exists("../testData/"+fileName+".horn")):
             print(fileName)
-            solvedProgramCount = verifySelectedHintsInOneProgram(file,timeOut,solvedProgramCount,abstractionOption)
+            solvedProgramCount = verifySelectedHintsInOneProgram(file,timeOut,solvedProgramCount,abstractionOption,rankOption)
             programCount = programCount + 1
             print('----------------------------', 'Program count: ', programCount, '--------------------------')
             #extractHornClausesFromOneProgram(filePath, benchmark, fileName, abstractionOption)
@@ -82,6 +85,7 @@ def main():
 
 
     abstractionOption = 'abstract:manual'
+    rankOption = '-rank:0.1'
 
     timeOut=60
     benchmarkList = list()
@@ -99,7 +103,7 @@ def main():
     # benchmarkList.append('svcomp16/ssh-simplified')
     # benchmarkList.append('svcomp16/systemc')
 
-    verifySelectedHintsInMultiplePrograms(timeOut, abstractionOption)
+    verifySelectedHintsInMultiplePrograms(timeOut, abstractionOption,rankOption)
 
 
 
