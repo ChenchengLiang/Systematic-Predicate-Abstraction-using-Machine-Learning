@@ -3,7 +3,22 @@ nltk.download('punkt')
 import gensim
 import numpy as np
 import pickle
-import os
+import os,glob,shutil,gc
+from pathlib import Path
+from extractDataFromEldarica import checkSolvability
+
+def renameBenchmarkFiles():
+
+    counter=0
+    for txt_file in glob.iglob('/home/chencheng/Downloads/sv-benchmarks-master/c/*/*.c'):
+        print(txt_file)
+        if os.path.exists(txt_file + ".annot.c"):
+            print("")
+        else:
+            shutil.copy2(txt_file, txt_file + ".annot.c")
+            counter=counter+1
+    print("Program counter:"+str(counter))
+
 def checkSplitData(X_train, X_test, y_train, y_test):
     print("------train-----")
     print("X_train",len(X_train))

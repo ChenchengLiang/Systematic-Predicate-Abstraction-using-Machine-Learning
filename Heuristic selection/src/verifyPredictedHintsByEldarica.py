@@ -21,8 +21,8 @@ def verifySelectedHintsInOneProgram(filePath,timeOut,solvedProgramCount,abstract
     start = time.time()
     try:
         run = run + " -" + abstractionOption
-        print("Command:",run)
-        p = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE)
+        print("Command:",run+ " -readHints" + " " + rankOption)
+        p = subprocess.Popen(run+ rankOption, shell=True, stdout=subprocess.PIPE)
         p.communicate()
         end = time.time()
         solvedProgramCount=solvedProgramCount+1
@@ -39,13 +39,10 @@ def verifySelectedHintsInOneProgram(filePath,timeOut,solvedProgramCount,abstract
     signal.alarm(timeOut)
     start = time.time()
     try:
-        run = run  + " " + rankOption
         print("Command:",run)
         p = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE)
         p.communicate()
         end = time.time()
-        if rankOption :
-          print(rankOption)
         print("Time consumption ("+abstractionOption+"):",end - start)
         p.kill()
     except Exception as ex:
@@ -85,7 +82,7 @@ def main():
 
 
     abstractionOption = 'abstract:manual'
-    rankOption = '-rank:0.1'
+    rankOption = ""
 
     timeOut=60
     benchmarkList = list()
