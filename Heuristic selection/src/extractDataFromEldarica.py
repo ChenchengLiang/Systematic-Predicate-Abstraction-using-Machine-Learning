@@ -102,6 +102,10 @@ def extractDataFromOneProgram(filePath,abstractionOption,timeOut):
         #eld.terminate()
         #os.system(run)
         gc.collect()  # clear memory
+        return True
+    else:
+        return False
+
 def extractDataFromMultipleProgram(benchmark, abstractionOption,timeOut):
     # logging.basicConfig(filename='log/memory-extract-data.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s',level=logging.INFO)
     programCount = 0
@@ -133,21 +137,21 @@ def main():
     abstractionOptionList = ["-abstract:manual"]
     timeOut=60
     benchmarkList = list()
-    benchmarkList.append('dillig')
-    benchmarkList.append('llreve')
-    benchmarkList.append('VeriMAP_bench')
-    benchmarkList.append('svcomp16/locks')
-    benchmarkList.append('svcomp16/loop-acceleration')
-    benchmarkList.append('svcomp16/loop-invgen')
-    benchmarkList.append('svcomp16/loop-lit')
-    benchmarkList.append('svcomp16/loop-new')
-    benchmarkList.append('svcomp16/loops')
-    benchmarkList.append('svcomp16/ntdrivers-simplified')
-    benchmarkList.append('svcomp16/seq-mthreaded')
-    benchmarkList.append('svcomp16/ssh-simplified')
-    benchmarkList.append('svcomp16/systemc')
+    # benchmarkList.append('dillig')
+    # benchmarkList.append('llreve')
+    # benchmarkList.append('VeriMAP_bench')
+    # benchmarkList.append('svcomp16/locks')
+    # benchmarkList.append('svcomp16/loop-acceleration')
+    # benchmarkList.append('svcomp16/loop-invgen')
+    # benchmarkList.append('svcomp16/loop-lit')
+    # benchmarkList.append('svcomp16/loop-new')
+    # benchmarkList.append('svcomp16/loops')
+    # benchmarkList.append('svcomp16/ntdrivers-simplified')
+    # benchmarkList.append('svcomp16/seq-mthreaded')
+    # benchmarkList.append('svcomp16/ssh-simplified')
+    # benchmarkList.append('svcomp16/systemc')
 
-    #benchmarkList.append('chc-comp19-benchmarks-master/lia-lin')
+    benchmarkList.append('chc-comp19-benchmarks-master/lia-lin')
 
     for abstractionOption in abstractionOptionList:
         for b in benchmarkList:

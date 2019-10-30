@@ -41,11 +41,10 @@ def main():
     #     shutil.copy2(txt_file, "../predictedHints/")
     #renameBenchmarkFiles()
     benchmark="locks"
-    sv_benchmark_smt2="/home/chencheng/Downloads/sv-benchmarks-master/clauses/LIA/Eldarica/*/*.smt2"
-    sv_benchmark_c="../benchmarks/allInOneFile/*.annot.c"
-    chc_benchmark_smt2 = "../benchmarks/chc-comp19-benchmarks-master/*/*.smt2"
-    absOption="-abstract:manual"
-    separateSolvableAndUnsolvableGroup(sv_benchmark_c,absOption)
+    sv_benchmark_smt2=["../benchmarks/sv-comp-clauses/*/*/*.smt2","-abstract"]
+    sv_benchmark_c=["../benchmarks/allInOneFile/*.annot.c","-abstract:manual"]
+    chc_benchmark_smt2 = ["../benchmarks/chc-comp19-benchmarks-master/*/*.smt2","-abstract"]
+    separateSolvableAndUnsolvableGroup(sv_benchmark_smt2[0],sv_benchmark_smt2[1])
 
     print("Finished")
 
