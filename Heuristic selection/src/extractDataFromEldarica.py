@@ -2,12 +2,10 @@ import os
 import glob
 import subprocess
 from distutils.dir_util import copy_tree
-import shutil
 from os import popen
 import time,signal,gc
 from threading import Timer
 import logging
-#import psutil
 import sys
 
 # def timeout_handler(num, stack):
@@ -129,6 +127,8 @@ def extractDataFromMultipleProgram(benchmark, abstractionOption,timeOut):
 
 def main():
     print("Start")
+    #sys.argv[1] = c or smt
+    #sys.argv[2] =  path to files
 
 
     filePath = '/home/chencheng/Desktop/benchmarks/'
@@ -151,7 +151,12 @@ def main():
     # benchmarkList.append('svcomp16/ssh-simplified')
     # benchmarkList.append('svcomp16/systemc')
 
-    benchmarkList.append('chc-comp19-benchmarks-master/lia-lin')
+    #benchmarkList.append('chc-comp19-benchmarks-master/*')
+
+    benchmarkList.append(sys.argv[2])
+
+
+
 
     for abstractionOption in abstractionOptionList:
         for b in benchmarkList:

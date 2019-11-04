@@ -5,9 +5,9 @@ from extractDataFromEldarica import checkSolvability
 import subprocess
 import glob
 
+import requests
 
-
-@ray.remote
+#@ray.remote
 def extractDataFromOneProgram(filePath,abstractionOption,timeOut):
     absParentPath=os.path.abspath(os.path.pardir)
     command = "../eldarica-graph-generation/./eld " \
@@ -54,12 +54,19 @@ def separateFilesToGroups(benchmark,groupSize,numberOfWorkers):
 
 @ray.remote
 def oneWorker(group,timeOut,benchmark,workerID):
+    global programCount
     for file in group:
-        id = extractDataFromOneProgram.remote(file, benchmark[2], timeOut)
-        results = ray.get(id)
-        global programCount
-        print('-----------------', "Worker ID:",workerID,' Program count: ', programCount,"/"+str(len(group)), '--------------------------')
-        programCount=programCount+1
+
+        id = extractDataFromOneProgram(file, benchmark[2], timeOut)
+#        results = ray.get(id)
+        print('-----------------', "Worker ID:", workerID, ' Program count: ', programCount, "/" + str(len(group)),
+              '--------------------------')
+        programCount = programCount + 1
+
+        #global programCount
+
+
+    return programCount
 
 
 def getNumberOfFiles(benchmark):
@@ -67,6 +74,7 @@ def getNumberOfFiles(benchmark):
     for file in sorted(glob.glob('../benchmarks/' + benchmark[0] + '/*.'+benchmark[1])):
         length=length+1
     return length
+
 
 programCount = 1
 def main():
@@ -80,11 +88,10 @@ def main():
     timeOut=60
 
 
-
     for benchmark in benchmarkList:
         length=getNumberOfFiles(benchmark)
         print(length," files")
-        numberOfWorkers=4
+        numberOfWorkers=16
         groupList=separateFilesToGroups(benchmark,int(length/numberOfWorkers),numberOfWorkers)
         print("Number of worker",numberOfWorkers)
         for g,gn in zip(groupList,range(len(groupList))):
@@ -96,13 +103,6 @@ def main():
             workerID=workerID+1
         ray.get(result_ids)
 
-
-    # for file in sorted(glob.glob('../benchmarks/' + benchmark + '/*.smt2')):
-    #     fileName = file[file.find(benchmark) + len(benchmark) + 1:]
-    #     print(file)
-    #     extractDataFromOneProgram(file, "-abstract", timeOut)
-    #     programCount = programCount + 1
-    #     print('----------------------------', 'Program count: ', programCount, '--------------------------')
 
     print("Finished")
 
