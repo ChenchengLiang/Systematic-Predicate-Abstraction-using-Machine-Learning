@@ -56,23 +56,50 @@ import sys
 
 def checkSolvability(timeOut,run,abstractionOption):
     #print(os.path.abspath(os.pardir))
+    runTime=timeOut
     file=run[run.find(" ../"):]
     file=file[3:]
     file=str(os.path.abspath(os.pardir))+file
     print("file",file)
+    start = time.time()
     p=subprocess.Popen(["../eldarica-graph-generation/eld",file,abstractionOption],shell=False)
     #print("check pid ",p.pid, psutil.pid_exists(p.pid))
     solvability=False
     try:
         print("Check solvability. \n Command:", "../eldarica-graph-generation/eld",file,abstractionOption)
         p.wait(timeout=timeOut)
+        end = time.time()
+        runTime=end-start
         solvability = True
     except subprocess.TimeoutExpired:
         print("Cannot be solved within "+str(timeOut)+" seconds" )
         p.kill()
-    #print("check pid ",p.pid, psutil.pid_exists(p.pid))
-    return solvability
+    print(abstractionOption,"time consumption:",runTime)
+    return solvability,runTime
 
+
+def checkSolvabilityWithOutAbstraction(timeOut,run):
+    #print(os.path.abspath(os.pardir))
+    runTime=timeOut
+    file=run[run.find(" ../"):]
+    file=file[3:]
+    file=str(os.path.abspath(os.pardir))+file
+    print("file",file)
+    start = time.time()
+    p=subprocess.Popen(["../eldarica-graph-generation/eld",file,"-abstract:off"],shell=False)
+    #print("check pid ",p.pid, psutil.pid_exists(p.pid))
+    solvability=False
+    try:
+        print("Check solvability. \n Command:", "../eldarica-graph-generation/eld",file,"-abstract:off")
+        p.wait(timeout=timeOut)
+        end = time.time()
+        runTime=end-start
+        solvability = True
+    except subprocess.TimeoutExpired:
+        print("Cannot be solved within "+str(timeOut)+" seconds" )
+        p.kill()
+    print("abstract:off time consumption:",runTime)
+    return solvability,runTime
 
 
 def extractDataFromOneProgram(filePath,abstractionOption,timeOut):
@@ -83,18 +110,22 @@ def extractDataFromOneProgram(filePath,abstractionOption,timeOut):
     #print("command:", run)
     run_normal = "../eldarica-graph-generation/./eld " \
               + abstractionOption  +" " +filePath
-    solvability=checkSolvability(timeOut,run_normal,abstractionOption)
+    #check solvability and its runtime with abstraction
+    solvabilityWithAbstraction,runTimeWithAbstraction=checkSolvability(timeOut,run_normal,abstractionOption)
+    #check solvability and its runtime with abstraction
+    solvabilityWithOutAbstraction,runTimeWithOutAbstraction=checkSolvabilityWithOutAbstraction(timeOut,run_normal)
 
-    if(solvability==True):#if the program can be solved in timeout time
+
+    if(solvabilityWithAbstraction==True and runTimeWithOutAbstraction-runTimeWithAbstraction>0):#if the program can be solved in timeout time
 
         file = run_p[run_p.find(" ../"):]
         file = file[3:]
         file = str(os.path.abspath(os.pardir)) + file
         print("Extract training data.\n Command:", "../eldarica-graph-generation/eld", file, abstractionOption,
-              "-absTimeout:" + str(timeOut), "-generateTrainData")
+              "-absTimeout:" + str(runTimeWithAbstraction), "-generateTrainData")
         gc.collect()#clear memory
         #eld = subprocess.Popen(run_p, shell=True, stdout=subprocess.PIPE)
-        eld = subprocess.Popen(["../eldarica-graph-generation/eld",file ,abstractionOption , "-absTimeout:"+str(timeOut),"-generateTrainData"],stdout=subprocess.DEVNULL, shell=False)
+        eld = subprocess.Popen(["../eldarica-graph-generation/eld",file ,abstractionOption , "-absTimeout:"+str(runTimeWithAbstraction),"-generateTrainData"],stdout=subprocess.DEVNULL, shell=False)
         #stdout = eld.communicate()
         eld.wait()
         #eld.terminate()

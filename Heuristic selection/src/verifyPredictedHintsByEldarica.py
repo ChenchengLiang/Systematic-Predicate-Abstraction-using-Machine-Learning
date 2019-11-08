@@ -2,54 +2,38 @@ import os
 import glob
 import subprocess
 import time
-import signal
 
-def timeout_handler(num, stack):
-    print("Received SIGALRM")
-    print("timeout")
-    raise Exception()
 
 def verifySelectedHintsInOneProgram(filePath,timeOut,solvedProgramCount,abstractionOption,rankOption):
     command = "../eldarica-graph-generation/./eld "
     run = command + filePath
 
-
-    #verify program by NNs prediction
-    signal.signal(signal.SIGALRM, timeout_handler)
-    signal.alarm(timeOut)
-
+    # verify program by read hints
     start = time.time()
+    p=subprocess.Popen(["../eldarica-graph-generation/eld",filePath,rankOption,"-readHints",abstractionOption],shell=False)
+    #print("check pid ",p.pid, psutil.pid_exists(p.pid))
+    solvability=False
     try:
-        run = run + " -" + abstractionOption
-        print("Command:",run+ " -readHints" + " " + rankOption)
-        p = subprocess.Popen(run+ rankOption, shell=True, stdout=subprocess.PIPE)
-        p.communicate()
+        print("Check solvability. \n Command:", "../eldarica-graph-generation/eld",filePath,abstractionOption,rankOption,"-readHints")
+        p.wait(timeout=timeOut)
         end = time.time()
-        solvedProgramCount=solvedProgramCount+1
-        print('Time consumption (NNs):',end - start)
+        print('Time consumption (NNs):', end - start)
+        solvedProgramCount = solvedProgramCount + 1
+    except subprocess.TimeoutExpired:
+        print("Cannot be solved within "+str(timeOut)+" seconds" )
         p.kill()
-    except Exception as ex:
-        print("Cannot be solved within "+str(timeOut)+" seconds ")
 
-    finally:
-        signal.alarm(0)
-
-    #verify program by abstract:manual
-    signal.signal(signal.SIGALRM, timeout_handler)
-    signal.alarm(timeOut)
+    #verify program by original hints
     start = time.time()
+    p=subprocess.Popen(["../eldarica-graph-generation/eld",filePath,abstractionOption],shell=False)
     try:
-        print("Command:",run)
-        p = subprocess.Popen(run, shell=True, stdout=subprocess.PIPE)
-        p.communicate()
+        print("Check solvability. \n Command:", "../eldarica-graph-generation/eld",filePath,abstractionOption)
+        p.wait(timeout=timeOut)
         end = time.time()
         print("Time consumption ("+abstractionOption+"):",end - start)
+    except subprocess.TimeoutExpired:
+        print("Cannot be solved within "+str(timeOut)+" seconds" )
         p.kill()
-    except Exception as ex:
-        print("Cannot be solved within "+str(timeOut)+" seconds ")
-
-    finally:
-        signal.alarm(0)
 
 
     return solvedProgramCount
@@ -61,8 +45,27 @@ def verifySelectedHintsInMultiplePrograms(timeOut,abstractionOption,rankOption):
     programCount = 0
     solvedProgramCount=0
 
-    for file in sorted(glob.glob('../benchmarks/allInOneFile/' + '/*.annot.c')):
-        fileName = file[file.find("allInOneFile") + len("allInOneFile") + 1:]
+    for file in sorted(glob.glob("../benchmarks/sv-comp-c/*/*.annot.c")):
+        fileName = file[file.rfind("/") +  1:]
+        #parenDir = os.path.abspath(os.path.pardir)
+        if(os.path.exists("../testData/"+fileName+".horn")):
+            print(fileName)
+            solvedProgramCount = verifySelectedHintsInOneProgram(file,timeOut,solvedProgramCount,abstractionOption,rankOption)
+            programCount = programCount + 1
+            print('----------------------------', 'Program count: ', programCount, '--------------------------')
+            #extractHornClausesFromOneProgram(filePath, benchmark, fileName, abstractionOption)
+
+    for file in sorted(glob.glob("../benchmarks/sv-comp-clauses/*/*/*.smt2")):
+        fileName = file[file.rfind("/") +  1:]
+        #parenDir = os.path.abspath(os.path.pardir)
+        if(os.path.exists("../testData/"+fileName+".horn")):
+            print(fileName)
+            solvedProgramCount = verifySelectedHintsInOneProgram(file,timeOut,solvedProgramCount,abstractionOption,rankOption)
+            programCount = programCount + 1
+            print('----------------------------', 'Program count: ', programCount, '--------------------------')
+            #extractHornClausesFromOneProgram(filePath, benchmark, fileName, abstractionOption)
+    for file in sorted(glob.glob("../benchmarks/chc-comp/*/*.smt2")):
+        fileName = file[file.rfind("/") +  1:]
         #parenDir = os.path.abspath(os.path.pardir)
         if(os.path.exists("../testData/"+fileName+".horn")):
             print(fileName)
@@ -81,8 +84,8 @@ def main():
     print("Start")
 
 
-    abstractionOption = 'abstract:manual'
-    rankOption = ""
+    abstractionOption = '-abstract:manual'
+    rankOption = "-rank:0.5"
 
     timeOut=60
     benchmarkList = list()

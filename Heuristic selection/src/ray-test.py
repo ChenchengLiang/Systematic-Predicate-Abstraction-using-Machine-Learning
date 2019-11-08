@@ -16,7 +16,7 @@ def extractDataFromOneProgram(filePath,abstractionOption,timeOut):
     #print("command:", run)
     run_normal = "../eldarica-graph-generation/./eld " \
               + abstractionOption  +" " +filePath
-    solvability=checkSolvability(timeOut,run_normal,abstractionOption)
+    solvability,runtime=checkSolvability(timeOut,run_normal,abstractionOption)
 
     if(solvability==True):#if the program can be solved in timeout time
 
@@ -91,7 +91,7 @@ def main():
     for benchmark in benchmarkList:
         length=getNumberOfFiles(benchmark)
         print(length," files")
-        numberOfWorkers=16
+        numberOfWorkers=4
         groupList=separateFilesToGroups(benchmark,int(length/numberOfWorkers),numberOfWorkers)
         print("Number of worker",numberOfWorkers)
         for g,gn in zip(groupList,range(len(groupList))):

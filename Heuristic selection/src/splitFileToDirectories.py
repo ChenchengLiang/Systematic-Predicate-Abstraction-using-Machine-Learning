@@ -8,11 +8,11 @@ import shutil,glob
 def main():
     print("Start")
     copyToOneFile()
-    splitToNDirectory(2,"sv-comp-clauses",".smt2")
-    splitToNDirectory(2,"chc-comp19-benchmarks-master",".smt2")
-    splitToNDirectory(2, "sv-comp-c",".annot.c")
+    splitToNDirectory(10,"sv-comp-clauses",".smt2")
+    splitToNDirectory(10,"chc-comp",".smt2")
+    splitToNDirectory(10, "sv-comp-c",".annot.c")
     shutil.rmtree("../benchmarks/sv-comp-clauses/allInOneFile")
-    shutil.rmtree("../benchmarks/chc-comp19-benchmarks-master/allInOneFile")
+    shutil.rmtree("../benchmarks/chc-comp/allInOneFile")
     shutil.rmtree("../benchmarks/sv-comp-c/allInOneFile")
 
 
@@ -46,11 +46,11 @@ def copyToOneFile():
         #print(file)
         shutil.copy2(file, "../benchmarks/sv-comp-clauses/allInOneFile")
 
-    benchmark="chc-comp19-benchmarks-master/*"
-    os.mkdir("../benchmarks/chc-comp19-benchmarks-master/allInOneFile")
+    benchmark="chc-comp/*"
+    os.mkdir("../benchmarks/chc-comp/allInOneFile")
     for file in sorted(glob.glob('../benchmarks/' + benchmark + '/*.smt2')):
         #print(file)
-        shutil.copy2(file, "../benchmarks/chc-comp19-benchmarks-master/allInOneFile")
+        shutil.copy2(file, "../benchmarks/chc-comp/allInOneFile")
 
     benchmark="sv-comp-c/*"
     os.mkdir("../benchmarks/sv-comp-c/allInOneFile")
