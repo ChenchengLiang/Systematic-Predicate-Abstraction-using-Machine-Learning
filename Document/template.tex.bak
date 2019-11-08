@@ -1,8 +1,23 @@
 \documentclass{article}
+\usepackage{graphicx}
+\usepackage{blindtext}
 
+\usepackage{subcaption}
 
 \usepackage{arxiv}
-
+\usepackage{listings}
+\lstset
+{ %Formatting for code in appendix
+    language=C,
+    basicstyle=\footnotesize,
+    numbers=left,
+    stepnumber=1,
+    showstringspaces=false,
+    tabsize=1,
+    breaklines=true,
+    breakatwhitespace=false,
+    xleftmargin=0.04\textwidth,
+}
 \usepackage[utf8]{inputenc} % allow utf-8 input
 \usepackage[T1]{fontenc}    % use 8-bit T1 fonts
 \usepackage{hyperref}       % hyperlinks
@@ -65,10 +80,91 @@ Systematic Predicate Abstraction using Deep Learning
 
 
 \section{Introduction}
-Systematic Predicate Abstraction using Deep Learning 
+Systematic Predicate Abstraction using Deep Learning
+
+\section{Background}
+\subsection{Abstraction Based Model Checking}
+\subsection{CEGAR}
+\subsection{Abstract Interpolation}
+
+\section{Problem Overview}
+
 
 \section{Data Collection}
+For a single instance, the inputs are a list of templates and a program in the form of text stream and graph. The output is a list of templates with labels.
 
+The strategy $A$ (fixed time out) to extract the training data (a list of templates with labels) is that for one program, we run Eldarica with an abstraction heuristic (e.g. use option -abstract:manual for .c files and -abstract for .smt2 files). If Eldarica can solve the program within 60 seconds. We mark this program as solvable. In Eldarica, we have an initial list of templates. We delete these templates one by one to see if the program can be solved with the remaining templates. If the program is still solvable within the timeout, then that deleted template is critical, we mark it as useful and label it as 1. By doing so iteratively, we can label the initial list of templates. This labelled list of templates will be used in the training process.
+
+\begin{enumerate}
+  \item chc-comp19-benchmarks: 38/1216 .smt2 files (programs) need templates to solve the program within in 60 seconds.
+  \item sv-comp-smt-benchmarks: 7/6814 .smt2 files need templates.
+  \item sv-comp-c-benchmarks: 31/545 .c files need templates.
+\end{enumerate}
+
+Only 76 training programs in total.
+
+A alternative strategy $B$ (variable timeout): First, confirm the solvability (i.e. the program can be solved within 60 seconds with the abstraction heuristic).
+Second, record the solving time with and without the abstraction heuristic. If Eldarica takes less solving time with abstraction heuristic, pass this solving time as timeout to Eldarica to label the templates used in the program.
+
+
+Strategy $C$: keep Strategy $A$'s extracting process. Collect more programs from much larger benchmarks, and use these three benchmarks only for testing.
+
+
+
+\section{Training Model}
+\subsection{Program Embedding}
+\subsubsection{Text Level}
+\subsubsection{Graph Level}
+\subsubsection{Graph Representation}
+\begin{lstlisting}
+extern int n;
+void main(){
+    int x,y;
+    assume(x==n,y==n);
+    while(x!=0){
+        x--;
+        y--;
+    }
+    assert(y==0);
+}
+\end{lstlisting}
+
+\begin{figure}
+\begin{subfigure}[b]{0.4\textwidth}
+\begin{lstlisting}
+extern int n;
+void main(){
+    int x,y;
+    assume(x==n,y==n);
+    while(x!=0){
+        x--;
+        y--;
+    }
+    assert(y==0);
+}
+\end{lstlisting}\caption{C program for horn graph example}\label{horn_graph_while-C}
+\end{subfigure}
+\begin{subfigure}[b]{0.4\textwidth}
+  \includegraphics[width=8cm]{graph/horn_graph_while}\\
+  \caption{Horn graph example}\label{horn_graph_while}\end{subfigure}
+\end{figure}
+
+
+\section{Experiments}
+\subsection{Work flow}
+\section{Related work}
+Program synthesis:
+
+Logical reasoning.
+
+Machine learning methods:
+
+Encode inputs to fixed vector, then decode this vector to target language.
+
+Guide formal method's search process by Training a statistical model to rank some options existed in search space and try them first.
+
+
+\section{Discussion and Future work}
 %
 %
 %\section{Headings: first level}
