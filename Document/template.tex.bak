@@ -36,20 +36,20 @@
   Department of \\
    University\\
   Address \\
-  \texttt{ccc@c.cc} \\
+  \texttt{xxx@xxx} \\
   %% examples of more authors
    \And
  Name \samethanks\\
   Department of \\
    University\\
   Address \\
-  \texttt{ccc@c.cc} \\
+  \texttt{xxx@xxx} \\
      \And
  Name \samethanks\\
   Department of \\
    University\\
   Address \\
-  \texttt{ccc@c.cc} \\
+  \texttt{xxx@xxx} \\
   %% \AND
   %% Coauthor \\
   %% Affiliation \\
@@ -96,9 +96,9 @@ For a single instance, the inputs are a list of templates and a program in the f
 The strategy $A$ (fixed time out) to extract the training data (a list of templates with labels) is that for one program, we run Eldarica with an abstraction heuristic (e.g. use option -abstract:manual for .c files and -abstract for .smt2 files). If Eldarica can solve the program within 60 seconds. We mark this program as solvable. In Eldarica, we have an initial list of templates. We delete these templates one by one to see if the program can be solved with the remaining templates. If the program is still solvable within the timeout, then that deleted template is critical, we mark it as useful and label it as 1. By doing so iteratively, we can label the initial list of templates. This labelled list of templates will be used in the training process.
 
 \begin{enumerate}
-  \item chc-comp19-benchmarks: 38/1216 .smt2 files (programs) need templates to solve the program within in 60 seconds.
-  \item sv-comp-smt-benchmarks: 7/6814 .smt2 files need templates.
-  \item sv-comp-c-benchmarks: 31/545 .c files need templates.
+  \item chc-comp benchmarks: 38/1216 .smt2 files (programs) need templates to solve the program within in 60 seconds.
+  \item sv-comp smt benchmarks: 7/6814 .smt2 files need templates.
+  \item sv-comp c benchmarks: 31/545 .c files need templates.
 \end{enumerate}
 
 Only 76 training programs in total.
@@ -106,30 +106,73 @@ Only 76 training programs in total.
 A alternative strategy $B$ (variable timeout): First, confirm the solvability (i.e. the program can be solved within 60 seconds with the abstraction heuristic).
 Second, record the solving time with and without the abstraction heuristic. If Eldarica takes less solving time with abstraction heuristic, pass this solving time as timeout to Eldarica to label the templates used in the program.
 
+\begin{enumerate}
+  \item chc-comp benchmarks: 40/1216.  32 programs (204 templates)for training and 8 (47 templates) for testing. 8/8 solved by read templates. Read templates time consumption/original templates consumption =  40.25/40.86 (in seconds)
+  \item sv-comp smt benchmarks: 15/6814.  12 programs (254 templates)for training and 3 (74 templates) for testing. 3/3 solved by read templates. Read templates time consumption/original templates consumption =  28.07/27.28 (in seconds)
+  \item sv-comp c benchmarks: 41/545.  32 programs (4635 templates)for training and 9 (350 templates) for testing. 8/9 solved by read templates. Read templates time consumption/original templates consumption = 34.04/53.46  (in seconds)
+\end{enumerate}
 
-Strategy $C$: keep Strategy $A$'s extracting process. Collect more programs from much larger benchmarks, and use these three benchmarks only for testing.
+96 training programs. 76 programs for training, 20 programs for testing.
+18/20 solved by read templates. Read templates time consumption/original templates consumption =  140.67/126.84 (in seconds)
+
+Strategy $C$: keep using Strategy $B$'s on larger benchmarks, and use these three benchmarks only for testing.
 
 
 
 \section{Training Model}
-\subsection{Program Embedding}
-\subsubsection{Text Level}
-\subsubsection{Graph Level}
-\subsubsection{Graph Representation}
-\begin{lstlisting}
-extern int n;
-void main(){
-    int x,y;
-    assume(x==n,y==n);
-    while(x!=0){
-        x--;
-        y--;
-    }
-    assert(y==0);
-}
-\end{lstlisting}
 
-\begin{figure}
+
+\begin{figure}[h]
+\centering
+  \includegraphics[width=10cm]{graph/NNstructure}\\
+  \caption{Neural network structure}\label{NNstructure}
+\end{figure}
+\subsection{Program Embedding}
+
+\subsubsection{Text Level}
+Doc2Vec \cite{DBLP:journals/corr/LeM14} embed different length of sentences to fixed vector.
+Program text streams are embedded into 100 dimensions. Template text streams are embedded to 20 dimensions.
+\subsubsection{Graph Level}
+Graph2Vec\cite{DBLP:journals/corr/NarayananCVCLJ17}.
+WL relabeling process \cite{WL_relabeling_process} to generate random subgraphs (can be seen as sentences). Then use Doc2Vec embed subgraphs to fixed vector.
+Program graphs (horn graphs) are embedded into 100 dimensions. Templates are embedded to 20 dimensions.
+\subsubsection{Graph Representation}
+
+Each template contain location, category, and predicate information. One example template is "inv\_main8:VerifHintInitPred(((\_0 + -1 * \_2) >= 0))" in which "inv\_main8" is its control location,"VerifHintInitPred" is its category (The meaning of the categories can be found in appendix), and "(((\_0 + -1 * \_2) >= 0))" is the predicate. \_0 and \_2 are canonical encoding of variable names in source code. For example, \_0 is x and \_2 is y.  We can combine the three components into one graph. The root node contains the location information ("inv\_main8") as its node attribute. The only child of the root contains the category information ("VerifHintInitPred"). The predicate ("(((\_0 + -1 * \_2) >= 0))") can be represent as a binary tree. We connect the binary tree's root to the category node to connect all parts together. One example is shown in Figure \ref{templateGraph}. We use graphviz to manipulate the graph. The corresponding graphviz text representation of the template is shown in \ref{templateGraphviz}
+\begin{figure}[h]
+\centering
+\begin{subfigure}{0.3\textwidth}
+\begin{lstlisting}
+digraph dag {
+0 [label="inv_main8/4"];
+1 [label="VerifHintInitPred"];
+2 [label=">="];
+3 [label="0"];
+4 [label="+"];
+5 [label="_0"];
+6 [label="*"];
+7 [label="-1"];
+8 [label="_2"];
+0->1
+1->2
+2->4
+2->3
+4->6
+4->5
+6->8
+6->7
+\end{lstlisting}\subcaption{Template graph example in graphviz format}\label{templateGraphviz}
+\end{subfigure}   ~~~~~~~~~~~~
+\begin{subfigure}{0.3\textwidth}
+  \includegraphics[width=3.4cm]{graph/template_graph}\\
+  \subcaption{Template graph example}\label{templateGraph}
+  \end{subfigure}
+  \caption{Graph representation for an example template "inv\_main8:VerifHintInitPred(((\_0 + -1 * \_2) >= 0))"}
+\end{figure}
+
+
+
+\begin{figure}[h]
 \begin{subfigure}[b]{0.4\textwidth}
 \begin{lstlisting}
 extern int n;
@@ -142,24 +185,31 @@ void main(){
     }
     assert(y==0);
 }
-\end{lstlisting}\caption{C program for horn graph example}\label{horn_graph_while-C}
+\end{lstlisting}\subcaption{C program for horn graph example}\label{horn_graph_while-C}
 \end{subfigure}
 \begin{subfigure}[b]{0.4\textwidth}
   \includegraphics[width=8cm]{graph/horn_graph_while}\\
-  \caption{Horn graph example}\label{horn_graph_while}\end{subfigure}
+  \subcaption{Horn graph example}\label{horn_graph_while}
+  \end{subfigure}
+  \caption{}
 \end{figure}
 
 
 \section{Experiments}
+The predicted result is a score for a template. We add a rank option too decide which templates will be used for solving a particular program. For example, we have 10 templates, their scores ranged from 0 to 1. The rank option can specify a threshold for the scores. If the threshold is 0.4, all templates that have scores larger than 0.4 will be used to solve the program, and the left templates are discarded.  
+
 \subsection{Work flow}
 \section{Related work}
 Program synthesis:
 
-Logical reasoning.
+Logical reasoning: NEO, BLAZE, CEGIS.
 
 Machine learning methods:
-
+Program synthesis from examples:
 Encode inputs to fixed vector, then decode this vector to target language.
+
+Program induction:
+Directly give output. The learned program is induced latently within the weights and activations of a neural network.
 
 Guide formal method's search process by Training a statistical model to rank some options existed in search space and try them first.
 
