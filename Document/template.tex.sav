@@ -1,4 +1,11 @@
 \documentclass{article}
+\usepackage{fullpage}
+\usepackage{times}
+\usepackage{fancyhdr,graphicx,amsmath,amssymb}
+\usepackage[ruled,vlined]{algorithm2e}
+\include{pythonlisting}
+
+\usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{blindtext}
 
@@ -83,15 +90,41 @@ Systematic Predicate Abstraction using Deep Learning
 Systematic Predicate Abstraction using Deep Learning
 
 \section{Background}
+---
 \subsection{Abstraction Based Model Checking}
+---
 \subsection{CEGAR}
+---
 \subsection{Abstract Interpolation}
-
+---
 \section{Problem Overview}
-
+---
 
 \section{Data Collection}
-For a single instance, the inputs are a list of templates and a program in the form of text stream and graph. The output is a list of templates with labels.
+For a single instance of data extracting, the inputs are a list of templates $T_{0},T_{1},...,T_{n}$ and a program $P$. The output is a list of templates with 0 or 1 labels $T_{0}^{l},T_{1}^{l},...,T_{n}^{l}, l= 0$ or $1$. A concrete example for an output is $T_{0}^{1} = ("inv\_main8:VerifHintInitPred(((\_0 + -1 * \_2) >= 0))",1)$
+
+\begin{algorithm}[H]
+\SetAlgoLined
+\KwResult{$T_{0}^{l},T_{1}^{l},...,T_{n}^{l}$}
+ initialization: length($T_{0}^{l},T_{1}^{l},...,T_{n}^{l}$) = L\;
+ Solvalbility=CEGAR($\{T_{0}^{l},T_{1}^{l},...,T_{n}^{l}\}$,HornClauses)\;
+   \eIf{Solvalbility == True}{
+    \While{While L>0}{
+        CurrentTemplateList = $\{T_{0}^{l},T_{1}^{l},...,T_{n}^{l}\} - \{T_{k}^{l}\} (0=<k<=n)$\;
+        Solvalbility=CEGAR(CurrentTemplateList,HornClauses)\;
+        \eIf{Solvalbility == True}{
+            RedunantTemplatesList=RedunantTemplatesList $\cup$ $T_{k}^{l}$;\
+        }{
+            CriticalTemplatesList=CriticalTemplatesList $\cup$ $T_{k}^{l}$;\
+        }
+        L- -\;
+    }\;
+   instructions2\;
+   }{
+   No need for templates\;
+  }
+ \caption{Data extracting process}
+\end{algorithm}
 
 The strategy $A$ (fixed time out) to extract the training data (a list of templates with labels) is that for one program, we run Eldarica with an abstraction heuristic (e.g. use option -abstract:manual for .c files and -abstract for .smt2 files). If Eldarica can solve the program within 60 seconds. We mark this program as solvable. In Eldarica, we have an initial list of templates. We delete these templates one by one to see if the program can be solved with the remaining templates. If the program is still solvable within the timeout, then that deleted template is critical, we mark it as useful and label it as 1. By doing so iteratively, we can label the initial list of templates. This labelled list of templates will be used in the training process.
 
@@ -107,17 +140,27 @@ A alternative strategy $B$ (variable timeout): First, confirm the solvability (i
 Second, record the solving time with and without the abstraction heuristic. If Eldarica takes less solving time with abstraction heuristic, pass this solving time as timeout to Eldarica to label the templates used in the program.
 
 \begin{enumerate}
-  \item chc-comp benchmarks: 40/1216.  32 programs (204 templates)for training and 8 (47 templates) for testing. 8/8 solved. Read template time consumption/original templates consumption =  40.25/40.86 (in seconds)
-  \item sv-comp smt benchmarks: 15/6814.  12 programs (254 templates)for training and 3 (74 templates) for testing. 3/3 solved. Read template time consumption/original templates consumption =  28.07/27.28 (in seconds)
-  \item sv-comp c benchmarks: 41/545.  32 programs (4635 templates)for training and 9 (350 templates) for testing. 8/9 solved. Read template time consumption/original templates consumption = 34.04/53.46  (in seconds)
+  \item chc-comp benchmarks: 40/1216.  32 programs (204 templates)for training and 8 (47 templates) for testing. 8/8 solved by read templates. Read templates time consumption/original templates consumption =  40.25/40.86 (in seconds)
+  \item sv-comp smt benchmarks: 15/6729.  12 programs (254 templates)for training and 3 (74 templates) for testing. 3/3 solved by read templates. Read templates time consumption/original templates consumption =  28.07/27.28 (in seconds)
+  \item sv-comp c benchmarks: 41/555.  32 programs (4635 templates)for training and 9 (350 templates) for testing. 8/9 solved by read templates. Read templates time consumption/original templates consumption = 34.04/53.46  (in seconds)
 \end{enumerate}
 
 96 training programs. 76 programs for training, 20 programs for testing.
-/20 solved. Read template time consumption/original templates consumption =   (in seconds)
+18/20 solved by read templates. Read templates time consumption/original templates consumption =  140.67/126.84 (in seconds)
 
 Strategy $C$: keep using Strategy $B$'s on larger benchmarks, and use these three benchmarks only for testing.
 
-
+\begin{center}
+\begin{tabular}{ |c|c|c|c| }
+\hline
+Benchmarks & File type & Total file \\
+\hline
+chc-comp & .smt2 & .1216 \\
+sv-comp smt & .sm2 & .6729 \\
+sv-comp C & .c & 555 \\
+\hline
+\end{tabular}
+\end{center}
 
 \section{Training Model}
 
@@ -196,6 +239,8 @@ void main(){
 
 
 \section{Experiments}
+The predicted result is a score for a template. We add two rank modes to decide which templates will be used for solving a particular program. For example, we have 10 templates, their scores ranged from 0 to 1. The first rank mode can specify a threshold for the scores. If the threshold is 0.4, all templates that have scores larger than 0.4 will be used to solve the program, and the left templates are discarded. The second rank mode can specify a hierarchical number (N) which decides to use top N ranked templates by score. If we specify the hierarchical number (N) be 5, then the top 5 ranked templates by score will be used to solve the program, and the left 5 templates will be discarded.
+
 \subsection{Work flow}
 \section{Related work}
 Program synthesis:

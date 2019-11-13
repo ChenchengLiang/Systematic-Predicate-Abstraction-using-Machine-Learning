@@ -5,7 +5,7 @@
 \usepackage[ruled,vlined]{algorithm2e}
 \include{pythonlisting}
 
-
+\usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{blindtext}
 
@@ -35,6 +35,7 @@
 \usepackage{microtype}      % microtypography
 \usepackage{lipsum}
 \newcommand*\samethanks[1][\value{footnote}]{\footnotemark[#1]}
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
 \title{Systematic Predicate Abstraction using Deep Learning}
 
 
@@ -105,17 +106,24 @@ For a single instance of data extracting, the inputs are a list of templates $T_
 
 \begin{algorithm}[H]
 \SetAlgoLined
-\KwResult{Write here the result }
- initialization\;
- \While{While condition}{
-  instructions\;
-  \eIf{condition}{
-   instructions1\;
+\KwResult{$T_{0}^{l},T_{1}^{l},...,T_{n}^{l}$}
+ initialization: length($T_{0}^{l},T_{1}^{l},...,T_{n}^{l}$) = L\;
+ Solvalbility=CEGAR($\{T_{0}^{l},T_{1}^{l},...,T_{n}^{l}\}$,HornClauses)\;
+   \eIf{Solvalbility == True}{
+    \While{While L>0}{
+        CurrentTemplateList = $\{T_{0}^{l},T_{1}^{l},...,T_{n}^{l}\} - \{T_{k}^{l}\} (0=<k<=n)$\;
+        Solvalbility=CEGAR(CurrentTemplateList,HornClauses)\;
+        \eIf{Solvalbility == True}{
+            RedunantTemplatesList=RedunantTemplatesList $\cup$ $T_{k}^{l}$;\
+        }{
+            CriticalTemplatesList=CriticalTemplatesList $\cup$ $T_{k}^{l}$;\
+        }
+        L- -\;
+    }\;
    instructions2\;
    }{
-   instructions3\;
+   No need for templates\;
   }
- }
  \caption{Data extracting process}
 \end{algorithm}
 
@@ -134,8 +142,8 @@ Second, record the solving time with and without the abstraction heuristic. If E
 
 \begin{enumerate}
   \item chc-comp benchmarks: 40/1216.  32 programs (204 templates)for training and 8 (47 templates) for testing. 8/8 solved by read templates. Read templates time consumption/original templates consumption =  40.25/40.86 (in seconds)
-  \item sv-comp smt benchmarks: 15/6814.  12 programs (254 templates)for training and 3 (74 templates) for testing. 3/3 solved by read templates. Read templates time consumption/original templates consumption =  28.07/27.28 (in seconds)
-  \item sv-comp c benchmarks: 41/545.  32 programs (4635 templates)for training and 9 (350 templates) for testing. 8/9 solved by read templates. Read templates time consumption/original templates consumption = 34.04/53.46  (in seconds)
+  \item sv-comp smt benchmarks: 15/5911.  12 programs (254 templates)for training and 3 (74 templates) for testing. 3/3 solved by read templates. Read templates time consumption/original templates consumption =  28.07/27.28 (in seconds)
+  \item sv-comp c benchmarks: 41/555.  32 programs (4635 templates)for training and 9 (350 templates) for testing. 8/9 solved by read templates. Read templates time consumption/original templates consumption = 34.04/53.46  (in seconds)
 \end{enumerate}
 
 96 training programs. 76 programs for training, 20 programs for testing.
@@ -143,7 +151,18 @@ Second, record the solving time with and without the abstraction heuristic. If E
 
 Strategy $C$: keep using Strategy $B$'s on larger benchmarks, and use these three benchmarks only for testing.
 
-
+\begin{center}
+\begin{tabular}{lp{1cm}p{1cm}p{1.5cm}p{1.5cm}p{1.5cm}p{1.5cm}p{1.5cm}}
+\hline
+Benchmarks & File type & Total file & Solved with abstract (abstract:manual) & Unsolved with abstract (abstract:manual)& Training program (templates) & Testing program (templates) &Solved by read templates\\
+\hline
+chc-comp & .smt2 & 1216 & -&-&-&-&-\\
+sv-comp smt & .sm2 & 5911 & -&-&-&-&-\\
+sv-comp C & .c & 555 & - &-&-&-&-\\
+In total  & .c,.smt2 & - & -&-&-&-&-\\
+\hline
+\end{tabular}
+\end{center}
 
 \section{Training Model}
 
@@ -223,6 +242,33 @@ void main(){
 
 \section{Experiments}
 The predicted result is a score for a template. We add two rank modes to decide which templates will be used for solving a particular program. For example, we have 10 templates, their scores ranged from 0 to 1. The first rank mode can specify a threshold for the scores. If the threshold is 0.4, all templates that have scores larger than 0.4 will be used to solve the program, and the left templates are discarded. The second rank mode can specify a hierarchical number (N) which decides to use top N ranked templates by score. If we specify the hierarchical number (N) be 5, then the top 5 ranked templates by score will be used to solve the program, and the left 5 templates will be discarded.
+
+Solvability:
+\begin{center}
+\begin{tabular}{lp{1cm}p{1cm}p{1cm}p{1cm}p{1cm}p{1cm}p{1cm} }
+\hline
+Benchmarks & File type & Total file & with template graph & with horn graph & with control flow graph &with control flow and template graphs & with horn and template graphs\\
+\hline
+chc-comp & .smt2 & 1216 & -&-\\
+sv-comp smt & .sm2 & 5911 & -&-\\
+sv-comp C & .c & 555 & -&-\\
+\hline
+\end{tabular}
+\end{center}
+
+Time consumption:
+\begin{center}
+\begin{tabular}{lp{1cm}p{1cm}p{1cm}p{1cm}p{1cm}p{1cm}p{1cm} }
+\hline
+Benchmarks & File type & Total file & with template graph & with horn graph & with control flow graph &with control flow and template graphs & with horn and template graphs\\
+\hline
+chc-comp & .smt2 & 1216 & -&-\\
+sv-comp smt & .sm2 & 5911 & -&-\\
+sv-comp C & .c & 555 & -&-\\
+\hline
+\end{tabular}
+\end{center}
+
 
 \subsection{Work flow}
 \section{Related work}
