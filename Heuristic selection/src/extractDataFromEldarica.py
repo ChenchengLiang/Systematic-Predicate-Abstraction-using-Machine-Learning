@@ -54,36 +54,33 @@ import sys
 #     return solvability
 
 
-def checkSolvability(timeOut,run,abstractionOption):
+def checkSolvability(timeOut,file,abstractionOption):
     #print(os.path.abspath(os.pardir))
     runTime=timeOut
-    file=run[run.find(" ../"):]
-    file=file[3:]
-    file=str(os.path.abspath(os.pardir))+file
     print("file",file)
     start = time.time()
-    p=subprocess.Popen(["../eldarica-graph-generation/eld",file,abstractionOption],shell=False)
+    solvability = False
+    p=subprocess.Popen(["../eldarica-graph-generation/eld",file,abstractionOption],shell=False,stdout=subprocess.PIPE)
     #print("check pid ",p.pid, psutil.pid_exists(p.pid))
-    solvability=False
     try:
         print("Check solvability. \n Command:", "../eldarica-graph-generation/eld",file,abstractionOption)
         p.wait(timeout=timeOut)
         end = time.time()
         runTime=end-start
         solvability = True
+        # check syntax error
+        if("error" in str(p.stdout.readline())):
+            solvability =False
     except subprocess.TimeoutExpired:
         print("Cannot be solved within "+str(timeOut)+" seconds" )
         p.kill()
-    print(abstractionOption,"time consumption:",runTime)
+    print(abstractionOption,"time consumption:",runTime,"solvability:",solvability)
     return solvability,runTime
 
 
-def checkSolvabilityWithOutAbstraction(timeOut,run):
+def checkSolvabilityWithOutAbstraction(timeOut,file):
     #print(os.path.abspath(os.pardir))
     runTime=timeOut
-    file=run[run.find(" ../"):]
-    file=file[3:]
-    file=str(os.path.abspath(os.pardir))+file
     print("file",file)
     start = time.time()
     p=subprocess.Popen(["../eldarica-graph-generation/eld",file,"-abstract:off"],shell=False)
@@ -95,6 +92,9 @@ def checkSolvabilityWithOutAbstraction(timeOut,run):
         end = time.time()
         runTime=end-start
         solvability = True
+        # check syntax error
+        if("error" in str(p.stdout.readline())):
+            solvability =False
     except subprocess.TimeoutExpired:
         print("Cannot be solved within "+str(timeOut)+" seconds" )
         p.kill()
@@ -111,9 +111,9 @@ def extractDataFromOneProgram(filePath,abstractionOption,timeOut):
     run_normal = "../eldarica-graph-generation/./eld " \
               + abstractionOption  +" " +filePath
     #check solvability and its runtime with abstraction
-    solvabilityWithAbstraction,runTimeWithAbstraction=checkSolvability(timeOut,run_normal,abstractionOption)
+    solvabilityWithAbstraction,runTimeWithAbstraction=checkSolvability(timeOut,filePath,abstractionOption)
     #check solvability and its runtime with abstraction
-    solvabilityWithOutAbstraction,runTimeWithOutAbstraction=checkSolvabilityWithOutAbstraction(timeOut,run_normal)
+    solvabilityWithOutAbstraction,runTimeWithOutAbstraction=checkSolvabilityWithOutAbstraction(timeOut,filePath)
 
 
     if(solvabilityWithAbstraction==True and runTimeWithOutAbstraction-runTimeWithAbstraction>0):#if the program can be solved in timeout time
@@ -161,7 +161,6 @@ def main():
     #sys.argv[1] = c or smt
     #sys.argv[2] =  path to files
 
-
     filePath = '/home/chencheng/Desktop/benchmarks/'
 
 
@@ -183,15 +182,20 @@ def main():
     # benchmarkList.append('svcomp16/systemc')
 
     #benchmarkList.append('chc-comp19-benchmarks-master/*')
+    try:
+        sys.argv[1]
+        benchmarkList.append(sys.argv[2])
 
-    benchmarkList.append(sys.argv[2])
-
-
+    except:
+        print("The first argument is c or smt")
+        print("The second argument is path to files")
+        return
 
 
     for abstractionOption in abstractionOptionList:
         for b in benchmarkList:
             extractDataFromMultipleProgram(b, abstractionOption,timeOut)
+
 
     #copy graph to trainData file
     copy_tree("../graphs/", "../trainData/")

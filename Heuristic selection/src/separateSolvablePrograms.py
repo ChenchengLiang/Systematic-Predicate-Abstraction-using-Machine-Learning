@@ -21,7 +21,7 @@ def separateSolvableAndUnsolvableGroup(benchamrk,absOption,benchmarkName,type):
         abstractionOption="abstract:manual"
         run_normal = "../eldarica-graph-generation/./eld " \
                        +txt_file
-        solvability,runtime=checkSolvability(timeOut,run_normal,absOption)
+        solvability,runtime=checkSolvability(timeOut,txt_file,absOption)
         benchmark_solvable="../benchmarks/"+benchmarkName+"-solvability/solvable"
         benchmark_unsolvable = "../benchmarks/"+benchmarkName+"-solvability/unsolvable"
         print("solvability",solvability)
@@ -38,12 +38,16 @@ def separateSolvableAndUnsolvableGroup(benchamrk,absOption,benchmarkName,type):
 
 def main():
     print("Start")
-
-    # for txt_file in glob.iglob("../trainData/*.initialHints"):
-    #     shutil.copy2(txt_file, "../predictedHints/")
-    #renameBenchmarkFiles()
-    benchamrk = sys.argv[1]
-    dir=sys.argv[2]
+    try:
+        # for txt_file in glob.iglob("../trainData/*.initialHints"):
+        #     shutil.copy2(txt_file, "../predictedHints/")
+        #renameBenchmarkFiles()
+        benchamrk = sys.argv[1] #benchmarks
+        dir=sys.argv[2] #fileList
+    except:
+        print("The first argument is benchmark name")
+        print("The second argument is path to files")
+        return
     if(benchamrk=="sv-comp-clauses"):
         sv_benchmark_smt2 = [dir, "-abstract", "sv-comp-clauses","smt2"]
         separateSolvableAndUnsolvableGroup(sv_benchmark_smt2[0], sv_benchmark_smt2[1], sv_benchmark_smt2[2],sv_benchmark_smt2[3])
@@ -54,12 +58,7 @@ def main():
         chc_benchmark_smt2 = [dir, "-abstract", "chc-comp","smt2"]
         separateSolvableAndUnsolvableGroup(chc_benchmark_smt2[0], chc_benchmark_smt2[1], chc_benchmark_smt2[2],chc_benchmark_smt2[3])
 
-    # sv_benchmark_smt2=["../benchmarks/sv-comp-clauses/*/*/*.smt2","-abstract","sv-comp-clauses"]
-    # sv_benchmark_c=["../benchmarks/sv-comp-c/*/*.annot.c","-abstract:manual","sv-comp-c"]
-    # chc_benchmark_smt2 = ["../benchmarks/chc-comp/*/*.smt2","-abstract","chc-comp19-benchmarks-master"]
-    # separateSolvableAndUnsolvableGroup(sv_benchmark_c[0],sv_benchmark_c[1],sv_benchmark_c[2])
-    # separateSolvableAndUnsolvableGroup(sv_benchmark_smt2[0], sv_benchmark_smt2[1], sv_benchmark_smt2[2])
-    # separateSolvableAndUnsolvableGroup(chc_benchmark_smt2[0], chc_benchmark_smt2[1], chc_benchmark_smt2[2])
+
     print("Finished")
 
 if __name__ == '__main__':

@@ -7,7 +7,8 @@ import time
 def verifySelectedHintsInOneProgram(filePath,timeOut,solvedProgramCount,abstractionOption,rankOption):
     command = "../eldarica-graph-generation/./eld "
     run = command + filePath
-
+    readHintsTimeConsumption=0
+    absTimeConsumption = 0
     # verify program by read hints
     start = time.time()
     p=subprocess.Popen(["../eldarica-graph-generation/eld",filePath,rankOption,"-readHints",abstractionOption],shell=False)
@@ -17,6 +18,7 @@ def verifySelectedHintsInOneProgram(filePath,timeOut,solvedProgramCount,abstract
         print("Check solvability. \n Command:", "../eldarica-graph-generation/eld",filePath,abstractionOption,rankOption,"-readHints")
         p.wait(timeout=timeOut)
         end = time.time()
+        readHintsTimeConsumption=end - start
         print('Time consumption (NNs):', end - start)
         solvedProgramCount = solvedProgramCount + 1
     except subprocess.TimeoutExpired:
@@ -31,60 +33,71 @@ def verifySelectedHintsInOneProgram(filePath,timeOut,solvedProgramCount,abstract
         p.wait(timeout=timeOut)
         end = time.time()
         print("Time consumption ("+abstractionOption+"):",end - start)
+        absTimeConsumption=end - start
     except subprocess.TimeoutExpired:
         print("Cannot be solved within "+str(timeOut)+" seconds" )
         p.kill()
 
 
-    return solvedProgramCount
+    return solvedProgramCount,readHintsTimeConsumption,absTimeConsumption
 
 
 
 
-def verifySelectedHintsInMultiplePrograms(timeOut,abstractionOption,rankOption):
+def verifySelectedHintsInMultiplePrograms(timeOut,rankOption):
     programCount = 0
     solvedProgramCount=0
-
+    TotalReadHintsTimeConsumption=0
+    TotalAbsTimeConsumption=0
     for file in sorted(glob.glob("../benchmarks/sv-comp-c/*/*.annot.c")):
         fileName = file[file.rfind("/") +  1:]
         #parenDir = os.path.abspath(os.path.pardir)
         if(os.path.exists("../testData/"+fileName+".horn")):
             print(fileName)
-            solvedProgramCount = verifySelectedHintsInOneProgram(file,timeOut,solvedProgramCount,abstractionOption,rankOption)
+            solvedProgramCount,readHintsTimeConsumption,absTimeConsumption =\
+                verifySelectedHintsInOneProgram(file,timeOut,solvedProgramCount,'-abstract:manual',rankOption)
             programCount = programCount + 1
             print('----------------------------', 'Program count: ', programCount, '--------------------------')
             #extractHornClausesFromOneProgram(filePath, benchmark, fileName, abstractionOption)
-
+            TotalReadHintsTimeConsumption=TotalReadHintsTimeConsumption+readHintsTimeConsumption
+            TotalAbsTimeConsumption=TotalAbsTimeConsumption+absTimeConsumption
     for file in sorted(glob.glob("../benchmarks/sv-comp-clauses/*/*/*.smt2")):
         fileName = file[file.rfind("/") +  1:]
         #parenDir = os.path.abspath(os.path.pardir)
         if(os.path.exists("../testData/"+fileName+".horn")):
             print(fileName)
-            solvedProgramCount = verifySelectedHintsInOneProgram(file,timeOut,solvedProgramCount,abstractionOption,rankOption)
+            solvedProgramCount,readHintsTimeConsumption,absTimeConsumption =\
+                verifySelectedHintsInOneProgram(file,timeOut,solvedProgramCount,'-abstract',rankOption)
             programCount = programCount + 1
             print('----------------------------', 'Program count: ', programCount, '--------------------------')
             #extractHornClausesFromOneProgram(filePath, benchmark, fileName, abstractionOption)
+            TotalReadHintsTimeConsumption = TotalReadHintsTimeConsumption + readHintsTimeConsumption
+            TotalAbsTimeConsumption = TotalAbsTimeConsumption + absTimeConsumption
     for file in sorted(glob.glob("../benchmarks/chc-comp/*/*.smt2")):
         fileName = file[file.rfind("/") +  1:]
         #parenDir = os.path.abspath(os.path.pardir)
         if(os.path.exists("../testData/"+fileName+".horn")):
             print(fileName)
-            solvedProgramCount = verifySelectedHintsInOneProgram(file,timeOut,solvedProgramCount,abstractionOption,rankOption)
+            solvedProgramCount,readHintsTimeConsumption,absTimeConsumption =\
+                verifySelectedHintsInOneProgram(file,timeOut,solvedProgramCount,'-abstract',rankOption)
             programCount = programCount + 1
             print('----------------------------', 'Program count: ', programCount, '--------------------------')
             #extractHornClausesFromOneProgram(filePath, benchmark, fileName, abstractionOption)
+            TotalReadHintsTimeConsumption = TotalReadHintsTimeConsumption + readHintsTimeConsumption
+            TotalAbsTimeConsumption = TotalAbsTimeConsumption + absTimeConsumption
 
     print(programCount,"programs")
     print(solvedProgramCount, "solved programs")
     accuracy=solvedProgramCount/programCount
     print("accuracy:",accuracy)
+    print("TotalReadHintsTimeConsumption:",TotalReadHintsTimeConsumption)
+    print("TotalAbsTimeConsumption:",TotalAbsTimeConsumption)
 
 
 def main():
     print("Start")
 
 
-    abstractionOption = '-abstract:manual'
     rankOption = "-rank:0.5"
 
     timeOut=60
@@ -103,7 +116,7 @@ def main():
     # benchmarkList.append('svcomp16/ssh-simplified')
     # benchmarkList.append('svcomp16/systemc')
 
-    verifySelectedHintsInMultiplePrograms(timeOut, abstractionOption,rankOption)
+    verifySelectedHintsInMultiplePrograms(timeOut,rankOption)
 
 
 
