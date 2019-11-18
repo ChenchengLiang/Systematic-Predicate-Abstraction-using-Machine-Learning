@@ -9,28 +9,34 @@ import sys
 def separateSolvableAndUnsolvableGroup(benchamrk,absOption,benchmarkName,type):
     count=1
     timeOut=60
-
+    benchmark_sat = "../benchmarks/" + benchmarkName + "-solvability/sat"
+    benchmark_unsat = "../benchmarks/" + benchmarkName + "-solvability/unsat"
+    benchmark_solvable = "../benchmarks/" + benchmarkName + "-solvability/solvable"
+    benchmark_unsolvable = "../benchmarks/" + benchmarkName + "-solvability/unsolvable"
+    benchmark_syntaxError = "../benchmarks/" + benchmarkName + "-solvability/syntaxError"
+    benchmark_unknown = "../benchmarks/" + benchmarkName + "-solvability/unknown"
     # logging.basicConfig(filename='log/memory-separating-solvability.log', filemode='w',
     #                     format='%(name)s - %(levelname)s - %(message)s', level=logging.INFO)
     for txt_file in glob.iglob(benchamrk+"/*."+type):
-        #logging.info(str(count)+":"+str(txt_file))
-        process = psutil.Process(os.getpid())
-        # print("Memory usage:", process.memory_info().rss / (1024 * 1024))  # in bytes/1024*1024=MB
-        # logging.info("Memory usage:"+ str(process.memory_info().rss / (1024 * 1024))+" MB")
-        #print(txt_file)
-        abstractionOption="abstract:manual"
-        run_normal = "../eldarica-graph-generation/./eld " \
-                       +txt_file
-        solvability,runtime=checkSolvability(timeOut,txt_file,absOption)
-        benchmark_solvable="../benchmarks/"+benchmarkName+"-solvability/solvable"
-        benchmark_unsolvable = "../benchmarks/"+benchmarkName+"-solvability/unsolvable"
+
+        solvability,runtime,flag=checkSolvability(timeOut,txt_file,absOption)
+
         print("solvability",solvability)
         if(solvability==True):
             shutil.copy2(txt_file, benchmark_solvable)
+            if (flag == "sat"):
+                shutil.copy2(txt_file, benchmark_sat)
+            if (flag == "unsat"):
+                shutil.copy2(txt_file, benchmark_unsat)
             print()
         else:
-            shutil.copy2(txt_file, benchmark_unsolvable)
-            print()
+            if(flag=="error"):
+                shutil.copy2(txt_file, benchmark_syntaxError)
+            if (flag == "unknown"):
+                shutil.copy2(txt_file, benchmark_unknown)
+            if (flag == "timeout"):
+                shutil.copy2(txt_file, benchmark_unsolvable)
+
         gc.collect()  # clear memory
         count=count+1
 

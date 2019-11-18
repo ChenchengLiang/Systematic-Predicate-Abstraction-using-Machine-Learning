@@ -20,7 +20,7 @@ def main():
     print("Finished")
 
 def splitToNDirectory(N,benchmark,type):
-    for dirNum in range(N):
+    for dirNum in range(N+1):
         os.mkdir(str("../benchmarks/"+benchmark+"/fileList_"+str(dirNum+1)))
     length=0
     for file in sorted(glob.glob("../benchmarks/"+benchmark+"/allInOneFile"+ '/*'+type)):
@@ -32,19 +32,20 @@ def splitToNDirectory(N,benchmark,type):
     for file in sorted(glob.glob("../benchmarks/"+benchmark+"/allInOneFile"+ '/*'+type)):
         if(filecount<cursor*batchsize):
             shutil.copy2(file, "../benchmarks/"+benchmark+"/"+"fileList_"+str(cursor))
-            filecount=filecount+1
         else:
             shutil.copy2(file, "../benchmarks/"+benchmark+"/" + "fileList_" + str(cursor))
             cursor=cursor+1
-            filecount=filecount+1
+        filecount = filecount + 1
     #print(os.path.exists("../benchmarks/"+benchmark+"/fileList_11"))
     if(os.path.exists("../benchmarks/"+benchmark+"/fileList_11")):
-        shutil.move("../benchmarks/"+benchmark+"/fileList_11","../benchmarks/"+benchmark+"/fileList_10/")
+        for x in glob.glob("../benchmarks/"+benchmark+"/fileList_11/*"):
+            shutil.move(x,"../benchmarks/"+benchmark+"/fileList_10/")
+        os.rmdir("../benchmarks/"+benchmark+"/fileList_11")
 
 
 def copyToOneFile(N):
     benchmark="sv-comp-clauses/*/*"
-    for i in range(N):
+    for i in range(N+1):
         if(os.path.exists("../benchmarks/sv-comp-clauses/"+"fileList_"+str(i+1))):
             shutil.rmtree("../benchmarks/sv-comp-clauses/"+"fileList_"+str(i+1))
     if (os.path.exists("../benchmarks/sv-comp-clauses/allInOneFile")):
@@ -55,7 +56,7 @@ def copyToOneFile(N):
         shutil.copy2(file, "../benchmarks/sv-comp-clauses/allInOneFile")
 
     benchmark="chc-comp/*"
-    for i in range(N):
+    for i in range(N+1):
         if (os.path.exists("../benchmarks/chc-comp/" + "fileList_" + str(i + 1))):
             shutil.rmtree("../benchmarks/chc-comp/"+"fileList_"+str(i+1))
     if (os.path.exists("../benchmarks/chc-comp/allInOneFile")):
@@ -66,7 +67,7 @@ def copyToOneFile(N):
         shutil.copy2(file, "../benchmarks/chc-comp/allInOneFile")
 
     benchmark="sv-comp-c/*"
-    for i in range(N):
+    for i in range(N+1):
         if (os.path.exists("../benchmarks/sv-comp-c/" + "fileList_" + str(i + 1))):
             shutil.rmtree("../benchmarks/sv-comp-c/"+"fileList_"+str(i+1))
     if (os.path.exists("../benchmarks/sv-comp-c/allInOneFile")):

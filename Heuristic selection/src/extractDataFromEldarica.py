@@ -62,20 +62,39 @@ def checkSolvability(timeOut,file,abstractionOption):
     solvability = False
     p=subprocess.Popen(["../eldarica-graph-generation/eld",file,abstractionOption],shell=False,stdout=subprocess.PIPE)
     #print("check pid ",p.pid, psutil.pid_exists(p.pid))
+    flag="sat"
     try:
         print("Check solvability. \n Command:", "../eldarica-graph-generation/eld",file,abstractionOption)
-        p.wait(timeout=timeOut)
+        stdOut=p.communicate(timeout=timeOut)
+        #p.wait(timeout=timeOut)
         end = time.time()
         runTime=end-start
         solvability = True
+        outputFromEldarica = str(stdOut)
+        print(outputFromEldarica)
+        # check if it is sat for c programs
+        if ("SAFE" in str(outputFromEldarica)):
+            solvability = True
+            flag = "SAFE"
+        #check if it is sat
+        if ("unsat" in str(outputFromEldarica)):
+            solvability = True
+            flag = "unsat"
         # check syntax error
-        if("error" in str(p.stdout.readline())):
+        if("error" in str(outputFromEldarica)):
             solvability =False
+            flag="error"
+        # check if returns unknown
+        if ("unknown" in str(outputFromEldarica)):
+            solvability = False
+            flag = "unknown"
     except subprocess.TimeoutExpired:
         print("Cannot be solved within "+str(timeOut)+" seconds" )
+        solvability = False
+        flag="timeout"
         p.kill()
     print(abstractionOption,"time consumption:",runTime,"solvability:",solvability)
-    return solvability,runTime
+    return solvability,runTime,flag
 
 
 def checkSolvabilityWithOutAbstraction(timeOut,file):
@@ -86,20 +105,39 @@ def checkSolvabilityWithOutAbstraction(timeOut,file):
     p=subprocess.Popen(["../eldarica-graph-generation/eld",file,"-abstract:off"],shell=False)
     #print("check pid ",p.pid, psutil.pid_exists(p.pid))
     solvability=False
+    flag="sat"
     try:
         print("Check solvability. \n Command:", "../eldarica-graph-generation/eld",file,"-abstract:off")
-        p.wait(timeout=timeOut)
+        stdOut = p.communicate(timeout=timeOut)
+        #p.wait(timeout=timeOut)
         end = time.time()
         runTime=end-start
         solvability = True
+        outputFromEldarica=str(stdOut)
+        print(outputFromEldarica)
+        # check if it is sat for c programs
+        if ("SAFE" in str(outputFromEldarica)):
+            solvability = True
+            flag = "sat"
+        #check if it is sat
+        if ("unsat" in str(outputFromEldarica)):
+            solvability = True
+            flag = "unsat"
         # check syntax error
-        if("error" in str(p.stdout.readline())):
+        if("error" in str(outputFromEldarica)):
             solvability =False
+            flag="error"
+        # check if returns unknown
+        if ("unknown" in str(outputFromEldarica)):
+            solvability = False
+            flag = "unknown"
     except subprocess.TimeoutExpired:
         print("Cannot be solved within "+str(timeOut)+" seconds" )
+        flag="timeout"
+        solvability = False
         p.kill()
     print("abstract:off time consumption:",runTime)
-    return solvability,runTime
+    return solvability,runTime,flag
 
 
 def extractDataFromOneProgram(filePath,abstractionOption,timeOut):
@@ -111,9 +149,9 @@ def extractDataFromOneProgram(filePath,abstractionOption,timeOut):
     run_normal = "../eldarica-graph-generation/./eld " \
               + abstractionOption  +" " +filePath
     #check solvability and its runtime with abstraction
-    solvabilityWithAbstraction,runTimeWithAbstraction=checkSolvability(timeOut,filePath,abstractionOption)
+    solvabilityWithAbstraction,runTimeWithAbstraction,flag=checkSolvability(timeOut,filePath,abstractionOption)
     #check solvability and its runtime with abstraction
-    solvabilityWithOutAbstraction,runTimeWithOutAbstraction=checkSolvabilityWithOutAbstraction(timeOut,filePath)
+    solvabilityWithOutAbstraction,runTimeWithOutAbstraction,flag=checkSolvabilityWithOutAbstraction(timeOut,filePath)
 
 
     if(solvabilityWithAbstraction==True and runTimeWithOutAbstraction-runTimeWithAbstraction>0):#if the program can be solved in timeout time
