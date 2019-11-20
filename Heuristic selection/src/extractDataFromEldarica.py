@@ -76,6 +76,8 @@ def checkSolvability(timeOut,file,abstractionOption):
         if ("SAFE" in str(outputFromEldarica)):
             solvability = True
             flag = "SAFE"
+            if("UNSAFE") in str(outputFromEldarica):
+                flag="UNSAFE"
         #check if it is sat
         if ("unsat" in str(outputFromEldarica)):
             solvability = True
@@ -140,27 +142,27 @@ def checkSolvabilityWithOutAbstraction(timeOut,file):
     return solvability,runTime,flag
 
 
-def extractDataFromOneProgram(filePath,abstractionOption,timeOut):
+def extractTemplatesFromOneProgram(filePath,abstractionOption,timeOut):
     absParentPath=os.path.abspath(os.path.pardir)
     command = "../eldarica-graph-generation/./eld " \
-              + abstractionOption  + " -absTimeout:"+str(timeOut)+" -generateTrainData "
+              + abstractionOption  + " -absTimeout:"+str(timeOut)+" -extractTemplates "
     run_p = command + filePath
-    #print("command:", run)
-    run_normal = "../eldarica-graph-generation/./eld " \
-              + abstractionOption  +" " +filePath
+
     #check solvability and its runtime with abstraction
     solvabilityWithAbstraction,runTimeWithAbstraction,flag=checkSolvability(timeOut,filePath,abstractionOption)
     #check solvability and its runtime with abstraction
-    solvabilityWithOutAbstraction,runTimeWithOutAbstraction,flag=checkSolvabilityWithOutAbstraction(timeOut,filePath)
+    if solvabilityWithAbstraction==True:
+        solvabilityWithOutAbstraction, runTimeWithOutAbstraction, flag = checkSolvabilityWithOutAbstraction(timeOut,filePath)
 
 
-    if(solvabilityWithAbstraction==True and runTimeWithOutAbstraction-runTimeWithAbstraction>0):#if the program can be solved in timeout time
 
+    #if(solvabilityWithAbstraction==True and runTimeWithOutAbstraction-runTimeWithAbstraction>0):#if the program can be solved in timeout time
+    if (solvabilityWithAbstraction == True):
         file = run_p[run_p.find(" ../"):]
         file = file[3:]
         file = str(os.path.abspath(os.pardir)) + file
         print("Extract training data.\n Command:", "../eldarica-graph-generation/eld", file, abstractionOption,
-              "-absTimeout:" + str(runTimeWithAbstraction), "-generateTrainData")
+              "-absTimeout:" + str(runTimeWithAbstraction), "-extractTemplates")
         gc.collect()#clear memory
         #eld = subprocess.Popen(run_p, shell=True, stdout=subprocess.PIPE)
         eld = subprocess.Popen(["../eldarica-graph-generation/eld",file ,abstractionOption , "-absTimeout:"+str(runTimeWithAbstraction),"-generateTrainData"],stdout=subprocess.DEVNULL, shell=False)
@@ -173,27 +175,75 @@ def extractDataFromOneProgram(filePath,abstractionOption,timeOut):
     else:
         return False
 
-def extractDataFromMultipleProgram(benchmark, abstractionOption,timeOut):
+def extractPredicatesFromOneProgram(filePath,abstractionOption,timeOut):
+    absParentPath=os.path.abspath(os.path.pardir)
+    command = "../eldarica-graph-generation/./eld " \
+              + abstractionOption  + " -absTimeout:"+str(timeOut)+" -extractPredicates "
+    run_p = command + filePath
+
+    #check solvability and its runtime with abstraction
+    solvabilityWithAbstraction,runTimeWithAbstraction,flag=checkSolvability(timeOut,filePath,abstractionOption)
+    #check solvability and its runtime with abstraction
+    if solvabilityWithAbstraction ==True:
+        solvabilityWithOutAbstraction,runTimeWithOutAbstraction,flag=checkSolvabilityWithOutAbstraction(timeOut,filePath)
+
+
+    #if(solvabilityWithAbstraction==True and runTimeWithOutAbstraction-runTimeWithAbstraction>0):#if the program can be solved in timeout time
+    if (solvabilityWithAbstraction == True):
+        file = run_p[run_p.find(" ../"):]
+        file = file[3:]
+        file = str(os.path.abspath(os.pardir)) + file
+        print("Extract training data.\n Command:", "../eldarica-graph-generation/eld",\
+              file, abstractionOption,\
+              "-absTimeout:" + str(runTimeWithAbstraction), "-extractPredicates")
+        gc.collect()#clear memory
+        #eld = subprocess.Popen(run_p, shell=True, stdout=subprocess.PIPE)
+        eld = subprocess.Popen(["../eldarica-graph-generation/eld",\
+                                file ,abstractionOption , \
+                                "-absTimeout:"+str(runTimeWithAbstraction),\
+                                "-extractPredicates"],stdout=subprocess.DEVNULL, shell=False)
+        #stdout = eld.communicate()
+        eld.wait()
+        #eld.terminate()
+        #os.system(run)
+        gc.collect()  # clear memory
+        return True
+    else:
+        return False
+
+
+def extractTemplatesFromMultipleProgram(benchmark, abstractionOption,timeOut,extractFlag):
     # logging.basicConfig(filename='log/memory-extract-data.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s',level=logging.INFO)
     programCount = 0
     #print(sys.argv[1])
-    # smt2 format
-    if(str(sys.argv[1])=="smt"):
-        for file in sorted(glob.glob('../benchmarks/' + benchmark + '/*.smt2')):
-            fileName = file[file.find(benchmark) + len(benchmark) + 1:]
-            print(file)
-            extractDataFromOneProgram(file,"-abstract",timeOut)
-            programCount = programCount + 1
-            print('----------------------------', 'Program count: ', programCount, '--------------------------')
-    if (str(sys.argv[1]) == "c"):
-    #c format
-        for file in sorted(glob.glob('../benchmarks/' + benchmark + '/*.annot.c')):
-            fileName = file[file.find(benchmark) + len(benchmark) + 1:]
-            extractDataFromOneProgram(file,abstractionOption,timeOut)
-            programCount = programCount + 1
-            print('----------------------------', 'Program count: ', programCount, '--------------------------')
-
-
+    if(str(sys.argv[1])=="smt"):# smt2 format
+        if(extractFlag=="templates"):
+            for file in sorted(glob.glob('../benchmarks/' + benchmark + '/*.smt2')):
+                fileName = file[file.find(benchmark) + len(benchmark) + 1:]
+                print(file)
+                extractTemplatesFromOneProgram(file,"-abstract",timeOut)
+                programCount = programCount + 1
+                print('----------------------------', 'Program count: ', programCount, '--------------------------')
+        if(extractFlag=="predicates"):
+            for file in sorted(glob.glob('../benchmarks/' + benchmark + '/*.smt2')):
+                fileName = file[file.find(benchmark) + len(benchmark) + 1:]
+                print(file)
+                extractPredicatesFromOneProgram(file, "-abstract", timeOut)
+                programCount = programCount + 1
+                print('----------------------------', 'Program count: ', programCount, '--------------------------')
+    if (str(sys.argv[1]) == "c"):#c format
+        if(extractFlag=="templates"):
+            for file in sorted(glob.glob('../benchmarks/' + benchmark + '/*.annot.c')):
+                fileName = file[file.find(benchmark) + len(benchmark) + 1:]
+                extractTemplatesFromOneProgram(file,abstractionOption,timeOut)
+                programCount = programCount + 1
+                print('----------------------------', 'Program count: ', programCount, '--------------------------')
+        if(extractFlag=="predicates"):
+            for file in sorted(glob.glob('../benchmarks/' + benchmark + '/*.annot.c')):
+                fileName = file[file.find(benchmark) + len(benchmark) + 1:]
+                extractPredicatesFromOneProgram(file,abstractionOption,timeOut)
+                programCount = programCount + 1
+                print('----------------------------', 'Program count: ', programCount, '--------------------------')
 def main():
     print("Start")
     #sys.argv[1] = c or smt
@@ -202,7 +252,7 @@ def main():
     filePath = '/home/chencheng/Desktop/benchmarks/'
 
 
-    abstractionOptionList = ["-abstract:manual"]
+    abstractionOptionList = ["-abstract:manual"] #optio for c programs
     timeOut=60
     benchmarkList = list()
     # benchmarkList.append('dillig')
@@ -223,16 +273,18 @@ def main():
     try:
         sys.argv[1]
         benchmarkList.append(sys.argv[2])
+        extractFlag=sys.argv[3]
 
     except:
         print("The first argument is c or smt")
         print("The second argument is path to files")
+        print("The third argument is templates or predicates")
         return
 
 
     for abstractionOption in abstractionOptionList:
         for b in benchmarkList:
-            extractDataFromMultipleProgram(b, abstractionOption,timeOut)
+            extractTemplatesFromMultipleProgram(b, abstractionOption,timeOut,extractFlag)
 
 
     #copy graph to trainData file

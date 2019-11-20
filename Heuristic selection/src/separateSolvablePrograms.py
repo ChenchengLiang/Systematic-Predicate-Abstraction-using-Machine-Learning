@@ -26,9 +26,12 @@ def separateSolvableAndUnsolvableGroup(benchamrk,absOption,benchmarkName,type):
             shutil.copy2(txt_file, benchmark_solvable)
             if (flag == "sat"):
                 shutil.copy2(txt_file, benchmark_sat)
-            if (flag == "unsat"):
+            if (flag == "SAFE"):
+                shutil.copy2(txt_file, benchmark_sat)
+            if (flag == "unsat" ):
                 shutil.copy2(txt_file, benchmark_unsat)
-            print()
+            if (flag=="UNSAFE"):
+                shutil.copy2(txt_file, benchmark_unsat)
         else:
             if(flag=="error"):
                 shutil.copy2(txt_file, benchmark_syntaxError)
@@ -51,7 +54,7 @@ def main():
         benchamrk = sys.argv[1] #benchmarks
         dir=sys.argv[2] #fileList
     except:
-        print("The first argument is benchmark name")
+        print("The first argument is benchmark name :sv-comp-clauses,sv-comp-c,or chc-comp")
         print("The second argument is path to files")
         return
     if(benchamrk=="sv-comp-clauses"):
