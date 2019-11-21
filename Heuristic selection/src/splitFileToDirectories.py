@@ -113,10 +113,10 @@ def splitSatFiles(N,benchmark):
             cursor=cursor+1
         filecount = filecount + 1
     #print(os.path.exists("../benchmarks/"+benchmark+"/fileList_11"))
-    if(os.path.exists("../benchmarks/"+benchmark+"-solvability/fileList_sat_11")):
-        for x in glob.glob("../benchmarks/"+benchmark+"-solvability/fileList_sat_11/*"):
-            shutil.move(x,"../benchmarks/"+benchmark+"-solvability/fileList_sat_10/")
-        os.rmdir("../benchmarks/"+benchmark+"-solvability/fileList_sat_11")
+    if(os.path.exists("../benchmarks/"+benchmark+"-solvability/fileList_sat_"+str(N+1))):
+        for x in glob.glob("../benchmarks/"+benchmark+"-solvability/fileList_sat_"+str(N+1)+"/*"):
+            shutil.move(x,"../benchmarks/"+benchmark+"-solvability/fileList_sat_"+str(N))
+        os.rmdir("../benchmarks/"+benchmark+"-solvability/fileList_sat_"+str(N+1))
 
 
 

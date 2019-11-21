@@ -143,10 +143,6 @@ def checkSolvabilityWithOutAbstraction(timeOut,file):
 
 
 def extractTemplatesFromOneProgram(filePath,abstractionOption,timeOut):
-    absParentPath=os.path.abspath(os.path.pardir)
-    command = "../eldarica-graph-generation/./eld " \
-              + abstractionOption  + " -absTimeout:"+str(timeOut)+" -extractTemplates "
-    run_p = command + filePath
 
     #check solvability and its runtime with abstraction
     solvabilityWithAbstraction,runTimeWithAbstraction,flag=checkSolvability(timeOut,filePath,abstractionOption)
@@ -158,14 +154,15 @@ def extractTemplatesFromOneProgram(filePath,abstractionOption,timeOut):
 
     #if(solvabilityWithAbstraction==True and runTimeWithOutAbstraction-runTimeWithAbstraction>0):#if the program can be solved in timeout time
     if (solvabilityWithAbstraction == True):
-        file = run_p[run_p.find(" ../"):]
-        file = file[3:]
-        file = str(os.path.abspath(os.pardir)) + file
-        print("Extract training data.\n Command:", "../eldarica-graph-generation/eld", file, abstractionOption,
+        print("Extract training data.\n Command:",\
+              "../eldarica-graph-generation/./eld", filePath, abstractionOption,
               "-absTimeout:" + str(runTimeWithAbstraction), "-extractTemplates")
         gc.collect()#clear memory
         #eld = subprocess.Popen(run_p, shell=True, stdout=subprocess.PIPE)
-        eld = subprocess.Popen(["../eldarica-graph-generation/eld",file ,abstractionOption , "-absTimeout:"+str(runTimeWithAbstraction),"-generateTrainData"],stdout=subprocess.DEVNULL, shell=False)
+        eld = subprocess.Popen(["../eldarica-graph-generation/eld",\
+                                filePath ,abstractionOption , \
+                                "-absTimeout:"+str(runTimeWithAbstraction),\
+                                "-extractTemplates"],stdout=subprocess.DEVNULL, shell=False)
         #stdout = eld.communicate()
         eld.wait()
         #eld.terminate()
@@ -194,12 +191,12 @@ def extractPredicatesFromOneProgram(filePath,abstractionOption,timeOut):
         file = file[3:]
         file = str(os.path.abspath(os.pardir)) + file
         print("Extract training data.\n Command:", "../eldarica-graph-generation/eld",\
-              file, abstractionOption,\
+              filePath, abstractionOption,\
               "-absTimeout:" + str(runTimeWithAbstraction), "-extractPredicates")
         gc.collect()#clear memory
         #eld = subprocess.Popen(run_p, shell=True, stdout=subprocess.PIPE)
         eld = subprocess.Popen(["../eldarica-graph-generation/eld",\
-                                file ,abstractionOption , \
+                                filePath ,abstractionOption , \
                                 "-absTimeout:"+str(runTimeWithAbstraction),\
                                 "-extractPredicates"],stdout=subprocess.DEVNULL, shell=False)
         #stdout = eld.communicate()
@@ -272,13 +269,13 @@ def main():
     #benchmarkList.append('chc-comp19-benchmarks-master/*')
     try:
         sys.argv[1]
-        benchmarkList.append(sys.argv[2])
-        extractFlag=sys.argv[3]
+        benchmarkList.append(sys.argv[3])
+        extractFlag=sys.argv[2]
 
     except:
         print("The first argument is c or smt")
-        print("The second argument is path to files")
-        print("The third argument is templates or predicates")
+        print("The second argument is templates or predicates")
+        print("The third argument is path to file")
         return
 
 

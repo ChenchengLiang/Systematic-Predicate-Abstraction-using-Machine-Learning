@@ -180,6 +180,8 @@ def predictAndOutputHints(model, programDoc2VecModel, hintsDoc2VecModel,programG
 
 def main():
     print("Start")
+    # remove files in predictedHints
+    shutil.rmtree("../predictedHints/*")
 
     parenDir = os.path.abspath(os.path.pardir)
 

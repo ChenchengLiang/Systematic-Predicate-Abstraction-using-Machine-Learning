@@ -10,8 +10,11 @@ import glob,shutil
 
 def main():
     print("Start")
+    #remove files in testData, pickleData, and models
+    shutil.rmtree("../testData/*")
+    shutil.rmtree("../pickleData/*")
+    shutil.rmtree("../models/*")
 
-    # benchmark='dillig'
     benchmark = 'trainData'
     curpath = os.path.abspath(os.curdir)
     parenDir = os.path.abspath(os.path.pardir)

@@ -118,7 +118,7 @@ def constructUnsplitedData_Ver1(fileName,hornText,positiveHintsText,negativeHint
         for line in positiveHintsText.splitlines():
             ID,head,hint=separateIDHeadAndHint(line)
             hintFilePath = fileName + ".hints.graphs/"
-            hintFileName = head+":"+hint+".gv"
+            hintFileName = str(ID)+".gv"
             positiveHintList.append([head, line])
             graph = readGraphFromGraphvizFromTrainData(hintFilePath +hintFileName, vitualize=False)
             positiveHintGraphWalks = getGraphNode2vecWalks(graph, dimension=20)
@@ -130,7 +130,8 @@ def constructUnsplitedData_Ver1(fileName,hornText,positiveHintsText,negativeHint
         for line in negativeHintsText.splitlines():
             ID,head,hint=separateIDHeadAndHint(line)
             hintFilePath = fileName + ".hints.graphs/"
-            hintFileName = head+":"+hint+".gv"
+            #hintFileName = head+":"+hint+".gv"
+            hintFileName = str(ID) + ".gv"
             negativeHintList.append([head, line])
             graph = readGraphFromGraphvizFromTrainData(hintFilePath + hintFileName, vitualize=False)
             negativeHintGraphWalks = getGraphNode2vecWalks(graph, dimension=20)
@@ -171,7 +172,7 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
     print("graph file", len(sorted(glob.glob(path + '*.gv'))))
     programCOunt=0
     unsplitedData = list()
-    for fileHorn, fileHints, fileNegativeHints,fileGraph in zip(sorted(glob.glob(path + '*.horn')),
+    for fileHorn, filePositiveHints, fileNegativeHints,fileGraph in zip(sorted(glob.glob(path + '*.horn')),
                                                       sorted(glob.glob(path + '*.positiveHints')),
                                                       sorted(glob.glob(path + '*.negativeHints')),\
                                                                 sorted(glob.glob(path + '*.gv'))):
@@ -183,14 +184,14 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
         hornText = f.read()
         f.close()
 
-        # read optimized hints
-        print(fileHints)
-        f = open(fileHints, "r")
+        # read positive hints
+        print(filePositiveHints)
+        f = open(filePositiveHints, "r")
         hintsText = f.read()
         f.close()
 
 
-        # read redundant hints
+        # read negative hints
         print(fileNegativeHints)
         f = open(fileNegativeHints, "r")
         negativeHintsText = f.read()
