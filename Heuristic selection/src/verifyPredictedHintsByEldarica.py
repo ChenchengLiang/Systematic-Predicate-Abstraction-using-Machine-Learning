@@ -2,7 +2,8 @@ import os
 import glob
 import subprocess
 import time
-
+import logging
+from datetime import datetime
 
 def verifySelectedHintsInOneProgram(filePath,timeOut,solvedProgramCount,abstractionOption,rankOption):
     command = "../eldarica-graph-generation/./eld "
@@ -49,7 +50,7 @@ def verifySelectedHintsInMultiplePrograms(timeOut,rankOption):
     solvedProgramCount=0
     TotalReadHintsTimeConsumption=0
     TotalAbsTimeConsumption=0
-    for file in sorted(glob.glob("../benchmarks/sv-comp-c/*/*.annot.c")):
+    for file in sorted(glob.glob("../benchmarks/sv-comp-c/fileList_*/*.annot.c")):
         fileName = file[file.rfind("/") +  1:]
         #parenDir = os.path.abspath(os.path.pardir)
         if(os.path.exists("../testData/"+fileName+".horn")):
@@ -61,7 +62,7 @@ def verifySelectedHintsInMultiplePrograms(timeOut,rankOption):
             #extractHornClausesFromOneProgram(filePath, benchmark, fileName, abstractionOption)
             TotalReadHintsTimeConsumption=TotalReadHintsTimeConsumption+readHintsTimeConsumption
             TotalAbsTimeConsumption=TotalAbsTimeConsumption+absTimeConsumption
-    for file in sorted(glob.glob("../benchmarks/sv-comp-clauses/*/*/*.smt2")):
+    for file in sorted(glob.glob("../benchmarks/sv-comp-clauses/fileList_*/*.smt2")):
         fileName = file[file.rfind("/") +  1:]
         #parenDir = os.path.abspath(os.path.pardir)
         if(os.path.exists("../testData/"+fileName+".horn")):
@@ -73,7 +74,7 @@ def verifySelectedHintsInMultiplePrograms(timeOut,rankOption):
             #extractHornClausesFromOneProgram(filePath, benchmark, fileName, abstractionOption)
             TotalReadHintsTimeConsumption = TotalReadHintsTimeConsumption + readHintsTimeConsumption
             TotalAbsTimeConsumption = TotalAbsTimeConsumption + absTimeConsumption
-    for file in sorted(glob.glob("../benchmarks/chc-comp/*/*.smt2")):
+    for file in sorted(glob.glob("../benchmarks/chc-comp/fileList_*/*.smt2")):
         fileName = file[file.rfind("/") +  1:]
         #parenDir = os.path.abspath(os.path.pardir)
         if(os.path.exists("../testData/"+fileName+".horn")):
@@ -92,7 +93,11 @@ def verifySelectedHintsInMultiplePrograms(timeOut,rankOption):
     print("accuracy:",accuracy)
     print("TotalReadHintsTimeConsumption:",TotalReadHintsTimeConsumption)
     print("TotalAbsTimeConsumption:",TotalAbsTimeConsumption)
-
+    logging.basicConfig(filename="../log/["+datetime.today().strftime('%Y-%m-%d')+"]Verifying.log", level=logging.INFO)
+    logging.info("solved programs:"+str(solvedProgramCount)+"/"+str(programCount))
+    logging.info("accuracy::"+str(accuracy))
+    logging.info("TotalReadHintsTimeConsumption:"+str(TotalReadHintsTimeConsumption))
+    logging.info("TotalAbsTimeConsumption:"+str(TotalAbsTimeConsumption))
 
 def main():
     print("Start")

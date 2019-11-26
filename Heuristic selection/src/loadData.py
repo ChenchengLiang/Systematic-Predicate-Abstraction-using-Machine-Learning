@@ -13,8 +13,9 @@ import gensim
 import nltk
 from graphProcessing import readGraphFromGraphvizFromTrainData,getGraphEmbeddingNode2vec
 nltk.download('punkt')
+import logging
 from collections import Counter
-
+from datetime import datetime
 from keras.layers import Conv1D, Dense,Input,concatenate, Flatten
 from Miscellaneous import data2list, recoverPredictedText,printOnePredictedTextInStringForm,\
     doc2vecModelInferNewData,testAccuracy,pickleWrite,pickleRead,printList,sortHints
@@ -86,16 +87,13 @@ def separateIDHeadAndHint(S):
     hint = S[S.find(":")+1:]
     return ID,head,hint
 
-def writeTestDataToFile(trainData,verifyData):
+def writeTestDataToFile(verifyData):
     #Store test data to testData file
-    print("---train programs---:")
-    for trainItem in trainData:
-        trainDataName=trainItem[7]
-        print(trainDataName)
-    print("---test programs---:")
+
+    #print("---test programs---:")
     for testItem in verifyData:
         testDataName=testItem[7]
-        print(testDataName)
+        #print(testDataName)
         for txt_file in glob.iglob("../trainData/"+testDataName+".*"):
             graphDir="../testData/"+testDataName+".hints.graphs"
             if os.path.isfile(txt_file):
@@ -116,28 +114,30 @@ def constructUnsplitedData_Ver1(fileName,hornText,positiveHintsText,negativeHint
     IDList = list()
     if positiveHintsText:
         for line in positiveHintsText.splitlines():
-            ID,head,hint=separateIDHeadAndHint(line)
-            hintFilePath = fileName + ".hints.graphs/"
-            hintFileName = str(ID)+".gv"
-            positiveHintList.append([head, line])
-            graph = readGraphFromGraphvizFromTrainData(hintFilePath +hintFileName, vitualize=False)
-            positiveHintGraphWalks = getGraphNode2vecWalks(graph, dimension=20)
-            # graphEmbededHint = getGraphEmbeddingNode2vec(graph, dimension=20, p=False)
-            positiveHintsList_tree.append(positiveHintGraphWalks)
-            IDList.append(ID)
+            if (line != ""):
+                ID,head,hint=separateIDHeadAndHint(line)
+                hintFilePath = fileName + ".hints.graphs/"
+                hintFileName = str(ID)+".gv"
+                positiveHintList.append([head, line])
+                graph = readGraphFromGraphvizFromTrainData(hintFilePath +hintFileName, vitualize=False)
+                positiveHintGraphWalks = getGraphNode2vecWalks(graph, dimension=20)
+                # graphEmbededHint = getGraphEmbeddingNode2vec(graph, dimension=20, p=False)
+                positiveHintsList_tree.append(positiveHintGraphWalks)
+                IDList.append(ID)
 
     if negativeHintsText:
         for line in negativeHintsText.splitlines():
-            ID,head,hint=separateIDHeadAndHint(line)
-            hintFilePath = fileName + ".hints.graphs/"
-            #hintFileName = head+":"+hint+".gv"
-            hintFileName = str(ID) + ".gv"
-            negativeHintList.append([head, line])
-            graph = readGraphFromGraphvizFromTrainData(hintFilePath + hintFileName, vitualize=False)
-            negativeHintGraphWalks = getGraphNode2vecWalks(graph, dimension=20)
-            # graphEmbededHint = getGraphEmbeddingNode2vec(graph, dimension=20, p=False)
-            negativeHintsList_tree.append(negativeHintGraphWalks)
-            IDList.append(ID)
+            if (line != ""):
+                ID,head,hint=separateIDHeadAndHint(line)
+                hintFilePath = fileName + ".hints.graphs/"
+                #hintFileName = head+":"+hint+".gv"
+                hintFileName = str(ID) + ".gv"
+                negativeHintList.append([head, line])
+                graph = readGraphFromGraphvizFromTrainData(hintFilePath + hintFileName, vitualize=False)
+                negativeHintGraphWalks = getGraphNode2vecWalks(graph, dimension=20)
+                # graphEmbededHint = getGraphEmbeddingNode2vec(graph, dimension=20, p=False)
+                negativeHintsList_tree.append(negativeHintGraphWalks)
+                IDList.append(ID)
 
 
     print("positive hints text:",len(positiveHintList))
@@ -187,7 +187,7 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
         # read positive hints
         print(filePositiveHints)
         f = open(filePositiveHints, "r")
-        hintsText = f.read()
+        positiveHintsText = f.read()
         f.close()
 
 
@@ -205,7 +205,7 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
         #graphEmbededProgram=getGraphEmbeddingNode2vec(graph, dimension=100,p=False)
 
         #unsplitedData.append(constructUnsplitedData(fileName,hornText, hintsText, negativeHintsText, programGraphWalks,discardNegativeData))
-        unsplitedData.append(constructUnsplitedData_Ver1(fileName, hornText, hintsText, negativeHintsText, programGraphWalks,
+        unsplitedData.append(constructUnsplitedData_Ver1(fileName, hornText, positiveHintsText, negativeHintsText, programGraphWalks,
                                                     discardNegativeData))
         # print(unsplitedData[-1][0]) horn clauses
         # print(unsplitedData[-1][1]) positive hint
@@ -221,15 +221,34 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
 
     print(programCOunt, "programs' information read")
     print(programCOunt, "program graphs' information read")
+    # templateCounter=0
+    # IDCounter=0
+    # for program in unsplitedData:
+    #     templateCounter=templateCounter+len(program[1])+len(program[2])
+    #     IDCounter=IDCounter+len(program[6])
+    # print(templateCounter,"templates")
+    # print(IDCounter," IDCounter")
 
-    print("unsplitedData length", len(unsplitedData))
+    logging.basicConfig(filename="../log/[" + datetime.today().strftime('%Y-%m-%d') + "]OneButtonTraining.log",
+                        level=logging.INFO)
+
+    logging.info("unsplitedData length:"+ str(len((unsplitedData))))
+
+    print("unsplitedData proggram", len(unsplitedData))
+    #splite train and test data
     random.shuffle(unsplitedData)
     splitPoint = int(trainDataSplitRate * len(unsplitedData))
     trainData = unsplitedData[:splitPoint]
     verifyData = unsplitedData[splitPoint:]
+    print("trainData length", len(trainData))
+    print("verifyData length", len(verifyData))
+    logging.info("trainData program:"+ str(len(trainData)))
+    logging.info("verifyData program:"+ str(len(verifyData)))
+
+    #should delete imbalanced data here in train data
 
     #Store test data to testData file
-    writeTestDataToFile(trainData,verifyData)
+    writeTestDataToFile(verifyData)
 
 
     trainData_X = list()
@@ -239,21 +258,21 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
 
     for program in trainData: #form train_Y by positive and negative hint
         for positiveHint,graphPositiveHint in zip(program[1],program[4]):
-            ID,head,hint=separateIDHeadAndHint(positiveHint[1])
-            trainData_X.append([program[0], positiveHint[0] + '\n' + hint,program[3],graphPositiveHint,ID])
+            ID,head,hint=separateIDHeadAndHint(positiveHint[1]) #positiveHint[0]=head
+            trainData_X.append([program[0], head + '\n' + hint,program[3],graphPositiveHint,ID])
             trainData_Y.append(1)
         for negativeHint,graphNegativeHint in zip(program[2],program[5]):
             ID,head,hint=separateIDHeadAndHint(negativeHint[1])
-            trainData_X.append([program[0], negativeHint[0] + '\n' + hint,program[3],graphNegativeHint,ID])
+            trainData_X.append([program[0], head + '\n' + hint,program[3],graphNegativeHint,ID])
             trainData_Y.append(0)
     for program in verifyData:
         for positiveHint,graphPositiveHint in zip(program[1],program[4]):
             ID,head,hint=separateIDHeadAndHint(positiveHint[1])
-            verifyData_X.append([program[0], positiveHint[0] + '\n' + hint,program[3],graphPositiveHint,ID])
+            verifyData_X.append([program[0], head + '\n' + hint,program[3],graphPositiveHint,ID])
             verifyData_Y.append(1)
         for negativeHint,graphNegativeHint in zip(program[2],program[5]):
             ID,head,hint=separateIDHeadAndHint(negativeHint[1])
-            verifyData_X.append([program[0], negativeHint[0] + '\n' + hint,program[3],graphNegativeHint,ID])
+            verifyData_X.append([program[0], head + '\n' + hint,program[3],graphNegativeHint,ID])
             verifyData_Y.append(0)
 
 
@@ -283,6 +302,14 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
         trainData_Y = trainData_Y[0:trainSize]
         verifyData_X = verifyData_X[0:trainSize]
         verifyData_Y = verifyData_Y[0:trainSize]
+
+
+    logging.info("trainData_X:"+str(np.array(trainData_X).shape))
+    logging.info("trainData_Y:"+str(np.array(trainData_Y).shape))
+    logging.info("verifyData_X:"+str(np.array(verifyData_X).shape))
+    logging.info("verifyData_Y:"+str(np.array(verifyData_Y).shape))
+    logging.info("discardNegativeData:"+str(discardNegativeData))
+
     print("trainData_X",np.array(trainData_X).shape)
     print("trainData_Y",np.array(trainData_Y).shape)
     print("verifyData_X",np.array(verifyData_X).shape)
@@ -346,6 +373,10 @@ def readHornClausesAndHints_graph_predict(path,dataset,discardNegativeData=False
         # print(unsplitedData[-1][6]) ID
         # print(unsplitedData[-1][7]) file name
 
+    logging.basicConfig(filename="../log/[" + datetime.today().strftime('%Y-%m-%d') + "]prediction.log",
+                        level=logging.INFO)
+    logging.info("test programs:" + str(len(unsplitedData)))
+
     print(len(glob.glob(path + '*.horn')), "programs' information read")
     print(len(glob.glob(path + '*.gv')), "program graphs' information read")
     testData_X = list()
@@ -381,8 +412,10 @@ def readHornClausesAndHints_graph_predict(path,dataset,discardNegativeData=False
     print("-----------------")
 
 
-    print("testData_X",np.array(testData_X).shape)
-    print("testData_y",np.array(testData_Y).shape)
+    logging.info("testData_X:"+str(np.array(testData_X).shape))
+    logging.info("testData_y:"+str(np.array(testData_Y).shape))
+    print("testData_X:"+str(np.array(testData_X).shape))
+    print("testData_Y:"+str(np.array(testData_Y).shape))
     #Store read data to pickle file
     pickleWrite(testData_X,'testData_X')
     pickleWrite(testData_Y, 'testData_Y')

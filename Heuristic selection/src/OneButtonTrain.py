@@ -11,10 +11,15 @@ import glob,shutil
 def main():
     print("Start")
     #remove files in testData, pickleData, and models
-    shutil.rmtree("../testData/*")
-    shutil.rmtree("../pickleData/*")
-    shutil.rmtree("../models/*")
-
+    if(os.path.exists("../testData")):
+        shutil.rmtree("../testData/")
+        shutil.rmtree("../pickleData/")
+        shutil.rmtree("../models/")
+        shutil.rmtree("../graphs/")
+        os.mkdir("../testData")
+        os.mkdir("../pickleData")
+        os.mkdir("../models")
+        os.mkdir("../graphs")
     benchmark = 'trainData'
     curpath = os.path.abspath(os.curdir)
     parenDir = os.path.abspath(os.path.pardir)
@@ -27,7 +32,7 @@ def main():
     # transformOneFiletoFeatures(path)
     train_X ,train_Y ,verify_X ,verify_Y =\
         readHornClausesAndHints_resplitTrainAndVerifyData(path ,\
-        dataset='train',discardNegativeData=True,smallTrain=False,smallTrainSize=50,\
+        dataset='train',discardNegativeData=False,smallTrain=False,smallTrainSize=50,\
                                                           trainDataSplitRate=0.8)
     # train_X=pickleRead('trainData_X')
     # train_Y = pickleRead('trainData_Y')
