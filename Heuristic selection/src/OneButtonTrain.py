@@ -1,10 +1,6 @@
 import os
-from graphProcessing import callEldaricaGenerateGraphs
-
 from loadData import train2,train3,train4,readHornClausesAndHints_resplitTrainAndVerifyData
 from trainDoc2VecModel import trainDoc2VecModelfunction,trainGraph2VecModelfunction
-from plot import plotHistory
-import gensim
 from Miscellaneous import pickleRead,pickleWrite
 import glob,shutil
 

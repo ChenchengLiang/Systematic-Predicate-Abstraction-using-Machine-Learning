@@ -118,6 +118,7 @@ def constructUnsplitedData_Ver1(fileName,hornText,positiveHintsText,negativeHint
                 ID,head,hint=separateIDHeadAndHint(line)
                 hintFilePath = fileName + ".hints.graphs/"
                 hintFileName = str(ID)+".gv"
+                #if(os.path.exists(hintFilePath+hintFileName)):
                 positiveHintList.append([head, line])
                 graph = readGraphFromGraphvizFromTrainData(hintFilePath +hintFileName, vitualize=False)
                 positiveHintGraphWalks = getGraphNode2vecWalks(graph, dimension=20)
@@ -132,6 +133,7 @@ def constructUnsplitedData_Ver1(fileName,hornText,positiveHintsText,negativeHint
                 hintFilePath = fileName + ".hints.graphs/"
                 #hintFileName = head+":"+hint+".gv"
                 hintFileName = str(ID) + ".gv"
+                #if (os.path.exists(hintFilePath + hintFileName)):
                 negativeHintList.append([head, line])
                 graph = readGraphFromGraphvizFromTrainData(hintFilePath + hintFileName, vitualize=False)
                 negativeHintGraphWalks = getGraphNode2vecWalks(graph, dimension=20)
@@ -145,6 +147,8 @@ def constructUnsplitedData_Ver1(fileName,hornText,positiveHintsText,negativeHint
     print("positive hints graph:", len(positiveHintsList_tree))
     print("negative hints graph:", len(negativeHintsList_tree))
     print("IDList:", len(IDList))
+
+
     if (discardNegativeData==True and len(negativeHintList)-len(positiveHintList)>0):
         shuf = list(zip(negativeHintList, negativeHintsList_tree))
         random.shuffle(shuf)
@@ -166,17 +170,19 @@ def constructUnsplitedData_Ver1(fileName,hornText,positiveHintsText,negativeHint
 def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
                   discardNegativeData,smallTrain=False,smallTrainSize=50,smallTrainProgramNumber=4,trainDataSplitRate=0.8):
     #trainDataSplitRate=0.8
-    print("horn file", len(sorted(glob.glob(path + '*.horn'))))
-    print("hints file", len(sorted(glob.glob(path + '*.positiveHints'))))
-    print("negativeHints file", len(sorted(glob.glob(path + '*.negativeHints'))))
-    print("graph file", len(sorted(glob.glob(path + '*.gv'))))
     programCOunt=0
     unsplitedData = list()
-    for fileHorn, filePositiveHints, fileNegativeHints,fileGraph in zip(sorted(glob.glob(path + '*.horn')),
-                                                      sorted(glob.glob(path + '*.positiveHints')),
-                                                      sorted(glob.glob(path + '*.negativeHints')),\
-                                                                sorted(glob.glob(path + '*.gv'))):
-        fileName=fileHorn[:fileHorn.find(".horn")]
+    suffix=".smt2" #some file name include .horn
+
+    print("horn file", len(sorted(glob.glob(path + '*'+suffix+'.horn'))))
+    print("hints file", len(sorted(glob.glob(path + '*'+suffix+'.positiveHints'))))
+    print("negativeHints file", len(sorted(glob.glob(path + '*'+suffix+'.negativeHints'))))
+    print("graph file", len(sorted(glob.glob(path + '*'+suffix+'.gv'))))
+    for fileHorn, filePositiveHints, fileNegativeHints,fileGraph in zip(sorted(glob.glob(path + '*'+suffix+'.horn')),
+                                                      sorted(glob.glob(path + '*'+suffix+'.positiveHints')),
+                                                      sorted(glob.glob(path + '*'+suffix+'.negativeHints')),\
+                                                      sorted(glob.glob(path + '*'+suffix+'.gv'))):
+        fileName=fileHorn[:fileHorn.find(suffix+".horn")+len(suffix)]
         print(fileName)
         # read program
         print(fileHorn)
@@ -219,15 +225,70 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
         if (smallTrain == True and programCOunt==smallTrainProgramNumber): # only use one program for debug
             break
 
+    suffix = ".c"  # some file name include .horn
+    print("horn file", len(sorted(glob.glob(path + '*'+suffix+'.horn'))))
+    print("hints file", len(sorted(glob.glob(path + '*'+suffix+'.positiveHints'))))
+    print("negativeHints file", len(sorted(glob.glob(path + '*'+suffix+'.negativeHints'))))
+    print("graph file", len(sorted(glob.glob(path + '*'+suffix+'.gv'))))
+    for fileHorn, filePositiveHints, fileNegativeHints,fileGraph in zip(sorted(glob.glob(path + '*'+suffix+'.horn')),
+                                                      sorted(glob.glob(path + '*'+suffix+'.positiveHints')),
+                                                      sorted(glob.glob(path + '*'+suffix+'.negativeHints')),\
+                                                      sorted(glob.glob(path + '*'+suffix+'.gv'))):
+        fileName=fileHorn[:fileHorn.find(suffix+".horn")+len(suffix)]
+        print(fileName)
+        # read program
+        print(fileHorn)
+        f = open(fileHorn, "r")
+        hornText = f.read()
+        f.close()
+
+        # read positive hints
+        print(filePositiveHints)
+        f = open(filePositiveHints, "r")
+        positiveHintsText = f.read()
+        f.close()
+
+
+        # read negative hints
+        print(fileNegativeHints)
+        f = open(fileNegativeHints, "r")
+        negativeHintsText = f.read()
+        f.close()
+
+        # read program graph
+        print(fileGraph)
+        graph = readGraphFromGraphvizFromTrainData(fileGraph, vitualize=False)
+
+        programGraphWalks=getGraphNode2vecWalks(graph, dimension=100)
+        #graphEmbededProgram=getGraphEmbeddingNode2vec(graph, dimension=100,p=False)
+
+        #unsplitedData.append(constructUnsplitedData(fileName,hornText, hintsText, negativeHintsText, programGraphWalks,discardNegativeData))
+        unsplitedData.append(constructUnsplitedData_Ver1(fileName, hornText, positiveHintsText, negativeHintsText, programGraphWalks,
+                                                    discardNegativeData))
+        # print(unsplitedData[-1][0]) horn clauses
+        # print(unsplitedData[-1][1]) positive hint
+        # print(unsplitedData[-1][2]) negative hint
+        # print(unsplitedData[-1][3]) program graph walks
+        # print(unsplitedData[-1][4]) positive hint graph walks
+        # print(unsplitedData[-1][5]) negative hint graph walks
+        # print(unsplitedData[-1][6]) ID
+        # print(unsplitedData[-1][7]) file name
+        programCOunt=programCOunt+1
+        if (smallTrain == True and programCOunt==smallTrainProgramNumber): # only use one program for debug
+            break
+
+
+    #debug information
     print(programCOunt, "programs' information read")
     print(programCOunt, "program graphs' information read")
-    # templateCounter=0
-    # IDCounter=0
-    # for program in unsplitedData:
-    #     templateCounter=templateCounter+len(program[1])+len(program[2])
-    #     IDCounter=IDCounter+len(program[6])
-    # print(templateCounter,"templates")
-    # print(IDCounter," IDCounter")
+    templateCounter=0
+    IDCounter=0
+    for program in unsplitedData:
+        templateCounter=templateCounter+len(program[1])+len(program[2])
+        IDCounter=IDCounter+len(program[6])
+    print(templateCounter,"templates")
+    print(IDCounter," IDCounter")
+
 
     logging.basicConfig(filename="../log/[" + datetime.today().strftime('%Y-%m-%d') + "]OneButtonTraining.log",
                         level=logging.INFO)
@@ -325,18 +386,67 @@ def readHornClausesAndHints_resplitTrainAndVerifyData(path,dataset,\
 
 
 def readHornClausesAndHints_graph_predict(path,dataset,discardNegativeData=False,shuf=True):
-
-
-    print("horn file",len(sorted(glob.glob(path+'*.horn'))))
-    print("Positivehints file", len(sorted(glob.glob(path + '*.positiveHints'))))
-    print("negativeHints file", len(sorted(glob.glob(path + '*.negativeHints'))))
-    print("graph file", len(sorted(glob.glob(path + '*.gv'))))
     unsplitedData = list()
-    for fileHorn, fileHints, fileNegativeHints, fileGraph in zip(sorted(glob.glob(path + '*.horn')),
-                                                                 sorted(glob.glob(path + '*.positiveHints')),
-                                                                 sorted(glob.glob(path + '*.negativeHints')), \
-                                                                 sorted(glob.glob(path + '*.gv'))):
-        fileName = fileHorn[:fileHorn.find(".horn")]
+    suffix = ".smt2"  # some file name include .horn
+    print("horn file",len(sorted(glob.glob(path+'*.horn'))))
+    print("Positivehints file", len(sorted(glob.glob(path + '*'+suffix+'.positiveHints'))))
+    print("negativeHints file", len(sorted(glob.glob(path + '*'+suffix+'.negativeHints'))))
+    print("graph file", len(sorted(glob.glob(path + '*'+suffix+'.gv'))))
+
+
+
+
+    for fileHorn, fileHints, fileNegativeHints, fileGraph in zip(sorted(glob.glob(path + '*'+suffix+'.horn')),
+                                                                 sorted(glob.glob(path + '*'+suffix+'.positiveHints')),
+                                                                 sorted(glob.glob(path + '*'+suffix+'.negativeHints')), \
+                                                                 sorted(glob.glob(path + '*'+suffix+'.gv'))):
+        fileName=fileHorn[:fileHorn.find(suffix+".horn")+len(suffix)]
+        print(fileName)
+        # read program
+        print(fileHorn)
+        f = open(fileHorn, "r")
+        hornText = f.read()
+        f.close()
+
+        # read positive hints
+        print(fileHints)
+        f = open(fileHints, "r")
+        hintsText = f.read()
+        f.close()
+
+        # read negative hints
+        print(fileNegativeHints)
+        f = open(fileNegativeHints, "r")
+        negativeHintsText = f.read()
+        f.close()
+
+        # read program graph
+        print(fileGraph)
+        from graphProcessing import readGraphFromGraphvizFromTrainData,getGraphEmbeddingNode2vec
+        graph = readGraphFromGraphvizFromTrainData(fileGraph, vitualize=False)
+        #graphEmbededProgram=getGraphEmbeddingNode2vec(graph, dimension=100,p=False)
+        programGraphWalks = getGraphNode2vecWalks(graph, dimension=100)
+
+        unsplitedData.append(constructUnsplitedData_Ver1(fileName,hornText, hintsText, negativeHintsText, programGraphWalks,discardNegativeData))
+        # print(unsplitedData[-1][0]) horn clauses
+        # print(unsplitedData[-1][1]) positive hint
+        # print(unsplitedData[-1][2]) negative hint
+        # print(unsplitedData[-1][3]) program graph walks
+        # print(unsplitedData[-1][4]) positive hint graph walks
+        # print(unsplitedData[-1][5]) negative hint graph walks
+        # print(unsplitedData[-1][6]) ID
+        # print(unsplitedData[-1][7]) file name
+
+    suffix = ".smt2"  # some file name include .horn
+    print("horn file",len(sorted(glob.glob(path+'*.horn'))))
+    print("Positivehints file", len(sorted(glob.glob(path + '*'+suffix+'.positiveHints'))))
+    print("negativeHints file", len(sorted(glob.glob(path + '*'+suffix+'.negativeHints'))))
+    print("graph file", len(sorted(glob.glob(path + '*'+suffix+'.gv'))))
+    for fileHorn, fileHints, fileNegativeHints, fileGraph in zip(sorted(glob.glob(path + '*'+suffix+'.horn')),
+                                                                 sorted(glob.glob(path + '*'+suffix+'.positiveHints')),
+                                                                 sorted(glob.glob(path + '*'+suffix+'.negativeHints')), \
+                                                                 sorted(glob.glob(path + '*'+suffix+'.gv'))):
+        fileName=fileHorn[:fileHorn.find(suffix+".horn")+len(suffix)]
         print(fileName)
         # read program
         print(fileHorn)

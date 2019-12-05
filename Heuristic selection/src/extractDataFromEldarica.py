@@ -209,6 +209,46 @@ def extractPredicatesFromOneProgram(filePath,abstractionOption,timeOut):
         return False
 
 
+def extractPredicatesFromOneProgramForMultiprocess(parameterList):
+
+    filePath=parameterList[0]
+    abstractionOption = parameterList[1]
+    timeOut = parameterList[2]
+    absParentPath=os.path.abspath(os.path.pardir)
+    command = "../eldarica-graph-generation/./eld " \
+              + abstractionOption  + " -absTimeout:"+str(timeOut)+" -extractPredicates "
+    run_p = command + filePath
+
+    #check solvability and its runtime with abstraction
+    solvabilityWithAbstraction,runTimeWithAbstraction,flag=checkSolvability(timeOut,filePath,abstractionOption)
+    #check solvability and its runtime with abstraction
+    if solvabilityWithAbstraction ==True:
+        solvabilityWithOutAbstraction,runTimeWithOutAbstraction,flag=checkSolvabilityWithOutAbstraction(timeOut,filePath)
+
+
+    #if(solvabilityWithAbstraction==True and runTimeWithOutAbstraction-runTimeWithAbstraction>0):#if the program can be solved in timeout time
+    if (solvabilityWithAbstraction == True):
+        file = run_p[run_p.find(" ../"):]
+        file = file[3:]
+        file = str(os.path.abspath(os.pardir)) + file
+        print("Extract training data.\n Command:", "../eldarica-graph-generation/eld",\
+              filePath, abstractionOption,\
+              "-absTimeout:" + str(runTimeWithAbstraction), "-extractPredicates")
+        gc.collect()#clear memory
+        #eld = subprocess.Popen(run_p, shell=True, stdout=subprocess.PIPE)
+        eld = subprocess.Popen(["../eldarica-graph-generation/eld",\
+                                filePath ,abstractionOption , \
+                                "-absTimeout:"+str(runTimeWithAbstraction),\
+                                "-extractPredicates"],stdout=subprocess.DEVNULL, shell=False)
+        #stdout = eld.communicate()
+        eld.wait()
+        #eld.terminate()
+        #os.system(run)
+        gc.collect()  # clear memory
+        return True
+    else:
+        return False
+
 def extractTemplatesFromMultipleProgram(benchmark, abstractionOption,timeOut,extractFlag):
     # logging.basicConfig(filename='log/memory-extract-data.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s',level=logging.INFO)
     programCount = 0

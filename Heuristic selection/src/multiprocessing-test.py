@@ -1,6 +1,6 @@
 import os
 import sys
-from extractDataFromEldarica import checkSolvability, extractPredicatesFromOneProgram,extractTemplatesFromOneProgram
+from extractDataFromEldarica import extractPredicatesFromOneProgramForMultiprocess, extractPredicatesFromOneProgram,extractTemplatesFromOneProgram
 import subprocess
 import shutil
 import glob
@@ -22,15 +22,20 @@ def main():
     if (os.path.exists("../graphs")):
         shutil.rmtree("../graphs/")
         os.mkdir("../graphs")
+    if (os.path.exists("../trainData")):
+        shutil.rmtree("../trainData/")
+        os.mkdir("../trainData")
 
     filePathList=list()
+    parameterList = list()
     for file in glob.glob(path+"/*"):
         filePathList.append(file)
+        parameterList.append([file,abstractOption,60])
     if(extractOption=="predicates"):
-        partialExtractPredicatesFromOneProgram = partial(extractPredicatesFromOneProgram, abstractionOption=abstractOption,timeOut=60)
+        #partialExtractPredicatesFromOneProgramFor = partial(extractPredicatesFromOneProgram, abstractionOption=abstractOption,timeOut=60)
         pool = Pool(processes=8)
         #extractPredicatesFromOneProgram(filePath,abstractionOption,timeOut)
-        pool.map(partialExtractPredicatesFromOneProgram,filePathList)
+        pool.map(extractPredicatesFromOneProgramForMultiprocess,parameterList)
     if(extractOption=="templates"):
         partialExtractTemplatesFromOneProgram = partial(extractTemplatesFromOneProgram, abstractionOption=abstractOption,timeOut=60)
         pool = Pool(processes=8)
