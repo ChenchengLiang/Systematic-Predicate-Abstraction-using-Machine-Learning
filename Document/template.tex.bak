@@ -98,18 +98,26 @@ Summarize the pipline:
 \section{Background}
 ---
 \subsection{Abstraction Based Model Checking}
----
-\subsection{CEGAR}
----
+Model checking is a technique for program verification. It builds a transition system based on variables' states in all control locations and to check if there is a path to the error states. The error states are built by specifications given by users. But, programs with infinite states are ubiquitous. Therefore, we need to find a finite transition system (abstract transition system $\widehat{M}$) to represent the infinite transition system $M$, such that if there is no path to the error state in $\widehat{M}$, $M$ has no error as well, and if there is a path to the error state in $\widehat{M}$, we can use this concrete error path to check if there is a error in $M$.
+
+The major challenge in this idea is to find a appropriate $\widehat{M}$. CEGAR \cite{10.1007/10722167_15} is a state-of-art framework to find $\widehat{M}$ iteratively. CEGAR framework can be described \ref{CEGAR}
+
+\begin{figure}[h]
+\centering
+  \includegraphics[width=10cm]{graph/CEGAR}\\
+  \caption{CEGAR framework}\label{CEGAR}
+\end{figure}
+
+
 \subsection{Abstract Interpolation}
 ---
 \section{Problem Overview}
 ---
 
 \section{Program representation}
-Eldarica can take SMT and C format programs as inputs and transform the programs to intermediate horn clause format [cite]. In this format, the semantics are transformed to horn clauses. By using horn clauses as inputs, our method can adapt to many verification problems because many verification problems can be transformed to SMT format and eventually to horn clauses. We have an example in Figure \ref{while-C-program} and \ref{while-C-horn-clauses} to explain how the horn clauses capture the semantics of the program.
+Eldarica transforms SMT or C format programs to intermediate horn clause format and the semantics are preserved [cite].  By using horn clauses as the learning inputs, we don't need to care about the input languages but focus on solving the logic problems. We have an example in Figure \ref{while-C-program} and \ref{while-C-horn-clauses} to explain how the horn clauses capture semantics of the program.
 
-In Figure \ref{while-C-program}, we have a simple while loop C program which assumes variable $x$ and $y$ equal to external input Integer $n$ and $n\geq 0$. The assertion is $y==0$. The corresponding Horn clauses can be found in  Figure \ref{while-C-horn-clauses}. Every line is consists of $Head:-Body,[constraint]$. For example, in line 0, $Head$ is $inv\_main4(x, y)$ which means in control location $while(x!=0)$ in the main function and there are two variables $x$ and $y$ inside. $Body$ is empty here because this is the initial state of the program. The $constraint$ is $n \geq 0 \wedge x = n \wedge n = 0 \wedge y = n$ which comes from the $assume(x==n\&\&y==n\&\&n>=0)$ in the C program. Line 0 means in control location $while(x!=0)$, there are two variables $x$, and $y$, which satisfy the $constraint$. In line 1, The body is not empty, this means that there is a transition from body to head and this transition satisfy the $constraint$. Line 1 means from control location $while(x!=0)$ to next iteration, it must satisfy that, $x!=0$ and in the new iteration, the variables $arg1$ and $arg2$ in the control location $while(x!=0)$ must equal to $x-1$ and $y-1$, (values of $x,y$ come from last iteration). Line 2 transforms the semantic of assertion $y==0$ to horn clauses. Line 2 means that from control  location $while(x!=0)$ to false state, in the control location $while(x!=0)$ , the variable $x$ is 0 and $y$ satisfy $y!=0$.
+In Figure \ref{while-C-program}, we have a simple while loop C program which assumes variable $x$ and $y$ equal to external input Integer $n$ and $n\geq 0$. The assertion is $y==0$. The corresponding Horn clauses are described in  Figure \ref{while-C-horn-clauses}. Every line is consists of $Head:-Body,[constraint]$. For example, in line 0, $Head$ is $inv\_main4(x, y)$ which means in control location $while(x!=0)$ in the main function, there are two variables $x$ and $y$. $Body$ is empty here because this is the initial state of the program. The $constraint$ is $n \geq 0 \wedge x = n \wedge n = 0 \wedge y = n$ which comes from the $assume(x==n\&\&y==n\&\&n>=0)$ in the C program. Line 0 means in control location $while(x!=0)$, there are two variables $x$, and $y$, which satisfy the $constraint: n \geq 0 \wedge x = n \wedge n = 0 \wedge y = n$. In line 1, The body is not empty, this means that there is a transition from body to head and this transition satisfy the $constraint$. Line 1 means from control location $while(x!=0)$ to next iteration, it must satisfy that, $x!=0$ and in the new iteration, the variables $arg1$ and $arg2$ in the control location $while(x!=0)$ must equal to $x-1$ and $y-1$, (values of $x,y$ come from last iteration). Line 2 transforms the semantic of assertion $y==0$ to horn clauses. Line 2 means that from control  location $while(x!=0)$ to false state, in the control location $while(x!=0)$ , the variable $x$ is 0 and $y$ satisfy $y!=0$.
 
 
 \begin{figure}[h]
@@ -137,36 +145,36 @@ false :- inv_main4(0, y), [y != 0].
   \caption{}
 \end{figure}
 
-How to transform program semantics to horn clauses and why it can be transformed in this way can be found in [cite]. Our main purpose is to use this horn clauses format as input of deep learning structure to select predicates to build valid abstract transition systems for model checkers. 
+How to transform program semantics to horn clauses and why it can be transformed in this way can be found in [cite]. Our main purpose is to use this horn clauses format as input of deep learning structure to select better templates to reduce the number of iterations in CEGAR loop.
 
-Text streamed Horn clauses as inputs are not enough to make neural networks to understand the semantics because text-level embedding cannot capture the structural information included in the horn clauses. Therefore, we represent horn clauses by a graph which contains both control flow and data flow information, then we embed the graph to represent the original program.
+Text streamed Horn clauses as inputs are not enough to make multilayer perceptron understand the semantics because it is hard to use text-level embedding to capture the structural information included in the horn clauses. Therefore, we represent horn clauses by a graph which contains both control flow and data flow information, then we embed the graph to represent the original program.
 
-The graph to represent horn clauses in Figure \ref{while-C-horn-clauses} is in Figure .
+The graph in Figure represents horn clauses in Figure \ref{while-C-horn-clauses}.
 
 
 Formally, the graph consists of five categories of nodes, two categories of hyperedges, and six categories of edges. The graph is defined as $G=(V_{CL},V_{Arg},V_{C},V_{Op},V_{FV},HE_{CF},HE_{DF},E_{CFI},E_{CFO},E_{DFI},E_{DFO},E_{CD},E_{Arg})$, in which $V_{CL}=\{cl_{Initial},cl_{Main_{k}},cl_{false}\}$ is control location node set, $V_{Arg}=\{Arg_{k}\}$ is argument set, $V_{C}$ is constant value set, $V_{Op}=\{+,-,==,...\}$ is operator set,$V_{FV}=\{v_{k}\}$ is free variables set. $k$ is a positive integer. $HE_{CF}$ is a set of Guarded control flow hyper edges. it is used between two control locations. it takes two inputs, a control location $cl_{Initial}$ or $cl_{Mian_{k}}$ and a boolean value from operator. It has a control flow out edge $e_{CFO}$ (one element from $E_{CFO}$) connected to next control location node. Similarly, $HE_{DF}$ is a set of Guarded data flow hyper edges. It guards the data flow from $Body$ to $Head$. It takes two inputs, a value from argument $Arg_{k}$ or free variable $v_{k}$ and a boolean value and has a data flow out edge $e_{DFO}$ (one element from $E_{DFO}$) connected to next operator or argument node. $E_{CFI},E_{CFO}$ are control flow in and control flow out edges, they are only used when there are connections between nodes and guarded control flow hyperedges. similarly, $E_{DFI},E_{DFO}$ are data flow in and out edges, they are only corresponding to guarded data flow hyperedges. $E_{CD}$ is condition edge. It connects boolean operator to the hyperedges to send boolean values to the hyperedges. $E_{Arg}$ is argument edge. It connects arguments to corresponding control location node. We use lower case to represent one elements in the set. For example $v_{CL}$ means one control location node from $V_{CL}$.
 
 
 The summary of $G$'s elements is shown in Table \ref{GraphDescription}
-\begin{table}\caption{Graph elements description} \label{GraphDescription}
+\begin{table}\caption{Graph elements description} \label{GraphDescription} 
 \begin{center}
-\begin{tabular}{lllll}
+\begin{tabular}{lp{3cm}p{3cm}p{3cm}p{3cm}p{3cm}}
 \hline
 Graph elements & Name & Elements & Inputs & Outputs \\
 \hline
-$V_{CL}$  & Control location node            & $CL_{Initial},CL_{Main_{k}},CL_{false}$ & $v_{CL}$ & $he_{CF}$\\
-$V_{Arg}$ & Argument node                    & $Arg_{k}$                               &  Data flow AST tree root, argument, free variable, or constant           &\\
-$V_{C}$   & Constant node                    & Constants & &\\
-$V_{Op}$  & Operator node                    & Arithmetic and boolean operators &&\\
-$V_{FV}$  & Free Variable node               & Free variables&-& variable\\
-$HE_{CF}$ & Guarded control flow hyperedge   & -    &&\\
-$HE_{DF}$ & Guarded data flow hyperedge      & - &&\\
-$E_{CFI}$ & Control flow in edge             & - &&\\
-$E_{CFO}$ & Control flow out edge            & - &&\\
-$E_{DFI}$ & Data flow in edge                & - &&\\
-$E_{DFO}$ & Data flow out edge               & - &&\\
-$E_{CD}$ &  Condition edge                   & - &&\\
-$E_{Arg}$ & Argument edge                    & - &&\\
+$V_{CL}$  & Control location node            & $CL_{Initial}$, $CL_{Main_{k}}$, $CL_{false}$   & $v_{CL}$ & $he_{CF}$\\
+$V_{Arg}$ & Argument node                    & $Arg_{k}$                               &  $v_{OP}$, $v_{Arg}$, $v_{FV}$, or $v_{C}$ & $he_{DF}$,$v_{OP}$\\
+$V_{C}$   & Constant node                    & Constants                               & - & $v_{OP}$, $v_{Arg}$, $v_{FV}$, $he_{DF}$, $he_{CF}$\\
+$V_{Op}$  & Operator node                    & Operators                               & $v_{Arg}$, $v_{FV}$, $v_{C}$, $he_{DF}$ &$v_{Arg}$, $v_{Op}$, $v_{FV}$, $he_{DF}$, $he_{CF}$\\
+$V_{FV}$  & Free Variable node               & Free variables                          & -  & $v_{OP},v_{Arg}$\\
+$HE_{CF}$ & Guarded control flow hyperedge   & -                                       & ($v_{OP}$ or $v_{C}$, $v_{CL}$) & $v_{CL}$\\
+$HE_{DF}$ & Guarded data flow hyperedge      & -                                       & ($v_{OP}$ or $v_{C}$, $v_{Arg}$ or $v_{FV}$) & $v_{Arg}$\\
+$E_{CFI}$ & Control flow in hyperedge             & -                                       & $v_{CL}$                                  & $he_{CF}$\\
+$E_{CFO}$ & Control flow out hyperedge            & -                                       &$he_{CF}$&$v_{CL}$\\
+$E_{DFI}$ & Data flow in hyperedge                & -                                       &$v_{OP}$, $v_{Arg}$, $v_{FV}$, $v_{C}$& $he_{DF}$\\
+$E_{DFO}$ & Data flow out hyperedge               & -                                       &$he_{DF}$ &$v_{OP},v_{Arg}$\\
+$E_{CD}$ &  Condition edge                   & -                                       &$v_{C},v_{OP}$&($he_{DF},he_{CF}$)\\
+$E_{Arg}$ & Argument edge                    & -                                       &$v_{Arg}$ & $v_{CL}$\\
 \hline
 \end{tabular}
 \end{center}
@@ -178,7 +186,7 @@ $E_{Arg}$ & Argument edge                    & - &&\\
 $Body$ has same structure with $Head$. 
 If $Head$ and $Body$ have the same control location, then they share the control location and arguments. 
  
-The $Constraint$ contains the constraints to make the transition from $Body$ to $Head$ satisfiable. We can parse it to two information, data flow AST and constraint AST.  Data flow AST takes $Body'$ arguments, constant value, or free variables in $constraint$ as inputs, and go through some arithmetic operator to the root as output (a value) eventually to an $Head'$ argument. The constraint AST takes $Body$' arguments, free variables in $constraint$ as the inputs. The root of the constraint AST tree is a boolean operator which can output a boolean value to all guarded control and data flow hyperedges from $Body$ to $Head$. If there is no $constraint$, the boolean value inputs to the hyperedges are set to true.
+The $Constraint$ contains the constraints to make the transition from $Body$ to $Head$ satisfiable. We parse it to two information, data flow AST and constraint AST.  Data flow AST takes $Body'$ arguments, constant value, or free variables in $constraint$ as inputs, and go through some arithmetic operator to the root as output (a value) eventually to an $Head'$ argument. The constraint AST takes $Body$' arguments, free variables in $constraint$ as the inputs. The root of the constraint AST tree is a boolean operator which can output a boolean value to all guarded control and data flow hyperedges from $Body$ to $Head$. If there is no $constraint$, the boolean value inputs to the hyperedges are set to true.
 
 We can represent the transition by the definition of graph:
 
@@ -187,7 +195,7 @@ $Head(CL_{Main_{m}},Arg_{head}):-Body(CL_{Main_{n}},Arg_{body}),[Constraint(Arg_
 
 To associate $Head$ and $Body$, we represent control flow information first by connecting the control location from $Body$ to $Head$, and between the control locations, there is a guarded control flow hyperedge which takes $Body$' control location and the boolean value from AST tree constructed from $constraint$ as inputs and output the control location information to $Head$'s control location. Then, we build data flow between $Head$ and $Body$. Every argument in $Head$ is guarded by a guarded data flow hyper edge which takes $Body$' arguments, data flow AST tree root, or free variables and the boolean value from $constraint$'s AST tree as inputs. In summary, all the control and data flows from $Body$ to $Head$ are guarded by a hyperedge, and one of the inputs of the hyperedges is the boolean value from the root of constraint AST tree constructed by the predicates in $constraint$. 
 
-
+\textbf{Graph Embedding.} 
 
 
 
@@ -280,17 +288,17 @@ For a single instance of data extracting from manual\cite{10.1007/978-3-319-5728
 
 The final goal is to have proper predicates that can represent the abstract transition system. The templates are heuristics to generate the predicates in each CEGAR iteration. There are additional predicates added to solve the program in every CEGAR iterationl but the templates are given and fixed before the CEGAR iteration.
 
-The strategy $A$ (fixed time out) to extract the training data (a list of templates with labels) is that for one program, we run Eldarica with an abstraction heuristic (e.g. use option -abstract:manual for .c files and -abstract for .smt2 files). If Eldarica can solve the program within 60 seconds. We mark this program as solvable. In Eldarica, we have an initial list of templates. We delete these templates one by one to see if the program can be solved with the remaining templates. If the program is still solvable within the timeout, then that deleted template is critical, we mark it as useful and label it as 1. By doing so iteratively, we can label the initial list of templates. This labelled list of templates will be used in the training process.
+%The strategy $A$ (fixed time out) to extract the training data (a list of templates with labels) is that for one program, we run Eldarica with an abstraction heuristic (e.g. use option -abstract:manual for .c files and -abstract for .smt2 files). If Eldarica can solve the program within 60 seconds. We mark this program as solvable. In Eldarica, we have an initial list of templates. We delete these templates one by one to see if the program can be solved with the remaining templates. If the program is still solvable within the timeout, then that deleted template is critical, we mark it as useful and label it as 1. By doing so iteratively, we can label the initial list of templates. This labelled list of templates will be used in the training process.
+%
+%\begin{enumerate}
+%  \item chc-comp benchmarks: 38/1216 .smt2 files (programs) need templates to solve the program within in 60 seconds.
+%  \item sv-comp smt benchmarks: 7/6814 .smt2 files need templates.
+%  \item sv-comp c benchmarks: 31/545 .c files need templates.
+%\end{enumerate}
+%
+%Only 76 training programs in total.
 
-\begin{enumerate}
-  \item chc-comp benchmarks: 38/1216 .smt2 files (programs) need templates to solve the program within in 60 seconds.
-  \item sv-comp smt benchmarks: 7/6814 .smt2 files need templates.
-  \item sv-comp c benchmarks: 31/545 .c files need templates.
-\end{enumerate}
-
-Only 76 training programs in total.
-
-A alternative strategy $B$ (variable timeout): First, confirm the solvability (i.e. the program can be solved within 60 seconds with the abstraction heuristic).
+Extracting data with variable timeout: First, confirm the solvability (i.e. the program can be solved within 60 seconds with the abstraction heuristic).
 Second, record the solving time with and without the abstraction heuristic. If Eldarica takes less solving time with abstraction heuristic, pass this solving time as timeout to Eldarica to label the templates used in the program.
 
 \begin{enumerate}
@@ -302,7 +310,7 @@ Second, record the solving time with and without the abstraction heuristic. If E
 96 training programs. 76 programs for training, 20 programs for testing.
 18/20 solved by read templates. Read templates time consumption/original templates consumption =  140.67/126.84 (in seconds)
 
-Strategy $C$: keep using Strategy $B$'s on larger benchmarks, and use these three benchmarks only for testing.
+Extracting data on larger benchmarks, and use these three benchmarks only for testing.
 
 
 
@@ -448,11 +456,11 @@ Define a the first state of nodes. Update node representations by edges type and
 The edges, hyper-edges, messages should capture the characteristics or relations between nodes.
 To deal with arbitrary length of information (different number of nodes), aggregation or abstraction then aggregation.
 
-AST embedding: code2vec \cite{Alon:2019:CLD:3302515.3290353}. TBCNN \cite{DBLP:journals/corr/MouLJZW14}.
+AST embedding: code2vec \cite{Alon:2019:CLD:3302515.3290353}. TBCNN \cite{DBLP:journals/corr/MouLJZW14}.Learning to represent programs with graphs\cite{DBLP:journals/corr/abs-1711-00740}.
 
 
 FormulaNet \cite{NIPS2017_6871}. GAT \cite{2017arXiv171010903V}.
-Gated Graph Neural Networks (GGNN) \cite{DBLP:journals/corr/abs-1711-00740}
+
 
 fake task graph embedding.
 
