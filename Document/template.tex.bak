@@ -100,14 +100,16 @@ Summarize the pipline:
 \subsection{Abstraction Based Model Checking}
 Model checking is a technique for program verification. It builds a transition system based on variables' states in all control locations and to check if there is a path to the error states. The error states are built by specifications given by users. But, programs with infinite states are ubiquitous. Therefore, we need to find a finite transition system (abstract transition system $\widehat{M}$) to represent the infinite transition system $M$, such that if there is no path to the error state in $\widehat{M}$, $M$ has no error as well, and if there is a path to the error state in $\widehat{M}$, we can use this concrete error path to check if there is a error in $M$.
 
-The major challenge in this idea is to find a appropriate $\widehat{M}$. CEGAR \cite{10.1007/10722167_15} is a state-of-art framework to find $\widehat{M}$ iteratively. CEGAR framework can be described \ref{CEGAR}
+The major challenge in this idea is to find a appropriate $\widehat{M}$. CEGAR \cite{10.1007/10722167_15} is a state-of-art framework to find $\widehat{M}$ iteratively. CEGAR framework can be described \ref{CEGAR}. It starts with a initial abstract transition system $\widehat{M}$. The model checker can check if there is a path to the error state. If there is no such path, the the system $M$ is safe, otherwise give the path as a counterexample to check the feasibility. Checking feasibility means to use this counterexample as input to $M$ If $M$ return a error, this counterexample is feasible and $M$ is not safe. If there is no error returned, this counterexample is infeasible which means $\widehat{M}$ does not represent $M$. Therefore, we need a new abstract transition system $\widehat{M}'$ obtained by a refinement process.
 
 \begin{figure}[h]
 \centering
-  \includegraphics[width=10cm]{graph/CEGAR}\\
+  \includegraphics[width=12cm]{graph/CEGAR}\\
   \caption{CEGAR framework}\label{CEGAR}
 \end{figure}
 
+
+$\widehat{M}$ is built by a set of predicates. To update $\widehat{M}$ to $\widehat{M}'$ means to update the predicate set.
 
 \subsection{Abstract Interpolation}
 ---

@@ -109,7 +109,7 @@ The major challenge in this idea is to find a appropriate $\widehat{M}$. CEGAR \
 \end{figure}
 
 
-
+$\widehat{M}$ is built by a set of predicates $Pred$. To update $\widehat{M}$ to $\widehat{M}'$ means to update $Pred$ to a new predicate set $Pred'$ by adding new predicates. The new predicates are constructed by splitting the counterexample path to two parts $A$ and $B$ and find the Interpolants $I$ of $A$ and $B$, such that $I$ consists of common elements in $A$ and $B$, $A\Rightarrow I$, and $I\Rightarrow$ $\neg B$. $I$ is the new predicates to be added to $Pred$.
 
 \subsection{Abstract Interpolation}
 ---
@@ -156,7 +156,8 @@ The graph in Figure represents horn clauses in Figure \ref{while-C-horn-clauses}
 
 Formally, the graph consists of five categories of nodes, two categories of hyperedges, and six categories of edges. The graph is defined as $G=(V_{CL},V_{Arg},V_{C},V_{Op},V_{FV},HE_{CF},HE_{DF},E_{CFI},E_{CFO},E_{DFI},E_{DFO},E_{CD},E_{Arg})$, in which $V_{CL}=\{cl_{Initial},cl_{Main_{k}},cl_{false}\}$ is control location node set, $V_{Arg}=\{Arg_{k}\}$ is argument set, $V_{C}$ is constant value set, $V_{Op}=\{+,-,==,...\}$ is operator set,$V_{FV}=\{v_{k}\}$ is free variables set. $k$ is a positive integer. $HE_{CF}$ is a set of Guarded control flow hyper edges. it is used between two control locations. it takes two inputs, a control location $cl_{Initial}$ or $cl_{Mian_{k}}$ and a boolean value from operator. It has a control flow out edge $e_{CFO}$ (one element from $E_{CFO}$) connected to next control location node. Similarly, $HE_{DF}$ is a set of Guarded data flow hyper edges. It guards the data flow from $Body$ to $Head$. It takes two inputs, a value from argument $Arg_{k}$ or free variable $v_{k}$ and a boolean value and has a data flow out edge $e_{DFO}$ (one element from $E_{DFO}$) connected to next operator or argument node. $E_{CFI},E_{CFO}$ are control flow in and control flow out edges, they are only used when there are connections between nodes and guarded control flow hyperedges. similarly, $E_{DFI},E_{DFO}$ are data flow in and out edges, they are only corresponding to guarded data flow hyperedges. $E_{CD}$ is condition edge. It connects boolean operator to the hyperedges to send boolean values to the hyperedges. $E_{Arg}$ is argument edge. It connects arguments to corresponding control location node. We use lower case to represent one elements in the set. For example $v_{CL}$ means one control location node from $V_{CL}$.
 
-
+% todo: separate to two graphs
+% todo: combine free vriables nodes and argument nodes
 The summary of $G$'s elements is shown in Table \ref{GraphDescription}
 \begin{table}\caption{Graph elements description} \label{GraphDescription} 
 \begin{center}
@@ -164,7 +165,7 @@ The summary of $G$'s elements is shown in Table \ref{GraphDescription}
 \hline
 Graph elements & Name & Elements & Inputs & Outputs \\
 \hline
-$V_{CL}$  & Control location node            & $CL_{Initial}$, $CL_{Main_{k}}$, $CL_{false}$   & $v_{CL}$ & $he_{CF}$\\
+$V_{CL}$  & Control location node            & $CL_{Initial}$, $CL_{Main_{k}}$, $CL_{false}$   & $he_{CL}$ & $he_{CF}$\\
 $V_{Arg}$ & Argument node                    & $Arg_{k}$                               &  $v_{OP}$, $v_{Arg}$, $v_{FV}$, or $v_{C}$ & $he_{DF}$,$v_{OP}$\\
 $V_{C}$   & Constant node                    & Constants                               & - & $v_{OP}$, $v_{Arg}$, $v_{FV}$, $he_{DF}$, $he_{CF}$\\
 $V_{Op}$  & Operator node                    & Operators                               & $v_{Arg}$, $v_{FV}$, $v_{C}$, $he_{DF}$ &$v_{Arg}$, $v_{Op}$, $v_{FV}$, $he_{DF}$, $he_{CF}$\\
