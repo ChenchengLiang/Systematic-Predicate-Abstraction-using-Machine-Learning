@@ -126,6 +126,8 @@ def predict_rank(model, programDoc2VecModel, hintsDoc2VecModel,programGraph2VecM
 
 
 def predictAndOutputHints(model, programDoc2VecModel, hintsDoc2VecModel,programGraph2VecModel,hintsGraph2VecModel):
+    if not os.path.exists("../predictedHints/"):
+        os.makedirs("../predictedHints/")
     test_X = pickleRead('testData_X')
     parenDir = os.path.abspath(os.path.pardir)
     path=parenDir+"/predictedHints/"

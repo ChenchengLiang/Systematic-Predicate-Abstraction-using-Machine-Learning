@@ -437,7 +437,7 @@ def readHornClausesAndHints_graph_predict(path,dataset,discardNegativeData=False
         # print(unsplitedData[-1][6]) ID
         # print(unsplitedData[-1][7]) file name
 
-    suffix = ".smt2"  # some file name include .horn
+    suffix = ".c"  # some file name include .horn
     print("horn file",len(sorted(glob.glob(path+'*.horn'))))
     print("Positivehints file", len(sorted(glob.glob(path + '*'+suffix+'.positiveHints'))))
     print("negativeHints file", len(sorted(glob.glob(path + '*'+suffix+'.negativeHints'))))

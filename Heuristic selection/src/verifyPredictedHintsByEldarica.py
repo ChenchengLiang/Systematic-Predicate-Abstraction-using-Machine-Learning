@@ -50,7 +50,7 @@ def verifySelectedHintsInMultiplePrograms(timeOut,rankOption):
     solvedProgramCount=0
     TotalReadHintsTimeConsumption=0
     TotalAbsTimeConsumption=0
-    for file in sorted(glob.glob("../benchmarks/sv-comp-c/fileList_*/*.annot.c")):
+    for file in sorted(glob.glob("../benchmarks/sv-comp-c-solvability/sat/*.annot.c")):
         fileName = file[file.rfind("/") +  1:]
         #parenDir = os.path.abspath(os.path.pardir)
         if(os.path.exists("../testData/"+fileName+".horn")):
@@ -62,7 +62,7 @@ def verifySelectedHintsInMultiplePrograms(timeOut,rankOption):
             #extractHornClausesFromOneProgram(filePath, benchmark, fileName, abstractionOption)
             TotalReadHintsTimeConsumption=TotalReadHintsTimeConsumption+readHintsTimeConsumption
             TotalAbsTimeConsumption=TotalAbsTimeConsumption+absTimeConsumption
-    for file in sorted(glob.glob("../benchmarks/sv-comp-clauses/fileList_*/*.smt2")):
+    for file in sorted(glob.glob("../benchmarks/sv-comp-c-solvability/sat/*.smt2")):
         fileName = file[file.rfind("/") +  1:]
         #parenDir = os.path.abspath(os.path.pardir)
         if(os.path.exists("../testData/"+fileName+".horn")):
@@ -74,7 +74,7 @@ def verifySelectedHintsInMultiplePrograms(timeOut,rankOption):
             #extractHornClausesFromOneProgram(filePath, benchmark, fileName, abstractionOption)
             TotalReadHintsTimeConsumption = TotalReadHintsTimeConsumption + readHintsTimeConsumption
             TotalAbsTimeConsumption = TotalAbsTimeConsumption + absTimeConsumption
-    for file in sorted(glob.glob("../benchmarks/chc-comp/fileList_*/*.smt2")):
+    for file in sorted(glob.glob("../benchmarks/sv-comp-c-solvability/sat/*.smt2")):
         fileName = file[file.rfind("/") +  1:]
         #parenDir = os.path.abspath(os.path.pardir)
         if(os.path.exists("../testData/"+fileName+".horn")):

@@ -32,12 +32,12 @@ def prerryPrintOneGraph(G):
 def readGraphFromGraphvizFromTrainData(fileName,vitualize=True):
     hornGraph=Source.from_file(fileName)
     #read gv to networkx
+    #print(fileName)
     G=nx.DiGraph(nx.drawing.nx_pydot.read_dot(fileName))
     #view by graphviz
     if(vitualize==True):
         hornGraph.view()
-
-    #print(hornGraph.source)
+        print(hornGraph.source)
     '''
     for node,content in nodes.items():
         print("-----------")
@@ -61,7 +61,7 @@ def readGraphFromGraphvizFromTrainData(fileName,vitualize=True):
 
 
 def readGraphFromGraphviz(fileName,vitualize=True):
-    path='../graph/'
+    path='../graphs/'
     parentDirectory=os.path.abspath(os.path.dirname(os.getcwd()))
     hornGraph=Source.from_file(path+fileName)
     #read gv to networkx
@@ -69,10 +69,9 @@ def readGraphFromGraphviz(fileName,vitualize=True):
     #view by graphviz
     if(vitualize==True):
         hornGraph.view()
+        print(hornGraph.source)
 
-    print(hornGraph.source)
-
-    '''
+    nodes=G.nodes
     for node,content in nodes.items():
         print("-----------")
         print(node,content['label'])
@@ -85,7 +84,7 @@ def readGraphFromGraphviz(fileName,vitualize=True):
         print("Successors:")
         for successor in G.successors(node):
             print(successor, nodes[successor]['label'])
-    '''
+
     G = nodeRelabel(G)
     #prerryPrintOneGraph(G)
 
@@ -94,7 +93,7 @@ def readGraphFromGraphviz(fileName,vitualize=True):
 def readAndEmbedAllGraphs(dimension=3):
     graphs=list()
     aggregatedEmbeddingList=list()
-    for count,file in enumerate(glob.glob("../graph/*.gv")):
+    for count,file in enumerate(glob.glob("../graphs/*.gv")):
         print(count,":",file)
         graph=readGraphFromGraphviz(file, vitualize=False)
         aggregatedEmbeddingList.append(getGraphEmbeddingNode2vec(graph, dimension=dimension))
@@ -181,11 +180,11 @@ def callEldaricaGenerateGraphs(dataset='trainData'):
 
 def main():
     print("Start")
-    #graph=readGraphFromGraphviz("02.c.annot.c.gv", vitualize=False)
+    graph=readGraphFromGraphviz("../trainData/07.c.annot.c.gv", vitualize=False)
     #getGraphEmbeddingNode2vec(graph, dimension=3, p=True)
     # walks=getGraphNode2vecWalks(graph, dimension=3)
     # print(walks)
-    callEldaricaGenerateGraphs('trainData')
+    #callEldaricaGenerateGraphs('trainData')
     #callEldaricaGenerateGraphs('testData')
     #aggregatedEmbeddingList=readAndEmbedAllGraphs(dimension=100)#text level program=500 dimension hint=50
     print("---------")

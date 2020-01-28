@@ -17,6 +17,21 @@ def separateSolvableAndUnsolvableGroup(benchamrk,absOption,benchmarkName,type):
     benchmark_unknown = "../benchmarks/" + benchmarkName + "-solvability/unknown"
     # logging.basicConfig(filename='log/memory-separating-solvability.log', filemode='w',
     #                     format='%(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+    if not os.path.exists(benchmark_sat):
+        os.makedirs(benchmark_sat)
+    if not os.path.exists(benchmark_unsat):
+        os.makedirs(benchmark_unsat)
+    if not os.path.exists(benchmark_solvable):
+        os.makedirs(benchmark_solvable)
+    if not os.path.exists(benchmark_unsolvable):
+        os.makedirs(benchmark_unsolvable)
+    if not os.path.exists(benchmark_syntaxError):
+        os.makedirs(benchmark_syntaxError)
+    if not os.path.exists(benchmark_unknown):
+        os.makedirs(benchmark_unknown)
+
+
     for txt_file in glob.iglob(benchamrk+"/*."+type):
 
         solvability,runtime,flag=checkSolvability(timeOut,txt_file,absOption)

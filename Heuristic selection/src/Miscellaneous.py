@@ -5,7 +5,6 @@ import numpy as np
 import pickle
 import os,glob,shutil,gc
 from pathlib import Path
-from extractDataFromEldarica import checkSolvability
 
 def renameBenchmarkFiles():
 

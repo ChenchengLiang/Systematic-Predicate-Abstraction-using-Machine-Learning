@@ -11,11 +11,9 @@ def main():
         shutil.rmtree("../testData/")
         shutil.rmtree("../pickleData/")
         shutil.rmtree("../models/")
-        shutil.rmtree("../graphs/")
         os.mkdir("../testData")
         os.mkdir("../pickleData")
         os.mkdir("../models")
-        os.mkdir("../graphs")
     benchmark = 'trainData'
     curpath = os.path.abspath(os.curdir)
     parenDir = os.path.abspath(os.path.pardir)
