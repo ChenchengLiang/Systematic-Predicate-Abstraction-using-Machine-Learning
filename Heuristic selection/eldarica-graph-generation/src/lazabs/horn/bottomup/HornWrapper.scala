@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2018 Hossein Hojjat and Philipp Ruemmer.
+ * Copyright (c) 2011-2019 Hossein Hojjat and Philipp Ruemmer.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -35,13 +35,11 @@ import IExpression._
 import ap.SimpleAPI
 import ap.SimpleAPI.ProverStatus
 import ap.types.MonoSortedPredicate
-
 import lazabs.GlobalParameters
 import lazabs.ParallelComputation
-import lazabs.Main.{TimeoutException, StoppedException}
+import lazabs.Main.{StoppedException, TimeoutException}
 import lazabs.horn.preprocessor.{DefaultPreprocessor, HornPreprocessor}
-import HornPreprocessor.{VerifHintElement, VerificationHints,
-                         EmptyVerificationHints, BackTranslator}
+import HornPreprocessor.BackTranslator
 import lazabs.horn.bottomup.HornClauses._
 import lazabs.horn.global._
 import lazabs.utils.Manip._
@@ -50,13 +48,13 @@ import PrincessWrapper._
 import lazabs.prover.Tree
 import lazabs.types.Type
 import Util._
-import HornPredAbs.{RelationSymbol}
-import lazabs.horn.abstractions.{AbsLattice, AbsReader, LoopDetector,
-                                 StaticAbstractionBuilder}
+import HornPredAbs.RelationSymbol
+import lazabs.horn.abstractions.{AbsLattice, AbsReader, AbstractionRecord, EmptyVerificationHints, LoopDetector, StaticAbstractionBuilder, VerificationHints}
+import AbstractionRecord.AbstractionMap
 import StaticAbstractionBuilder.AbstractionType
+import lazabs.horn.concurrency.{HintsSelection, ReaderMain}
 
-import scala.collection.mutable.{HashSet => MHashSet, HashMap => MHashMap,
-                                 LinkedHashMap}
+import scala.collection.mutable.{LinkedHashMap, HashMap => MHashMap, HashSet => MHashSet}
 
 
 object HornWrapper {
@@ -132,7 +130,7 @@ class HornWrapper(constraints: Seq[HornClause],
   
   //////////////////////////////////////////////////////////////////////////////
 
-  ap.util.Debug enableAllAssertions lazabs.Main.assertions
+  GlobalParameters.get.setupApUtilDebug
 
   private val outStream =
      if (GlobalParameters.get.logStat)
@@ -214,6 +212,14 @@ class HornWrapper(constraints: Seq[HornClause],
 
     (simplifiedClauses, simpHints, backTranslator)
   }
+
+  //print horn graph in smt format
+  if(GlobalParameters.get.getHornGraph==true){
+    HintsSelection.writeHornClausesGraphToFile(GlobalParameters.get.fileName,simplifiedClauses) //write horn format to file
+    //println(simplifiedClauses)
+    //val hornGraph = new GraphTranslator(simpClauses, GlobalParameters.get.fileName)
+  }
+
 
   val params =
     if (lazabs.GlobalParameters.get.templateBasedInterpolationPortfolio)
@@ -320,11 +326,11 @@ class InnerHornWrapper(unsimplifiedClauses : Seq[Clause],
   private lazy val absBuilder =
     new StaticAbstractionBuilder(simplifiedClauses, abstractionType)
 
-  private lazy val autoAbstraction : TemplateInterpolator.AbstractionMap =
-    absBuilder.abstractions mapValues (TemplateInterpolator.AbstractionRecord(_))
+  private lazy val autoAbstraction : AbstractionMap =
+    absBuilder.abstractionRecords
 
   /** Manually provided interpolation abstraction hints */
-  private lazy val hintsAbstraction : TemplateInterpolator.AbstractionMap =
+  private lazy val hintsAbstraction : AbstractionMap =
     if (simpHints.isEmpty)
       Map()
     else
@@ -335,8 +341,7 @@ class InnerHornWrapper(unsimplifiedClauses : Seq[Clause],
   private val predGenerator = Console.withErr(outStream) {
     if (lazabs.GlobalParameters.get.templateBasedInterpolation) {
       val fullAbstractionMap =
-        TemplateInterpolator.AbstractionRecord
-          .mergeMaps(hintsAbstraction, autoAbstraction)
+        AbstractionRecord.mergeMaps(hintsAbstraction, autoAbstraction)
 
       if (fullAbstractionMap.isEmpty)
         DagInterpolator.interpolatingPredicateGenCEXAndOr _
@@ -349,7 +354,13 @@ class InnerHornWrapper(unsimplifiedClauses : Seq[Clause],
     }
   }
 
+  if (GlobalParameters.get.templateBasedInterpolationPrint &&
+      !simpHints.isEmpty)
+    ReaderMain.printHints(simpHints, name = "Manual verification hints:")
+
   //////////////////////////////////////////////////////////////////////////////
+
+
 
   val result : Either[Map[Predicate, IFormula], Dag[IAtom]] = {
     val counterexampleMethod =
@@ -361,12 +372,14 @@ class InnerHornWrapper(unsimplifiedClauses : Seq[Clause],
     val result = Console.withOut(outStream) {
       println
       println(
-         "----------------------------------- CEGAR --------------------------------------")
+        "----------------------------------- CEGAR --------------------------------------")
 
-       (new HornPredAbs(simplifiedClauses,
-                        simpHints.toInitialPredicates, predGenerator,
-                        counterexampleMethod)).result
+      (new HornPredAbs(simplifiedClauses,
+        simpHints.toInitialPredicates, predGenerator,
+        counterexampleMethod)).result
     }
+
+
 
     result match {
       case Left(res) =>
