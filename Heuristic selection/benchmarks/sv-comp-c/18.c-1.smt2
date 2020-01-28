@@ -1,0 +1,16 @@
+(set-logic HORN)
+(set-info :source |
+    Benchmark: C_VC
+    Output by Princess (http://www.philipp.ruemmer.org/princess.shtml)
+|)
+(set-info :status unknown)
+(declare-fun inv_main17 (Int Int Int Int) Bool)
+(declare-fun inv_main6 (Int Int Int Int) Bool)
+(declare-fun inv_main8 (Int Int Int Int) Bool)
+(assert (forall ((var0 Int)) (forall ((var1 Int)) (forall ((var2 Int)) (inv_main6 var0 var2 var1 0 ) ) ) ) )
+(assert (forall ((var0 Int)) (forall ((var1 Int)) (forall ((var2 Int)) (forall ((var3 Int)) (or (not (inv_main6 var2 var0 var1 var3 ) ) (inv_main8 var2 var0 0 var3 ) ) ) ) ) ) )
+(assert (forall ((var0 Int)) (forall ((var1 Int)) (forall ((var2 Int)) (forall ((var3 Int)) (or (not (and (inv_main8 var2 var0 var1 var3 ) (and (not (= var3 100 ) ) (and (not (= var2 0 ) ) (not (<= 0 (+ (+ 100 (* (- 1) var1 ) ) (- 1) ) ) ) ) ) ) ) (inv_main17 var2 var0 var1 var3 ) ) ) ) ) ) )
+(assert (forall ((var0 Int)) (forall ((var1 Int)) (forall ((var2 Int)) (forall ((var3 Int)) (or (not (and (inv_main8 var2 var0 var1 var3 ) (and (not (= var2 0 ) ) (<= 0 (+ (+ 100 (* (- 1) var1 ) ) (- 1) ) ) ) ) ) (inv_main8 var2 var0 (+ var1 1 ) (+ var3 1 ) ) ) ) ) ) ) )
+(assert (forall ((var0 Int)) (forall ((var1 Int)) (forall ((var2 Int)) (forall ((var3 Int)) (or (not (and (inv_main8 var2 var0 var1 var3 ) (and (= var2 0 ) (<= 0 (+ (+ 100 (* (- 1) var1 ) ) (- 1) ) ) ) ) ) (inv_main8 var2 var0 (+ var1 1 ) var3 ) ) ) ) ) ) )
+(assert (forall ((var0 Int)) (forall ((var1 Int)) (forall ((var2 Int)) (forall ((var3 Int)) (not (inv_main17 var2 var0 var1 var3 ) ) ) ) ) ) )
+(check-sat)

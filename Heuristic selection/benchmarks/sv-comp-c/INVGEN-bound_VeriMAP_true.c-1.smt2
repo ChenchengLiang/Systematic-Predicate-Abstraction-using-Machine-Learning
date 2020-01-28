@@ -1,0 +1,18 @@
+(set-logic HORN)
+(set-info :source |
+    Benchmark: C_VC
+    Output by Princess (http://www.philipp.ruemmer.org/princess.shtml)
+|)
+(set-info :status unknown)
+(declare-fun inv_main11 (Int Int Int Int Int Int) Bool)
+(declare-fun inv_main18 (Int Int Int Int Int Int) Bool)
+(declare-fun inv_main19 (Int Int Int Int Int Int) Bool)
+(declare-fun inv_main4 (Int Int Int Int Int Int) Bool)
+(assert (forall ((var0 Int)) (forall ((var1 Int)) (forall ((var2 Int)) (forall ((var3 Int)) (forall ((var4 Int)) (forall ((var5 Int)) (inv_main4 var4 var0 var3 var1 var5 var2 ) ) ) ) ) ) ) )
+(assert (forall ((var0 Int)) (forall ((var1 Int)) (forall ((var2 Int)) (forall ((var3 Int)) (forall ((var4 Int)) (forall ((var5 Int)) (or (not (and (inv_main18 var0 var1 var5 var3 var2 var4 ) (not (<= 0 (+ var3 (- 1) ) ) ) ) ) (inv_main19 var0 var1 var5 var3 var2 var4 ) ) ) ) ) ) ) ) )
+(assert (forall ((var0 Int)) (forall ((var1 Int)) (forall ((var2 Int)) (forall ((var3 Int)) (forall ((var4 Int)) (forall ((var5 Int)) (or (not (and (inv_main4 var0 var1 var5 var3 var2 var4 ) (and (<= 0 (+ 200 (* (- 1) var0 ) ) ) (<= 0 var0 ) ) ) ) (inv_main11 var0 var0 var0 var3 0 var4 ) ) ) ) ) ) ) ) )
+(assert (forall ((var0 Int)) (forall ((var1 Int)) (forall ((var2 Int)) (forall ((var3 Int)) (forall ((var4 Int)) (forall ((var5 Int)) (or (not (and (inv_main11 var0 var1 var5 var3 var2 var4 ) (<= 0 (+ var5 (- 1) ) ) ) ) (inv_main11 var0 (+ (+ var5 (- 1) ) (+ var2 1 ) ) (+ var5 (- 1) ) var3 (+ var2 1 ) var4 ) ) ) ) ) ) ) ) )
+(assert (forall ((var0 Int)) (forall ((var1 Int)) (forall ((var2 Int)) (forall ((var3 Int)) (forall ((var4 Int)) (forall ((var5 Int)) (or (not (and (inv_main11 var0 var1 var5 var3 var2 var4 ) (not (<= 0 (+ var5 (- 1) ) ) ) ) ) (inv_main18 var0 var2 var5 var2 var2 0 ) ) ) ) ) ) ) ) )
+(assert (forall ((var0 Int)) (forall ((var1 Int)) (forall ((var2 Int)) (forall ((var3 Int)) (forall ((var4 Int)) (forall ((var5 Int)) (or (not (and (inv_main18 var0 var1 var5 var3 var2 var4 ) (<= 0 (+ var3 (- 1) ) ) ) ) (inv_main18 var0 (+ (+ var3 (- 1) ) (+ var4 1 ) ) var5 (+ var3 (- 1) ) var2 (+ var4 1 ) ) ) ) ) ) ) ) ) )
+(assert (forall ((var0 Int)) (forall ((var1 Int)) (forall ((var2 Int)) (forall ((var3 Int)) (forall ((var4 Int)) (forall ((var5 Int)) (not (and (inv_main19 var0 var1 var5 var3 var2 var4 ) (not (<= 0 var5 ) ) ) ) ) ) ) ) ) ) )
+(check-sat)

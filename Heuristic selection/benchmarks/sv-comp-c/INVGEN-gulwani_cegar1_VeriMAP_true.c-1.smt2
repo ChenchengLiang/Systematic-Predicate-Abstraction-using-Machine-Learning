@@ -1,0 +1,15 @@
+(set-logic HORN)
+(set-info :source |
+    Benchmark: C_VC
+    Output by Princess (http://www.philipp.ruemmer.org/princess.shtml)
+|)
+(set-info :status unknown)
+(declare-fun inv_main15 (Int Int Int) Bool)
+(declare-fun inv_main3 (Int Int Int) Bool)
+(declare-fun inv_main7 (Int Int Int) Bool)
+(assert (forall ((var0 Int)) (forall ((var1 Int)) (inv_main3 0 var0 var1 ) ) ) )
+(assert (forall ((var0 Int)) (forall ((var1 Int)) (forall ((var2 Int)) (or (not (and (inv_main3 var1 var0 var2 ) (and (<= 0 (+ 2 (* (- 1) var2 ) ) ) (and (<= 0 var2 ) (and (<= 0 (+ 2 (* (- 1) var0 ) ) ) (<= 0 var0 ) ) ) ) ) ) (inv_main7 var1 var0 var2 ) ) ) ) ) )
+(assert (forall ((var0 Int)) (forall ((var1 Int)) (forall ((var2 Int)) (or (not (and (inv_main7 var1 var0 var2 ) (not (= var1 0 ) ) ) ) (inv_main7 var1 (+ var0 2 ) (+ var2 2 ) ) ) ) ) ) )
+(assert (forall ((var0 Int)) (forall ((var1 Int)) (forall ((var2 Int)) (or (not (and (inv_main7 var1 var0 var2 ) (and (<= 0 (+ var0 (- 4) ) ) (and (<= 0 (* (- 1) var2 ) ) (and (<= 0 var2 ) (= var1 0 ) ) ) ) ) ) (inv_main15 var1 var0 var2 ) ) ) ) ) )
+(assert (forall ((var0 Int)) (forall ((var1 Int)) (forall ((var2 Int)) (not (and (inv_main15 var1 var0 var2 ) (not (<= 0 (+ (+ 4 (* (- 1) var0 ) ) (- 1) ) ) ) ) ) ) ) ) )
+(check-sat)
