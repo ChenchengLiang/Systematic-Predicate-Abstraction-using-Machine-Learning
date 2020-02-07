@@ -1,0 +1,42 @@
+-------------
+inv_main5(x, n) :- n >= 1 & 0 = x.
+Head arguments: ListBuffer((x,x), (n,n))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((x,x), (n,n))
+variables in guard: ListBuffer(n)
+Data flow:
+x<-0
+n<-_n
+Guard:
+((-1 + _n) >= 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main5(arg1, n) :- inv_main5(x, n), n - x >= 1 & x + 1 = arg1.
+Head arguments: ListBuffer((arg1,arg1), (n,n))
+Body arguments: ListBuffer((x,x), (n,n))
+Common Arguments:ListBuffer((n,n))
+relativeComplimentOfHeadArg:ListBuffer((arg1,arg1))
+variables in guard: ListBuffer(n, x)
+Data flow:
+arg1<-(x + 1)
+n<-n
+Guard:
+(((n + -1 * x) + -1) >= 0)
+dataflow number:1
+guard number:1
+-------------
+false :- inv_main5(x, n), !(n >= x) & !(n - x >= 1).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((x,x), (n,n))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(n, x)
+Data flow:
+Guard:
+!((n + -1 * x) >= 0)
+!(((n + -1 * x) + -1) >= 0)
+dataflow number:0
+guard number:2
+-----------

@@ -1,0 +1,8 @@
+inv_main7(flag, arg0, arg1, arg2, arg3) :- 0 = arg0 & 0 = arg1 & 0 = arg2 & 0 = arg3.
+inv_main22(x, arg4) :- inv_main22(x, y), __eval108 != 0 & x >= y & y + 1 = arg4.
+inv_main22(x, arg5) :- inv_main22(x, y), x >= y & y + 2 = arg5.
+inv_main22(arg6, arg7) :- inv_main7(flag, t, s, a, b), flag != 0 & t - 2*s + 2 = arg6 & 0 = arg7.
+inv_main22(arg8, arg9) :- inv_main7(0, t, s, a, b), flag = 0 & 1 = arg8 & 0 = arg9.
+inv_main7(flag, arg10, arg11, arg12, arg13) :- inv_main7(flag, t, s, a, b), flag != 0 & __eval64 != 0 & a + 1 = arg12 & t + b + 1 + a + 1 = arg10 & s + a + 1 = arg11 & b + 1 = arg13.
+inv_main7(flag, arg14, arg15, arg16, arg17) :- inv_main7(0, t, s, a, b), __eval64 != 0 & t + b + 1 = arg14 & s + a + 1 = arg15 & a + 1 = arg16 & b + 1 = arg17 & flag = 0.
+false :- inv_main22(x, y), !(4 >= y | x >= y).

@@ -1,0 +1,1498 @@
+-------------
+inv_main107(c, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main97(c, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), c != 41 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c, bslashmode, errno)
+Data flow:
+c<-c
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!((c + -41) = 0)
+(bslashmode = 0)
+(errno = 0)
+dataflow number:0
+guard number:3
+-------------
+inv_main26(delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main23(-1, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), c = -1 & errno = 0.
+Head arguments: ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((-1,-1), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c, errno)
+Data flow:
+delim<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+inv_main23_argument_0<--1
+Guard:
+((c + 1) = 0)
+(errno = 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main26(delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main23(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), bslashmode != 0 & c != -1 & errno = 0.
+Head arguments: ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(bslashmode, c, errno)
+Data flow:
+delim<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!(bslashmode = 0)
+!((c + 1) = 0)
+(errno = 0)
+dataflow number:0
+guard number:3
+-------------
+inv_main26(delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, arg1) :- inv_main23(c, delim, pvpbsize, 0, route_syntax, cmntcnt, anglecnt, state, id), !(id + -1*(pvpbsize + -5) >= 0) & c != -1 & id + 1 = arg1 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (arg1,arg1))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (0,0), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state))
+relativeComplimentOfHeadArg:ListBuffer((bslashmode,bslashmode), (arg1,arg1))
+variables in guard: ListBuffer(id, pvpbsize, c, errno)
+Data flow:
+bslashmode<-0
+arg1<-(id + 1)
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+inv_main23_argument_3<-0
+Guard:
+!((id + -1 * (pvpbsize + -5)) >= 0)
+!((c + 1) = 0)
+(errno = 0)
+dataflow number:2
+guard number:3
+-------------
+inv_main24(i, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main26(delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), !(anglecnt >= 1) & !(cmntcnt >= 1) & state != 2 & i = 0 & errno = 0.
+Head arguments: ListBuffer((i,i), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((i,i))
+variables in guard: ListBuffer(anglecnt, cmntcnt, state, errno)
+Data flow:
+i<-0
+delim<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!((anglecnt + -1) >= 0)
+!((cmntcnt + -1) >= 0)
+!((state + -2) = 0)
+(errno = 0)
+dataflow number:1
+guard number:4
+-------------
+inv_main24(i, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main26(delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), 0 >= anglecnt & state != 2 & 0 >= cmntcnt & delim != 0 & i = delim & errno = 0.
+Head arguments: ListBuffer((i,i), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((i,i))
+variables in guard: ListBuffer(anglecnt, state, cmntcnt, delim, errno)
+Data flow:
+i<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+(-1 * anglecnt >= 0)
+!((state + -2) = 0)
+(-1 * cmntcnt >= 0)
+!(delim = 0)
+(errno = 0)
+dataflow number:1
+guard number:5
+-------------
+inv_main75(c, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main73(c, delim, pvpbsize, 0, route_syntax, cmntcnt, anglecnt, state, id), bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (0,0), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(bslashmode, errno)
+Data flow:
+c<-c
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+inv_main73_argument_3<-0
+Guard:
+(bslashmode = 0)
+(errno = 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main75(c, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main73(33, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), state != 2 & !(cmntcnt >= 1) & bslashmode != 0 & c = 33 & 0 = arg2 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((33,33), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((c,c))
+variables in guard: ListBuffer(state, cmntcnt, bslashmode, arg2, errno)
+Data flow:
+c<-33
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+inv_main73_argument_0<-33
+Guard:
+!((state + -2) = 0)
+!((cmntcnt + -1) >= 0)
+!(bslashmode = 0)
+(-1 * arg2 = 0)
+(errno = 0)
+dataflow number:1
+guard number:5
+-------------
+inv_main91(c, delim, pvpbsize, arg3, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main75(92, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), c = 92 & 1 = arg3 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (arg3,arg3), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((92,92), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((c,c), (arg3,arg3))
+variables in guard: ListBuffer(errno)
+Data flow:
+c<-92
+arg3<-1
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+inv_main75_argument_0<-92
+Guard:
+(errno = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main97(c, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main75(c, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), c != 40 & state != 2 & c != 92 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c, state, bslashmode, errno)
+Data flow:
+c<-c
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!((c + -40) = 0)
+!((state + -2) = 0)
+!((c + -92) = 0)
+(bslashmode = 0)
+(errno = 0)
+dataflow number:0
+guard number:5
+-------------
+inv_main91(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main75(c, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, 2, id), c != 92 & state = 2 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (2,2), (id,id))
+Common Arguments:ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((bslashmode,bslashmode), (state,state))
+variables in guard: ListBuffer(c, errno)
+Data flow:
+bslashmode<-0
+state<-2
+c<-c
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+id<-id
+inv_main75_argument_6<-2
+Guard:
+!((c + -92) = 0)
+(errno = 0)
+dataflow number:2
+guard number:2
+-------------
+inv_main97(c, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main75(40, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), state != 2 & i = 0 & c = 40 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((40,40), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((c,c))
+variables in guard: ListBuffer(state, i, bslashmode, errno)
+Data flow:
+c<-40
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+inv_main75_argument_0<-40
+Guard:
+!((state + -2) = 0)
+(i = 0)
+(bslashmode = 0)
+(errno = 0)
+dataflow number:1
+guard number:4
+-------------
+inv_main91(arg4, delim, pvpbsize, bslashmode, route_syntax, arg5, anglecnt, state, id) :- inv_main75(40, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), i != 0 & state != 2 & -1 = arg4 & cmntcnt + 1 = arg5 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((arg4,arg4), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (arg5,arg5), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((40,40), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((arg4,arg4), (bslashmode,bslashmode), (arg5,arg5))
+variables in guard: ListBuffer(i, state, errno)
+Data flow:
+arg4<--1
+bslashmode<-0
+arg5<-(cmntcnt + 1)
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+anglecnt<-anglecnt
+state<-state
+id<-id
+inv_main75_argument_0<-40
+Guard:
+!(i = 0)
+!((state + -2) = 0)
+(errno = 0)
+dataflow number:3
+guard number:3
+-------------
+inv_main107(c, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main97(41, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), i = 0 & c = 41 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((41,41), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((c,c))
+variables in guard: ListBuffer(i, bslashmode, errno)
+Data flow:
+c<-41
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+inv_main97_argument_0<-41
+Guard:
+(i = 0)
+(bslashmode = 0)
+(errno = 0)
+dataflow number:1
+guard number:3
+-------------
+inv_main91(arg6, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main97(41, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), 0 >= cmntcnt & i != 0 & -1 = arg6 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((arg6,arg6), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((41,41), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((arg6,arg6), (bslashmode,bslashmode))
+variables in guard: ListBuffer(cmntcnt, i, errno)
+Data flow:
+arg6<--1
+bslashmode<-0
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+inv_main97_argument_0<-41
+Guard:
+(-1 * cmntcnt >= 0)
+!(i = 0)
+(errno = 0)
+dataflow number:2
+guard number:3
+-------------
+inv_main91(c, delim, pvpbsize, bslashmode, route_syntax, arg7, anglecnt, state, id) :- inv_main97(41, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), !(0 >= cmntcnt) & i != 0 & c = 41 & cmntcnt + -1 = arg7 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (arg7,arg7), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((41,41), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((c,c), (bslashmode,bslashmode), (arg7,arg7))
+variables in guard: ListBuffer(cmntcnt, i, errno)
+Data flow:
+c<-41
+bslashmode<-0
+arg7<-(cmntcnt + -1)
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+anglecnt<-anglecnt
+state<-state
+id<-id
+inv_main97_argument_0<-41
+Guard:
+!(-1 * cmntcnt >= 0)
+!(i = 0)
+(errno = 0)
+dataflow number:3
+guard number:3
+-------------
+inv_main91(arg8, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main107(c, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), cmntcnt >= 1 & -1 = arg8 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((arg8,arg8), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((arg8,arg8), (bslashmode,bslashmode))
+variables in guard: ListBuffer(cmntcnt, errno)
+Data flow:
+arg8<--1
+bslashmode<-0
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+((cmntcnt + -1) >= 0)
+(errno = 0)
+dataflow number:2
+guard number:2
+-------------
+inv_main121(delim, pvpbsize, route_syntax, cmntcnt, arg9, state, id) :- inv_main107(60, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), !(cmntcnt >= 1) & c = 60 & anglecnt + 1 = arg9 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (arg9,arg9), (state,state), (id,id))
+Body arguments: ListBuffer((60,60), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((arg9,arg9))
+variables in guard: ListBuffer(cmntcnt, c, bslashmode, errno)
+Data flow:
+arg9<-(anglecnt + 1)
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+state<-state
+id<-id
+inv_main107_argument_0<-60
+Guard:
+!((cmntcnt + -1) >= 0)
+((c + -60) = 0)
+(bslashmode = 0)
+(errno = 0)
+dataflow number:1
+guard number:4
+-------------
+inv_main121(delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main121(delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), i != 0 & i = 0 & c = 60 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(i, c, bslashmode, errno)
+Data flow:
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!(i = 0)
+(i = 0)
+((c + -60) = 0)
+(bslashmode = 0)
+(errno = 0)
+dataflow number:0
+guard number:5
+-------------
+inv_main91(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main107(c, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), delim != 32 & c != 62 & c != 60 & !(cmntcnt >= 1) & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((bslashmode,bslashmode))
+variables in guard: ListBuffer(delim, c, cmntcnt, errno)
+Data flow:
+bslashmode<-0
+c<-c
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!((delim + -32) = 0)
+!((c + -62) = 0)
+!((c + -60) = 0)
+!((cmntcnt + -1) >= 0)
+(errno = 0)
+dataflow number:1
+guard number:5
+-------------
+inv_main91(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main107(c, 32, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), c != 62 & c != 60 & !(cmntcnt >= 1) & i = 0 & delim = 32 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((c,c), (32,32), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((c,c), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((delim,delim), (bslashmode,bslashmode))
+variables in guard: ListBuffer(c, cmntcnt, i, errno)
+Data flow:
+delim<-32
+bslashmode<-0
+c<-c
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+inv_main107_argument_1<-32
+Guard:
+!((c + -62) = 0)
+!((c + -60) = 0)
+!((cmntcnt + -1) >= 0)
+(i = 0)
+(errno = 0)
+dataflow number:2
+guard number:5
+-------------
+inv_main91(arg10, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main107(c, 32, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), i != 0 & i != 0 & c != 62 & c != 60 & !(cmntcnt >= 1) & delim = 32 & 32 = arg10 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((arg10,arg10), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((c,c), (32,32), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((arg10,arg10), (delim,delim), (bslashmode,bslashmode))
+variables in guard: ListBuffer(i, c, cmntcnt, errno)
+Data flow:
+arg10<-32
+delim<-32
+bslashmode<-0
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+inv_main107_argument_1<-32
+Guard:
+!(i = 0)
+!(i = 0)
+!((c + -62) = 0)
+!((c + -60) = 0)
+!((cmntcnt + -1) >= 0)
+(errno = 0)
+dataflow number:3
+guard number:6
+-------------
+inv_main91(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main107(c, 32, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), i != 0 & c != 62 & c != 60 & !(cmntcnt >= 1) & i = 0 & delim = 32 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((c,c), (32,32), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((c,c), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((delim,delim), (bslashmode,bslashmode))
+variables in guard: ListBuffer(i, c, cmntcnt, errno)
+Data flow:
+delim<-32
+bslashmode<-0
+c<-c
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+inv_main107_argument_1<-32
+Guard:
+!(i = 0)
+!((c + -62) = 0)
+!((c + -60) = 0)
+!((cmntcnt + -1) >= 0)
+(i = 0)
+(errno = 0)
+dataflow number:2
+guard number:6
+-------------
+inv_main169(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, id) :- inv_main91(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), c != delim & c != -1 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (id,id))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c, delim, errno)
+Data flow:
+c<-c
+delim<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+id<-id
+Guard:
+!((c + -1 * delim) = 0)
+!((c + 1) = 0)
+(errno = 0)
+dataflow number:0
+guard number:3
+-------------
+inv_main169(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, id) :- inv_main91(delim, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), !(0 >= anglecnt) & delim != -1 & c = delim & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (id,id))
+Body arguments: ListBuffer((delim,delim), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((c,c))
+variables in guard: ListBuffer(anglecnt, delim, errno)
+Data flow:
+c<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+id<-id
+Guard:
+!(-1 * anglecnt >= 0)
+!((delim + 1) = 0)
+(errno = 0)
+dataflow number:1
+guard number:3
+-------------
+inv_main24(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main91(delim, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), state != 2 & 0 >= anglecnt & delim != -1 & c = delim & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((delim,delim), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((c,c))
+variables in guard: ListBuffer(state, anglecnt, delim, errno)
+Data flow:
+c<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!((state + -2) = 0)
+(-1 * anglecnt >= 0)
+!((delim + 1) = 0)
+(errno = 0)
+dataflow number:1
+guard number:4
+-------------
+inv_main169(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, id) :- inv_main91(delim, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, 2, id), 0 >= anglecnt & delim != -1 & state = 2 & c = delim & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (id,id))
+Body arguments: ListBuffer((delim,delim), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (2,2), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((c,c))
+variables in guard: ListBuffer(anglecnt, delim, state, errno)
+Data flow:
+c<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+id<-id
+inv_main91_argument_7<-2
+Guard:
+(-1 * anglecnt >= 0)
+!((delim + 1) = 0)
+((state + -2) = 0)
+(errno = 0)
+dataflow number:1
+guard number:4
+-------------
+inv_main181(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, i, id) :- inv_main169(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, id), i != 5 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (i,i), (id,id))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (id,id))
+Common Arguments:ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((i,i))
+variables in guard: ListBuffer(i, errno)
+Data flow:
+i<-_i
+c<-c
+delim<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+id<-id
+Guard:
+!((-5 + _i) = 0)
+(errno = 0)
+dataflow number:1
+guard number:2
+-------------
+inv_main181(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, i, id) :- inv_main169(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, id), i = 0 & i = 5 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (i,i), (id,id))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (id,id))
+Common Arguments:ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((i,i))
+variables in guard: ListBuffer(i, errno)
+Data flow:
+i<-5
+c<-c
+delim<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+id<-id
+Guard:
+(i = 0)
+(errno = 0)
+dataflow number:1
+guard number:2
+-------------
+inv_main181(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, i, id) :- inv_main169(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, id), i != 0 & i != 0 & i = 5 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (i,i), (id,id))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (id,id))
+Common Arguments:ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((i,i))
+variables in guard: ListBuffer(i, errno)
+Data flow:
+i<-5
+c<-c
+delim<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+id<-id
+Guard:
+!(i = 0)
+!(i = 0)
+(errno = 0)
+dataflow number:1
+guard number:3
+-------------
+inv_main88(c, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main73(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), !(id + -1*(pvpbsize + -5) >= 0) & c != 33 & !(cmntcnt >= 1) & bslashmode != 0 & 0 = arg11 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id, pvpbsize, c, cmntcnt, bslashmode, arg11, errno)
+Data flow:
+c<-c
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!((id + -1 * (pvpbsize + -5)) >= 0)
+!((c + -33) = 0)
+!((cmntcnt + -1) >= 0)
+!(bslashmode = 0)
+(-1 * arg11 = 0)
+(errno = 0)
+dataflow number:0
+guard number:6
+-------------
+inv_main88(c, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main73(33, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, 2, id), !(id + -1*(pvpbsize + -5) >= 0) & !(cmntcnt >= 1) & bslashmode != 0 & state = 2 & c = 33 & 0 = arg12 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((33,33), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (2,2), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((c,c), (state,state))
+variables in guard: ListBuffer(id, pvpbsize, cmntcnt, bslashmode, arg12, errno)
+Data flow:
+c<-33
+state<-2
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+id<-id
+inv_main73_argument_0<-33
+inv_main73_argument_7<-2
+Guard:
+!((id + -1 * (pvpbsize + -5)) >= 0)
+!((cmntcnt + -1) >= 0)
+!(bslashmode = 0)
+(-1 * arg12 = 0)
+(errno = 0)
+dataflow number:2
+guard number:5
+-------------
+inv_main91(c, delim, pvpbsize, bslashmode, arg13, cmntcnt, anglecnt, state, id) :- inv_main121(delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), i != 0 & 1 = arg13 & c = 60 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (arg13,arg13), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((c,c), (bslashmode,bslashmode), (arg13,arg13))
+variables in guard: ListBuffer(i, errno)
+Data flow:
+c<-60
+bslashmode<-0
+arg13<-1
+delim<-delim
+pvpbsize<-pvpbsize
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!(i = 0)
+(errno = 0)
+dataflow number:3
+guard number:2
+-------------
+inv_main91(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main121(delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), i = 0 & c = 60 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((c,c), (bslashmode,bslashmode))
+variables in guard: ListBuffer(i, errno)
+Data flow:
+c<-60
+bslashmode<-0
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+(i = 0)
+(errno = 0)
+dataflow number:2
+guard number:2
+-------------
+inv_main91(c, delim, pvpbsize, bslashmode, arg14, cmntcnt, anglecnt, state, id) :- inv_main121(delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), i != 0 & i != 0 & i != 0 & 1 = arg14 & c = 60 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (arg14,arg14), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((c,c), (bslashmode,bslashmode), (arg14,arg14))
+variables in guard: ListBuffer(i, errno)
+Data flow:
+c<-60
+bslashmode<-0
+arg14<-1
+delim<-delim
+pvpbsize<-pvpbsize
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!(i = 0)
+!(i = 0)
+!(i = 0)
+(errno = 0)
+dataflow number:3
+guard number:4
+-------------
+inv_main91(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main121(delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), i != 0 & i != 0 & i = 0 & c = 60 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((c,c), (bslashmode,bslashmode))
+variables in guard: ListBuffer(i, errno)
+Data flow:
+c<-60
+bslashmode<-0
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!(i = 0)
+!(i = 0)
+(i = 0)
+(errno = 0)
+dataflow number:2
+guard number:4
+-------------
+inv_main91(arg15, delim, pvpbsize, bslashmode, arg16, cmntcnt, anglecnt, state, id) :- inv_main107(62, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), 0 >= anglecnt & !(cmntcnt >= 1) & -1 = arg15 & 0 = arg16 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((arg15,arg15), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (arg16,arg16), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((62,62), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((arg15,arg15), (bslashmode,bslashmode), (arg16,arg16))
+variables in guard: ListBuffer(anglecnt, cmntcnt, errno)
+Data flow:
+arg15<--1
+bslashmode<-0
+arg16<-0
+delim<-delim
+pvpbsize<-pvpbsize
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+inv_main107_argument_0<-62
+Guard:
+(-1 * anglecnt >= 0)
+!((cmntcnt + -1) >= 0)
+(errno = 0)
+dataflow number:3
+guard number:3
+-------------
+inv_main91(c, delim, pvpbsize, bslashmode, arg17, cmntcnt, arg18, state, id) :- inv_main107(62, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), !(0 >= anglecnt) & !(cmntcnt >= 1) & c = 62 & 0 = arg17 & anglecnt + -1 = arg18 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (arg17,arg17), (cmntcnt,cmntcnt), (arg18,arg18), (state,state), (id,id))
+Body arguments: ListBuffer((62,62), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (cmntcnt,cmntcnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((c,c), (bslashmode,bslashmode), (arg17,arg17), (arg18,arg18))
+variables in guard: ListBuffer(anglecnt, cmntcnt, errno)
+Data flow:
+c<-62
+bslashmode<-0
+arg17<-0
+arg18<-(anglecnt + -1)
+delim<-delim
+pvpbsize<-pvpbsize
+cmntcnt<-cmntcnt
+state<-state
+id<-id
+inv_main107_argument_0<-62
+Guard:
+!(-1 * anglecnt >= 0)
+!((cmntcnt + -1) >= 0)
+(errno = 0)
+dataflow number:4
+guard number:3
+-------------
+inv_main24(arg19, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main181(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), i != 0 & i != 0 & -1 = arg19 & errno = 0.
+Head arguments: ListBuffer((arg19,arg19), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((arg19,arg19))
+variables in guard: ListBuffer(i, errno)
+Data flow:
+arg19<--1
+delim<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!(i = 0)
+!(i = 0)
+(errno = 0)
+dataflow number:1
+guard number:3
+-------------
+inv_main24(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main181(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), i != 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(i, errno)
+Data flow:
+c<-c
+delim<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!(i = 0)
+(errno = 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main23(arg20, delim, pvpbsize, arg21, arg22, arg23, arg24, arg25, id) :- tmp >= 0 & route_syntax >= 0 & bslashmode >= 0 & -1 = arg20 & 0 = arg21 & 0 = arg22 & 0 = arg23 & 0 = arg24 & 1 = arg25 & 0 = arg26 & 0 = id.
+Head arguments: ListBuffer((arg20,arg20), (delim,delim), (pvpbsize,pvpbsize), (arg21,arg21), (arg22,arg22), (arg23,arg23), (arg24,arg24), (arg25,arg25), (id,id))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg20,arg20), (delim,delim), (pvpbsize,pvpbsize), (arg21,arg21), (arg22,arg22), (arg23,arg23), (arg24,arg24), (arg25,arg25), (id,id))
+variables in guard: ListBuffer(tmp, route_syntax, bslashmode, arg26)
+Data flow:
+arg20<--1
+arg21<-0
+arg22<-0
+arg23<-0
+arg24<-0
+arg25<-1
+id<-0
+Guard:
+(tmp >= 0)
+(route_syntax >= 0)
+(bslashmode >= 0)
+(-1 * arg26 = 0)
+dataflow number:7
+guard number:4
+-------------
+inv_main23(arg27, delim, pvpbsize, arg28, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main73(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), cmntcnt >= 1 & bslashmode != 0 & -1 = arg27 & 0 = arg28 & errno = 0.
+Head arguments: ListBuffer((arg27,arg27), (delim,delim), (pvpbsize,pvpbsize), (arg28,arg28), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((arg27,arg27), (arg28,arg28))
+variables in guard: ListBuffer(cmntcnt, bslashmode, errno)
+Data flow:
+arg27<--1
+arg28<-0
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+((cmntcnt + -1) >= 0)
+!(bslashmode = 0)
+(errno = 0)
+dataflow number:2
+guard number:3
+-------------
+inv_main23(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, arg29) :- inv_main88(c, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), id + 1 = arg29 & bslashmode = 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (arg29,arg29))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state))
+relativeComplimentOfHeadArg:ListBuffer((bslashmode,bslashmode), (arg29,arg29))
+variables in guard: ListBuffer(errno)
+Data flow:
+bslashmode<-0
+arg29<-(id + 1)
+c<-c
+delim<-delim
+pvpbsize<-pvpbsize
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+Guard:
+(errno = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main23(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main91(-1, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), c = -1 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((-1,-1), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((c,c))
+variables in guard: ListBuffer(errno)
+Data flow:
+c<--1
+delim<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+inv_main91_argument_0<--1
+Guard:
+(errno = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main23(arg30, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main181(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), i != 0 & i = 0 & -1 = arg30 & errno = 0.
+Head arguments: ListBuffer((arg30,arg30), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((arg30,arg30))
+variables in guard: ListBuffer(i, errno)
+Data flow:
+arg30<--1
+delim<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!(i = 0)
+(i = 0)
+(errno = 0)
+dataflow number:1
+guard number:3
+-------------
+inv_main23(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main181(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), i = 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(i, errno)
+Data flow:
+c<-c
+delim<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+(i = 0)
+(errno = 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main23(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main24(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), c != delim & c != 0 & i = 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c, delim, i, errno)
+Data flow:
+c<-c
+delim<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!((c + -1 * delim) = 0)
+!(c = 0)
+(i = 0)
+(errno = 0)
+dataflow number:0
+guard number:4
+-------------
+inv_main23(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main24(delim, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), anglecnt >= 1 & delim != 0 & c = delim & i = 0 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((delim,delim), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((c,c))
+variables in guard: ListBuffer(anglecnt, delim, i, errno)
+Data flow:
+c<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+((anglecnt + -1) >= 0)
+!(delim = 0)
+(i = 0)
+(errno = 0)
+dataflow number:1
+guard number:4
+-------------
+inv_main23(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, arg31) :- inv_main24(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), c != delim & c != 0 & !(id + -1*(pvpbsize + -5) >= 0) & nondetvar != 0 & i = 0 & id + 1 = arg31 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (arg31,arg31))
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state))
+relativeComplimentOfHeadArg:ListBuffer((arg31,arg31))
+variables in guard: ListBuffer(c, delim, id, pvpbsize, nondetvar, i, errno)
+Data flow:
+arg31<-(id + 1)
+c<-c
+delim<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+Guard:
+!((c + -1 * delim) = 0)
+!(c = 0)
+!((id + -1 * (pvpbsize + -5)) >= 0)
+!(nondetvar = 0)
+(i = 0)
+(errno = 0)
+dataflow number:1
+guard number:6
+-------------
+inv_main23(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, arg32) :- inv_main24(delim, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), anglecnt >= 1 & delim != 0 & !(id + -1*(pvpbsize + -5) >= 0) & nondetvar != 0 & c = delim & i = 0 & id + 1 = arg32 & errno = 0.
+Head arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (arg32,arg32))
+Body arguments: ListBuffer((delim,delim), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state))
+relativeComplimentOfHeadArg:ListBuffer((c,c), (arg32,arg32))
+variables in guard: ListBuffer(anglecnt, delim, id, pvpbsize, nondetvar, i, errno)
+Data flow:
+c<-delim
+arg32<-(id + 1)
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+Guard:
+((anglecnt + -1) >= 0)
+!(delim = 0)
+!((id + -1 * (pvpbsize + -5)) >= 0)
+!(nondetvar = 0)
+(i = 0)
+(errno = 0)
+dataflow number:2
+guard number:6
+-------------
+inv_main73(arg33, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main26(delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, 2, id), !(id + -1*(pvpbsize + -5) >= 0) & state = 2 & 34 = arg33 & errno = 0.
+Head arguments: ListBuffer((arg33,arg33), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (2,2), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((arg33,arg33), (state,state))
+variables in guard: ListBuffer(id, pvpbsize, errno)
+Data flow:
+arg33<-34
+state<-2
+delim<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+id<-id
+inv_main26_argument_6<-2
+Guard:
+!((id + -1 * (pvpbsize + -5)) >= 0)
+(errno = 0)
+dataflow number:2
+guard number:2
+-------------
+inv_main73(arg34, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main26(delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), !(id + -1*(pvpbsize + -5) >= 0) & cmntcnt >= 1 & state != 2 & 41 = arg34 & errno = 0.
+Head arguments: ListBuffer((arg34,arg34), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((arg34,arg34))
+variables in guard: ListBuffer(id, pvpbsize, cmntcnt, state, errno)
+Data flow:
+arg34<-41
+delim<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!((id + -1 * (pvpbsize + -5)) >= 0)
+((cmntcnt + -1) >= 0)
+!((state + -2) = 0)
+(errno = 0)
+dataflow number:1
+guard number:4
+-------------
+inv_main73(arg35, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main26(delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), !(id + -1*(pvpbsize + -5) >= 0) & anglecnt >= 1 & !(cmntcnt >= 1) & state != 2 & 62 = arg35 & errno = 0.
+Head arguments: ListBuffer((arg35,arg35), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((arg35,arg35))
+variables in guard: ListBuffer(id, pvpbsize, anglecnt, cmntcnt, state, errno)
+Data flow:
+arg35<-62
+delim<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!((id + -1 * (pvpbsize + -5)) >= 0)
+((anglecnt + -1) >= 0)
+!((cmntcnt + -1) >= 0)
+!((state + -2) = 0)
+(errno = 0)
+dataflow number:1
+guard number:5
+-------------
+inv_main73(i, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main26(delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), !(id + -1*(pvpbsize + -5) >= 0) & i != delim & i != 0 & errno = 0.
+Head arguments: ListBuffer((i,i), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((i,i))
+variables in guard: ListBuffer(id, pvpbsize, i, delim, errno)
+Data flow:
+i<-_i
+delim<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!((id + -1 * (pvpbsize + -5)) >= 0)
+!((_i + -1 * delim) = 0)
+!(_i = 0)
+(errno = 0)
+dataflow number:1
+guard number:4
+-------------
+inv_main73(i, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main26(delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), !(id + -1*(pvpbsize + -5) >= 0) & !(0 >= cmntcnt) & delim != 0 & i = delim & errno = 0.
+Head arguments: ListBuffer((i,i), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((i,i))
+variables in guard: ListBuffer(id, pvpbsize, cmntcnt, delim, errno)
+Data flow:
+i<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!((id + -1 * (pvpbsize + -5)) >= 0)
+!(-1 * cmntcnt >= 0)
+!(delim = 0)
+(errno = 0)
+dataflow number:1
+guard number:4
+-------------
+inv_main73(i, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main26(delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, 2, id), !(id + -1*(pvpbsize + -5) >= 0) & 0 >= cmntcnt & delim != 0 & state = 2 & i = delim & errno = 0.
+Head arguments: ListBuffer((i,i), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (2,2), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((i,i), (state,state))
+variables in guard: ListBuffer(id, pvpbsize, cmntcnt, delim, errno)
+Data flow:
+i<-delim
+state<-2
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+id<-id
+inv_main26_argument_6<-2
+Guard:
+!((id + -1 * (pvpbsize + -5)) >= 0)
+(-1 * cmntcnt >= 0)
+!(delim = 0)
+(errno = 0)
+dataflow number:2
+guard number:4
+-------------
+inv_main73(i, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main26(delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), !(id + -1*(pvpbsize + -5) >= 0) & delim != 44 & !(0 >= anglecnt) & state != 2 & 0 >= cmntcnt & delim != 0 & i = delim & errno = 0.
+Head arguments: ListBuffer((i,i), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((i,i))
+variables in guard: ListBuffer(id, pvpbsize, delim, anglecnt, state, cmntcnt, errno)
+Data flow:
+i<-delim
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+Guard:
+!((id + -1 * (pvpbsize + -5)) >= 0)
+!((delim + -44) = 0)
+!(-1 * anglecnt >= 0)
+!((state + -2) = 0)
+(-1 * cmntcnt >= 0)
+!(delim = 0)
+(errno = 0)
+dataflow number:1
+guard number:7
+-------------
+inv_main73(arg36, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main26(44, pvpbsize, bslashmode, 0, cmntcnt, anglecnt, state, id), !(id + -1*(pvpbsize + -5) >= 0) & !(0 >= anglecnt) & state != 2 & 0 >= cmntcnt & route_syntax = 0 & delim = 44 & 62 = arg36 & errno = 0.
+Head arguments: ListBuffer((arg36,arg36), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((44,44), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (0,0), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((pvpbsize,pvpbsize), (bslashmode,bslashmode), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((arg36,arg36), (delim,delim), (route_syntax,route_syntax))
+variables in guard: ListBuffer(id, pvpbsize, anglecnt, state, cmntcnt, errno)
+Data flow:
+arg36<-62
+delim<-44
+route_syntax<-0
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+inv_main26_argument_0<-44
+inv_main26_argument_3<-0
+Guard:
+!((id + -1 * (pvpbsize + -5)) >= 0)
+!(-1 * anglecnt >= 0)
+!((state + -2) = 0)
+(-1 * cmntcnt >= 0)
+(errno = 0)
+dataflow number:3
+guard number:5
+-------------
+inv_main73(i, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id) :- inv_main26(44, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), !(id + -1*(pvpbsize + -5) >= 0) & route_syntax != 0 & !(0 >= anglecnt) & state != 2 & 0 >= cmntcnt & i = 44 & delim = 44 & errno = 0.
+Head arguments: ListBuffer((i,i), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Body arguments: ListBuffer((44,44), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer((pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((i,i), (delim,delim))
+variables in guard: ListBuffer(id, pvpbsize, route_syntax, anglecnt, state, cmntcnt, errno)
+Data flow:
+i<-44
+delim<-44
+pvpbsize<-pvpbsize
+bslashmode<-bslashmode
+route_syntax<-route_syntax
+cmntcnt<-cmntcnt
+anglecnt<-anglecnt
+state<-state
+id<-id
+inv_main26_argument_0<-44
+Guard:
+!((id + -1 * (pvpbsize + -5)) >= 0)
+!(route_syntax = 0)
+!(-1 * anglecnt >= 0)
+!((state + -2) = 0)
+(-1 * cmntcnt >= 0)
+(errno = 0)
+dataflow number:2
+guard number:6
+-------------
+false :- inv_main23(c, delim, pvpbsize, 0, route_syntax, cmntcnt, anglecnt, state, id), !(id >= 0) & !(id + -1*(pvpbsize + -5) >= 0) & c != -1.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (0,0), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id, pvpbsize, c)
+Data flow:
+inv_main23_argument_3<-0
+Guard:
+!(id >= 0)
+!((id + -1 * (pvpbsize + -5)) >= 0)
+!((c + 1) = 0)
+dataflow number:0
+guard number:3
+-------------
+false :- inv_main23(c, delim, pvpbsize, 0, route_syntax, cmntcnt, anglecnt, state, id), !(pvpbsize - id >= 1) & !(id + -1*(pvpbsize + -5) >= 0) & c != -1.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (0,0), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(pvpbsize, id, c)
+Data flow:
+inv_main23_argument_3<-0
+Guard:
+!(((pvpbsize + -1 * id) + -1) >= 0)
+!((id + -1 * (pvpbsize + -5)) >= 0)
+!((c + 1) = 0)
+dataflow number:0
+guard number:3
+-------------
+false :- inv_main73(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), !(id >= 0).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!(id >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main73(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), !(pvpbsize - id >= 1).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(pvpbsize, id)
+Data flow:
+Guard:
+!(((pvpbsize + -1 * id) + -1) >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main88(c, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), !(id >= 0).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!(id >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main88(c, delim, pvpbsize, route_syntax, cmntcnt, anglecnt, state, id), !(pvpbsize - id >= 1).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(pvpbsize, id)
+Data flow:
+Guard:
+!(((pvpbsize + -1 * id) + -1) >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main24(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), !(id >= 0) & !(id + -1*(pvpbsize + -5) >= 0) & nondetvar != 0.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id, pvpbsize, nondetvar)
+Data flow:
+Guard:
+!(id >= 0)
+!((id + -1 * (pvpbsize + -5)) >= 0)
+!(nondetvar = 0)
+dataflow number:0
+guard number:3
+-------------
+false :- inv_main24(c, delim, pvpbsize, bslashmode, route_syntax, cmntcnt, anglecnt, state, id), !(pvpbsize - id >= 1) & !(id + -1*(pvpbsize + -5) >= 0) & nondetvar != 0.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c,c), (delim,delim), (pvpbsize,pvpbsize), (bslashmode,bslashmode), (route_syntax,route_syntax), (cmntcnt,cmntcnt), (anglecnt,anglecnt), (state,state), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(pvpbsize, id, nondetvar)
+Data flow:
+Guard:
+!(((pvpbsize + -1 * id) + -1) >= 0)
+!((id + -1 * (pvpbsize + -5)) >= 0)
+!(nondetvar = 0)
+dataflow number:0
+guard number:3
+-----------

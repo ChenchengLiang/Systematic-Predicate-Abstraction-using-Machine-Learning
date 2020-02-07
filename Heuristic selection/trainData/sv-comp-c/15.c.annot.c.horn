@@ -1,0 +1,3 @@
+inv_main10(__eval27, k, arg0) :- k - __eval27 >= 1 & __eval27 >= 1 & 0 = arg0.
+inv_main10(n, arg1, arg2) :- inv_main10(n, k, j), n - j >= 1 & k + -1 = arg1 & j + 1 = arg2.
+false :- inv_main10(n, k, j), !(k >= 0 | n - j >= 1).

@@ -1,0 +1,4 @@
+inv_main5(n, m, i) :- 1 = i.
+inv_main5(n, m, arg1) :- inv_main5(n, m, i), m >= 1 & n - i >= 1 & 2*i = arg1.
+inv_main5(n, m, arg2) :- inv_main5(n, m, i), !(m >= 1) & n - i >= 1 & 3*i = arg2.
+false :- inv_main5(n, m, i), !(i >= 1) & !(n - i >= 1).

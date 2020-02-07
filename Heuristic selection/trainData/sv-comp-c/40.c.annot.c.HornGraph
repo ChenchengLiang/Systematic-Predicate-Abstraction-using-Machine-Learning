@@ -1,0 +1,124 @@
+-------------
+inv_main16(flag, i, j, arg0, arg1) :- inv_main16(flag, i, j, a, b), __eval45 != 0 & a + 1 = arg0 & b + j - i = arg1.
+Head arguments: ListBuffer((flag,flag), (i,i), (j,j), (arg0,arg0), (arg1,arg1))
+Body arguments: ListBuffer((flag,flag), (i,i), (j,j), (a,a), (b,b))
+Common Arguments:ListBuffer((flag,flag), (i,i), (j,j))
+relativeComplimentOfHeadArg:ListBuffer((arg0,arg0), (arg1,arg1))
+variables in guard: ListBuffer(__eval45)
+Data flow:
+arg0<-(a + 1)
+arg1<-(b + (j + -1 * i))
+flag<-flag
+Guard:
+!(__eval45 = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main5(flag, arg2, arg3) :- flag != 0 & 0 = arg2 & 1 = arg3.
+Head arguments: ListBuffer((flag,flag), (arg2,arg2), (arg3,arg3))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((flag,flag), (arg2,arg2), (arg3,arg3))
+variables in guard: ListBuffer(flag)
+Data flow:
+flag<-_flag
+arg2<-0
+arg3<-1
+Guard:
+!(_flag = 0)
+dataflow number:3
+guard number:1
+-------------
+inv_main5(flag, arg4, arg5) :- flag = 0 & 1 = arg4 & 1 = arg5.
+Head arguments: ListBuffer((flag,flag), (arg4,arg4), (arg5,arg5))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((flag,flag), (arg4,arg4), (arg5,arg5))
+variables in guard: ListBuffer()
+Data flow:
+flag<-0
+arg4<-1
+arg5<-1
+Guard:
+dataflow number:3
+guard number:0
+-------------
+inv_main16(flag, i, j, arg6, arg7) :- inv_main5(flag, i, j), 0 = arg6 & 0 = arg7.
+Head arguments: ListBuffer((flag,flag), (i,i), (j,j), (arg6,arg6), (arg7,arg7))
+Body arguments: ListBuffer((flag,flag), (i,i), (j,j))
+Common Arguments:ListBuffer((flag,flag), (i,i), (j,j))
+relativeComplimentOfHeadArg:ListBuffer((arg6,arg6), (arg7,arg7))
+variables in guard: ListBuffer()
+Data flow:
+arg6<-0
+arg7<-0
+flag<-flag
+i<-i
+j<-j
+Guard:
+dataflow number:2
+guard number:0
+-------------
+inv_main5(flag, arg8, arg9) :- inv_main5(flag, i, j), i + 2 = 2*arg11 & __eval21 != 0 & i + 2 = arg8 & j + 2 = arg9.
+Head arguments: ListBuffer((flag,flag), (arg8,arg8), (arg9,arg9))
+Body arguments: ListBuffer((flag,flag), (i,i), (j,j))
+Common Arguments:ListBuffer((flag,flag))
+relativeComplimentOfHeadArg:ListBuffer((arg8,arg8), (arg9,arg9))
+variables in guard: ListBuffer(i, arg11, __eval21)
+Data flow:
+arg8<-(i + 2)
+arg9<-(j + 2)
+flag<-flag
+Guard:
+(((i + 2) + -2 * arg11) = 0)
+!(__eval21 = 0)
+dataflow number:2
+guard number:2
+-------------
+inv_main5(flag, arg12, arg13) :- inv_main5(flag, i, j), arg13 - j = 1 & arg12 - i = 2 & 2*arg15 - i = 1 & __eval21 != 0 & arg15 >= 0.
+Head arguments: ListBuffer((flag,flag), (arg12,arg12), (arg13,arg13))
+Body arguments: ListBuffer((flag,flag), (i,i), (j,j))
+Common Arguments:ListBuffer((flag,flag))
+relativeComplimentOfHeadArg:ListBuffer((arg12,arg12), (arg13,arg13))
+variables in guard: ListBuffer(arg15, i, __eval21)
+Data flow:
+arg12<-(2 + -1 * -1 * i)
+arg13<-(1 + -1 * -1 * j)
+flag<-flag
+Guard:
+((-1 + (2 * arg15 + -1 * i)) = 0)
+!(__eval21 = 0)
+(arg15 >= 0)
+dataflow number:2
+guard number:3
+-------------
+inv_main5(flag, arg12, arg13) :- inv_main5(flag, i, j), arg13 - j = 1 & arg12 - i = 2 & 2*arg15 - i = 3 & __eval21 != 0 & arg15 - i >= 3.
+Head arguments: ListBuffer((flag,flag), (arg12,arg12), (arg13,arg13))
+Body arguments: ListBuffer((flag,flag), (i,i), (j,j))
+Common Arguments:ListBuffer((flag,flag))
+relativeComplimentOfHeadArg:ListBuffer((arg12,arg12), (arg13,arg13))
+variables in guard: ListBuffer(arg15, i, __eval21)
+Data flow:
+arg12<-(2 + -1 * -1 * i)
+arg13<-(1 + -1 * -1 * j)
+flag<-flag
+Guard:
+((-3 + (2 * arg15 + -1 * i)) = 0)
+!(__eval21 = 0)
+((-3 + (arg15 + -1 * i)) >= 0)
+dataflow number:2
+guard number:3
+-------------
+false :- inv_main16(flag, i, j, a, b), a != b & flag != 0.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((flag,flag), (i,i), (j,j), (a,a), (b,b))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(a, b, flag)
+Data flow:
+Guard:
+!((a + -1 * b) = 0)
+!(flag = 0)
+dataflow number:0
+guard number:2
+-----------

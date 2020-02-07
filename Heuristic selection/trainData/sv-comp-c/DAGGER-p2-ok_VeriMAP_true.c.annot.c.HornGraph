@@ -1,0 +1,1467 @@
+-------------
+inv_main184(c3, c4, id) :- inv_main173(c3, c4, id), !(id >= 1000).
+Head arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c3,c3), (c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+c3<-c3
+c4<-c4
+id<-id
+Guard:
+!((id + -1000) >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main243(c4, id) :- inv_main232(c4, id), !(id >= 1000).
+Head arguments: ListBuffer((c4,c4), (id,id))
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer((c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+c4<-c4
+id<-id
+Guard:
+!((id + -1000) >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main304(id) :- inv_main293(id), !(id >= 1000).
+Head arguments: ListBuffer((id,id))
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer((id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+id<-id
+Guard:
+!((id + -1000) >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main16(id) :- inv_main16(id), __BLAST_NONDET != 0 & __BLAST_NONDET != 0 & __BLAST_NONDET != -1.
+Head arguments: ListBuffer((id,id))
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer((id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(__BLAST_NONDET)
+Data flow:
+id<-id
+Guard:
+!(__BLAST_NONDET = 0)
+!(__BLAST_NONDET = 0)
+!((__BLAST_NONDET + 1) = 0)
+dataflow number:0
+guard number:3
+-------------
+inv_main46(c1, id) :- inv_main46(c1, id), __BLAST_NONDET != 0.
+Head arguments: ListBuffer((c1,c1), (id,id))
+Body arguments: ListBuffer((c1,c1), (id,id))
+Common Arguments:ListBuffer((c1,c1), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(__BLAST_NONDET)
+Data flow:
+c1<-c1
+id<-id
+Guard:
+!(__BLAST_NONDET = 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main81(c1, c2, id) :- inv_main81(c1, c2, id), __BLAST_NONDET != 0.
+Head arguments: ListBuffer((c1,c1), (c2,c2), (id,id))
+Body arguments: ListBuffer((c1,c1), (c2,c2), (id,id))
+Common Arguments:ListBuffer((c1,c1), (c2,c2), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(__BLAST_NONDET)
+Data flow:
+c1<-c1
+c2<-c2
+id<-id
+Guard:
+!(__BLAST_NONDET = 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main123(c1, c2, c3, __BLAST_NONDET, id) :- inv_main116(c1, c2, c3, id).
+Head arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (__BLAST_NONDET,__BLAST_NONDET), (id,id))
+Body arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (id,id))
+Common Arguments:ListBuffer((c1,c1), (c2,c2), (c3,c3), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((__BLAST_NONDET,__BLAST_NONDET))
+variables in guard: ListBuffer(true)
+Data flow:
+c1<-c1
+c2<-c2
+c3<-c3
+id<-id
+Guard:
+true
+dataflow number:0
+guard number:1
+-------------
+inv_main123(c1, c2, c3, __BLAST_NONDET, id) :- inv_main116(c1, c2, c3, id), __BLAST_NONDET != 0 & __BLAST_NONDET != 0.
+Head arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (__BLAST_NONDET,__BLAST_NONDET), (id,id))
+Body arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (id,id))
+Common Arguments:ListBuffer((c1,c1), (c2,c2), (c3,c3), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((__BLAST_NONDET,__BLAST_NONDET))
+variables in guard: ListBuffer(__BLAST_NONDET)
+Data flow:
+c1<-c1
+c2<-c2
+c3<-c3
+id<-id
+Guard:
+!(__BLAST_NONDET = 0)
+!(__BLAST_NONDET = 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main116(c1, c2, c3, id) :- inv_main116(c1, c2, c3, id), __BLAST_NONDET != 0.
+Head arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (id,id))
+Body arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (id,id))
+Common Arguments:ListBuffer((c1,c1), (c2,c2), (c3,c3), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(__BLAST_NONDET)
+Data flow:
+c1<-c1
+c2<-c2
+c3<-c3
+id<-id
+Guard:
+!(__BLAST_NONDET = 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main148(c1, c2, c3, c4, id) :- inv_main123(c1, c2, c3, c4, id), !(c4 >= -1).
+Head arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+Body arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c4)
+Data flow:
+c1<-c1
+c2<-c2
+c3<-c3
+c4<-c4
+id<-id
+Guard:
+!((c4 + 1) >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main148(c1, c2, c3, c4, id) :- inv_main123(c1, c2, c3, c4, id), !(-1 >= c4) & c4 >= -1.
+Head arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+Body arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c4)
+Data flow:
+c1<-c1
+c2<-c2
+c3<-c3
+c4<-c4
+id<-id
+Guard:
+!((-1 + -1 * c4) >= 0)
+((c4 + 1) >= 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main16(id) :- inv_main148(c1, c2, c3, c4, id), 61 >= c1 & c1 >= 61.
+Head arguments: ListBuffer((id,id))
+Body arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c1)
+Data flow:
+id<-id
+Guard:
+((61 + -1 * c1) >= 0)
+((c1 + -61) >= 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main153(c1, c2, c3, c4, id) :- inv_main148(c1, c2, c3, c4, id), !(61 >= c1) & c1 >= 61.
+Head arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+Body arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c1)
+Data flow:
+c1<-c1
+c2<-c2
+c3<-c3
+c4<-c4
+id<-id
+Guard:
+!((61 + -1 * c1) >= 0)
+((c1 + -61) >= 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main153(c1, c2, c3, c4, id) :- inv_main148(c1, c2, c3, c4, id), !(c2 >= 61) & !(c1 >= 61).
+Head arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+Body arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c2, c1)
+Data flow:
+c1<-c1
+c2<-c2
+c3<-c3
+c4<-c4
+id<-id
+Guard:
+!((c2 + -61) >= 0)
+!((c1 + -61) >= 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main16(id) :- inv_main148(c1, c2, c3, c4, id), 61 >= c2 & c2 >= 61 & !(c1 >= 61).
+Head arguments: ListBuffer((id,id))
+Body arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c2, c1)
+Data flow:
+id<-id
+Guard:
+((61 + -1 * c2) >= 0)
+((c2 + -61) >= 0)
+!((c1 + -61) >= 0)
+dataflow number:0
+guard number:3
+-------------
+inv_main153(c1, c2, c3, c4, id) :- inv_main148(c1, c2, c3, c4, id), !(61 >= c2) & c2 >= 61 & !(c1 >= 61).
+Head arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+Body arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c2, c1)
+Data flow:
+c1<-c1
+c2<-c2
+c3<-c3
+c4<-c4
+id<-id
+Guard:
+!((61 + -1 * c2) >= 0)
+((c2 + -61) >= 0)
+!((c1 + -61) >= 0)
+dataflow number:0
+guard number:3
+-------------
+inv_main162(c2, c3, c4, id) :- inv_main153(c1, c2, c3, c4, id), -1 >= c1.
+Head arguments: ListBuffer((c2,c2), (c3,c3), (c4,c4), (id,id))
+Body arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c2,c2), (c3,c3), (c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c1)
+Data flow:
+c2<-c2
+c3<-c3
+c4<-c4
+id<-id
+Guard:
+((-1 * c1 + -1) >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main162(c2, c3, c4, id) :- inv_main153(c1, c2, c3, c4, id), c1 + -127 >= 1 & !(-1 >= c1).
+Head arguments: ListBuffer((c2,c2), (c3,c3), (c4,c4), (id,id))
+Body arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c2,c2), (c3,c3), (c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c1)
+Data flow:
+c2<-c2
+c3<-c3
+c4<-c4
+id<-id
+Guard:
+(((c1 + -127) + -1) >= 0)
+!((-1 * c1 + -1) >= 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main162(c2, c3, c4, id) :- inv_main153(c1, c2, c3, c4, id), !(c1 + -127 >= 1) & !(-1 >= c1).
+Head arguments: ListBuffer((c2,c2), (c3,c3), (c4,c4), (id,id))
+Body arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c2,c2), (c3,c3), (c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c1)
+Data flow:
+c2<-c2
+c3<-c3
+c4<-c4
+id<-id
+Guard:
+!(((c1 + -127) + -1) >= 0)
+!((-1 * c1 + -1) >= 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main173(c3, c4, id) :- inv_main162(c2, c3, c4, id), -1 >= c2.
+Head arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Body arguments: ListBuffer((c2,c2), (c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c3,c3), (c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c2)
+Data flow:
+c3<-c3
+c4<-c4
+id<-id
+Guard:
+((-1 * c2 + -1) >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main173(c3, c4, id) :- inv_main162(c2, c3, c4, id), c2 + -127 >= 1 & !(-1 >= c2).
+Head arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Body arguments: ListBuffer((c2,c2), (c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c3,c3), (c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c2)
+Data flow:
+c3<-c3
+c4<-c4
+id<-id
+Guard:
+(((c2 + -127) + -1) >= 0)
+!((-1 * c2 + -1) >= 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main173(c3, c4, id) :- inv_main162(c2, c3, c4, id), !(c2 + -127 >= 1) & !(-1 >= c2).
+Head arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Body arguments: ListBuffer((c2,c2), (c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c3,c3), (c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c2)
+Data flow:
+c3<-c3
+c4<-c4
+id<-id
+Guard:
+!(((c2 + -127) + -1) >= 0)
+!((-1 * c2 + -1) >= 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main184(c3, c4, arg4) :- inv_main173(c3, c4, id), id >= 1000 & 0 = arg4.
+Head arguments: ListBuffer((c3,c3), (c4,c4), (arg4,arg4))
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c3,c3), (c4,c4))
+relativeComplimentOfHeadArg:ListBuffer((arg4,arg4))
+variables in guard: ListBuffer(id)
+Data flow:
+arg4<-0
+c3<-c3
+c4<-c4
+Guard:
+((id + -1000) >= 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main191(c3, c4, arg5) :- inv_main184(c3, c4, id), !(id + 1 >= 1000) & id + 1 = arg5.
+Head arguments: ListBuffer((c3,c3), (c4,c4), (arg5,arg5))
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c3,c3), (c4,c4))
+relativeComplimentOfHeadArg:ListBuffer((arg5,arg5))
+variables in guard: ListBuffer(id)
+Data flow:
+arg5<-(id + 1)
+c3<-c3
+c4<-c4
+Guard:
+!(((id + 1) + -1000) >= 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main227(c3, c4, id) :- inv_main191(c3, c4, id), !(c3 >= 61).
+Head arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c3,c3), (c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c3)
+Data flow:
+c3<-c3
+c4<-c4
+id<-id
+Guard:
+!((c3 + -61) >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main16(id) :- inv_main191(c3, c4, id), 61 >= c3 & c3 >= 61.
+Head arguments: ListBuffer((id,id))
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c3)
+Data flow:
+id<-id
+Guard:
+((61 + -1 * c3) >= 0)
+((c3 + -61) >= 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main227(c3, c4, id) :- inv_main191(c3, c4, id), !(61 >= c3) & c3 >= 61.
+Head arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c3,c3), (c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c3)
+Data flow:
+c3<-c3
+c4<-c4
+id<-id
+Guard:
+!((61 + -1 * c3) >= 0)
+((c3 + -61) >= 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main232(c4, id) :- inv_main227(c3, c4, id), -1 >= c3.
+Head arguments: ListBuffer((c4,c4), (id,id))
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c3)
+Data flow:
+c4<-c4
+id<-id
+Guard:
+((-1 * c3 + -1) >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main232(c4, id) :- inv_main227(c3, c4, id), c3 + -127 >= 1 & !(-1 >= c3).
+Head arguments: ListBuffer((c4,c4), (id,id))
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c3)
+Data flow:
+c4<-c4
+id<-id
+Guard:
+(((c3 + -127) + -1) >= 0)
+!((-1 * c3 + -1) >= 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main232(c4, id) :- inv_main227(c3, c4, id), !(c3 + -127 >= 1) & !(-1 >= c3).
+Head arguments: ListBuffer((c4,c4), (id,id))
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c3)
+Data flow:
+c4<-c4
+id<-id
+Guard:
+!(((c3 + -127) + -1) >= 0)
+!((-1 * c3 + -1) >= 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main243(c4, arg9) :- inv_main232(c4, id), id >= 1000 & 0 = arg9.
+Head arguments: ListBuffer((c4,c4), (arg9,arg9))
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer((c4,c4))
+relativeComplimentOfHeadArg:ListBuffer((arg9,arg9))
+variables in guard: ListBuffer(id)
+Data flow:
+arg9<-0
+c4<-c4
+Guard:
+((id + -1000) >= 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main250(c4, arg10) :- inv_main243(c4, id), !(id + 1 >= 1000) & id + 1 = arg10.
+Head arguments: ListBuffer((c4,c4), (arg10,arg10))
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer((c4,c4))
+relativeComplimentOfHeadArg:ListBuffer((arg10,arg10))
+variables in guard: ListBuffer(id)
+Data flow:
+arg10<-(id + 1)
+c4<-c4
+Guard:
+!(((id + 1) + -1000) >= 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main261(c4, arg11) :- inv_main264(c4, id), __BLAST_NONDET != 0 & id + 1 = arg11.
+Head arguments: ListBuffer((c4,c4), (arg11,arg11))
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer((c4,c4))
+relativeComplimentOfHeadArg:ListBuffer((arg11,arg11))
+variables in guard: ListBuffer(__BLAST_NONDET)
+Data flow:
+arg11<-(id + 1)
+c4<-c4
+Guard:
+!(__BLAST_NONDET = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main261(c4, arg13) :- inv_main264(c4, id), __BLAST_NONDET != 0 & id + -1 + 1 = arg13.
+Head arguments: ListBuffer((c4,c4), (arg13,arg13))
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer((c4,c4))
+relativeComplimentOfHeadArg:ListBuffer((arg13,arg13))
+variables in guard: ListBuffer(__BLAST_NONDET)
+Data flow:
+arg13<-((id + -1) + 1)
+c4<-c4
+Guard:
+!(__BLAST_NONDET = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main261(c4, id) :- inv_main264(c4, id), id + -1 = id.
+Head arguments: ListBuffer((c4,c4), (id,id))
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer((c4,c4))
+relativeComplimentOfHeadArg:ListBuffer((id,id))
+variables in guard: ListBuffer()
+Data flow:
+id<-(id + -1)
+c4<-c4
+Guard:
+dataflow number:1
+guard number:0
+-------------
+inv_main250(c4, arg14) :- inv_main261(c4, id), 0 = arg14.
+Head arguments: ListBuffer((c4,c4), (arg14,arg14))
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer((c4,c4))
+relativeComplimentOfHeadArg:ListBuffer((arg14,arg14))
+variables in guard: ListBuffer()
+Data flow:
+arg14<-0
+c4<-c4
+Guard:
+dataflow number:1
+guard number:0
+-------------
+inv_main288(c4, id) :- inv_main250(c4, id), !(c4 >= 61).
+Head arguments: ListBuffer((c4,c4), (id,id))
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer((c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c4)
+Data flow:
+c4<-c4
+id<-id
+Guard:
+!((c4 + -61) >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main16(id) :- inv_main250(c4, id), 61 >= c4 & c4 >= 61.
+Head arguments: ListBuffer((id,id))
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer((id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c4)
+Data flow:
+id<-id
+Guard:
+((61 + -1 * c4) >= 0)
+((c4 + -61) >= 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main288(c4, id) :- inv_main250(c4, id), !(61 >= c4) & c4 >= 61.
+Head arguments: ListBuffer((c4,c4), (id,id))
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer((c4,c4), (id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c4)
+Data flow:
+c4<-c4
+id<-id
+Guard:
+!((61 + -1 * c4) >= 0)
+((c4 + -61) >= 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main293(id) :- inv_main288(c4, id), -1 >= c4.
+Head arguments: ListBuffer((id,id))
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer((id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c4)
+Data flow:
+id<-id
+Guard:
+((-1 * c4 + -1) >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main293(id) :- inv_main288(c4, id), c4 + -127 >= 1 & !(-1 >= c4).
+Head arguments: ListBuffer((id,id))
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer((id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c4)
+Data flow:
+id<-id
+Guard:
+(((c4 + -127) + -1) >= 0)
+!((-1 * c4 + -1) >= 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main293(id) :- inv_main288(c4, id), !(c4 + -127 >= 1) & !(-1 >= c4).
+Head arguments: ListBuffer((id,id))
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer((id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(c4)
+Data flow:
+id<-id
+Guard:
+!(((c4 + -127) + -1) >= 0)
+!((-1 * c4 + -1) >= 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main304(arg17) :- inv_main293(id), id >= 1000 & 0 = arg17.
+Head arguments: ListBuffer((arg17,arg17))
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg17,arg17))
+variables in guard: ListBuffer(id)
+Data flow:
+arg17<-0
+Guard:
+((id + -1000) >= 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main16(arg18) :- inv_main304(id), !(id + 1 >= 1000) & id + 1 = arg18.
+Head arguments: ListBuffer((arg18,arg18))
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg18,arg18))
+variables in guard: ListBuffer(id)
+Data flow:
+arg18<-(id + 1)
+Guard:
+!(((id + 1) + -1000) >= 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main46(__BLAST_NONDET, id) :- inv_main16(id), __BLAST_NONDET != -1.
+Head arguments: ListBuffer((__BLAST_NONDET,__BLAST_NONDET), (id,id))
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer((id,id))
+relativeComplimentOfHeadArg:ListBuffer((__BLAST_NONDET,__BLAST_NONDET))
+variables in guard: ListBuffer(__BLAST_NONDET)
+Data flow:
+__BLAST_NONDET<-___BLAST_NONDET
+id<-id
+Guard:
+!((1 + ___BLAST_NONDET) = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main46(__BLAST_NONDET, id) :- inv_main16(id), __BLAST_NONDET != 0 & __BLAST_NONDET != -1.
+Head arguments: ListBuffer((__BLAST_NONDET,__BLAST_NONDET), (id,id))
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer((id,id))
+relativeComplimentOfHeadArg:ListBuffer((__BLAST_NONDET,__BLAST_NONDET))
+variables in guard: ListBuffer(__BLAST_NONDET)
+Data flow:
+__BLAST_NONDET<-___BLAST_NONDET
+id<-id
+Guard:
+!(__BLAST_NONDET = 0)
+!((1 + ___BLAST_NONDET) = 0)
+dataflow number:1
+guard number:2
+-------------
+inv_main81(c1, __BLAST_NONDET, id) :- inv_main46(c1, id), __BLAST_NONDET != -1.
+Head arguments: ListBuffer((c1,c1), (__BLAST_NONDET,__BLAST_NONDET), (id,id))
+Body arguments: ListBuffer((c1,c1), (id,id))
+Common Arguments:ListBuffer((c1,c1), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((__BLAST_NONDET,__BLAST_NONDET))
+variables in guard: ListBuffer(__BLAST_NONDET)
+Data flow:
+__BLAST_NONDET<-___BLAST_NONDET
+c1<-c1
+id<-id
+Guard:
+!((1 + ___BLAST_NONDET) = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main81(c1, __BLAST_NONDET, id) :- inv_main46(c1, id), __BLAST_NONDET != -1 & __BLAST_NONDET != 0 & __BLAST_NONDET != 0.
+Head arguments: ListBuffer((c1,c1), (__BLAST_NONDET,__BLAST_NONDET), (id,id))
+Body arguments: ListBuffer((c1,c1), (id,id))
+Common Arguments:ListBuffer((c1,c1), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((__BLAST_NONDET,__BLAST_NONDET))
+variables in guard: ListBuffer(__BLAST_NONDET)
+Data flow:
+__BLAST_NONDET<-___BLAST_NONDET
+c1<-c1
+id<-id
+Guard:
+!((1 + ___BLAST_NONDET) = 0)
+!(__BLAST_NONDET = 0)
+!(__BLAST_NONDET = 0)
+dataflow number:1
+guard number:3
+-------------
+inv_main116(c1, c2, __BLAST_NONDET, id) :- inv_main81(c1, c2, id), __BLAST_NONDET != -1.
+Head arguments: ListBuffer((c1,c1), (c2,c2), (__BLAST_NONDET,__BLAST_NONDET), (id,id))
+Body arguments: ListBuffer((c1,c1), (c2,c2), (id,id))
+Common Arguments:ListBuffer((c1,c1), (c2,c2), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((__BLAST_NONDET,__BLAST_NONDET))
+variables in guard: ListBuffer(__BLAST_NONDET)
+Data flow:
+__BLAST_NONDET<-___BLAST_NONDET
+c1<-c1
+c2<-c2
+id<-id
+Guard:
+!((1 + ___BLAST_NONDET) = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main116(c1, c2, __BLAST_NONDET, id) :- inv_main81(c1, c2, id), __BLAST_NONDET != -1 & __BLAST_NONDET != 0 & __BLAST_NONDET != 0.
+Head arguments: ListBuffer((c1,c1), (c2,c2), (__BLAST_NONDET,__BLAST_NONDET), (id,id))
+Body arguments: ListBuffer((c1,c1), (c2,c2), (id,id))
+Common Arguments:ListBuffer((c1,c1), (c2,c2), (id,id))
+relativeComplimentOfHeadArg:ListBuffer((__BLAST_NONDET,__BLAST_NONDET))
+variables in guard: ListBuffer(__BLAST_NONDET)
+Data flow:
+__BLAST_NONDET<-___BLAST_NONDET
+c1<-c1
+c2<-c2
+id<-id
+Guard:
+!((1 + ___BLAST_NONDET) = 0)
+!(__BLAST_NONDET = 0)
+!(__BLAST_NONDET = 0)
+dataflow number:1
+guard number:3
+-------------
+inv_main205(c3, c4, arg20) :- inv_main184(c3, c4, arg20), __BLAST_NONDET != 0 & arg20 != 0.
+Head arguments: ListBuffer((c3,c3), (c4,c4), (arg20,arg20))
+Body arguments: ListBuffer((c3,c3), (c4,c4), (arg20,arg20))
+Common Arguments:ListBuffer((c3,c3), (c4,c4), (arg20,arg20))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(__BLAST_NONDET, arg20)
+Data flow:
+c3<-c3
+c4<-c4
+arg20<-arg20
+Guard:
+!(__BLAST_NONDET = 0)
+!(arg20 = 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main205(c3, c4, arg21) :- inv_main184(c3, c4, arg21), arg21 >= 999.
+Head arguments: ListBuffer((c3,c3), (c4,c4), (arg21,arg21))
+Body arguments: ListBuffer((c3,c3), (c4,c4), (arg21,arg21))
+Common Arguments:ListBuffer((c3,c3), (c4,c4), (arg21,arg21))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(arg21)
+Data flow:
+c3<-c3
+c4<-c4
+arg21<-arg21
+Guard:
+((-999 + arg21) >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main264(c4, arg22) :- inv_main243(c4, arg22), __BLAST_NONDET != 0 & arg22 != 0.
+Head arguments: ListBuffer((c4,c4), (arg22,arg22))
+Body arguments: ListBuffer((c4,c4), (arg22,arg22))
+Common Arguments:ListBuffer((c4,c4), (arg22,arg22))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(__BLAST_NONDET, arg22)
+Data flow:
+c4<-c4
+arg22<-arg22
+Guard:
+!(__BLAST_NONDET = 0)
+!(arg22 = 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main261(c4, arg23) :- inv_main243(c4, id), !(id + 1 + -1 >= 1) & !(-1*(id + 1) + 1 >= 1) & __BLAST_NONDET != 0 & id + 1 = arg23.
+Head arguments: ListBuffer((c4,c4), (arg23,arg23))
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer((c4,c4))
+relativeComplimentOfHeadArg:ListBuffer((arg23,arg23))
+variables in guard: ListBuffer(id, __BLAST_NONDET)
+Data flow:
+arg23<-(id + 1)
+c4<-c4
+Guard:
+!((((id + 1) + -1) + -1) >= 0)
+!(((1 + -1 * (id + 1)) + -1) >= 0)
+!(__BLAST_NONDET = 0)
+dataflow number:1
+guard number:3
+-------------
+inv_main264(c4, arg24) :- inv_main243(c4, arg24), arg24 >= 999.
+Head arguments: ListBuffer((c4,c4), (arg24,arg24))
+Body arguments: ListBuffer((c4,c4), (arg24,arg24))
+Common Arguments:ListBuffer((c4,c4), (arg24,arg24))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(arg24)
+Data flow:
+c4<-c4
+arg24<-arg24
+Guard:
+((-999 + arg24) >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main261(c4, arg25) :- inv_main243(c4, id), !(id + 1 + -1 >= 1) & !(-1*(id + 1) + 1 >= 1) & id + 1 >= 1000 & id + 1 = arg25.
+Head arguments: ListBuffer((c4,c4), (arg25,arg25))
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer((c4,c4))
+relativeComplimentOfHeadArg:ListBuffer((arg25,arg25))
+variables in guard: ListBuffer(id)
+Data flow:
+arg25<-(id + 1)
+c4<-c4
+Guard:
+!((((id + 1) + -1) + -1) >= 0)
+!(((1 + -1 * (id + 1)) + -1) >= 0)
+(((id + 1) + -1000) >= 0)
+dataflow number:1
+guard number:3
+-------------
+inv_main324(arg26) :- inv_main304(arg26), __BLAST_NONDET != 0 & arg26 != 0.
+Head arguments: ListBuffer((arg26,arg26))
+Body arguments: ListBuffer((arg26,arg26))
+Common Arguments:ListBuffer((arg26,arg26))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(__BLAST_NONDET, arg26)
+Data flow:
+arg26<-arg26
+Guard:
+!(__BLAST_NONDET = 0)
+!(arg26 = 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main324(arg27) :- inv_main304(arg27), arg27 >= 999.
+Head arguments: ListBuffer((arg27,arg27))
+Body arguments: ListBuffer((arg27,arg27))
+Common Arguments:ListBuffer((arg27,arg27))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(arg27)
+Data flow:
+arg27<-arg27
+Guard:
+((-999 + arg27) >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main191(c3, c4, arg28) :- inv_main205(c3, c4, id), __BLAST_NONDET != 0 & 0 = arg28.
+Head arguments: ListBuffer((c3,c3), (c4,c4), (arg28,arg28))
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c3,c3), (c4,c4))
+relativeComplimentOfHeadArg:ListBuffer((arg28,arg28))
+variables in guard: ListBuffer(__BLAST_NONDET)
+Data flow:
+arg28<-0
+c3<-c3
+c4<-c4
+Guard:
+!(__BLAST_NONDET = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main191(c3, c4, arg29) :- inv_main205(c3, c4, id), __BLAST_NONDET != 0 & 0 = arg29.
+Head arguments: ListBuffer((c3,c3), (c4,c4), (arg29,arg29))
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c3,c3), (c4,c4))
+relativeComplimentOfHeadArg:ListBuffer((arg29,arg29))
+variables in guard: ListBuffer(__BLAST_NONDET)
+Data flow:
+arg29<-0
+c3<-c3
+c4<-c4
+Guard:
+!(__BLAST_NONDET = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main191(c3, c4, arg30) :- inv_main205(c3, c4, id), 0 = arg30.
+Head arguments: ListBuffer((c3,c3), (c4,c4), (arg30,arg30))
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c3,c3), (c4,c4))
+relativeComplimentOfHeadArg:ListBuffer((arg30,arg30))
+variables in guard: ListBuffer()
+Data flow:
+arg30<-0
+c3<-c3
+c4<-c4
+Guard:
+dataflow number:1
+guard number:0
+-------------
+inv_main191(c3, c4, arg31) :- inv_main184(c3, c4, id), !(id + 1 + -1 >= 1) & !(-1*(id + 1) + 1 >= 1) & __BLAST_NONDET != 0 & 0 = arg31.
+Head arguments: ListBuffer((c3,c3), (c4,c4), (arg31,arg31))
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c3,c3), (c4,c4))
+relativeComplimentOfHeadArg:ListBuffer((arg31,arg31))
+variables in guard: ListBuffer(id, __BLAST_NONDET)
+Data flow:
+arg31<-0
+c3<-c3
+c4<-c4
+Guard:
+!((((id + 1) + -1) + -1) >= 0)
+!(((1 + -1 * (id + 1)) + -1) >= 0)
+!(__BLAST_NONDET = 0)
+dataflow number:1
+guard number:3
+-------------
+inv_main191(c3, c4, arg32) :- inv_main184(c3, c4, id), !(id + 1 + -1 >= 1) & !(-1*(id + 1) + 1 >= 1) & id + 1 >= 1000 & 0 = arg32.
+Head arguments: ListBuffer((c3,c3), (c4,c4), (arg32,arg32))
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((c3,c3), (c4,c4))
+relativeComplimentOfHeadArg:ListBuffer((arg32,arg32))
+variables in guard: ListBuffer(id)
+Data flow:
+arg32<-0
+c3<-c3
+c4<-c4
+Guard:
+!((((id + 1) + -1) + -1) >= 0)
+!(((1 + -1 * (id + 1)) + -1) >= 0)
+(((id + 1) + -1000) >= 0)
+dataflow number:1
+guard number:3
+-------------
+inv_main16(arg33) :- inv_main324(id), __BLAST_NONDET != 0 & 0 = arg33.
+Head arguments: ListBuffer((arg33,arg33))
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg33,arg33))
+variables in guard: ListBuffer(__BLAST_NONDET)
+Data flow:
+arg33<-0
+Guard:
+!(__BLAST_NONDET = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main16(arg34) :- inv_main324(id), __BLAST_NONDET != 0 & 0 = arg34.
+Head arguments: ListBuffer((arg34,arg34))
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg34,arg34))
+variables in guard: ListBuffer(__BLAST_NONDET)
+Data flow:
+arg34<-0
+Guard:
+!(__BLAST_NONDET = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main16(arg35) :- inv_main324(id), 0 = arg35.
+Head arguments: ListBuffer((arg35,arg35))
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg35,arg35))
+variables in guard: ListBuffer()
+Data flow:
+arg35<-0
+Guard:
+dataflow number:1
+guard number:0
+-------------
+inv_main16(arg36) :- inv_main304(id), !(id + 1 + -1 >= 1) & !(-1*(id + 1) + 1 >= 1) & __BLAST_NONDET != 0 & 0 = arg36.
+Head arguments: ListBuffer((arg36,arg36))
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg36,arg36))
+variables in guard: ListBuffer(id, __BLAST_NONDET)
+Data flow:
+arg36<-0
+Guard:
+!((((id + 1) + -1) + -1) >= 0)
+!(((1 + -1 * (id + 1)) + -1) >= 0)
+!(__BLAST_NONDET = 0)
+dataflow number:1
+guard number:3
+-------------
+inv_main16(arg37) :- inv_main304(id), !(id + 1 + -1 >= 1) & !(-1*(id + 1) + 1 >= 1) & id + 1 >= 1000 & 0 = arg37.
+Head arguments: ListBuffer((arg37,arg37))
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg37,arg37))
+variables in guard: ListBuffer(id)
+Data flow:
+arg37<-0
+Guard:
+!((((id + 1) + -1) + -1) >= 0)
+!(((1 + -1 * (id + 1)) + -1) >= 0)
+(((id + 1) + -1000) >= 0)
+dataflow number:1
+guard number:3
+-------------
+inv_main16(arg38) :- 0 = arg38.
+Head arguments: ListBuffer((arg38,arg38))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg38,arg38))
+variables in guard: ListBuffer()
+Data flow:
+arg38<-0
+Guard:
+dataflow number:1
+guard number:0
+-------------
+inv_main346(id) :- inv_main16(id), id >= 0.
+Head arguments: ListBuffer((id,id))
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer((id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+id<-id
+Guard:
+(id >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main346(id) :- inv_main123(c1, c2, c3, c4, id), id >= 0 & -1 >= c4 & c4 >= -1.
+Head arguments: ListBuffer((id,id))
+Body arguments: ListBuffer((c1,c1), (c2,c2), (c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer((id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id, c4)
+Data flow:
+id<-id
+Guard:
+(id >= 0)
+((-1 + -1 * c4) >= 0)
+((c4 + 1) >= 0)
+dataflow number:0
+guard number:3
+-------------
+inv_main346(id) :- inv_main46(c1, id), id >= 0.
+Head arguments: ListBuffer((id,id))
+Body arguments: ListBuffer((c1,c1), (id,id))
+Common Arguments:ListBuffer((id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+id<-id
+Guard:
+(id >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main346(id) :- inv_main46(c1, id), id >= 0 & __BLAST_NONDET != 0 & __BLAST_NONDET != 0.
+Head arguments: ListBuffer((id,id))
+Body arguments: ListBuffer((c1,c1), (id,id))
+Common Arguments:ListBuffer((id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id, __BLAST_NONDET)
+Data flow:
+id<-id
+Guard:
+(id >= 0)
+!(__BLAST_NONDET = 0)
+!(__BLAST_NONDET = 0)
+dataflow number:0
+guard number:3
+-------------
+inv_main346(id) :- inv_main81(c1, c2, id), id >= 0.
+Head arguments: ListBuffer((id,id))
+Body arguments: ListBuffer((c1,c1), (c2,c2), (id,id))
+Common Arguments:ListBuffer((id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+id<-id
+Guard:
+(id >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main346(id) :- inv_main81(c1, c2, id), id >= 0 & __BLAST_NONDET != 0 & __BLAST_NONDET != 0.
+Head arguments: ListBuffer((id,id))
+Body arguments: ListBuffer((c1,c1), (c2,c2), (id,id))
+Common Arguments:ListBuffer((id,id))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id, __BLAST_NONDET)
+Data flow:
+id<-id
+Guard:
+(id >= 0)
+!(__BLAST_NONDET = 0)
+!(__BLAST_NONDET = 0)
+dataflow number:0
+guard number:3
+-------------
+false :- inv_main173(c3, c4, id), !(id >= 0) & id >= 1000.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!(id >= 0)
+((id + -1000) >= 0)
+dataflow number:0
+guard number:2
+-------------
+false :- inv_main173(c3, c4, id), !(1000 >= id) & id >= 1000.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!((1000 + -1 * id) >= 0)
+((id + -1000) >= 0)
+dataflow number:0
+guard number:2
+-------------
+false :- inv_main173(c3, c4, id), !(id >= 0) & !(id >= 1000).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!(id >= 0)
+!((id + -1000) >= 0)
+dataflow number:0
+guard number:2
+-------------
+false :- inv_main173(c3, c4, id), !(1000 >= id) & !(id >= 1000).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!((1000 + -1 * id) >= 0)
+!((id + -1000) >= 0)
+dataflow number:0
+guard number:2
+-------------
+false :- inv_main205(c3, c4, id), !(id >= 0).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!(id >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main205(c3, c4, id), !(1000 >= id).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!((1000 + -1 * id) >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main205(c3, c4, id), !(id >= 1).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!((id + -1) >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main205(c3, c4, id), !(-1*(id + -1) >= -1000).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c3,c3), (c4,c4), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!((1000 + -1 * (id + -1)) >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main232(c4, id), !(id >= 0) & id >= 1000.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!(id >= 0)
+((id + -1000) >= 0)
+dataflow number:0
+guard number:2
+-------------
+false :- inv_main232(c4, id), !(1000 >= id) & id >= 1000.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!((1000 + -1 * id) >= 0)
+((id + -1000) >= 0)
+dataflow number:0
+guard number:2
+-------------
+false :- inv_main232(c4, id), !(id >= 0) & !(id >= 1000).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!(id >= 0)
+!((id + -1000) >= 0)
+dataflow number:0
+guard number:2
+-------------
+false :- inv_main232(c4, id), !(1000 >= id) & !(id >= 1000).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!((1000 + -1 * id) >= 0)
+!((id + -1000) >= 0)
+dataflow number:0
+guard number:2
+-------------
+false :- inv_main264(c4, id), !(id >= 0).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!(id >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main264(c4, id), !(1000 >= id).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!((1000 + -1 * id) >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main264(c4, id), !(id >= 1).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!((id + -1) >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main264(c4, id), !(-1*(id + -1) >= -1000).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!((1000 + -1 * (id + -1)) >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main261(c4, id), !(id >= 0).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!(id >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main261(c4, id), !(1000 >= id).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((c4,c4), (id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!((1000 + -1 * id) >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main293(id), !(id >= 0) & id >= 1000.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!(id >= 0)
+((id + -1000) >= 0)
+dataflow number:0
+guard number:2
+-------------
+false :- inv_main293(id), !(1000 >= id) & id >= 1000.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!((1000 + -1 * id) >= 0)
+((id + -1000) >= 0)
+dataflow number:0
+guard number:2
+-------------
+false :- inv_main293(id), !(id >= 0) & !(id >= 1000).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!(id >= 0)
+!((id + -1000) >= 0)
+dataflow number:0
+guard number:2
+-------------
+false :- inv_main293(id), !(1000 >= id) & !(id >= 1000).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!((1000 + -1 * id) >= 0)
+!((id + -1000) >= 0)
+dataflow number:0
+guard number:2
+-------------
+false :- inv_main324(id), !(id >= 0).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!(id >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main324(id), !(1000 >= id).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!((1000 + -1 * id) >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main324(id), !(id >= 1).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!((id + -1) >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main324(id), !(-1*(id + -1) >= -1000).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!((1000 + -1 * (id + -1)) >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main346(id), !(id >= 0).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!(id >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main346(id), !(1000 >= id).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((id,id))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(id)
+Data flow:
+Guard:
+!((1000 + -1 * id) >= 0)
+dataflow number:0
+guard number:1
+-----------

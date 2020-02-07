@@ -1,0 +1,4 @@
+inv_main21(__eval45, arg2, arg4) :- __eval45 + 1 >= 1 & __eval45 >= 1 & -1*__eval45 + 2147483647 >= 1 & __eval45 + 1 + -1 = arg1 & __eval45 + 1 + -1 = arg4 & 0 = arg0 & 0 = arg2 & 0 = arg3.
+inv_main21(MAXPATHLEN, arg5, glob2_pathlim_off) :- inv_main21(MAXPATHLEN, glob2_p_off, glob2_pathlim_off), glob2_pathlim_off + -1*(glob2_p_off + 1) >= 0 & glob2_p_off + 1 = arg5 & pathbuf_off = 0 & glob2_pathbuf_off = 0.
+false :- inv_main21(MAXPATHLEN, glob2_p_off, glob2_pathlim_off), !(glob2_p_off >= 0).
+false :- inv_main21(MAXPATHLEN, glob2_p_off, glob2_pathlim_off), !(MAXPATHLEN + 1 - glob2_p_off >= 1).

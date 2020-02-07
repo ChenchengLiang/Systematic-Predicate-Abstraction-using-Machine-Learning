@@ -1,0 +1,3 @@
+inv_main5(arg1, sn) :- 1 = arg1 & 0 = sn.
+inv_main5(arg2, arg3) :- inv_main5(i, sn), 8 >= i & i + 1 = arg2 & sn + 2 = arg3.
+false :- inv_main5(i, sn), !(sn = 16 | sn = 0) & !(8 >= i).

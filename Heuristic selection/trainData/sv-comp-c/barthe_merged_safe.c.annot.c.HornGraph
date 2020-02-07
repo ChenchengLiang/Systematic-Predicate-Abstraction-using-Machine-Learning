@@ -1,0 +1,64 @@
+-------------
+inv_main10(n, c, arg5, arg6, x1, arg7, x2) :- inv_main10(n, c, i, j1, x1, j2, x2), n + -1*(i + 1) >= 1 & i + 1 = arg5 & x2 + j2 = x2 & 5*(i + 1) + c = arg6 & j2 + 5 = arg7 & x1 + j1 = x1.
+Head arguments: ListBuffer((n,n), (c,c), (arg5,arg5), (arg6,arg6), (x1,x1), (arg7,arg7), (x2,x2))
+Body arguments: ListBuffer((n,n), (c,c), (i,i), (j1,j1), (x1,x1), (j2,j2), (x2,x2))
+Common Arguments:ListBuffer((n,n), (c,c))
+relativeComplimentOfHeadArg:ListBuffer((arg5,arg5), (arg6,arg6), (x1,x1), (arg7,arg7), (x2,x2))
+variables in guard: ListBuffer(n, i)
+Data flow:
+arg5<-(i + 1)
+arg6<-(5 * (i + 1) + c)
+x1<-(x1 + j1)
+arg7<-(j2 + 5)
+x2<-(x2 + j2)
+n<-n
+Guard:
+(((n + -1 * (i + 1)) + -1) >= 0)
+dataflow number:5
+guard number:1
+-------------
+inv_main10(n, c, i, arg8, x1, arg9, arg10) :- n >= 1 & c = arg8 & arg9 = arg8 & 0 = arg10 & 0 = i & 0 = x1.
+Head arguments: ListBuffer((n,n), (c,c), (i,i), (arg8,arg8), (x1,x1), (arg9,arg9), (arg10,arg10))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((n,n), (c,c), (i,i), (arg8,arg8), (x1,x1), (arg9,arg9), (arg10,arg10))
+variables in guard: ListBuffer(n)
+Data flow:
+n<-_n
+c<-_c
+i<-0
+arg8<-_arg8
+x1<-0
+arg9<-_arg9
+arg10<-0
+Guard:
+((-1 + _n) >= 0)
+((_c + -1 * _arg8) = 0)
+((_arg9 + -1 * _arg8) = 0)
+dataflow number:7
+guard number:3
+-------------
+false :- inv_main10(n, c, i, j1, x1, j2, x2), j1 != j2.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((n,n), (c,c), (i,i), (j1,j1), (x1,x1), (j2,j2), (x2,x2))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(j1, j2)
+Data flow:
+Guard:
+!((j1 + -1 * j2) = 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main10(n, c, i, j1, x1, j2, x2), x1 + j1 != x2 + j2.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((n,n), (c,c), (i,i), (j1,j1), (x1,x1), (j2,j2), (x2,x2))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(x1, j1, x2, j2)
+Data flow:
+Guard:
+!(((x1 + j1) + -1 * (x2 + j2)) = 0)
+dataflow number:0
+guard number:1
+-----------

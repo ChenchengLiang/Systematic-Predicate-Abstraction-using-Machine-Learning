@@ -1,0 +1,5 @@
+inv_main4(arg0) :- 0 = arg0 & 0 = arg1.
+inv_main7(x, arg2) :- inv_main4(x), -1*x + 268435455 >= 1 & 0 = arg2.
+inv_main7(x, arg3) :- inv_main7(x, y), -1*y + 10 >= 1 & y + 1 = arg3.
+inv_main4(arg4) :- inv_main7(x, y), !(-1*y + 10 >= 1) & x + 1 = arg4.
+false :- inv_main4(2*arg6), !(-2*arg6 + 268435455 >= 1).

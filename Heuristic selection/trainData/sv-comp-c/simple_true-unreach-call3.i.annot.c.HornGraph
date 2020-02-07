@@ -1,0 +1,55 @@
+-------------
+inv_main6(arg1, N) :- inv_main6(x, N), N - x >= 1 & x + 2 = arg1.
+Head arguments: ListBuffer((arg1,arg1), (N,N))
+Body arguments: ListBuffer((x,x), (N,N))
+Common Arguments:ListBuffer((N,N))
+relativeComplimentOfHeadArg:ListBuffer((arg1,arg1))
+variables in guard: ListBuffer(N, x)
+Data flow:
+arg1<-(x + 2)
+N<-N
+Guard:
+(((N + -1 * x) + -1) >= 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main6(x, __eval10) :- __eval10 >= 0 & 0 = x.
+Head arguments: ListBuffer((x,x), (__eval10,__eval10))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((x,x), (__eval10,__eval10))
+variables in guard: ListBuffer(__eval10)
+Data flow:
+x<-0
+__eval10<-___eval10
+Guard:
+(___eval10 >= 0)
+dataflow number:2
+guard number:1
+-------------
+false :- inv_main6(2*arg3 + 1, N), 2*arg3 - N >= -1 & arg3 >= 0.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer(((2 * arg3 + 1),(2 * arg3 + 1)), (N,N))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(N, arg3)
+Data flow:
+Guard:
+((1 + (-1 * N + 2 * arg3)) >= 0)
+(arg3 >= 0)
+dataflow number:0
+guard number:2
+-------------
+false :- inv_main6(2*arg3 + -1, N), 2*arg3 - N >= 1 & 0 >= arg3.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer(((2 * arg3 + -1),(2 * arg3 + -1)), (N,N))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(N, arg3)
+Data flow:
+Guard:
+((-1 + (-1 * N + 2 * arg3)) >= 0)
+(-1 * arg3 >= 0)
+dataflow number:0
+guard number:2
+-----------

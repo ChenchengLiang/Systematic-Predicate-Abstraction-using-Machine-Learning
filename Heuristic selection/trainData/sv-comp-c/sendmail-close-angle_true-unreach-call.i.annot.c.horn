@@ -1,0 +1,12 @@
+inv_main23(in, inlen, bufferlen, buf, buflim) :- inv_main23(in, inlen, bufferlen, buf, buflim), buf != buflim & __eval60 != 0 & in + 1 = in & buf + 1 = buf.
+inv_main24(bufferlen, buf) :- inv_main23(in, inlen, bufferlen, buf, buflim).
+inv_main24(bufferlen, buf) :- inv_main23(in, inlen, bufferlen, buflim, buflim), __eval60 != 0 & buf = buflim.
+inv_main23(arg3, __eval3, __eval10, arg4, arg5) :- __eval3 - __eval10 >= 1 & __eval3 >= 1 & __eval10 + -1 >= 1 & 0 = arg3 & 0 = arg4 & __eval10 + -2 = arg5.
+false :- inv_main23(in, inlen, bufferlen, buf, buflim), !(buf >= 0) & !(buf = buflim | __eval60 = 0).
+false :- inv_main23(in, inlen, bufferlen, buf, buflim), !(bufferlen - buf >= 1) & !(buf = buflim | __eval60 = 0).
+false :- inv_main23(in, inlen, bufferlen, buf, buflim), !(in >= -1) & buf != buflim & __eval60 != 0.
+false :- inv_main23(in, inlen, bufferlen, buf, buflim), !(inlen + -1*(in + 1) >= 1) & buf != buflim & __eval60 != 0.
+false :- inv_main24(bufferlen, buf), !(buf >= 0).
+false :- inv_main24(bufferlen, buf), !(bufferlen - buf >= 1).
+false :- inv_main24(bufferlen, buf), !(buf >= -1).
+false :- inv_main24(bufferlen, buf), !(bufferlen + -1*(buf + 1) >= 1).

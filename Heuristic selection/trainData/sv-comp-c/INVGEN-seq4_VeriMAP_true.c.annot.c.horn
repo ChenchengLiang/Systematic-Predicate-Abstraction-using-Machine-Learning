@@ -1,0 +1,7 @@
+inv_main5(n0, n1, arg0, arg1) :- 0 = arg0 & 0 = arg1.
+inv_main18(n1, arg2, arg3) :- inv_main18(n1, k, j1), n1 + -1*(j1 + 1) >= 1 & k + -1 = arg2 & j1 + 1 = arg3.
+inv_main18(n1, k, arg4) :- inv_main10(n1, k, i1), n1 >= 1 & !(n1 - i1 >= 1) & 0 = arg4.
+inv_main10(n1, arg5, arg6) :- inv_main10(n1, k, i1), n1 - i1 >= 1 & k + 1 = arg5 & i1 + 1 = arg6.
+inv_main10(n1, k, arg7) :- inv_main5(n0, n1, i0, k), !(n0 - i0 >= 1) & 0 = arg7.
+inv_main5(n0, n1, arg8, arg9) :- inv_main5(n0, n1, i0, k), n0 - i0 >= 1 & i0 + 1 = arg8 & k + 1 = arg9.
+false :- inv_main18(n1, k, j1), !(k >= 1).

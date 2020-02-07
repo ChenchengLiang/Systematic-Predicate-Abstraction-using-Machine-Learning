@@ -1,0 +1,13 @@
+inv_main6(arg0, arg1, k, arg2, i, n, j) :- inv_main6(x, y, k, i, i, n, m), __eval72 != 0 & n - i >= 1 & j = i & i + 1 = arg2 & x + 1 = arg0 & y + -1 = arg1.
+inv_main6(arg3, arg4, k, arg5, i, n, m) :- inv_main6(x, y, k, i, i, n, m), n - i >= 1 & i + 1 = arg5 & x + 1 = arg3 & y + -1 = arg4.
+inv_main6(arg6, arg7, k, arg8, i, n, j) :- inv_main6(x, y, k, j, i, n, m), __eval72 != 0 & j != i & n - j >= 1 & x + -1 = arg6 & y + 1 = arg7 & j + 1 = arg8.
+inv_main6(arg9, arg10, k, arg11, i, n, m) :- inv_main6(x, y, k, j, i, n, m), j != i & n - j >= 1 & x + -1 = arg9 & y + 1 = arg10 & j + 1 = arg11.
+inv_main35 :- inv_main30(n, m), !(n - m >= 1).
+inv_main6(x, y, k, arg12, i, n, arg13) :- x + y = k & 0 = arg12 & 0 = arg13.
+inv_main30(n, m) :- inv_main6(x, y, x + y, j, i, n, m), !(m >= 0) & n >= 1 & !(n - j >= 1) & x + y = k.
+inv_main35 :- inv_main6(x, y, x + y, j, i, n, m), !(n - m >= 1) & m >= 0 & n >= 1 & !(n - j >= 1) & x + y = k.
+inv_main30(n, m) :- inv_main6(x, y, k, j, i, n, m), !(m >= 0 | !(n >= 1)) & !(x + y = k | n - j >= 1).
+inv_main35 :- inv_main6(x, y, k, j, i, n, m), !(n - m >= 1 | !(m >= 0) | !(n >= 1)) & !(x + y = k | n - j >= 1).
+false :- inv_main6(x, y, k, j, i, n, m), !(x + y = k | n - j >= 1).
+false :- inv_main30(n, m).
+false :- inv_main35.

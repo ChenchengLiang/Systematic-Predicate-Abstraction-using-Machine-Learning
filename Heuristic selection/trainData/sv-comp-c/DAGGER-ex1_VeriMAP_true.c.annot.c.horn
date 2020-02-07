@@ -1,0 +1,4 @@
+inv_main6(arg0, arg1) :- 0 = arg0 & 0 = arg1.
+inv_main6(arg4, arg5) :- inv_main6(xa, ya), __eval34 != 0 & __eval21 != 0 & xa + 2*ya + 1 + -2*(ya - 2*xa + xa + 2*ya + 1) = arg4 & 2*(xa + 2*ya + 1) + ya - 2*xa + xa + 2*ya + 1 = arg5 & xa + 2*ya + 1 = arg2 & ya - 2*xa + xa + 2*ya + 1 = arg3.
+inv_main6(arg8, arg9) :- inv_main6(xa, ya), __eval21 != 0 & 2*(xa + 2*ya + 1) + ya - 2*xa + -1*(xa + 2*ya + 1) = arg9 & xa + 2*ya + 1 = arg6 & ya - 2*xa + -1*(xa + 2*ya + 1) = arg7 & xa + 2*ya + 1 + -2*(ya - 2*xa + -1*(xa + 2*ya + 1)) = arg8.
+false :- inv_main6(xa, ya), !(xa + 2*ya >= 0).

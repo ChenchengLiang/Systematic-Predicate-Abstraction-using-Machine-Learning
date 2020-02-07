@@ -1,0 +1,77 @@
+-------------
+inv_main5(n0, n2, m1, m2) :- inv_main4(n0, n1, m1), !(n1 >= 0) & n2 = n0 & m2 = 0.
+Head arguments: ListBuffer((n0,n0), (n2,n2), (m1,m1), (m2,m2))
+Body arguments: ListBuffer((n0,n0), (n1,n1), (m1,m1))
+Common Arguments:ListBuffer((n0,n0), (m1,m1))
+relativeComplimentOfHeadArg:ListBuffer((n2,n2), (m2,m2))
+variables in guard: ListBuffer(n1)
+Data flow:
+n2<-n0
+m2<-0
+m1<-m1
+Guard:
+!(n1 >= 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main4(n0, arg0, arg1) :- inv_main4(n0, n1, m1), n1 >= 0 & n1 + -1 = arg0 & m1 + 1 = arg1 & n2 = n0 & m2 = 0.
+Head arguments: ListBuffer((n0,n0), (arg0,arg0), (arg1,arg1))
+Body arguments: ListBuffer((n0,n0), (n1,n1), (m1,m1))
+Common Arguments:ListBuffer((n0,n0))
+relativeComplimentOfHeadArg:ListBuffer((arg0,arg0), (arg1,arg1))
+variables in guard: ListBuffer(n1, n2, n0, m2)
+Data flow:
+arg0<-(n1 + -1)
+arg1<-(m1 + 1)
+n0<-n0
+Guard:
+(n1 >= 0)
+((n2 + -1 * n0) = 0)
+(m2 = 0)
+dataflow number:2
+guard number:3
+-------------
+inv_main5(n0, arg2, m1, arg3) :- inv_main5(n0, n2, m1, m2), n2 >= 1 & n2 + -1 = arg2 & m2 + 1 = arg3.
+Head arguments: ListBuffer((n0,n0), (arg2,arg2), (m1,m1), (arg3,arg3))
+Body arguments: ListBuffer((n0,n0), (n2,n2), (m1,m1), (m2,m2))
+Common Arguments:ListBuffer((n0,n0), (m1,m1))
+relativeComplimentOfHeadArg:ListBuffer((arg2,arg2), (arg3,arg3))
+variables in guard: ListBuffer(n2)
+Data flow:
+arg2<-(n2 + -1)
+arg3<-(m2 + 1)
+n0<-n0
+m1<-m1
+Guard:
+((n2 + -1) >= 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main4(n0, arg4, arg6) :- n0 = arg5 & arg4 = arg5 & 0 = arg6 & 0 = arg7.
+Head arguments: ListBuffer((n0,n0), (arg4,arg4), (arg6,arg6))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((n0,n0), (arg4,arg4), (arg6,arg6))
+variables in guard: ListBuffer(arg7)
+Data flow:
+n0<-arg5
+arg4<-arg5
+arg6<-0
+Guard:
+(-1 * arg7 = 0)
+dataflow number:3
+guard number:1
+-------------
+false :- inv_main5(n0, n2, m1, m2), !(-1 >= n0 | m1 = m2 + 1) & !(n2 >= 1).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((n0,n0), (n2,n2), (m1,m1), (m2,m2))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(n0, m1, m2, n2)
+Data flow:
+Guard:
+!(((-1 * n0 + -1) >= 0) | ((m1 + -1 * (m2 + 1)) = 0))
+!((n2 + -1) >= 0)
+dataflow number:0
+guard number:2
+-----------

@@ -1,0 +1,43 @@
+-------------
+inv_main7(j, arg2) :- 0 = arg2 & 0 = j & 100 = x.
+Head arguments: ListBuffer((j,j), (arg2,arg2))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((j,j), (arg2,arg2))
+variables in guard: ListBuffer(x)
+Data flow:
+j<-0
+arg2<-0
+Guard:
+((100 + -1 * x) = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main7(arg3, arg4) :- inv_main7(j, i), -1*i + 100 >= 1 & j + 2 = arg3 & i + 1 = arg4 & x = 100.
+Head arguments: ListBuffer((arg3,arg3), (arg4,arg4))
+Body arguments: ListBuffer((j,j), (i,i))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg3,arg3), (arg4,arg4))
+variables in guard: ListBuffer(i, x)
+Data flow:
+arg3<-(j + 2)
+arg4<-(i + 1)
+Guard:
+(((100 + -1 * i) + -1) >= 0)
+((x + -100) = 0)
+dataflow number:2
+guard number:2
+-------------
+false :- inv_main7(j, i), j != 200 & !(-1*i + 100 >= 1).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((j,j), (i,i))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(j, i)
+Data flow:
+Guard:
+!((j + -200) = 0)
+!(((100 + -1 * i) + -1) >= 0)
+dataflow number:0
+guard number:2
+-----------

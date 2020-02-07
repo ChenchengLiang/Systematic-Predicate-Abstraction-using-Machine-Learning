@@ -1,0 +1,67 @@
+-------------
+inv_main10(x, y) :- inv_main11(x, y), !(-1*x + 100 >= 1).
+Head arguments: ListBuffer((x,x), (y,y))
+Body arguments: ListBuffer((x,x), (y,y))
+Common Arguments:ListBuffer((x,x), (y,y))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(x)
+Data flow:
+x<-x
+y<-y
+Guard:
+!(((100 + -1 * x) + -1) >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main11(arg0, y) :- inv_main11(x, y), -1*x + 100 >= 1 & x + y = arg0.
+Head arguments: ListBuffer((arg0,arg0), (y,y))
+Body arguments: ListBuffer((x,x), (y,y))
+Common Arguments:ListBuffer((y,y))
+relativeComplimentOfHeadArg:ListBuffer((arg0,arg0))
+variables in guard: ListBuffer(x)
+Data flow:
+arg0<-(x + y)
+Guard:
+(((100 + -1 * x) + -1) >= 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main11(__eval0, __eval7) :- !(!(__eval7 >= 1) | !(1000000 >= __eval7)).
+Head arguments: ListBuffer((__eval0,__eval0), (__eval7,__eval7))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((__eval0,__eval0), (__eval7,__eval7))
+variables in guard: ListBuffer(__eval7)
+Data flow:
+__eval7<-___eval7
+Guard:
+(((-1 + ___eval7) >= 0) & ((1000000 + -1 * ___eval7) >= 0))
+dataflow number:1
+guard number:1
+-------------
+inv_main10(__eval0, __eval7) :- !(__eval7 >= 1 | !(1000000 >= __eval7)).
+Head arguments: ListBuffer((__eval0,__eval0), (__eval7,__eval7))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((__eval0,__eval0), (__eval7,__eval7))
+variables in guard: ListBuffer(__eval7)
+Data flow:
+__eval7<-___eval7
+Guard:
+((-1 * ___eval7 >= 0) & ((1000000 + -1 * ___eval7) >= 0))
+dataflow number:1
+guard number:1
+-------------
+false :- inv_main10(x, y), 99 >= x & y >= 1.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((x,x), (y,y))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(x, y)
+Data flow:
+Guard:
+((99 + -1 * x) >= 0)
+((-1 + y) >= 0)
+dataflow number:0
+guard number:2
+-----------

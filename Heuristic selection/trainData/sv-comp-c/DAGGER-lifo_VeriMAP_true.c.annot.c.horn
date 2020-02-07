@@ -1,0 +1,17 @@
+inv_main18(I, arg0, arg1, arg2, arg3, arg4, arg5) :- I >= 1 & 0 = arg0 & 0 = arg1 & 0 = arg2 & 0 = arg3 & 0 = arg4 & 0 = arg5.
+inv_main18(I, arg6, arg7, arg8, arg9, Eb, Mb) :- inv_main18(I, Sa, Ea, Ma, Sb, Eb, Mb), Sb >= 1 & i != 0 & i != 0 & Ea + Ma + 1 = arg6 & 0 = arg7 & 0 = arg8 & Sb + -1 = arg9.
+inv_main18(arg10, arg11, arg12, arg13, Sb, Eb, Mb) :- inv_main18(I, Sa, Ea, Ma, Sb, Eb, Mb), I >= 1 & i != 0 & i != 0 & I + -1 = arg10 & Sa + Ea + Ma + 1 = arg11 & 0 = arg12 & 0 = arg13.
+inv_main18(arg14, Sa, Ea, Ma, arg15, arg16, arg17) :- inv_main18(I, Sa, Ea, Ma, Sb, Eb, Mb), I >= 1 & i != 0 & i != 0 & I + -1 = arg14 & Sb + Eb + Mb + 1 = arg15 & 0 = arg16 & 0 = arg17.
+inv_main18(I, arg18, Ea, Ma, arg19, arg20, arg21) :- inv_main18(I, Sa, Ea, Ma, Sb, Eb, Mb), Sa >= 1 & i != 0 & i != 0 & Sa + -1 = arg18 & Sb + Eb + Mb + 1 = arg19 & 0 = arg20 & 0 = arg21.
+inv_main18(arg22, arg23, arg24, arg25, Sb, Eb, Mb) :- inv_main18(I, Sa, Ea, Ma, Sb, Eb, Mb), Sa >= 1 & i != 0 & i != 0 & I + Sa + Ea + Ma = arg22 & 0 = arg23 & 1 = arg24 & 0 = arg25.
+inv_main18(arg26, arg27, arg28, arg29, arg30, Eb, Mb) :- inv_main18(I, Sa, Ea, Ma, Sb, Eb, Mb), Sb >= 1 & i != 0 & i != 0 & I + Sa + Ea + Ma = arg26 & 0 = arg27 & 1 = arg28 & 0 = arg29 & Sb + -1 = arg30.
+inv_main18(arg31, Sa, Ea, Ma, arg32, arg33, arg34) :- inv_main18(I, Sa, Ea, Ma, Sb, Eb, Mb), Sb >= 1 & i != 0 & i != 0 & I + Sb + Eb + Mb = arg31 & 0 = arg32 & 1 = arg33 & 0 = arg34.
+inv_main18(arg35, arg36, Ea, Ma, arg37, arg38, arg39) :- inv_main18(I, Sa, Ea, Ma, Sb, Eb, Mb), Sa >= 1 & i != 0 & i != 0 & I + Sb + Eb + Mb = arg35 & Sa + -1 = arg36 & 0 = arg37 & 1 = arg38 & 0 = arg39.
+inv_main18(I, Sa, arg40, arg41, Sb, Eb, Mb) :- inv_main18(I, Sa, Ea, Ma, Sb, Eb, Mb), Ea >= 1 & i != 0 & i != 0 & Ea + -1 = arg40 & Ma + 1 = arg41.
+inv_main18(I, Sa, Ea, Ma, Sb, arg42, arg43) :- inv_main18(I, Sa, Ea, Ma, Sb, Eb, Mb), Eb >= 1 & i != 0 & Eb + -1 = arg42 & Mb + 1 = arg43.
+false :- inv_main18(I, Sa, Ea, Ma, Sb, Eb, Mb), !(-1*(Ea + Ma) >= -1).
+false :- inv_main18(I, Sa, Ea, Ma, Sb, Eb, Mb), !(-1*(Eb + Mb) >= -1).
+false :- inv_main18(I, Sa, Ea, Ma, Sb, Eb, Mb), !(Mb >= 0).
+false :- inv_main18(I, Sa, Ea, Ma, Sb, Eb, Mb), !(Eb >= 0).
+false :- inv_main18(I, Sa, Ea, Ma, Sb, Eb, Mb), !(Ma >= 0).
+false :- inv_main18(I, Sa, Ea, Ma, Sb, Eb, Mb), !(Ea >= 0).

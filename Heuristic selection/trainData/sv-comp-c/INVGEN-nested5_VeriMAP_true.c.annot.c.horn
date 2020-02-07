@@ -1,0 +1,7 @@
+inv_main8(arg1, arg2, n) :- n >= 1 & 0 = arg1 & 0 = arg2 & 0 = NONDET.
+inv_main8(arg3, arg4, n) :- inv_main8(i, j, n), n + -1*(i + 1) >= 1 & !(n - j >= 1) & i + 1 = arg3 & i + 1 = arg4 & NONDET = 0.
+inv_main12(i, j, arg5, n) :- inv_main8(i, arg5, n), n - arg5 >= 1 & n - arg5 >= 1 & j = arg5 & NONDET = 0.
+inv_main8(i, arg6, n) :- inv_main8(i, j, n), !(n - j >= 1) & n - j >= 1 & j + 1 = arg6 & NONDET = 0.
+inv_main12(i, j, arg7, n) :- inv_main12(i, j, k, n), n + -1*(k + 1) >= 1 & k + 1 = arg7 & NONDET = 0.
+inv_main8(i, arg8, n) :- inv_main12(i, j, k, n), !(n + -1*(k + 1) >= 1) & j + 1 = arg8 & k + 1 = arg9 & NONDET = 0.
+false :- inv_main12(i, j, k, n), !(k >= i).

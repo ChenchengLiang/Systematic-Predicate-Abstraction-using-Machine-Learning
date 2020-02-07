@@ -1,0 +1,63 @@
+-------------
+inv_main21(__eval45, arg2, arg4) :- __eval45 + 1 >= 1 & __eval45 >= 1 & -1*__eval45 + 2147483647 >= 1 & __eval45 + 1 + -1 = arg1 & __eval45 + 1 + -1 = arg4 & 0 = arg0 & 0 = arg2 & 0 = arg3.
+Head arguments: ListBuffer((__eval45,__eval45), (arg2,arg2), (arg4,arg4))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((__eval45,__eval45), (arg2,arg2), (arg4,arg4))
+variables in guard: ListBuffer(__eval45, arg0, arg3)
+Data flow:
+__eval45<-arg1
+__eval45<-___eval45
+arg2<-0
+arg4<-_arg4
+Guard:
+(___eval45 >= 0)
+((-1 + ___eval45) >= 0)
+((2147483646 + -1 * ___eval45) >= 0)
+(-1 * arg0 = 0)
+(-1 * arg3 = 0)
+((___eval45 + -1 * _arg4) = 0)
+dataflow number:3
+guard number:6
+-------------
+inv_main21(MAXPATHLEN, arg5, glob2_pathlim_off) :- inv_main21(MAXPATHLEN, glob2_p_off, glob2_pathlim_off), glob2_pathlim_off + -1*(glob2_p_off + 1) >= 0 & glob2_p_off + 1 = arg5 & pathbuf_off = 0 & glob2_pathbuf_off = 0.
+Head arguments: ListBuffer((MAXPATHLEN,MAXPATHLEN), (arg5,arg5), (glob2_pathlim_off,glob2_pathlim_off))
+Body arguments: ListBuffer((MAXPATHLEN,MAXPATHLEN), (glob2_p_off,glob2_p_off), (glob2_pathlim_off,glob2_pathlim_off))
+Common Arguments:ListBuffer((MAXPATHLEN,MAXPATHLEN), (glob2_pathlim_off,glob2_pathlim_off))
+relativeComplimentOfHeadArg:ListBuffer((arg5,arg5))
+variables in guard: ListBuffer(glob2_pathlim_off, glob2_p_off, pathbuf_off, glob2_pathbuf_off)
+Data flow:
+arg5<-(glob2_p_off + 1)
+MAXPATHLEN<-MAXPATHLEN
+glob2_pathlim_off<-glob2_pathlim_off
+Guard:
+((glob2_pathlim_off + -1 * (glob2_p_off + 1)) >= 0)
+(pathbuf_off = 0)
+(glob2_pathbuf_off = 0)
+dataflow number:1
+guard number:3
+-------------
+false :- inv_main21(MAXPATHLEN, glob2_p_off, glob2_pathlim_off), !(glob2_p_off >= 0).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((MAXPATHLEN,MAXPATHLEN), (glob2_p_off,glob2_p_off), (glob2_pathlim_off,glob2_pathlim_off))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(glob2_p_off)
+Data flow:
+Guard:
+!(glob2_p_off >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main21(MAXPATHLEN, glob2_p_off, glob2_pathlim_off), !(MAXPATHLEN + 1 - glob2_p_off >= 1).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((MAXPATHLEN,MAXPATHLEN), (glob2_p_off,glob2_p_off), (glob2_pathlim_off,glob2_pathlim_off))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(MAXPATHLEN, glob2_p_off)
+Data flow:
+Guard:
+!((((MAXPATHLEN + 1) + -1 * glob2_p_off) + -1) >= 0)
+dataflow number:0
+guard number:1
+-----------

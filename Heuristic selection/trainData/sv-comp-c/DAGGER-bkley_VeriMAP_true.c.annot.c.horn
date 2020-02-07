@@ -1,0 +1,7 @@
+inv_main16(invalid, unowned, nonexclusive, exclusive) :- invalid >= 1 & unowned = 0 & nonexclusive = 0 & exclusive = 0.
+inv_main16(arg0, arg1, arg2, arg3) :- inv_main16(invalid, unowned, nonexclusive, exclusive), invalid >= 1 & i != 0 & i != 0 & invalid + -1 = arg0 & unowned + 1 = arg1 & nonexclusive + exclusive = arg2 & 0 = arg3.
+inv_main16(arg4, arg5, arg6, arg7) :- inv_main16(invalid, unowned, nonexclusive, exclusive), nonexclusive + unowned >= 1 & i != 0 & i != 0 & invalid + unowned + nonexclusive + -1 = arg4 & 0 = arg5 & 0 = arg6 & exclusive + 1 = arg7.
+inv_main16(arg8, arg9, arg10, arg11) :- inv_main16(invalid, unowned, nonexclusive, exclusive), invalid >= 1 & i != 0 & invalid + 1 + -1 = arg8 & 0 = arg9 & 0 = arg10 & 1 = arg11.
+false :- inv_main16(invalid, unowned, nonexclusive, exclusive), !(exclusive >= 0).
+false :- inv_main16(invalid, unowned, nonexclusive, exclusive), !(unowned >= 0).
+false :- inv_main16(invalid, unowned, nonexclusive, exclusive), !(invalid + unowned + exclusive + nonexclusive >= 1).

@@ -1,0 +1,14 @@
+inv_main9(n, i) :- inv_main42(n, i, j), !(n >= j).
+inv_main6(n, arg1, l) :- l >= 1 & n = arg1.
+inv_main9(n, i) :- inv_main6(n, i, l), !(n - i >= 1) & i >= 1.
+inv_main42(n, i, arg4) :- inv_main42(n, i, j), n >= j & j + 1 = arg4.
+inv_main6(n, arg5, i) :- inv_main9(n, i), i + -1 = arg5.
+inv_main42(n, i, l) :- inv_main6(n, i, l), n - i >= 1 & i >= 1.
+false :- inv_main42(n, i, j), !(j >= 1) & n >= j.
+false :- inv_main42(n, i, j), !(n >= j) & n >= j.
+false :- inv_main42(n, i, j), !(i >= 1) & n >= j.
+false :- inv_main42(n, i, j), !(n >= i) & n >= j.
+false :- inv_main9(n, i), !(i >= 1).
+false :- inv_main9(n, i), !(n >= i).
+false :- inv_main9(n, i), !(i >= 1).
+false :- inv_main9(n, i), !(n >= i).

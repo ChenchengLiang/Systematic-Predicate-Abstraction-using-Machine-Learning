@@ -1,0 +1,78 @@
+-------------
+inv_main17(z, res1, arg1) :- inv_main17(z, res1, x), -1*x + 10 >= 1 & x + 2 = arg0 & x + 2 + x + 2 = arg1 & z = z.
+Head arguments: ListBuffer((z,z), (res1,res1), (arg1,arg1))
+Body arguments: ListBuffer((z,z), (res1,res1), (x,x))
+Common Arguments:ListBuffer((z,z), (res1,res1))
+relativeComplimentOfHeadArg:ListBuffer((arg1,arg1))
+variables in guard: ListBuffer(x, arg0, z)
+Data flow:
+arg1<-((2 + x) + (2 + x))
+z<-z
+res1<-res1
+Guard:
+(((10 + -1 * x) + -1) >= 0)
+(((2 + x) + -1 * arg0) = 0)
+((z + -1 * z) = 0)
+dataflow number:1
+guard number:3
+-------------
+inv_main8(z, arg2) :- inv_main8(z, x), 9 >= x & 2*(x + 2) = arg2 & x + 2 = arg3 & z = z.
+Head arguments: ListBuffer((z,z), (arg2,arg2))
+Body arguments: ListBuffer((z,z), (x,x))
+Common Arguments:ListBuffer((z,z))
+relativeComplimentOfHeadArg:ListBuffer((arg2,arg2))
+variables in guard: ListBuffer(x, arg3, z)
+Data flow:
+arg2<-2 * (x + 2)
+z<-z
+Guard:
+((9 + -1 * x) >= 0)
+(((x + 2) + -1 * arg3) = 0)
+((z + -1 * z) = 0)
+dataflow number:1
+guard number:3
+-------------
+inv_main8(z, arg6) :- z = arg5 & 1 = arg6 & 0 = arg7.
+Head arguments: ListBuffer((z,z), (arg6,arg6))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((z,z), (arg6,arg6))
+variables in guard: ListBuffer(arg7)
+Data flow:
+z<-arg5
+arg6<-1
+Guard:
+(-1 * arg7 = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main17(z, arg8, arg11) :- inv_main8(arg9, x), !(9 >= x) & z = arg9 & 2*x = arg8 & z = arg9 & 0 = arg10 & 1 = arg11.
+Head arguments: ListBuffer((z,z), (arg8,arg8), (arg11,arg11))
+Body arguments: ListBuffer((arg9,arg9), (x,x))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((z,z), (arg8,arg8), (arg11,arg11))
+variables in guard: ListBuffer(x, z, arg9, arg10)
+Data flow:
+z<-arg9
+arg8<-2 * x
+arg11<-1
+Guard:
+!((9 + -1 * x) >= 0)
+((z + -1 * arg9) = 0)
+(-1 * arg10 = 0)
+dataflow number:3
+guard number:3
+-------------
+false :- inv_main17(z, res1, x), res1 != 2*x & !(-1*x + 10 >= 1).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((z,z), (res1,res1), (x,x))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(res1, x)
+Data flow:
+Guard:
+!((res1 + -2 * x) = 0)
+!(((10 + -1 * x) + -1) >= 0)
+dataflow number:0
+guard number:2
+-----------

@@ -1,0 +1,8 @@
+inv_main4(arg0, arg1, arg2, arg3) :- 0 = arg0 & 0 = arg1 & 0 = arg2 & 0 = arg3.
+inv_main4(arg4, arg5, z, w) :- inv_main4(x, y, z, w), __eval98 != 0 & __eval97 != 0 & x + 1 = arg4 & y + 2 = arg5.
+inv_main4(x, y, z, w) :- inv_main4(x, y, z, w), !(x >= 4) & __eval103 != 0 & __eval97 != 0.
+inv_main4(arg6, arg7, arg8, arg9) :- inv_main4(x, y, z, w), x >= 4 & __eval103 != 0 & __eval97 != 0 & x + 1 = arg6 & y + 3 = arg7 & z + 10 = arg8 & w + 10 = arg9.
+inv_main4(x, y, z, w) :- inv_main4(x, y, z, w), __eval97 != 0 & y >= w.
+inv_main4(x, y, z, w) :- inv_main4(x, y, z, w), __eval97 != 0 & z - x >= 1.
+inv_main4(arg10, arg11, z, w) :- inv_main4(x, y, z, w), x >= z & w - y >= 1 & __eval97 != 0 & -1*x = arg10 & -1*y = arg11.
+false :- inv_main4(x, y, z, w), !(3*x >= y).

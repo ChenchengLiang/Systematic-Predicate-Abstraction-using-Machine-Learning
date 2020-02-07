@@ -1,0 +1,165 @@
+-------------
+inv_main24(i, j, arg0, n, m) :- inv_main24(i, j, k, n, m), j - k >= 1 & k + 1 = arg0.
+Head arguments: ListBuffer((i,i), (j,j), (arg0,arg0), (n,n), (m,m))
+Body arguments: ListBuffer((i,i), (j,j), (k,k), (n,n), (m,m))
+Common Arguments:ListBuffer((i,i), (j,j), (n,n), (m,m))
+relativeComplimentOfHeadArg:ListBuffer((arg0,arg0))
+variables in guard: ListBuffer(j, k)
+Data flow:
+arg0<-(k + 1)
+i<-i
+j<-j
+n<-n
+m<-m
+Guard:
+(((j + -1 * k) + -1) >= 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main10(arg1, arg2, n, m) :- n >= 1 & n + -1*(m + 1) >= 1 & 0 = arg1 & 0 = arg2.
+Head arguments: ListBuffer((arg1,arg1), (arg2,arg2), (n,n), (m,m))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg1,arg1), (arg2,arg2), (n,n), (m,m))
+variables in guard: ListBuffer(n, m)
+Data flow:
+arg1<-0
+arg2<-0
+n<-_n
+m<-_m
+Guard:
+((-1 + _n) >= 0)
+((-2 + (_n + -1 * _m)) >= 0)
+dataflow number:4
+guard number:2
+-------------
+inv_main10(arg3, arg4, n, m) :- inv_main10(i, j, n, m), n + -1*(i + 4) >= 1 & !(m - j >= 1) & i + 4 = arg3 & i + 4 = arg4.
+Head arguments: ListBuffer((arg3,arg3), (arg4,arg4), (n,n), (m,m))
+Body arguments: ListBuffer((i,i), (j,j), (n,n), (m,m))
+Common Arguments:ListBuffer((n,n), (m,m))
+relativeComplimentOfHeadArg:ListBuffer((arg3,arg3), (arg4,arg4))
+variables in guard: ListBuffer(n, i, m, j)
+Data flow:
+arg3<-(i + 4)
+arg4<-(i + 4)
+n<-n
+m<-m
+Guard:
+(((n + -1 * (i + 4)) + -1) >= 0)
+!(((m + -1 * j) + -1) >= 0)
+dataflow number:2
+guard number:2
+-------------
+inv_main24(i, arg5, arg6, n, m) :- inv_main10(i, j, n, m), j >= 0 & __eval102 != 0 & m - j >= 1 & j + 1 = arg5 & 0 = arg6.
+Head arguments: ListBuffer((i,i), (arg5,arg5), (arg6,arg6), (n,n), (m,m))
+Body arguments: ListBuffer((i,i), (j,j), (n,n), (m,m))
+Common Arguments:ListBuffer((i,i), (n,n), (m,m))
+relativeComplimentOfHeadArg:ListBuffer((arg5,arg5), (arg6,arg6))
+variables in guard: ListBuffer(j, __eval102, m)
+Data flow:
+arg5<-(j + 1)
+arg6<-0
+i<-i
+n<-n
+m<-m
+Guard:
+(j >= 0)
+!(__eval102 = 0)
+(((m + -1 * j) + -1) >= 0)
+dataflow number:2
+guard number:3
+-------------
+inv_main24(i, arg7, arg8, n, m) :- inv_main10(i, j, n, m), !(j >= 0) & __eval102 != 0 & m - j >= 1 & j + 1 = arg7 & 0 = arg8.
+Head arguments: ListBuffer((i,i), (arg7,arg7), (arg8,arg8), (n,n), (m,m))
+Body arguments: ListBuffer((i,i), (j,j), (n,n), (m,m))
+Common Arguments:ListBuffer((i,i), (n,n), (m,m))
+relativeComplimentOfHeadArg:ListBuffer((arg7,arg7), (arg8,arg8))
+variables in guard: ListBuffer(j, __eval102, m)
+Data flow:
+arg7<-(j + 1)
+arg8<-0
+i<-i
+n<-n
+m<-m
+Guard:
+!(j >= 0)
+!(__eval102 = 0)
+(((m + -1 * j) + -1) >= 0)
+dataflow number:2
+guard number:3
+-------------
+inv_main10(i, j, n, m) :- inv_main24(i, j, k, n, m), !(j - k >= 1).
+Head arguments: ListBuffer((i,i), (j,j), (n,n), (m,m))
+Body arguments: ListBuffer((i,i), (j,j), (k,k), (n,n), (m,m))
+Common Arguments:ListBuffer((i,i), (j,j), (n,n), (m,m))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(j, k)
+Data flow:
+i<-i
+j<-j
+n<-n
+m<-m
+Guard:
+!(((j + -1 * k) + -1) >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main10(i, arg9, n, m) :- inv_main10(i, j, n, m), n + j + 5 - i >= 1 & m - j >= 1 & j + 2 = arg9.
+Head arguments: ListBuffer((i,i), (arg9,arg9), (n,n), (m,m))
+Body arguments: ListBuffer((i,i), (j,j), (n,n), (m,m))
+Common Arguments:ListBuffer((i,i), (n,n), (m,m))
+relativeComplimentOfHeadArg:ListBuffer((arg9,arg9))
+variables in guard: ListBuffer(n, j, i, m)
+Data flow:
+arg9<-(j + 2)
+i<-i
+n<-n
+m<-m
+Guard:
+(((((n + j) + 5) + -1 * i) + -1) >= 0)
+(((m + -1 * j) + -1) >= 0)
+dataflow number:1
+guard number:2
+-------------
+inv_main10(i, arg10, n, m) :- inv_main10(i, j, n, m), !(n + j + 5 - i >= 1) & m - j >= 1 & j + 2 = arg10.
+Head arguments: ListBuffer((i,i), (arg10,arg10), (n,n), (m,m))
+Body arguments: ListBuffer((i,i), (j,j), (n,n), (m,m))
+Common Arguments:ListBuffer((i,i), (n,n), (m,m))
+relativeComplimentOfHeadArg:ListBuffer((arg10,arg10))
+variables in guard: ListBuffer(n, j, i, m)
+Data flow:
+arg10<-(j + 2)
+i<-i
+n<-n
+m<-m
+Guard:
+!(((((n + j) + 5) + -1 * i) + -1) >= 0)
+(((m + -1 * j) + -1) >= 0)
+dataflow number:1
+guard number:2
+-------------
+false :- inv_main10(i, j, n, m), !(j >= 0 | __eval102 = 0 | !(m - j >= 1)).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((i,i), (j,j), (n,n), (m,m))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(j, __eval102, m)
+Data flow:
+Guard:
+!((j >= 0) | ((__eval102 = 0) | !(((m + -1 * j) + -1) >= 0)))
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main10(i, j, n, m), !(n + j + 5 - i >= 1) & m - j >= 1.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((i,i), (j,j), (n,n), (m,m))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(n, j, i, m)
+Data flow:
+Guard:
+!(((((n + j) + 5) + -1 * i) + -1) >= 0)
+(((m + -1 * j) + -1) >= 0)
+dataflow number:0
+guard number:2
+-----------

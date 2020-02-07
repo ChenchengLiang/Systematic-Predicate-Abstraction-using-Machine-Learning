@@ -1,0 +1,4 @@
+inv_main7(n, m, arg0, arg1) :- inv_main7(n, m, x, y), x + 1 - m >= 1 & n - x >= 1 & x + 1 = arg0 & y + 1 = arg1.
+inv_main7(n, m, arg2, y) :- inv_main7(n, m, x, y), !(x + 1 - m >= 1) & n - x >= 1 & x + 1 = arg2.
+inv_main7(n, m, arg3, arg4) :- n - arg4 >= 1 & arg4 >= 0 & n >= 0 & 0 = arg3 & m = arg4.
+false :- inv_main7(n, m, x, y), !(y = n | n - x >= 1).

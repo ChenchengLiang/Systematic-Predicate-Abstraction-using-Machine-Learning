@@ -1,0 +1,158 @@
+-------------
+inv_main28(arg1, arg2, n, arg3) :- inv_main28(i, k, n, j), !(j + 1 >= n) & i + -1 = arg1 & k + -1 = arg2 & j + 1 = arg3.
+Head arguments: ListBuffer((arg1,arg1), (arg2,arg2), (n,n), (arg3,arg3))
+Body arguments: ListBuffer((i,i), (k,k), (n,n), (j,j))
+Common Arguments:ListBuffer((n,n))
+relativeComplimentOfHeadArg:ListBuffer((arg1,arg1), (arg2,arg2), (arg3,arg3))
+variables in guard: ListBuffer(j, n)
+Data flow:
+arg1<-(i + -1)
+arg2<-(k + -1)
+arg3<-(j + 1)
+n<-n
+Guard:
+!(((j + 1) + -1 * n) >= 0)
+dataflow number:3
+guard number:1
+-------------
+inv_main8(arg4, __eval23) :- 0 = arg4.
+Head arguments: ListBuffer((arg4,arg4), (__eval23,__eval23))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg4,arg4), (__eval23,__eval23))
+variables in guard: ListBuffer()
+Data flow:
+arg4<-0
+Guard:
+dataflow number:1
+guard number:0
+-------------
+inv_main8(arg5, pvlen) :- inv_main8(i, pvlen), __eval24 != 0 & 1000000 >= i & i + 1 = arg5.
+Head arguments: ListBuffer((arg5,arg5), (pvlen,pvlen))
+Body arguments: ListBuffer((i,i), (pvlen,pvlen))
+Common Arguments:ListBuffer((pvlen,pvlen))
+relativeComplimentOfHeadArg:ListBuffer((arg5,arg5))
+variables in guard: ListBuffer(__eval24, i)
+Data flow:
+arg5<-(i + 1)
+pvlen<-pvlen
+Guard:
+!(__eval24 = 0)
+((1000000 + -1 * i) >= 0)
+dataflow number:1
+guard number:2
+-------------
+inv_main28(i, k, arg6, arg7) :- inv_main18(arg6, k), arg7 = 0 & i = arg6.
+Head arguments: ListBuffer((i,i), (k,k), (arg6,arg6), (arg7,arg7))
+Body arguments: ListBuffer((arg6,arg6), (k,k))
+Common Arguments:ListBuffer((k,k), (arg6,arg6))
+relativeComplimentOfHeadArg:ListBuffer((i,i), (arg7,arg7))
+variables in guard: ListBuffer()
+Data flow:
+i<-arg6
+arg7<-0
+k<-k
+Guard:
+dataflow number:2
+guard number:0
+-------------
+inv_main28(i, k, arg6, arg7) :- inv_main18(arg6, k), arg6 >= 1000001 & arg7 = 0 & i = arg6.
+Head arguments: ListBuffer((i,i), (k,k), (arg6,arg6), (arg7,arg7))
+Body arguments: ListBuffer((arg6,arg6), (k,k))
+Common Arguments:ListBuffer((k,k), (arg6,arg6))
+relativeComplimentOfHeadArg:ListBuffer((i,i), (arg7,arg7))
+variables in guard: ListBuffer(arg6)
+Data flow:
+i<-arg6
+arg7<-0
+k<-k
+Guard:
+((-1000001 + arg6) >= 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main18(arg8, arg9) :- inv_main18(i, k), __eval37 != 0 & 1000000 >= i & i + 1 = arg8 & k + 1 = arg9.
+Head arguments: ListBuffer((arg8,arg8), (arg9,arg9))
+Body arguments: ListBuffer((i,i), (k,k))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg8,arg8), (arg9,arg9))
+variables in guard: ListBuffer(__eval37, i)
+Data flow:
+arg8<-(i + 1)
+arg9<-(k + 1)
+Guard:
+!(__eval37 = 0)
+((1000000 + -1 * i) >= 0)
+dataflow number:2
+guard number:2
+-------------
+inv_main18(arg10, k) :- inv_main8(i, pvlen), i - pvlen >= 1 & k = 0 & arg10 = 0.
+Head arguments: ListBuffer((arg10,arg10), (k,k))
+Body arguments: ListBuffer((i,i), (pvlen,pvlen))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg10,arg10), (k,k))
+variables in guard: ListBuffer(pvlen, i)
+Data flow:
+arg10<-0
+k<-0
+Guard:
+((-1 + (-1 * pvlen + i)) >= 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main18(arg10, k) :- inv_main8(i, pvlen), i - pvlen >= 1 & i >= 1000001 & k = 0 & arg10 = 0.
+Head arguments: ListBuffer((arg10,arg10), (k,k))
+Body arguments: ListBuffer((i,i), (pvlen,pvlen))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg10,arg10), (k,k))
+variables in guard: ListBuffer(pvlen, i)
+Data flow:
+arg10<-0
+k<-0
+Guard:
+((-1 + (-1 * pvlen + i)) >= 0)
+((-1000001 + i) >= 0)
+dataflow number:2
+guard number:2
+-------------
+inv_main18(arg11, k) :- inv_main8(i, pvlen), pvlen >= i & k = 0 & arg11 = 0.
+Head arguments: ListBuffer((arg11,arg11), (k,k))
+Body arguments: ListBuffer((i,i), (pvlen,pvlen))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg11,arg11), (k,k))
+variables in guard: ListBuffer(pvlen, i)
+Data flow:
+arg11<-0
+k<-0
+Guard:
+((pvlen + -1 * i) >= 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main18(arg11, k) :- inv_main8(i, pvlen), pvlen >= i & i >= 1000001 & k = 0 & arg11 = 0.
+Head arguments: ListBuffer((arg11,arg11), (k,k))
+Body arguments: ListBuffer((i,i), (pvlen,pvlen))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg11,arg11), (k,k))
+variables in guard: ListBuffer(pvlen, i)
+Data flow:
+arg11<-0
+k<-0
+Guard:
+((pvlen + -1 * i) >= 0)
+((-1000001 + i) >= 0)
+dataflow number:2
+guard number:2
+-------------
+false :- inv_main28(i, k, n, j), !(k >= 0).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((i,i), (k,k), (n,n), (j,j))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(k)
+Data flow:
+Guard:
+!(k >= 0)
+dataflow number:0
+guard number:1
+-----------

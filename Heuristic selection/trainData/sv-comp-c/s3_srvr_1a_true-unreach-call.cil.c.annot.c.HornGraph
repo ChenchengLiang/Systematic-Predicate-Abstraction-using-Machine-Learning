@@ -1,0 +1,558 @@
+-------------
+inv_main73(s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main21(8544, s__hit, s__verify_mode, 0, s__s3__tmp__new_cipher__algorithms, blastFlag), s__verify_mode != -1 & s__session__peer = 0 & s__state = 8544.
+Head arguments: ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((8544,8544), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (0,0), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((s__session__peer,s__session__peer))
+variables in guard: ListBuffer(s__verify_mode, s__state)
+Data flow:
+s__session__peer<-0
+s__hit<-s__hit
+s__verify_mode<-s__verify_mode
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+blastFlag<-blastFlag
+inv_main21_argument_0<-8544
+inv_main21_argument_3<-0
+Guard:
+!((s__verify_mode + 1) = 0)
+((s__state + -8544) = 0)
+dataflow number:1
+guard number:2
+-------------
+inv_main73(s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main21(8544, s__hit, -4, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag), s__session__peer != 0 & s__verify_mode = -4 & s__state = 8544.
+Head arguments: ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((8544,8544), (s__hit,s__hit), (-4,-4), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((s__verify_mode,s__verify_mode))
+variables in guard: ListBuffer(s__session__peer, s__state)
+Data flow:
+s__verify_mode<--4
+s__hit<-s__hit
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+blastFlag<-blastFlag
+inv_main21_argument_0<-8544
+inv_main21_argument_2<--4
+Guard:
+!(s__session__peer = 0)
+((s__state + -8544) = 0)
+dataflow number:1
+guard number:2
+-------------
+inv_main116 :- inv_main21(s__state, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag), !(!(8512 >= s__state) | !(blastFlag + -2 >= 1)).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((s__state,s__state), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(s__state, blastFlag)
+Data flow:
+Guard:
+!(!((8512 + -1 * s__state) >= 0) | !(((blastFlag + -2) + -1) >= 0))
+dataflow number:0
+guard number:1
+-------------
+inv_main116 :- inv_main21(8672, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, 5), blastFlag = 5 & s__state = 8672.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((8672,8672), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (5,5))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(blastFlag, s__state)
+Data flow:
+inv_main21_argument_0<-8672
+inv_main21_argument_5<-5
+Guard:
+((blastFlag + -5) = 0)
+((s__state + -8672) = 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main21(arg0, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main21(8512, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag), !(blastFlag + -2 >= 1) & 8528 = arg0.
+Head arguments: ListBuffer((arg0,arg0), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((8512,8512), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((arg0,arg0))
+variables in guard: ListBuffer(blastFlag)
+Data flow:
+arg0<-8528
+s__hit<-s__hit
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+blastFlag<-blastFlag
+inv_main21_argument_0<-8512
+Guard:
+!(((blastFlag + -2) + -1) >= 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main21(arg1, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main21(8528, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag), 8544 = arg1.
+Head arguments: ListBuffer((arg1,arg1), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((8528,8528), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((arg1,arg1))
+variables in guard: ListBuffer()
+Data flow:
+arg1<-8544
+s__hit<-s__hit
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+blastFlag<-blastFlag
+inv_main21_argument_0<-8528
+Guard:
+dataflow number:1
+guard number:0
+-------------
+inv_main21(arg2, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main21(8560, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag), 8576 = arg2.
+Head arguments: ListBuffer((arg2,arg2), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((8560,8560), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((arg2,arg2))
+variables in guard: ListBuffer()
+Data flow:
+arg2<-8576
+s__hit<-s__hit
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+blastFlag<-blastFlag
+inv_main21_argument_0<-8560
+Guard:
+dataflow number:1
+guard number:0
+-------------
+inv_main21(arg3, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main21(8592, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag), 8608 = arg3.
+Head arguments: ListBuffer((arg3,arg3), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((8592,8592), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((arg3,arg3))
+variables in guard: ListBuffer()
+Data flow:
+arg3<-8608
+s__hit<-s__hit
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+blastFlag<-blastFlag
+inv_main21_argument_0<-8592
+Guard:
+dataflow number:1
+guard number:0
+-------------
+inv_main21(arg4, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main21(8608, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag), 8640 = arg4.
+Head arguments: ListBuffer((arg4,arg4), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((8608,8608), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((arg4,arg4))
+variables in guard: ListBuffer()
+Data flow:
+arg4<-8640
+s__hit<-s__hit
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+blastFlag<-blastFlag
+inv_main21_argument_0<-8608
+Guard:
+dataflow number:1
+guard number:0
+-------------
+inv_main21(arg5, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, arg6) :- inv_main21(8466, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, 0), 8496 = arg5 & 1 = arg6.
+Head arguments: ListBuffer((arg5,arg5), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (arg6,arg6))
+Body arguments: ListBuffer((8466,8466), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (0,0))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms))
+relativeComplimentOfHeadArg:ListBuffer((arg5,arg5), (arg6,arg6))
+variables in guard: ListBuffer()
+Data flow:
+arg5<-8496
+arg6<-1
+s__hit<-s__hit
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+inv_main21_argument_0<-8466
+inv_main21_argument_5<-0
+Guard:
+dataflow number:2
+guard number:0
+-------------
+inv_main21(arg7, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main21(8466, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag), blastFlag != 0 & !(blastFlag + -2 >= 1) & 8496 = arg7.
+Head arguments: ListBuffer((arg7,arg7), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((8466,8466), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((arg7,arg7))
+variables in guard: ListBuffer(blastFlag)
+Data flow:
+arg7<-8496
+s__hit<-s__hit
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+blastFlag<-blastFlag
+inv_main21_argument_0<-8466
+Guard:
+!(blastFlag = 0)
+!(((blastFlag + -2) + -1) >= 0)
+dataflow number:1
+guard number:2
+-------------
+inv_main21(arg8, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, arg9) :- inv_main21(8496, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, 1), s__hit != 0 & 8656 = arg8 & 2 = arg9.
+Head arguments: ListBuffer((arg8,arg8), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (arg9,arg9))
+Body arguments: ListBuffer((8496,8496), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (1,1))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms))
+relativeComplimentOfHeadArg:ListBuffer((arg8,arg8), (arg9,arg9))
+variables in guard: ListBuffer(s__hit)
+Data flow:
+arg8<-8656
+arg9<-2
+s__hit<-s__hit
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+inv_main21_argument_0<-8496
+inv_main21_argument_5<-1
+Guard:
+!(s__hit = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main21(arg10, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, arg11) :- inv_main21(8496, 0, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, 1), s__hit = 0 & 8512 = arg10 & 2 = arg11.
+Head arguments: ListBuffer((arg10,arg10), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (arg11,arg11))
+Body arguments: ListBuffer((8496,8496), (0,0), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (1,1))
+Common Arguments:ListBuffer((s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms))
+relativeComplimentOfHeadArg:ListBuffer((arg10,arg10), (s__hit,s__hit), (arg11,arg11))
+variables in guard: ListBuffer()
+Data flow:
+arg10<-8512
+s__hit<-0
+arg11<-2
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+inv_main21_argument_0<-8496
+inv_main21_argument_1<-0
+inv_main21_argument_5<-1
+Guard:
+dataflow number:3
+guard number:0
+-------------
+inv_main21(arg12, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main21(8496, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag), s__hit != 0 & blastFlag != 1 & !(blastFlag + -2 >= 1) & 8656 = arg12.
+Head arguments: ListBuffer((arg12,arg12), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((8496,8496), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((arg12,arg12))
+variables in guard: ListBuffer(s__hit, blastFlag)
+Data flow:
+arg12<-8656
+s__hit<-s__hit
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+blastFlag<-blastFlag
+inv_main21_argument_0<-8496
+Guard:
+!(s__hit = 0)
+!((blastFlag + -1) = 0)
+!(((blastFlag + -2) + -1) >= 0)
+dataflow number:1
+guard number:3
+-------------
+inv_main21(arg13, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main21(8496, 0, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag), blastFlag != 1 & !(blastFlag + -2 >= 1) & s__hit = 0 & 8512 = arg13.
+Head arguments: ListBuffer((arg13,arg13), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((8496,8496), (0,0), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((arg13,arg13), (s__hit,s__hit))
+variables in guard: ListBuffer(blastFlag)
+Data flow:
+arg13<-8512
+s__hit<-0
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+blastFlag<-blastFlag
+inv_main21_argument_0<-8496
+inv_main21_argument_1<-0
+Guard:
+!((blastFlag + -1) = 0)
+!(((blastFlag + -2) + -1) >= 0)
+dataflow number:2
+guard number:2
+-------------
+inv_main21(arg14, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main21(8576, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag), __eval211 = 2 & 8466 = arg14.
+Head arguments: ListBuffer((arg14,arg14), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((8576,8576), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((arg14,arg14))
+variables in guard: ListBuffer(__eval211)
+Data flow:
+arg14<-8466
+s__hit<-s__hit
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+blastFlag<-blastFlag
+inv_main21_argument_0<-8576
+Guard:
+((__eval211 + -2) = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main21(arg15, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main21(8576, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag), __eval211 != 2 & 8592 = arg15.
+Head arguments: ListBuffer((arg15,arg15), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((8576,8576), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((arg15,arg15))
+variables in guard: ListBuffer(__eval211)
+Data flow:
+arg15<-8592
+s__hit<-s__hit
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+blastFlag<-blastFlag
+inv_main21_argument_0<-8576
+Guard:
+!((__eval211 + -2) = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main21(arg16, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, arg17) :- inv_main21(8640, 0, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, 3), s__hit = 0 & 8656 = arg16 & 4 = arg17.
+Head arguments: ListBuffer((arg16,arg16), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (arg17,arg17))
+Body arguments: ListBuffer((8640,8640), (0,0), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (3,3))
+Common Arguments:ListBuffer((s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms))
+relativeComplimentOfHeadArg:ListBuffer((arg16,arg16), (s__hit,s__hit), (arg17,arg17))
+variables in guard: ListBuffer()
+Data flow:
+arg16<-8656
+s__hit<-0
+arg17<-4
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+inv_main21_argument_0<-8640
+inv_main21_argument_1<-0
+inv_main21_argument_5<-3
+Guard:
+dataflow number:3
+guard number:0
+-------------
+inv_main21(arg18, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main21(8640, 0, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag), blastFlag != 3 & s__hit = 0 & 8656 = arg18.
+Head arguments: ListBuffer((arg18,arg18), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((8640,8640), (0,0), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((arg18,arg18), (s__hit,s__hit))
+variables in guard: ListBuffer(blastFlag)
+Data flow:
+arg18<-8656
+s__hit<-0
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+blastFlag<-blastFlag
+inv_main21_argument_0<-8640
+inv_main21_argument_1<-0
+Guard:
+!((blastFlag + -3) = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main21(arg19, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, arg20) :- inv_main21(8656, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, 2), 8672 = arg19 & 3 = arg20.
+Head arguments: ListBuffer((arg19,arg19), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (arg20,arg20))
+Body arguments: ListBuffer((8656,8656), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (2,2))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms))
+relativeComplimentOfHeadArg:ListBuffer((arg19,arg19), (arg20,arg20))
+variables in guard: ListBuffer()
+Data flow:
+arg19<-8672
+arg20<-3
+s__hit<-s__hit
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+inv_main21_argument_0<-8656
+inv_main21_argument_5<-2
+Guard:
+dataflow number:2
+guard number:0
+-------------
+inv_main21(arg21, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main21(8656, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag), blastFlag != 2 & 8672 = arg21.
+Head arguments: ListBuffer((arg21,arg21), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((8656,8656), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((arg21,arg21))
+variables in guard: ListBuffer(blastFlag)
+Data flow:
+arg21<-8672
+s__hit<-s__hit
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+blastFlag<-blastFlag
+inv_main21_argument_0<-8656
+Guard:
+!((blastFlag + -2) = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main21(arg22, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, arg23) :- inv_main21(8672, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, 4), s__hit != 0 & 8640 = arg22 & 5 = arg23.
+Head arguments: ListBuffer((arg22,arg22), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (arg23,arg23))
+Body arguments: ListBuffer((8672,8672), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (4,4))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms))
+relativeComplimentOfHeadArg:ListBuffer((arg22,arg22), (arg23,arg23))
+variables in guard: ListBuffer(s__hit)
+Data flow:
+arg22<-8640
+arg23<-5
+s__hit<-s__hit
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+inv_main21_argument_0<-8672
+inv_main21_argument_5<-4
+Guard:
+!(s__hit = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main21(arg24, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main21(8672, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag), s__hit != 0 & blastFlag != 5 & blastFlag != 4 & 8640 = arg24.
+Head arguments: ListBuffer((arg24,arg24), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((8672,8672), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((arg24,arg24))
+variables in guard: ListBuffer(s__hit, blastFlag)
+Data flow:
+arg24<-8640
+s__hit<-s__hit
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+blastFlag<-blastFlag
+inv_main21_argument_0<-8672
+Guard:
+!(s__hit = 0)
+!((blastFlag + -5) = 0)
+!((blastFlag + -4) = 0)
+dataflow number:1
+guard number:3
+-------------
+inv_main21(arg25, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main21(8544, s__hit, -1, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag), s__verify_mode = -1 & 8560 = arg25.
+Head arguments: ListBuffer((arg25,arg25), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((8544,8544), (s__hit,s__hit), (-1,-1), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((arg25,arg25), (s__verify_mode,s__verify_mode))
+variables in guard: ListBuffer()
+Data flow:
+arg25<-8560
+s__verify_mode<--1
+s__hit<-s__hit
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+blastFlag<-blastFlag
+inv_main21_argument_0<-8544
+inv_main21_argument_2<--1
+Guard:
+dataflow number:2
+guard number:0
+-------------
+inv_main21(arg26, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main21(8544, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag), s__verify_mode != -4 & s__session__peer != 0 & s__verify_mode != -1 & 8560 = arg26.
+Head arguments: ListBuffer((arg26,arg26), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((8544,8544), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((arg26,arg26))
+variables in guard: ListBuffer(s__verify_mode, s__session__peer)
+Data flow:
+arg26<-8560
+s__hit<-s__hit
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+blastFlag<-blastFlag
+inv_main21_argument_0<-8544
+Guard:
+!((s__verify_mode + 4) = 0)
+!(s__session__peer = 0)
+!((s__verify_mode + 1) = 0)
+dataflow number:1
+guard number:3
+-------------
+inv_main21(arg27, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main73(s__hit, -2, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag), s__s3__tmp__new_cipher__algorithms != -256 & s__verify_mode = -2 & 8560 = arg27.
+Head arguments: ListBuffer((arg27,arg27), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((s__hit,s__hit), (-2,-2), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((arg27,arg27), (s__verify_mode,s__verify_mode))
+variables in guard: ListBuffer(s__s3__tmp__new_cipher__algorithms)
+Data flow:
+arg27<-8560
+s__verify_mode<--2
+s__hit<-s__hit
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+blastFlag<-blastFlag
+inv_main73_argument_1<--2
+Guard:
+!((s__s3__tmp__new_cipher__algorithms + 256) = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main21(arg28, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main73(s__hit, s__verify_mode, s__session__peer, -256, blastFlag), s__s3__tmp__new_cipher__algorithms = -256 & 8576 = arg28.
+Head arguments: ListBuffer((arg28,arg28), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (-256,-256), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((arg28,arg28), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms))
+variables in guard: ListBuffer()
+Data flow:
+arg28<-8576
+s__s3__tmp__new_cipher__algorithms<--256
+s__hit<-s__hit
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+blastFlag<-blastFlag
+inv_main73_argument_3<--256
+Guard:
+dataflow number:2
+guard number:0
+-------------
+inv_main21(arg29, s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag) :- inv_main73(s__hit, s__verify_mode, s__session__peer, s__s3__tmp__new_cipher__algorithms, blastFlag), s__verify_mode != -2 & s__s3__tmp__new_cipher__algorithms != -256 & 8576 = arg29.
+Head arguments: ListBuffer((arg29,arg29), (s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Body arguments: ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+Common Arguments:ListBuffer((s__hit,s__hit), (s__verify_mode,s__verify_mode), (s__session__peer,s__session__peer), (s__s3__tmp__new_cipher__algorithms,s__s3__tmp__new_cipher__algorithms), (blastFlag,blastFlag))
+relativeComplimentOfHeadArg:ListBuffer((arg29,arg29))
+variables in guard: ListBuffer(s__verify_mode, s__s3__tmp__new_cipher__algorithms)
+Data flow:
+arg29<-8576
+s__hit<-s__hit
+s__verify_mode<-s__verify_mode
+s__session__peer<-s__session__peer
+s__s3__tmp__new_cipher__algorithms<-s__s3__tmp__new_cipher__algorithms
+blastFlag<-blastFlag
+Guard:
+!((s__verify_mode + 2) = 0)
+!((s__s3__tmp__new_cipher__algorithms + 256) = 0)
+dataflow number:1
+guard number:2
+-------------
+inv_main21(arg30, __eval42, __eval55, __eval77, __eval90, arg31) :- 8466 = arg30 & 0 = arg31.
+Head arguments: ListBuffer((arg30,arg30), (__eval42,__eval42), (__eval55,__eval55), (__eval77,__eval77), (__eval90,__eval90), (arg31,arg31))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg30,arg30), (__eval42,__eval42), (__eval55,__eval55), (__eval77,__eval77), (__eval90,__eval90), (arg31,arg31))
+variables in guard: ListBuffer()
+Data flow:
+arg30<-8466
+arg31<-0
+Guard:
+dataflow number:2
+guard number:0
+-------------
+false :- inv_main116.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(true)
+Data flow:
+Guard:
+true
+dataflow number:0
+guard number:1
+-----------

@@ -1,0 +1,1949 @@
+-------------
+inv_main167(m_pc, t1_pc, t1_st, M_E, T1_E, E_M) :- inv_main128(1, t1_pc, 0, t1_st, M_E, T1_E, E_M, E_1, token, local, tmp), token != local + 1 & tmp_ndt_1 != 0 & tmp != 0 & m_pc = 1.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M))
+Body arguments: ListBuffer((1,1), (t1_pc,t1_pc), (0,0), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (tmp,tmp))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M))
+relativeComplimentOfHeadArg:ListBuffer((m_pc,m_pc))
+variables in guard: ListBuffer(token, local, tmp_ndt_1, tmp)
+Data flow:
+m_pc<-1
+t1_pc<-t1_pc
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+inv_main128_argument_0<-1
+inv_main128_argument_2<-0
+Guard:
+!((token + -1 * (local + 1)) = 0)
+!(tmp_ndt_1 = 0)
+!(tmp = 0)
+dataflow number:1
+guard number:3
+-------------
+inv_main203(t1_pc, t1_st, M_E, T1_E, E_M, token) :- inv_main189(t1_pc, t1_st, M_E, T1_E, E_M, token, tmp), tmp != 0.
+Head arguments: ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token))
+Body arguments: ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token), (tmp,tmp))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(tmp)
+Data flow:
+t1_pc<-t1_pc
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+token<-token
+Guard:
+!(tmp = 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main203(t1_pc, t1_st, M_E, T1_E, E_M, token) :- inv_main189(t1_pc, t1_st, M_E, T1_E, E_M, token, 0).
+Head arguments: ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token))
+Body arguments: ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token), (0,0))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(true)
+Data flow:
+t1_pc<-t1_pc
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+token<-token
+inv_main189_argument_6<-0
+Guard:
+true
+dataflow number:0
+guard number:1
+-------------
+inv_main206(t1_pc, t1_st, M_E, T1_E, E_M, token, arg13) :- inv_main203(1, t1_st, M_E, T1_E, E_M, token), t1_pc = 1 & 1 = arg13.
+Head arguments: ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token), (arg13,arg13))
+Body arguments: ListBuffer((1,1), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token))
+Common Arguments:ListBuffer((t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token))
+relativeComplimentOfHeadArg:ListBuffer((t1_pc,t1_pc), (arg13,arg13))
+variables in guard: ListBuffer()
+Data flow:
+t1_pc<-1
+arg13<-1
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+token<-token
+inv_main203_argument_0<-1
+Guard:
+dataflow number:2
+guard number:0
+-------------
+inv_main206(t1_pc, t1_st, M_E, T1_E, E_M, token, arg14) :- inv_main203(t1_pc, t1_st, M_E, T1_E, E_M, token), t1_pc != 1 & 0 = arg14.
+Head arguments: ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token), (arg14,arg14))
+Body arguments: ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token))
+relativeComplimentOfHeadArg:ListBuffer((arg14,arg14))
+variables in guard: ListBuffer(t1_pc)
+Data flow:
+arg14<-0
+t1_pc<-t1_pc
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+token<-token
+Guard:
+!((t1_pc + -1) = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main289(m_pc, m_st, M_E, T1_E, E_1, token, local, arg16) :- inv_main286(m_pc, m_st, M_E, T1_E, 1, token, local), E_1 = 1 & 1 = arg16.
+Head arguments: ListBuffer((m_pc,m_pc), (m_st,m_st), (M_E,M_E), (T1_E,T1_E), (E_1,E_1), (token,token), (local,local), (arg16,arg16))
+Body arguments: ListBuffer((m_pc,m_pc), (m_st,m_st), (M_E,M_E), (T1_E,T1_E), (1,1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (m_st,m_st), (M_E,M_E), (T1_E,T1_E), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((E_1,E_1), (arg16,arg16))
+variables in guard: ListBuffer()
+Data flow:
+E_1<-1
+arg16<-1
+m_pc<-m_pc
+m_st<-m_st
+M_E<-M_E
+T1_E<-T1_E
+token<-token
+local<-local
+inv_main286_argument_4<-1
+Guard:
+dataflow number:2
+guard number:0
+-------------
+inv_main289(m_pc, m_st, M_E, T1_E, E_1, token, local, arg18) :- inv_main286(m_pc, m_st, M_E, T1_E, E_1, token, local), E_1 != 1 & 0 = arg18.
+Head arguments: ListBuffer((m_pc,m_pc), (m_st,m_st), (M_E,M_E), (T1_E,T1_E), (E_1,E_1), (token,token), (local,local), (arg18,arg18))
+Body arguments: ListBuffer((m_pc,m_pc), (m_st,m_st), (M_E,M_E), (T1_E,T1_E), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (m_st,m_st), (M_E,M_E), (T1_E,T1_E), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg18,arg18))
+variables in guard: ListBuffer(E_1)
+Data flow:
+arg18<-0
+m_pc<-m_pc
+m_st<-m_st
+M_E<-M_E
+T1_E<-T1_E
+E_1<-E_1
+token<-token
+local<-local
+Guard:
+!((E_1 + -1) = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main78(t1_pc, E_1, arg20) :- 1 = 0 & -1 = 0 & E_1 = 1 & t1_pc = 1 & 1 = arg20.
+Head arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1), (arg20,arg20))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((t1_pc,t1_pc), (E_1,E_1), (arg20,arg20))
+variables in guard: ListBuffer()
+Data flow:
+t1_pc<-1
+E_1<-1
+arg20<-1
+Guard:
+(1 = 0)
+(-1 = 0)
+dataflow number:3
+guard number:2
+-------------
+inv_main78(t1_pc, E_1, arg21) :- 0 = arg21 & t1_pc = 0 & E_1 = 2.
+Head arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1), (arg21,arg21))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((t1_pc,t1_pc), (E_1,E_1), (arg21,arg21))
+variables in guard: ListBuffer()
+Data flow:
+t1_pc<-0
+E_1<-2
+arg21<-0
+Guard:
+dataflow number:3
+guard number:0
+-------------
+inv_main78(t1_pc, E_1, arg22) :- 1 = 0 & t1_pc = 1 & 0 = arg22 & E_1 = 2.
+Head arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1), (arg22,arg22))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((t1_pc,t1_pc), (E_1,E_1), (arg22,arg22))
+variables in guard: ListBuffer()
+Data flow:
+t1_pc<-1
+E_1<-2
+arg22<-0
+Guard:
+(1 = 0)
+dataflow number:3
+guard number:1
+-------------
+inv_main189(t1_pc, t1_st, M_E, T1_E, E_M, __eval267, arg25) :- inv_main167(1, t1_pc, t1_st, M_E, T1_E, 1), E_M = 1 & 1 = arg25.
+Head arguments: ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (__eval267,__eval267), (arg25,arg25))
+Body arguments: ListBuffer((1,1), (t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (1,1))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E))
+relativeComplimentOfHeadArg:ListBuffer((E_M,E_M), (__eval267,__eval267), (arg25,arg25))
+variables in guard: ListBuffer()
+Data flow:
+E_M<-1
+arg25<-1
+t1_pc<-t1_pc
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+inv_main167_argument_0<-1
+inv_main167_argument_5<-1
+inv_main167_argument_0<-1
+inv_main167_argument_5<-1
+Guard:
+dataflow number:2
+guard number:0
+-------------
+inv_main189(t1_pc, t1_st, M_E, T1_E, E_M, __eval267, arg28) :- inv_main167(m_pc, t1_pc, t1_st, M_E, T1_E, E_M), m_pc != 1 & 0 = arg28.
+Head arguments: ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (__eval267,__eval267), (arg28,arg28))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M))
+relativeComplimentOfHeadArg:ListBuffer((__eval267,__eval267), (arg28,arg28))
+variables in guard: ListBuffer(m_pc)
+Data flow:
+arg28<-0
+t1_pc<-t1_pc
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+Guard:
+!((m_pc + -1) = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main189(t1_pc, t1_st, M_E, T1_E, E_M, __eval267, arg31) :- inv_main167(1, t1_pc, t1_st, M_E, T1_E, E_M), E_M != 1 & 0 = arg31.
+Head arguments: ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (__eval267,__eval267), (arg31,arg31))
+Body arguments: ListBuffer((1,1), (t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M))
+relativeComplimentOfHeadArg:ListBuffer((__eval267,__eval267), (arg31,arg31))
+variables in guard: ListBuffer(E_M)
+Data flow:
+arg31<-0
+t1_pc<-t1_pc
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+inv_main167_argument_0<-1
+Guard:
+!((E_M + -1) = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main353(m_pc, t1_pc, arg32, t1_st, M_E, T1_E, E_M, E_1, token, local) :- inv_main339(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, tmp), tmp != 0 & 0 = arg32.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (arg32,arg32), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (tmp,tmp))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg32,arg32))
+variables in guard: ListBuffer(tmp)
+Data flow:
+arg32<-0
+m_pc<-m_pc
+t1_pc<-t1_pc
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+Guard:
+!(tmp = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main353(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local) :- inv_main339(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, 0).
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (0,0))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(true)
+Data flow:
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main339_argument_10<-0
+Guard:
+true
+dataflow number:0
+guard number:1
+-------------
+inv_main356(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, arg33) :- inv_main353(m_pc, 1, m_st, t1_st, M_E, T1_E, E_M, 1, token, local), E_1 = 1 & t1_pc = 1 & 1 = arg33.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (arg33,arg33))
+Body arguments: ListBuffer((m_pc,m_pc), (1,1), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (1,1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((t1_pc,t1_pc), (E_1,E_1), (arg33,arg33))
+variables in guard: ListBuffer()
+Data flow:
+t1_pc<-1
+E_1<-1
+arg33<-1
+m_pc<-m_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+token<-token
+local<-local
+inv_main353_argument_1<-1
+inv_main353_argument_7<-1
+inv_main353_argument_1<-1
+inv_main353_argument_7<-1
+Guard:
+dataflow number:3
+guard number:0
+-------------
+inv_main356(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, arg34) :- inv_main353(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local), t1_pc != 1 & 0 = arg34.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (arg34,arg34))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg34,arg34))
+variables in guard: ListBuffer(t1_pc)
+Data flow:
+arg34<-0
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+Guard:
+!((t1_pc + -1) = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main356(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, arg35) :- inv_main353(m_pc, 1, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local), E_1 != 1 & t1_pc = 1 & 0 = arg35.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (arg35,arg35))
+Body arguments: ListBuffer((m_pc,m_pc), (1,1), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((t1_pc,t1_pc), (arg35,arg35))
+variables in guard: ListBuffer(E_1)
+Data flow:
+t1_pc<-1
+arg35<-0
+m_pc<-m_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main353_argument_1<-1
+Guard:
+!((E_1 + -1) = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main436(m_pc, t1_pc, arg36, t1_st, T1_E, E_M, E_1, token, local) :- inv_main422(m_pc, t1_pc, m_st, t1_st, T1_E, E_M, E_1, token, local, tmp), tmp != 0 & 0 = arg36.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (arg36,arg36), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (tmp,tmp))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg36,arg36))
+variables in guard: ListBuffer(tmp)
+Data flow:
+arg36<-0
+m_pc<-m_pc
+t1_pc<-t1_pc
+t1_st<-t1_st
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+Guard:
+!(tmp = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main436(m_pc, t1_pc, m_st, t1_st, T1_E, E_M, E_1, token, local) :- inv_main422(m_pc, t1_pc, m_st, t1_st, T1_E, E_M, E_1, token, local, 0).
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (0,0))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(true)
+Data flow:
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main422_argument_9<-0
+Guard:
+true
+dataflow number:0
+guard number:1
+-------------
+inv_main439(m_pc, t1_pc, m_st, t1_st, T1_E, E_M, E_1, token, local, arg37) :- inv_main436(m_pc, 1, m_st, t1_st, T1_E, E_M, 1, token, local), E_1 = 1 & t1_pc = 1 & 1 = arg37.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (arg37,arg37))
+Body arguments: ListBuffer((m_pc,m_pc), (1,1), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (1,1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((t1_pc,t1_pc), (E_1,E_1), (arg37,arg37))
+variables in guard: ListBuffer()
+Data flow:
+t1_pc<-1
+E_1<-1
+arg37<-1
+m_pc<-m_pc
+m_st<-m_st
+t1_st<-t1_st
+T1_E<-T1_E
+E_M<-E_M
+token<-token
+local<-local
+inv_main436_argument_1<-1
+inv_main436_argument_6<-1
+inv_main436_argument_1<-1
+inv_main436_argument_6<-1
+Guard:
+dataflow number:3
+guard number:0
+-------------
+inv_main439(m_pc, t1_pc, m_st, t1_st, T1_E, E_M, E_1, token, local, arg38) :- inv_main436(m_pc, t1_pc, m_st, t1_st, T1_E, E_M, E_1, token, local), t1_pc != 1 & 0 = arg38.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (arg38,arg38))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg38,arg38))
+variables in guard: ListBuffer(t1_pc)
+Data flow:
+arg38<-0
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+Guard:
+!((t1_pc + -1) = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main439(m_pc, t1_pc, m_st, t1_st, T1_E, E_M, E_1, token, local, arg39) :- inv_main436(m_pc, 1, m_st, t1_st, T1_E, E_M, E_1, token, local), E_1 != 1 & t1_pc = 1 & 0 = arg39.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (arg39,arg39))
+Body arguments: ListBuffer((m_pc,m_pc), (1,1), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((t1_pc,t1_pc), (arg39,arg39))
+variables in guard: ListBuffer(E_1)
+Data flow:
+t1_pc<-1
+arg39<-0
+m_pc<-m_pc
+m_st<-m_st
+t1_st<-t1_st
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main436_argument_1<-1
+Guard:
+!((E_1 + -1) = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main146(arg40, t1_pc, arg41, arg42, M_E, T1_E, E_M, arg43, token, local) :- inv_main206(t1_pc, t1_st, M_E, T1_E, E_M, token, tmp___0), tmp___0 != 0 & 1 = arg40 & 2 = arg41 & 0 = arg42 & 2 = arg43 & local = token.
+Head arguments: ListBuffer((arg40,arg40), (t1_pc,t1_pc), (arg41,arg41), (arg42,arg42), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (arg43,arg43), (token,token), (local,local))
+Body arguments: ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token), (tmp___0,tmp___0))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token))
+relativeComplimentOfHeadArg:ListBuffer((arg40,arg40), (arg41,arg41), (arg42,arg42), (arg43,arg43), (local,local))
+variables in guard: ListBuffer(tmp___0)
+Data flow:
+arg40<-1
+arg41<-2
+arg42<-0
+arg43<-2
+local<-token
+t1_pc<-t1_pc
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+Guard:
+!(tmp___0 = 0)
+dataflow number:5
+guard number:1
+-------------
+inv_main146(arg44, t1_pc, arg45, t1_st, M_E, T1_E, E_M, arg46, token, local) :- inv_main206(t1_pc, t1_st, M_E, T1_E, E_M, token, 0), 1 = arg44 & 2 = arg45 & 2 = arg46 & local = token.
+Head arguments: ListBuffer((arg44,arg44), (t1_pc,t1_pc), (arg45,arg45), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (arg46,arg46), (token,token), (local,local))
+Body arguments: ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token), (0,0))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token))
+relativeComplimentOfHeadArg:ListBuffer((arg44,arg44), (arg45,arg45), (arg46,arg46), (local,local))
+variables in guard: ListBuffer()
+Data flow:
+arg44<-1
+arg45<-2
+arg46<-2
+local<-token
+t1_pc<-t1_pc
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+inv_main206_argument_6<-0
+Guard:
+dataflow number:4
+guard number:0
+-------------
+inv_main123(m_pc, arg47, m_st, arg48, M_E, T1_E, arg49, E_1, token, local) :- inv_main289(m_pc, m_st, M_E, T1_E, E_1, token, local, tmp___0), tmp___0 != 0 & 1 = arg47 & 2 = arg48 & 2 = arg49.
+Head arguments: ListBuffer((m_pc,m_pc), (arg47,arg47), (m_st,m_st), (arg48,arg48), (M_E,M_E), (T1_E,T1_E), (arg49,arg49), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (m_st,m_st), (M_E,M_E), (T1_E,T1_E), (E_1,E_1), (token,token), (local,local), (tmp___0,tmp___0))
+Common Arguments:ListBuffer((m_pc,m_pc), (m_st,m_st), (M_E,M_E), (T1_E,T1_E), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg47,arg47), (arg48,arg48), (arg49,arg49))
+variables in guard: ListBuffer(tmp___0)
+Data flow:
+arg47<-1
+arg48<-2
+arg49<-2
+m_pc<-m_pc
+m_st<-m_st
+M_E<-M_E
+T1_E<-T1_E
+E_1<-E_1
+token<-token
+local<-local
+Guard:
+!(tmp___0 = 0)
+dataflow number:3
+guard number:1
+-------------
+inv_main123(m_pc, arg50, m_st, arg51, M_E, T1_E, arg52, E_1, token, local) :- inv_main289(m_pc, m_st, M_E, T1_E, E_1, token, local, 0), 1 = arg50 & 2 = arg51 & 2 = arg52.
+Head arguments: ListBuffer((m_pc,m_pc), (arg50,arg50), (m_st,m_st), (arg51,arg51), (M_E,M_E), (T1_E,T1_E), (arg52,arg52), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (m_st,m_st), (M_E,M_E), (T1_E,T1_E), (E_1,E_1), (token,token), (local,local), (0,0))
+Common Arguments:ListBuffer((m_pc,m_pc), (m_st,m_st), (M_E,M_E), (T1_E,T1_E), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg50,arg50), (arg51,arg51), (arg52,arg52))
+variables in guard: ListBuffer()
+Data flow:
+arg50<-1
+arg51<-2
+arg52<-2
+m_pc<-m_pc
+m_st<-m_st
+M_E<-M_E
+T1_E<-T1_E
+E_1<-E_1
+token<-token
+local<-local
+inv_main289_argument_7<-0
+Guard:
+dataflow number:3
+guard number:0
+-------------
+inv_main128(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, arg53) :- inv_main123(m_pc, t1_pc, 0, t1_st, M_E, T1_E, E_M, E_1, token, local), m_st = 0 & 1 = arg53.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (arg53,arg53))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (0,0), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((m_st,m_st), (arg53,arg53))
+variables in guard: ListBuffer()
+Data flow:
+m_st<-0
+arg53<-1
+m_pc<-m_pc
+t1_pc<-t1_pc
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main123_argument_2<-0
+Guard:
+dataflow number:2
+guard number:0
+-------------
+inv_main128(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, arg54) :- inv_main123(m_pc, t1_pc, m_st, 0, M_E, T1_E, E_M, E_1, token, local), m_st != 0 & t1_st = 0 & 1 = arg54.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (arg54,arg54))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (0,0), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((t1_st,t1_st), (arg54,arg54))
+variables in guard: ListBuffer(m_st)
+Data flow:
+t1_st<-0
+arg54<-1
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main123_argument_3<-0
+Guard:
+!(m_st = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main128(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, arg55) :- inv_main123(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local), t1_st != 0 & m_st != 0 & 0 = arg55.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (arg55,arg55))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg55,arg55))
+variables in guard: ListBuffer(t1_st, m_st)
+Data flow:
+arg55<-0
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+Guard:
+!(t1_st = 0)
+!(m_st = 0)
+dataflow number:1
+guard number:2
+-------------
+inv_main146(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local) :- inv_main128(m_pc, t1_pc, 0, t1_st, M_E, T1_E, E_M, E_1, token, local, tmp), tmp != 0 & m_st = 0.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (0,0), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (tmp,tmp))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((m_st,m_st))
+variables in guard: ListBuffer(tmp)
+Data flow:
+m_st<-0
+m_pc<-m_pc
+t1_pc<-t1_pc
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main128_argument_2<-0
+Guard:
+!(tmp = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main167(m_pc, t1_pc, t1_st, M_E, T1_E, E_M) :- inv_main128(1, t1_pc, 0, t1_st, M_E, T1_E, E_M, E_1, local + 1, local, tmp), __eval257 != 0 & tmp != 0 & m_pc = 1.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M))
+Body arguments: ListBuffer((1,1), (t1_pc,t1_pc), (0,0), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), ((local + 1),(local + 1)), (local,local), (tmp,tmp))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M))
+relativeComplimentOfHeadArg:ListBuffer((m_pc,m_pc))
+variables in guard: ListBuffer(__eval257, tmp)
+Data flow:
+m_pc<-1
+t1_pc<-t1_pc
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+inv_main128_argument_0<-1
+inv_main128_argument_2<-0
+Guard:
+!(__eval257 = 0)
+!(tmp = 0)
+dataflow number:1
+guard number:2
+-------------
+inv_main167(m_pc, t1_pc, t1_st, M_E, T1_E, E_M) :- inv_main128(0, t1_pc, 0, t1_st, M_E, T1_E, E_M, E_1, token, local, tmp), __eval257 != 0 & tmp != 0 & m_pc = 0.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M))
+Body arguments: ListBuffer((0,0), (t1_pc,t1_pc), (0,0), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (tmp,tmp))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M))
+relativeComplimentOfHeadArg:ListBuffer((m_pc,m_pc))
+variables in guard: ListBuffer(__eval257, tmp)
+Data flow:
+m_pc<-0
+t1_pc<-t1_pc
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+inv_main128_argument_0<-0
+inv_main128_argument_2<-0
+inv_main128_argument_0<-0
+inv_main128_argument_2<-0
+Guard:
+!(__eval257 = 0)
+!(tmp = 0)
+dataflow number:1
+guard number:2
+-------------
+inv_main167(m_pc, t1_pc, t1_st, M_E, T1_E, E_M) :- inv_main128(m_pc, t1_pc, 0, t1_st, M_E, T1_E, E_M, E_1, token, local, tmp), m_pc != 1 & m_pc != 0 & __eval257 != 0 & tmp != 0.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (0,0), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (tmp,tmp))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(m_pc, __eval257, tmp)
+Data flow:
+m_pc<-m_pc
+t1_pc<-t1_pc
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+inv_main128_argument_2<-0
+Guard:
+!((m_pc + -1) = 0)
+!(m_pc = 0)
+!(__eval257 = 0)
+!(tmp = 0)
+dataflow number:0
+guard number:4
+-------------
+inv_main146(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local) :- inv_main128(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, tmp), m_st != 0 & tmp != 0.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (tmp,tmp))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(m_st, tmp)
+Data flow:
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+Guard:
+!(m_st = 0)
+!(tmp = 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main123(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local) :- inv_main146(m_pc, t1_pc, m_st, 0, M_E, T1_E, E_M, E_1, token, local), t1_st = 0.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (0,0), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((t1_st,t1_st))
+variables in guard: ListBuffer()
+Data flow:
+t1_st<-0
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main146_argument_3<-0
+Guard:
+dataflow number:1
+guard number:0
+-------------
+inv_main286(m_pc, arg60, M_E, T1_E, E_1, arg63, local) :- inv_main146(1, 1, m_st, 0, M_E, T1_E, E_M, E_1, token, local), __eval341 != 0 & m_pc = 1 & 0 = arg60 & token + 1 = arg63.
+Head arguments: ListBuffer((m_pc,m_pc), (arg60,arg60), (M_E,M_E), (T1_E,T1_E), (E_1,E_1), (arg63,arg63), (local,local))
+Body arguments: ListBuffer((1,1), (1,1), (m_st,m_st), (0,0), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((M_E,M_E), (T1_E,T1_E), (E_1,E_1), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((m_pc,m_pc), (arg60,arg60), (arg63,arg63))
+variables in guard: ListBuffer(__eval341)
+Data flow:
+m_pc<-1
+arg60<-0
+arg63<-(token + 1)
+M_E<-M_E
+T1_E<-T1_E
+E_1<-E_1
+local<-local
+inv_main146_argument_0<-1
+inv_main146_argument_1<-1
+inv_main146_argument_0<-1
+inv_main146_argument_1<-1
+inv_main146_argument_3<-0
+Guard:
+!(__eval341 = 0)
+dataflow number:3
+guard number:1
+-------------
+inv_main286(m_pc, m_st, M_E, T1_E, E_1, arg67, local) :- inv_main146(m_pc, 1, m_st, 0, M_E, T1_E, E_M, E_1, token, local), m_pc != 1 & __eval341 != 0 & token + 1 = arg67.
+Head arguments: ListBuffer((m_pc,m_pc), (m_st,m_st), (M_E,M_E), (T1_E,T1_E), (E_1,E_1), (arg67,arg67), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (1,1), (m_st,m_st), (0,0), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (m_st,m_st), (M_E,M_E), (T1_E,T1_E), (E_1,E_1), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg67,arg67))
+variables in guard: ListBuffer(m_pc, __eval341)
+Data flow:
+arg67<-(token + 1)
+m_pc<-m_pc
+m_st<-m_st
+M_E<-M_E
+T1_E<-T1_E
+E_1<-E_1
+local<-local
+inv_main146_argument_1<-1
+inv_main146_argument_3<-0
+Guard:
+!((m_pc + -1) = 0)
+!(__eval341 = 0)
+dataflow number:1
+guard number:2
+-------------
+inv_main123(m_pc, arg69, m_st, arg70, M_E, T1_E, E_M, E_1, token, local) :- inv_main146(m_pc, 0, m_st, 0, M_E, T1_E, E_M, E_1, token, local), __eval341 != 0 & 1 = arg69 & 2 = arg70.
+Head arguments: ListBuffer((m_pc,m_pc), (arg69,arg69), (m_st,m_st), (arg70,arg70), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (0,0), (m_st,m_st), (0,0), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (m_st,m_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg69,arg69), (arg70,arg70))
+variables in guard: ListBuffer(__eval341)
+Data flow:
+arg69<-1
+arg70<-2
+m_pc<-m_pc
+m_st<-m_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main146_argument_1<-0
+inv_main146_argument_3<-0
+inv_main146_argument_1<-0
+inv_main146_argument_3<-0
+Guard:
+!(__eval341 = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main123(m_pc, arg71, m_st, arg72, M_E, T1_E, E_M, E_1, token, local) :- inv_main146(m_pc, t1_pc, m_st, 0, M_E, T1_E, E_M, E_1, token, local), t1_pc != 1 & t1_pc != 0 & __eval341 != 0 & 1 = arg71 & 2 = arg72.
+Head arguments: ListBuffer((m_pc,m_pc), (arg71,arg71), (m_st,m_st), (arg72,arg72), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (0,0), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (m_st,m_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg71,arg71), (arg72,arg72))
+variables in guard: ListBuffer(t1_pc, __eval341)
+Data flow:
+arg71<-1
+arg72<-2
+m_pc<-m_pc
+m_st<-m_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main146_argument_3<-0
+Guard:
+!((t1_pc + -1) = 0)
+!(t1_pc = 0)
+!(__eval341 = 0)
+dataflow number:2
+guard number:3
+-------------
+inv_main123(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local) :- inv_main146(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local), t1_st != 0.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(t1_st)
+Data flow:
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+Guard:
+!(t1_st = 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main98(t1_pc, E_1) :- inv_main78(t1_pc, E_1, tmp___0), tmp___0 != 0 & -1 = 0.
+Head arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+Body arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1), (tmp___0,tmp___0))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(tmp___0)
+Data flow:
+t1_pc<-t1_pc
+E_1<-E_1
+Guard:
+!(tmp___0 = 0)
+(-1 = 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main98(t1_pc, E_1) :- inv_main78(t1_pc, E_1, 0), -1 = 0.
+Head arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+Body arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1), (0,0))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer()
+Data flow:
+t1_pc<-t1_pc
+E_1<-E_1
+inv_main78_argument_2<-0
+Guard:
+(-1 = 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main98(t1_pc, E_1) :- inv_main78(t1_pc, E_1, tmp___0), tmp___0 != 0.
+Head arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+Body arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1), (tmp___0,tmp___0))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(tmp___0)
+Data flow:
+t1_pc<-t1_pc
+E_1<-E_1
+Guard:
+!(tmp___0 = 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main98(t1_pc, E_1) :- inv_main78(t1_pc, E_1, 0).
+Head arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+Body arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1), (0,0))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(true)
+Data flow:
+t1_pc<-t1_pc
+E_1<-E_1
+inv_main78_argument_2<-0
+Guard:
+true
+dataflow number:0
+guard number:1
+-------------
+inv_main339(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, arg80) :- inv_main329(1, t1_pc, m_st, t1_st, M_E, T1_E, 1, E_1, token, local), E_M = 1 & m_pc = 1 & 1 = arg80.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (arg80,arg80))
+Body arguments: ListBuffer((1,1), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (1,1), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((m_pc,m_pc), (E_M,E_M), (arg80,arg80))
+variables in guard: ListBuffer()
+Data flow:
+m_pc<-1
+E_M<-1
+arg80<-1
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_1<-E_1
+token<-token
+local<-local
+inv_main329_argument_0<-1
+inv_main329_argument_6<-1
+inv_main329_argument_0<-1
+inv_main329_argument_6<-1
+Guard:
+dataflow number:3
+guard number:0
+-------------
+inv_main339(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, arg81) :- inv_main329(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local), m_pc != 1 & 0 = arg81.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (arg81,arg81))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg81,arg81))
+variables in guard: ListBuffer(m_pc)
+Data flow:
+arg81<-0
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+Guard:
+!((m_pc + -1) = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main339(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, arg82) :- inv_main329(1, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local), E_M != 1 & m_pc = 1 & 0 = arg82.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (arg82,arg82))
+Body arguments: ListBuffer((1,1), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((m_pc,m_pc), (arg82,arg82))
+variables in guard: ListBuffer(E_M)
+Data flow:
+m_pc<-1
+arg82<-0
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main329_argument_0<-1
+Guard:
+!((E_M + -1) = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main376(m_pc, t1_pc, m_st, arg83, arg84, T1_E, E_M, E_1, token, local) :- inv_main356(m_pc, t1_pc, m_st, t1_st, 1, T1_E, E_M, E_1, token, local, tmp___0), tmp___0 != 0 & 0 = arg83 & 2 = arg84.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (arg83,arg83), (arg84,arg84), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (1,1), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (tmp___0,tmp___0))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg83,arg83), (arg84,arg84))
+variables in guard: ListBuffer(tmp___0)
+Data flow:
+arg83<-0
+arg84<-2
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main356_argument_4<-1
+Guard:
+!(tmp___0 = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main376(m_pc, t1_pc, m_st, t1_st, arg85, T1_E, E_M, E_1, token, local) :- inv_main356(m_pc, t1_pc, m_st, t1_st, 1, T1_E, E_M, E_1, token, local, 0), 2 = arg85.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (arg85,arg85), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (1,1), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (0,0))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg85,arg85))
+variables in guard: ListBuffer()
+Data flow:
+arg85<-2
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main356_argument_4<-1
+inv_main356_argument_10<-0
+Guard:
+dataflow number:1
+guard number:0
+-------------
+inv_main376(m_pc, t1_pc, m_st, arg86, M_E, T1_E, E_M, E_1, token, local) :- inv_main356(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, tmp___0), M_E != 1 & tmp___0 != 0 & 0 = arg86.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (arg86,arg86), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (tmp___0,tmp___0))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg86,arg86))
+variables in guard: ListBuffer(M_E, tmp___0)
+Data flow:
+arg86<-0
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+Guard:
+!((M_E + -1) = 0)
+!(tmp___0 = 0)
+dataflow number:1
+guard number:2
+-------------
+inv_main376(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local) :- inv_main356(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, 0), M_E != 1.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (0,0))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(M_E)
+Data flow:
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main356_argument_10<-0
+Guard:
+!((M_E + -1) = 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main388(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, arg87, token, local) :- inv_main384(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, 1, token, local), 2 = arg87.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (arg87,arg87), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (1,1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg87,arg87))
+variables in guard: ListBuffer()
+Data flow:
+arg87<-2
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+token<-token
+local<-local
+inv_main384_argument_7<-1
+Guard:
+dataflow number:1
+guard number:0
+-------------
+inv_main388(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local) :- inv_main384(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local), E_1 != 1.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(E_1)
+Data flow:
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+Guard:
+!((E_1 + -1) = 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main392(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, arg88) :- inv_main388(m_pc, t1_pc, 0, t1_st, M_E, T1_E, E_M, E_1, token, local), m_st = 0 & 1 = arg88.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (arg88,arg88))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (0,0), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((m_st,m_st), (arg88,arg88))
+variables in guard: ListBuffer()
+Data flow:
+m_st<-0
+arg88<-1
+m_pc<-m_pc
+t1_pc<-t1_pc
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main388_argument_2<-0
+Guard:
+dataflow number:2
+guard number:0
+-------------
+inv_main392(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, arg89) :- inv_main388(m_pc, t1_pc, m_st, 0, M_E, T1_E, E_M, E_1, token, local), m_st != 0 & t1_st = 0 & 1 = arg89.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (arg89,arg89))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (0,0), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((t1_st,t1_st), (arg89,arg89))
+variables in guard: ListBuffer(m_st)
+Data flow:
+t1_st<-0
+arg89<-1
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main388_argument_3<-0
+Guard:
+!(m_st = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main392(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, arg90) :- inv_main388(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local), t1_st != 0 & m_st != 0 & 0 = arg90.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (arg90,arg90))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg90,arg90))
+variables in guard: ListBuffer(t1_st, m_st)
+Data flow:
+arg90<-0
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+Guard:
+!(t1_st = 0)
+!(m_st = 0)
+dataflow number:1
+guard number:2
+-------------
+inv_main407(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local) :- inv_main392(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, tmp), tmp != 0.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (tmp,tmp))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(tmp)
+Data flow:
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+Guard:
+!(tmp = 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main422(m_pc, t1_pc, m_st, t1_st, T1_E, E_M, E_1, token, local, arg93) :- inv_main392(1, t1_pc, m_st, t1_st, M_E, T1_E, 1, E_1, token, local, 0), E_M = 1 & m_pc = 1 & 1 = arg93.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (arg93,arg93))
+Body arguments: ListBuffer((1,1), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (1,1), (E_1,E_1), (token,token), (local,local), (0,0))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((m_pc,m_pc), (E_M,E_M), (arg93,arg93))
+variables in guard: ListBuffer()
+Data flow:
+m_pc<-1
+E_M<-1
+arg93<-1
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+T1_E<-T1_E
+E_1<-E_1
+token<-token
+local<-local
+inv_main392_argument_0<-1
+inv_main392_argument_6<-1
+inv_main392_argument_0<-1
+inv_main392_argument_6<-1
+inv_main392_argument_10<-0
+Guard:
+dataflow number:3
+guard number:0
+-------------
+inv_main422(m_pc, t1_pc, m_st, t1_st, T1_E, E_M, E_1, token, local, arg96) :- inv_main392(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, 0), m_pc != 1 & 0 = arg96.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (arg96,arg96))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (0,0))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg96,arg96))
+variables in guard: ListBuffer(m_pc)
+Data flow:
+arg96<-0
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main392_argument_10<-0
+Guard:
+!((m_pc + -1) = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main422(m_pc, t1_pc, m_st, t1_st, T1_E, E_M, E_1, token, local, arg99) :- inv_main392(1, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, 0), E_M != 1 & m_pc = 1 & 0 = arg99.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (arg99,arg99))
+Body arguments: ListBuffer((1,1), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (0,0))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((m_pc,m_pc), (arg99,arg99))
+variables in guard: ListBuffer(E_M)
+Data flow:
+m_pc<-1
+arg99<-0
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main392_argument_0<-1
+inv_main392_argument_10<-0
+Guard:
+!((E_M + -1) = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main459(m_pc, t1_pc, m_st, arg100, T1_E, E_M, E_1, token, local) :- inv_main439(m_pc, t1_pc, m_st, t1_st, T1_E, E_M, E_1, token, local, tmp___0), tmp___0 != 0 & 0 = arg100.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (arg100,arg100), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (tmp___0,tmp___0))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg100,arg100))
+variables in guard: ListBuffer(tmp___0)
+Data flow:
+arg100<-0
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+Guard:
+!(tmp___0 = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main459(m_pc, t1_pc, m_st, t1_st, T1_E, E_M, E_1, token, local) :- inv_main439(m_pc, t1_pc, m_st, t1_st, T1_E, E_M, E_1, token, local, 0).
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (0,0))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(true)
+Data flow:
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main439_argument_9<-0
+Guard:
+true
+dataflow number:0
+guard number:1
+-------------
+inv_main106(t1_pc, E_1) :- inv_main98(t1_pc, E_1), -1 = 0 & -1 = 0.
+Head arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+Body arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer()
+Data flow:
+t1_pc<-t1_pc
+E_1<-E_1
+Guard:
+(-1 = 0)
+(-1 = 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main106(t1_pc, E_1) :- inv_main98(t1_pc, E_1), -1 = 0.
+Head arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+Body arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer()
+Data flow:
+t1_pc<-t1_pc
+E_1<-E_1
+Guard:
+(-1 = 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main106(t1_pc, E_1) :- inv_main98(t1_pc, E_1), -1 = 0.
+Head arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+Body arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer()
+Data flow:
+t1_pc<-t1_pc
+E_1<-E_1
+Guard:
+(-1 = 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main106(t1_pc, E_1) :- inv_main98(t1_pc, E_1).
+Head arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+Body arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(true)
+Data flow:
+t1_pc<-t1_pc
+E_1<-E_1
+Guard:
+true
+dataflow number:0
+guard number:1
+-------------
+inv_main123(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, arg112, token, local) :- inv_main106(t1_pc, 1), 2 = arg112 & m_pc = 0 & m_st = 0 & t1_st = 0 & M_E = 2 & T1_E = 2 & E_M = 2 & token = 0 & local = 0.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (arg112,arg112), (token,token), (local,local))
+Body arguments: ListBuffer((t1_pc,t1_pc), (1,1))
+Common Arguments:ListBuffer((t1_pc,t1_pc))
+relativeComplimentOfHeadArg:ListBuffer((m_pc,m_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (arg112,arg112), (token,token), (local,local))
+variables in guard: ListBuffer()
+Data flow:
+m_pc<-0
+m_st<-0
+t1_st<-0
+M_E<-2
+T1_E<-2
+E_M<-2
+arg112<-2
+token<-0
+local<-0
+t1_pc<-t1_pc
+inv_main106_argument_1<-1
+Guard:
+dataflow number:9
+guard number:0
+-------------
+inv_main123(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local) :- inv_main106(t1_pc, E_1), E_1 != 1 & m_pc = 0 & m_st = 0 & t1_st = 0 & M_E = 2 & T1_E = 2 & E_M = 2 & token = 0 & local = 0.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+Common Arguments:ListBuffer((t1_pc,t1_pc), (E_1,E_1))
+relativeComplimentOfHeadArg:ListBuffer((m_pc,m_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token), (local,local))
+variables in guard: ListBuffer(E_1)
+Data flow:
+m_pc<-0
+m_st<-0
+t1_st<-0
+M_E<-2
+T1_E<-2
+E_M<-2
+token<-0
+local<-0
+t1_pc<-t1_pc
+E_1<-E_1
+Guard:
+!((E_1 + -1) = 0)
+dataflow number:8
+guard number:1
+-------------
+inv_main321(m_pc, t1_pc, m_st, t1_st, arg115, arg116, E_M, E_1, token, local) :- inv_main128(m_pc, t1_pc, m_st, t1_st, 0, 0, E_M, E_1, token, local, 0), 1 = arg115 & 1 = arg116.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (arg115,arg115), (arg116,arg116), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (0,0), (0,0), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (0,0))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg115,arg115), (arg116,arg116))
+variables in guard: ListBuffer()
+Data flow:
+arg115<-1
+arg116<-1
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main128_argument_4<-0
+inv_main128_argument_5<-0
+inv_main128_argument_10<-0
+inv_main128_argument_4<-0
+inv_main128_argument_5<-0
+inv_main128_argument_10<-0
+inv_main128_argument_4<-0
+inv_main128_argument_5<-0
+inv_main128_argument_10<-0
+Guard:
+dataflow number:2
+guard number:0
+-------------
+inv_main321(m_pc, t1_pc, m_st, t1_st, arg118, T1_E, E_M, E_1, token, local) :- inv_main128(m_pc, t1_pc, m_st, t1_st, 0, T1_E, E_M, E_1, token, local, 0), T1_E != 0 & 1 = arg118.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (arg118,arg118), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (0,0), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (0,0))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg118,arg118))
+variables in guard: ListBuffer(T1_E)
+Data flow:
+arg118<-1
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main128_argument_4<-0
+inv_main128_argument_10<-0
+inv_main128_argument_4<-0
+inv_main128_argument_10<-0
+Guard:
+!(T1_E = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main321(m_pc, t1_pc, m_st, t1_st, M_E, arg120, E_M, E_1, token, local) :- inv_main128(m_pc, t1_pc, m_st, t1_st, M_E, 0, E_M, E_1, token, local, 0), M_E != 0 & 1 = arg120.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (arg120,arg120), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (0,0), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (0,0))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg120,arg120))
+variables in guard: ListBuffer(M_E)
+Data flow:
+arg120<-1
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main128_argument_5<-0
+inv_main128_argument_10<-0
+inv_main128_argument_5<-0
+inv_main128_argument_10<-0
+Guard:
+!(M_E = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main321(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local) :- inv_main128(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local, 0), T1_E != 0 & M_E != 0.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (0,0))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(T1_E, M_E)
+Data flow:
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main128_argument_10<-0
+Guard:
+!(T1_E = 0)
+!(M_E = 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main329(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, arg123, arg124, token, local) :- inv_main321(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, 0, 0, token, local), 1 = arg123 & 1 = arg124.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (arg123,arg123), (arg124,arg124), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (0,0), (0,0), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg123,arg123), (arg124,arg124))
+variables in guard: ListBuffer()
+Data flow:
+arg123<-1
+arg124<-1
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+token<-token
+local<-local
+inv_main321_argument_6<-0
+inv_main321_argument_7<-0
+inv_main321_argument_6<-0
+inv_main321_argument_7<-0
+Guard:
+dataflow number:2
+guard number:0
+-------------
+inv_main329(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, arg125, E_1, token, local) :- inv_main321(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, 0, E_1, token, local), E_1 != 0 & 1 = arg125.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (arg125,arg125), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (0,0), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg125,arg125))
+variables in guard: ListBuffer(E_1)
+Data flow:
+arg125<-1
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_1<-E_1
+token<-token
+local<-local
+inv_main321_argument_6<-0
+Guard:
+!(E_1 = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main329(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, arg126, token, local) :- inv_main321(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, 0, token, local), E_M != 0 & 1 = arg126.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (arg126,arg126), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (0,0), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg126,arg126))
+variables in guard: ListBuffer(E_M)
+Data flow:
+arg126<-1
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+token<-token
+local<-local
+inv_main321_argument_7<-0
+Guard:
+!(E_M = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main329(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local) :- inv_main321(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local), E_1 != 0 & E_M != 0.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(E_1, E_M)
+Data flow:
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+Guard:
+!(E_1 = 0)
+!(E_M = 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main384(m_pc, t1_pc, m_st, t1_st, M_E, arg127, arg128, E_1, token, local) :- inv_main376(m_pc, t1_pc, m_st, t1_st, M_E, 1, 1, E_1, token, local), 2 = arg127 & 2 = arg128.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (arg127,arg127), (arg128,arg128), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (1,1), (1,1), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg127,arg127), (arg128,arg128))
+variables in guard: ListBuffer()
+Data flow:
+arg127<-2
+arg128<-2
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+E_1<-E_1
+token<-token
+local<-local
+inv_main376_argument_5<-1
+inv_main376_argument_6<-1
+inv_main376_argument_5<-1
+inv_main376_argument_6<-1
+Guard:
+dataflow number:2
+guard number:0
+-------------
+inv_main384(m_pc, t1_pc, m_st, t1_st, M_E, arg129, E_M, E_1, token, local) :- inv_main376(m_pc, t1_pc, m_st, t1_st, M_E, 1, E_M, E_1, token, local), E_M != 1 & 2 = arg129.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (arg129,arg129), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (1,1), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg129,arg129))
+variables in guard: ListBuffer(E_M)
+Data flow:
+arg129<-2
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main376_argument_5<-1
+Guard:
+!((E_M + -1) = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main384(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, arg130, E_1, token, local) :- inv_main376(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, 1, E_1, token, local), T1_E != 1 & 2 = arg130.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (arg130,arg130), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (1,1), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg130,arg130))
+variables in guard: ListBuffer(T1_E)
+Data flow:
+arg130<-2
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_1<-E_1
+token<-token
+local<-local
+inv_main376_argument_6<-1
+Guard:
+!((T1_E + -1) = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main384(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local) :- inv_main376(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local), E_M != 1 & T1_E != 1.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(E_M, T1_E)
+Data flow:
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+Guard:
+!((E_M + -1) = 0)
+!((T1_E + -1) = 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main467(m_pc, t1_pc, m_st, t1_st, arg131, arg132, E_1, token, local) :- inv_main459(m_pc, t1_pc, m_st, t1_st, 1, 1, E_1, token, local), 2 = arg131 & 2 = arg132.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (arg131,arg131), (arg132,arg132), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (1,1), (1,1), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg131,arg131), (arg132,arg132))
+variables in guard: ListBuffer()
+Data flow:
+arg131<-2
+arg132<-2
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+E_1<-E_1
+token<-token
+local<-local
+inv_main459_argument_4<-1
+inv_main459_argument_5<-1
+inv_main459_argument_4<-1
+inv_main459_argument_5<-1
+Guard:
+dataflow number:2
+guard number:0
+-------------
+inv_main467(m_pc, t1_pc, m_st, t1_st, arg133, E_M, E_1, token, local) :- inv_main459(m_pc, t1_pc, m_st, t1_st, 1, E_M, E_1, token, local), E_M != 1 & 2 = arg133.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (arg133,arg133), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (1,1), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg133,arg133))
+variables in guard: ListBuffer(E_M)
+Data flow:
+arg133<-2
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main459_argument_4<-1
+Guard:
+!((E_M + -1) = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main467(m_pc, t1_pc, m_st, t1_st, T1_E, arg134, E_1, token, local) :- inv_main459(m_pc, t1_pc, m_st, t1_st, T1_E, 1, E_1, token, local), T1_E != 1 & 2 = arg134.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (arg134,arg134), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (1,1), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((arg134,arg134))
+variables in guard: ListBuffer(T1_E)
+Data flow:
+arg134<-2
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+T1_E<-T1_E
+E_1<-E_1
+token<-token
+local<-local
+inv_main459_argument_5<-1
+Guard:
+!((T1_E + -1) = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main467(m_pc, t1_pc, m_st, t1_st, T1_E, E_M, E_1, token, local) :- inv_main459(m_pc, t1_pc, m_st, t1_st, T1_E, E_M, E_1, token, local), E_M != 1 & T1_E != 1.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(E_M, T1_E)
+Data flow:
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+Guard:
+!((E_M + -1) = 0)
+!((T1_E + -1) = 0)
+dataflow number:0
+guard number:2
+-------------
+inv_main407(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, arg135, token, local) :- inv_main467(m_pc, t1_pc, m_st, t1_st, T1_E, E_M, 1, token, local), 2 = arg135 & M_E = 2.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (arg135,arg135), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (1,1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((M_E,M_E), (arg135,arg135))
+variables in guard: ListBuffer()
+Data flow:
+M_E<-2
+arg135<-2
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+T1_E<-T1_E
+E_M<-E_M
+token<-token
+local<-local
+inv_main467_argument_6<-1
+Guard:
+dataflow number:2
+guard number:0
+-------------
+inv_main407(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local) :- inv_main467(m_pc, t1_pc, m_st, t1_st, T1_E, E_M, E_1, token, local), E_1 != 1 & M_E = 2.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((M_E,M_E))
+variables in guard: ListBuffer(E_1)
+Data flow:
+M_E<-2
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+t1_st<-t1_st
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+Guard:
+!((E_1 + -1) = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main123(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local) :- inv_main407(m_pc, t1_pc, 0, t1_st, M_E, T1_E, E_M, E_1, token, local), m_st = 0.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (0,0), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((m_st,m_st))
+variables in guard: ListBuffer()
+Data flow:
+m_st<-0
+m_pc<-m_pc
+t1_pc<-t1_pc
+t1_st<-t1_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main407_argument_2<-0
+Guard:
+dataflow number:1
+guard number:0
+-------------
+inv_main123(m_pc, t1_pc, m_st, t1_st, M_E, T1_E, E_M, E_1, token, local) :- inv_main407(m_pc, t1_pc, m_st, 0, M_E, T1_E, E_M, E_1, token, local), m_st != 0 & t1_st = 0.
+Head arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Body arguments: ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (0,0), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+Common Arguments:ListBuffer((m_pc,m_pc), (t1_pc,t1_pc), (m_st,m_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local))
+relativeComplimentOfHeadArg:ListBuffer((t1_st,t1_st))
+variables in guard: ListBuffer(m_st)
+Data flow:
+t1_st<-0
+m_pc<-m_pc
+t1_pc<-t1_pc
+m_st<-m_st
+M_E<-M_E
+T1_E<-T1_E
+E_M<-E_M
+E_1<-E_1
+token<-token
+local<-local
+inv_main407_argument_3<-0
+Guard:
+!(m_st = 0)
+dataflow number:1
+guard number:1
+-------------
+false :- inv_main128(1, t1_pc, 0, t1_st, M_E, T1_E, E_M, E_1, token, local, tmp), token != local + 1 & tmp_ndt_1 != 0 & tmp != 0.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((1,1), (t1_pc,t1_pc), (0,0), (t1_st,t1_st), (M_E,M_E), (T1_E,T1_E), (E_M,E_M), (E_1,E_1), (token,token), (local,local), (tmp,tmp))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(token, local, tmp_ndt_1, tmp)
+Data flow:
+inv_main128_argument_0<-1
+inv_main128_argument_2<-0
+Guard:
+!((token + -1 * (local + 1)) = 0)
+!(tmp_ndt_1 = 0)
+!(tmp = 0)
+dataflow number:0
+guard number:3
+-----------

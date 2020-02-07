@@ -1,0 +1,10 @@
+inv_main18(arg0, arg1, __eval80, __eval81) :- __eval81 >= 1 & -1*__eval81 + 1000000 >= 1 & __eval80 = __eval81 & 0 = arg0 & 0 = arg1.
+inv_main18(arg2, arg3, k, n) :- inv_main18(i, j, k, n), n + -1*(i + 1) >= 1 & !(n - j >= 1) & i + 1 = arg2 & 2*(i + 1) = arg3.
+inv_main26(i, j, arg4, n) :- inv_main18(i, arg4, k, n), n - arg4 >= 1 & __eval100 != 0 & n - arg4 >= 1 & j = arg4.
+inv_main26(i, j, arg5, n) :- inv_main26(i, j, k, n), n + -1*(k + 1) >= 1 & k + 1 = arg5.
+inv_main18(i, arg6, k, n) :- inv_main18(i, j, k, n), n - j >= 1 & j + 1 = arg6.
+inv_main18(i, arg7, j, n) :- inv_main18(i, j, k, n), !(n - j >= 1) & __eval100 != 0 & n - j >= 1 & j + 1 = arg7.
+inv_main18(i, arg8, arg9, n) :- inv_main26(i, j, k, n), !(n + -1*(k + 1) >= 1) & j + 1 = arg8 & k + 1 = arg9.
+false :- inv_main26(i, j, k, n), !(k >= 2*i).
+false :- inv_main18(i, j, k, n), !(k >= n) & n - j >= 1.
+false :- inv_main18(i, j, k, n), !(n >= k) & n - j >= 1.

@@ -1,0 +1,29 @@
+digraph dag {
+0 [label="inv_main10"];
+1 [label="VerifHintInitPred"];
+2 [label="EX"];
+3 [label="="];
+4 [label="0"];
+5 [label="+"];
+6 [label="*"];
+7 [label="2"];
+8 [label="_0"];
+9 [label="+"];
+10 [label="*"];
+11 [label="-2"];
+12 [label="_3"];
+13 [label="_1"];
+0->1
+1->2
+2->3
+3->5
+3 -> 4
+5->6
+5 -> 9
+6->8
+6 -> 7
+9->10
+9 -> 13
+10->12
+10 -> 11
+}

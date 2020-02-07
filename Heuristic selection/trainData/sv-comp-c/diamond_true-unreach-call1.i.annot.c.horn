@@ -1,0 +1,7 @@
+inv_main6(arg1, y) :- inv_main6(x, 2*arg3), -1*x + 99 >= 1 & y = 2*arg3 & x + 2 = arg1.
+inv_main6(arg4, y) :- inv_main6(x, 2*arg6 + 1), arg4 - x = 1 & y - 2*arg6 = 1 & 98 >= x & arg6 >= 0.
+inv_main6(arg4, y) :- inv_main6(x, 2*arg6 + -1), arg4 - x = 1 & y - 2*arg6 = -1 & 98 >= x & 0 >= arg6.
+inv_main6(x, __eval13) :- __eval13 >= 0 & 0 = x.
+false :- inv_main6(2*arg8, 2*arg10 + 1), arg10 >= 0 & arg8 >= 50.
+false :- inv_main6(2*arg8 + arg7, 2*arg10 + -1), 0 >= arg10 & 2*arg8 + arg7 >= 99 & 1 >= arg7 & arg7 >= 0.
+false :- inv_main6(2*arg8 + 1, 2*arg10), arg8 >= 49.

@@ -1,0 +1,169 @@
+-------------
+inv_main23(in, inlen, bufferlen, buf, buflim) :- inv_main23(in, inlen, bufferlen, buf, buflim), buf != buflim & __eval60 != 0 & in + 1 = in & buf + 1 = buf.
+Head arguments: ListBuffer((in,in), (inlen,inlen), (bufferlen,bufferlen), (buf,buf), (buflim,buflim))
+Body arguments: ListBuffer((in,in), (inlen,inlen), (bufferlen,bufferlen), (buf,buf), (buflim,buflim))
+Common Arguments:ListBuffer((inlen,inlen), (bufferlen,bufferlen), (buflim,buflim))
+relativeComplimentOfHeadArg:ListBuffer((in,in), (buf,buf))
+variables in guard: ListBuffer(buf, buflim, __eval60)
+Data flow:
+in<-(in + 1)
+buf<-(buf + 1)
+inlen<-inlen
+bufferlen<-bufferlen
+buflim<-buflim
+Guard:
+!((buf + -1 * buflim) = 0)
+!(__eval60 = 0)
+dataflow number:2
+guard number:2
+-------------
+inv_main24(bufferlen, buf) :- inv_main23(in, inlen, bufferlen, buf, buflim).
+Head arguments: ListBuffer((bufferlen,bufferlen), (buf,buf))
+Body arguments: ListBuffer((in,in), (inlen,inlen), (bufferlen,bufferlen), (buf,buf), (buflim,buflim))
+Common Arguments:ListBuffer((bufferlen,bufferlen), (buf,buf))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(true)
+Data flow:
+bufferlen<-bufferlen
+buf<-buf
+Guard:
+true
+dataflow number:0
+guard number:1
+-------------
+inv_main24(bufferlen, buf) :- inv_main23(in, inlen, bufferlen, buflim, buflim), __eval60 != 0 & buf = buflim.
+Head arguments: ListBuffer((bufferlen,bufferlen), (buf,buf))
+Body arguments: ListBuffer((in,in), (inlen,inlen), (bufferlen,bufferlen), (buflim,buflim), (buflim,buflim))
+Common Arguments:ListBuffer((bufferlen,bufferlen))
+relativeComplimentOfHeadArg:ListBuffer((buf,buf))
+variables in guard: ListBuffer(__eval60)
+Data flow:
+buf<-buflim
+bufferlen<-bufferlen
+Guard:
+!(__eval60 = 0)
+dataflow number:1
+guard number:1
+-------------
+inv_main23(arg3, __eval3, __eval10, arg4, arg5) :- __eval3 - __eval10 >= 1 & __eval3 >= 1 & __eval10 + -1 >= 1 & 0 = arg3 & 0 = arg4 & __eval10 + -2 = arg5.
+Head arguments: ListBuffer((arg3,arg3), (__eval3,__eval3), (__eval10,__eval10), (arg4,arg4), (arg5,arg5))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg3,arg3), (__eval3,__eval3), (__eval10,__eval10), (arg4,arg4), (arg5,arg5))
+variables in guard: ListBuffer(__eval3, __eval10)
+Data flow:
+arg3<-0
+__eval3<-___eval3
+__eval10<-___eval10
+arg4<-0
+arg5<-_arg5
+Guard:
+((-1 + (___eval3 + -1 * ___eval10)) >= 0)
+((-1 + ___eval3) >= 0)
+((-2 + ___eval10) >= 0)
+((-2 + (___eval10 + -1 * _arg5)) = 0)
+dataflow number:5
+guard number:4
+-------------
+false :- inv_main23(in, inlen, bufferlen, buf, buflim), !(buf >= 0) & !(buf = buflim | __eval60 = 0).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((in,in), (inlen,inlen), (bufferlen,bufferlen), (buf,buf), (buflim,buflim))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(buf, buflim, __eval60)
+Data flow:
+Guard:
+!(buf >= 0)
+!(((buf + -1 * buflim) = 0) | (__eval60 = 0))
+dataflow number:0
+guard number:2
+-------------
+false :- inv_main23(in, inlen, bufferlen, buf, buflim), !(bufferlen - buf >= 1) & !(buf = buflim | __eval60 = 0).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((in,in), (inlen,inlen), (bufferlen,bufferlen), (buf,buf), (buflim,buflim))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(bufferlen, buf, buflim, __eval60)
+Data flow:
+Guard:
+!(((bufferlen + -1 * buf) + -1) >= 0)
+!(((buf + -1 * buflim) = 0) | (__eval60 = 0))
+dataflow number:0
+guard number:2
+-------------
+false :- inv_main23(in, inlen, bufferlen, buf, buflim), !(in >= -1) & buf != buflim & __eval60 != 0.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((in,in), (inlen,inlen), (bufferlen,bufferlen), (buf,buf), (buflim,buflim))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(in, buf, buflim, __eval60)
+Data flow:
+Guard:
+!((in + 1) >= 0)
+!((buf + -1 * buflim) = 0)
+!(__eval60 = 0)
+dataflow number:0
+guard number:3
+-------------
+false :- inv_main23(in, inlen, bufferlen, buf, buflim), !(inlen + -1*(in + 1) >= 1) & buf != buflim & __eval60 != 0.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((in,in), (inlen,inlen), (bufferlen,bufferlen), (buf,buf), (buflim,buflim))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(inlen, in, buf, buflim, __eval60)
+Data flow:
+Guard:
+!(((inlen + -1 * (in + 1)) + -1) >= 0)
+!((buf + -1 * buflim) = 0)
+!(__eval60 = 0)
+dataflow number:0
+guard number:3
+-------------
+false :- inv_main24(bufferlen, buf), !(buf >= 0).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((bufferlen,bufferlen), (buf,buf))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(buf)
+Data flow:
+Guard:
+!(buf >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main24(bufferlen, buf), !(bufferlen - buf >= 1).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((bufferlen,bufferlen), (buf,buf))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(bufferlen, buf)
+Data flow:
+Guard:
+!(((bufferlen + -1 * buf) + -1) >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main24(bufferlen, buf), !(buf >= -1).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((bufferlen,bufferlen), (buf,buf))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(buf)
+Data flow:
+Guard:
+!((buf + 1) >= 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main24(bufferlen, buf), !(bufferlen + -1*(buf + 1) >= 1).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((bufferlen,bufferlen), (buf,buf))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(bufferlen, buf)
+Data flow:
+Guard:
+!(((bufferlen + -1 * (buf + 1)) + -1) >= 0)
+dataflow number:0
+guard number:1
+-----------

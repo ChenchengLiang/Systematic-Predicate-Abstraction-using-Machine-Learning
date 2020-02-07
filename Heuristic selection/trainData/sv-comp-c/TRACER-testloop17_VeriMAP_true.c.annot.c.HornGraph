@@ -1,0 +1,64 @@
+-------------
+inv_main8(N, arg0, arg1, arg2) :- N + -1 >= 1 & 0 = arg0 & 0 = arg1 & 0 = arg2.
+Head arguments: ListBuffer((N,N), (arg0,arg0), (arg1,arg1), (arg2,arg2))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((N,N), (arg0,arg0), (arg1,arg1), (arg2,arg2))
+variables in guard: ListBuffer(N)
+Data flow:
+N<-_N
+arg0<-0
+arg1<-0
+arg2<-0
+Guard:
+((-2 + _N) >= 0)
+dataflow number:4
+guard number:1
+-------------
+inv_main8(N, arg3, arg4, arg5) :- inv_main8(N, i, j, k), -1*i + 1 >= 1 & N - i >= 1 & i + 1 = arg3 & j + 1 = arg4 & 1 = arg5.
+Head arguments: ListBuffer((N,N), (arg3,arg3), (arg4,arg4), (arg5,arg5))
+Body arguments: ListBuffer((N,N), (i,i), (j,j), (k,k))
+Common Arguments:ListBuffer((N,N))
+relativeComplimentOfHeadArg:ListBuffer((arg3,arg3), (arg4,arg4), (arg5,arg5))
+variables in guard: ListBuffer(i, N)
+Data flow:
+arg3<-(i + 1)
+arg4<-(j + 1)
+arg5<-1
+N<-N
+Guard:
+(((1 + -1 * i) + -1) >= 0)
+(((N + -1 * i) + -1) >= 0)
+dataflow number:3
+guard number:2
+-------------
+inv_main8(N, arg6, arg7, arg8) :- inv_main8(N, i, j, k), !(-1*i + 1 >= 1) & N - i >= 1 & i + 1 = arg6 & j + 1 = arg7 & 0 = arg8.
+Head arguments: ListBuffer((N,N), (arg6,arg6), (arg7,arg7), (arg8,arg8))
+Body arguments: ListBuffer((N,N), (i,i), (j,j), (k,k))
+Common Arguments:ListBuffer((N,N))
+relativeComplimentOfHeadArg:ListBuffer((arg6,arg6), (arg7,arg7), (arg8,arg8))
+variables in guard: ListBuffer(i, N)
+Data flow:
+arg6<-(i + 1)
+arg7<-(j + 1)
+arg8<-0
+N<-N
+Guard:
+!(((1 + -1 * i) + -1) >= 0)
+(((N + -1 * i) + -1) >= 0)
+dataflow number:3
+guard number:2
+-------------
+false :- inv_main8(N, i, j, k), k >= 1 & !(N - i >= 1).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((N,N), (i,i), (j,j), (k,k))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(k, N, i)
+Data flow:
+Guard:
+((k + -1) >= 0)
+!(((N + -1 * i) + -1) >= 0)
+dataflow number:0
+guard number:2
+-----------

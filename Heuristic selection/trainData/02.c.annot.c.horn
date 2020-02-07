@@ -1,7 +1,0 @@
-    main4(1, 0).                                  
-    main20(i, j, z, x, y, w) :- main8(i, j, z, x, y, w), x != y & __eval75 = 0.  
-    main8(i, j, z + x + y + w, x + 1, y + 1, w + 2) :- main8(i, j, z, x, y, w), (\eps int v0; (-1*v0 + 2 >= 1 & -1*-1*v0 + 2 >= 1 & (!(v0 >= 1) | z + x + y + w >= 1) & (!(-1 >= v0) | -1*(z + x + y + w) >= 1) & \exists int v1; z + x + y + w = 2*v1 + v0)) = 1 & __eval75 != 0.  
-    main8(i, j, z + x + y + w, x, y + 1, w + 2) :- main8(i, j, z, x, y, w), \eps int v0; (-1*v0 + 2 >= 1 & -1*-1*v0 + 2 >= 1 & (!(v0 >= 1) | z + x + y + w >= 1) & (!(-1 >= v0) | -1*(z + x + y + w) >= 1) & \exists int v1; z + x + y + w = 2*v1 + v0) != 1 & __eval75 != 0.  
-    main8(i, j, i - j, 0, 0, 0) :- main4(i, j).   
-Assertions:
-  false :- main20(i, j, z, x, y, w), true & true.

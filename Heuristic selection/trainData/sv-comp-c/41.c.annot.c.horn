@@ -1,0 +1,4 @@
+inv_main13(n, k, arg1, arg2) :- inv_main13(n, k, i, j), n >= i & i + 1 = arg1 & j + i + 1 = arg2.
+inv_main13(n, arg3, arg4, arg5) :- n >= 0 & flag = 0 & 1 = arg3 & 0 = arg4 & 0 = arg5.
+inv_main13(n, __eval19, arg6, arg7) :- __eval19 >= 0 & flag != 0 & n >= 0 & 0 = arg6 & 0 = arg7.
+false :- inv_main13(n, k, i, j), !(k + i + j - 2*n >= 1) & !(n >= i).

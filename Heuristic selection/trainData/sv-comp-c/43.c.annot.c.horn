@@ -1,0 +1,4 @@
+inv_main7(x, y, arg1) :- x != arg1 & y = arg1 & 0 = i.
+inv_main7(x, arg2, t) :- inv_main7(x, y, t), x >= 1 & __eval15 != 0 & y + x = arg2 & i = 0.
+inv_main7(x, y, t) :- inv_main7(x, y, t), !(x >= 1) & __eval15 != 0 & i = 0.
+false :- inv_main7(x, y, t), !(y >= t).

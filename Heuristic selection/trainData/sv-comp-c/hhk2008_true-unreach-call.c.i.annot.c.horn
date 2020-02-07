@@ -1,0 +1,3 @@
+inv_main13(a, b, arg0, arg1) :- inv_main13(a, b, res, cnt), cnt >= 1 & res + 1 = arg0 & cnt + -1 = arg1.
+inv_main13(__eval0, __eval4, arg2, arg3) :- arg3 >= 0 & 1000000 >= arg3 & 1000000 >= arg2 & __eval0 = arg2 & __eval4 = arg3.
+false :- inv_main13(a, b, res, cnt), res != a + b & !(cnt >= 1).

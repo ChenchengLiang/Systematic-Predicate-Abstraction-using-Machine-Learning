@@ -1,0 +1,3 @@
+inv_main5(arg2, y) :- __eval23 != 0 & 5 = arg2 & 0 = y.
+inv_main5(x, arg3) :- 10 = arg3 & 0 = x.
+false :- inv_main5(x, y), !(x = 5 | y = 10).

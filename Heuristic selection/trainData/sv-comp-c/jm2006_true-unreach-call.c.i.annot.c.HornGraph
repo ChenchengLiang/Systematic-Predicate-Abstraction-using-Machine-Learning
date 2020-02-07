@@ -1,0 +1,49 @@
+-------------
+inv_main12(i, j, arg0, arg1) :- inv_main12(i, j, x, y), x != 0 & x + -1 = arg0 & y + -1 = arg1.
+Head arguments: ListBuffer((i,i), (j,j), (arg0,arg0), (arg1,arg1))
+Body arguments: ListBuffer((i,i), (j,j), (x,x), (y,y))
+Common Arguments:ListBuffer((i,i), (j,j))
+relativeComplimentOfHeadArg:ListBuffer((arg0,arg0), (arg1,arg1))
+variables in guard: ListBuffer(x)
+Data flow:
+arg0<-(x + -1)
+arg1<-(y + -1)
+i<-i
+j<-j
+Guard:
+!(x = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main12(__eval12, __eval13, arg2, arg3) :- arg2 >= 0 & arg3 >= 0 & __eval12 = arg2 & __eval13 = arg3.
+Head arguments: ListBuffer((__eval12,__eval12), (__eval13,__eval13), (arg2,arg2), (arg3,arg3))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((__eval12,__eval12), (__eval13,__eval13), (arg2,arg2), (arg3,arg3))
+variables in guard: ListBuffer(arg2, arg3)
+Data flow:
+__eval12<-___eval12
+__eval13<-___eval13
+arg2<-_arg2
+arg3<-_arg3
+Guard:
+(_arg2 >= 0)
+(_arg3 >= 0)
+((___eval12 + -1 * _arg2) = 0)
+((___eval13 + -1 * _arg3) = 0)
+dataflow number:4
+guard number:4
+-------------
+false :- inv_main12(j, j, 0, y), y != 0.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((j,j), (j,j), (0,0), (y,y))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(y)
+Data flow:
+inv_main12_argument_2<-0
+Guard:
+!(y = 0)
+dataflow number:0
+guard number:1
+-----------

@@ -1,0 +1,5 @@
+inv_main14(arg0, arg1, arg2) :- inv_main14(i, j, k), -1*i + 1000000 >= 1 & k + -1 = arg2 & j + k = arg1 & i + 1 = arg0.
+inv_main14(arg3, arg4, arg5) :- __eval54 >= 0 & 1 >= __eval54 & __eval54 + -1 = arg5 & __eval54 + 1 = arg4 & 2 = arg3.
+false :- inv_main14(i, j, k), k + i >= 3.
+false :- inv_main14(i, j, k), -1*k >= i.
+false :- inv_main14(i, j, k), 0 >= i.

@@ -1,0 +1,69 @@
+-------------
+inv_main4(arg0, arg1) :- 1 = arg0 & 0 = arg1.
+Head arguments: ListBuffer((arg0,arg0), (arg1,arg1))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg0,arg0), (arg1,arg1))
+variables in guard: ListBuffer()
+Data flow:
+arg0<-1
+arg1<-0
+Guard:
+dataflow number:2
+guard number:0
+-------------
+inv_main5(x, y) :- inv_main4(x, y), !(-1*y + 1000 >= 1).
+Head arguments: ListBuffer((x,x), (y,y))
+Body arguments: ListBuffer((x,x), (y,y))
+Common Arguments:ListBuffer((x,x), (y,y))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(y)
+Data flow:
+x<-x
+y<-y
+Guard:
+!(((1000 + -1 * y) + -1) >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main5(x, y) :- inv_main4(x, y), -1*y + 1000 >= 1.
+Head arguments: ListBuffer((x,x), (y,y))
+Body arguments: ListBuffer((x,x), (y,y))
+Common Arguments:ListBuffer((x,x), (y,y))
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(y)
+Data flow:
+x<-x
+y<-y
+Guard:
+(((1000 + -1 * y) + -1) >= 0)
+dataflow number:0
+guard number:1
+-------------
+inv_main4(arg2, arg3) :- inv_main4(x, y), __eval20 != 0 & -1*y + 1000 >= 1 & x + y = arg2 & y + 1 = arg3.
+Head arguments: ListBuffer((arg2,arg2), (arg3,arg3))
+Body arguments: ListBuffer((x,x), (y,y))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((arg2,arg2), (arg3,arg3))
+variables in guard: ListBuffer(__eval20, y)
+Data flow:
+arg2<-(x + y)
+arg3<-(y + 1)
+Guard:
+!(__eval20 = 0)
+(((1000 + -1 * y) + -1) >= 0)
+dataflow number:2
+guard number:2
+-------------
+false :- inv_main5(x, y), !(x >= y).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((x,x), (y,y))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(x, y)
+Data flow:
+Guard:
+!((x + -1 * y) >= 0)
+dataflow number:0
+guard number:1
+-----------
