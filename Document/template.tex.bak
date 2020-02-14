@@ -154,40 +154,47 @@ Text streamed Horn clauses as inputs are not enough to make multilayer perceptro
 The graph in Figure represents horn clauses in Figure \ref{while-C-horn-clauses}.
 
 
-Formally, the graph consists of five categories of nodes, two categories of hyperedges, and six categories of edges. The graph is defined as $G=(V_{CL},V_{Arg},V_{C},V_{Op},V_{FV},HE_{CF},HE_{DF},E_{CFI},E_{CFO},E_{DFI},E_{DFO},E_{CD},E_{Arg})$, in which $V_{CL}=\{cl_{Initial},cl_{Main_{k}},cl_{false}\}$ is control location node set, $V_{Arg}=\{Arg_{k}\}$ is argument set, $V_{C}$ is constant value set, $V_{Op}=\{+,-,==,...\}$ is operator set,$V_{FV}=\{v_{k}\}$ is free variables set. $k$ is a positive integer. $HE_{CF}$ is a set of Guarded control flow hyper edges. it is used between two control locations. it takes two inputs, a control location $cl_{Initial}$ or $cl_{Mian_{k}}$ and a boolean value from operator. It has a control flow out edge $e_{CFO}$ (one element from $E_{CFO}$) connected to next control location node. Similarly, $HE_{DF}$ is a set of Guarded data flow hyper edges. It guards the data flow from $Body$ to $Head$. It takes two inputs, a value from argument $Arg_{k}$ or free variable $v_{k}$ and a boolean value and has a data flow out edge $e_{DFO}$ (one element from $E_{DFO}$) connected to next operator or argument node. $E_{CFI},E_{CFO}$ are control flow in and control flow out edges, they are only used when there are connections between nodes and guarded control flow hyperedges. similarly, $E_{DFI},E_{DFO}$ are data flow in and out edges, they are only corresponding to guarded data flow hyperedges. $E_{CD}$ is condition edge. It connects boolean operator to the hyperedges to send boolean values to the hyperedges. $E_{Arg}$ is argument edge. It connects arguments to corresponding control location node. We use lower case to represent one elements in the set. For example $v_{CL}$ means one control location node from $V_{CL}$.
+Formally, the graph consists of four categories of nodes, two categories of hyperedges, and six categories of edges. The graph is defined as $G=(V_{CL},V_{Vri},V_{C},V_{Op},HE_{CF},HE_{DF},E_{CFI},E_{CFO},E_{DFI},E_{DFO},E_{CD},E_{Arg})$, in which $V_{CL}=\{cl_{Initial},cl_{Main_{k}},cl_{false}\}$ is control location node set, $V_{Arg}=\{Arg_{k}\}$ is argument set, $V_{C}$ is constant value set, $V_{Op}=\{+,-,==,...\}$ is operator set,$V_{FV}=\{v_{k}\}$ is free variables set. $k$ is a positive integer. $HE_{CF}$ is a set of Guarded control flow hyper edges. it is used between two control locations. it takes two inputs, a control location $cl_{Initial}$ or $cl_{Mian_{k}}$ and a boolean value from operator. It has a control flow out edge $e_{CFO}$ (one element from $E_{CFO}$) connected to next control location node. Similarly, $HE_{DF}$ is a set of Guarded data flow hyper edges. It guards the data flow from $Body$ to $Head$. It takes two inputs, a value from argument $Arg_{k}$ or free variable $v_{k}$ and a boolean value and has a data flow out edge $e_{DFO}$ (one element from $E_{DFO}$) connected to next operator or argument node. $E_{CFI},E_{CFO}$ are control flow in and control flow out edges, they are only used when there are connections between nodes and guarded control flow hyperedges. similarly, $E_{DFI},E_{DFO}$ are data flow in and out edges, they are only corresponding to guarded data flow hyperedges. $E_{CD}$ is condition edge. It connects boolean operator to the hyperedges to send boolean values to the hyperedges. $E_{Arg}$ is argument edge. It connects arguments to corresponding control location node. We use lower case to represent one elements in the set. For example $v_{CL}$ means one control location node from $V_{CL}$.
 
-% todo: separate to two graphs
-% todo: combine free vriables nodes and argument nodes
-The summary of $G$'s Nodes is shown in Table \ref{GraphDescription}
-\begin{table}\caption{Graph elements description} \label{GraphDescription} 
+The summary of $G$'s nodes and hyperedges are shown in Table \ref{GraphDescriptionNodes} and edges are shown in \ref{GraphDescriptionEdges} respectively.
+\begin{table}\caption{Nodes and hyperedges in graph} \label{GraphDescriptionNodes}
 \begin{center}
 \begin{tabular}{lp{3cm}p{3cm}p{3cm}p{3cm}p{3cm}}
 \hline
 Graph elements & Name & Elements & Inputs & Outputs \\
 \hline
 $V_{CL}$  & Control location node            & $CL_{Initial}$, $CL_{Main_{k}}$, $CL_{false}$   & $he_{CL}$ & $he_{CF}$\\
-$V_{Vri}$ & Variable node                    & $Arg_{k}$(argument),$FV_{k}$ (free variable)                               &  $v_{OP}$, $v_{Arg}$, $v_{FV}$, or $v_{C}$ & $he_{DF}$,$v_{OP}$\\
+$V_{Vri}$ & Variable node                    & $Arg_{k}$(argument),$FV_{k}$ (free variable)    &  $v_{OP}$, $v_{Vri}$,  $v_{C}$,$he_{DF}$ & $he_{DF}$,$v_{OP}$\\
 $V_{C}$   & Constant node                    & Constants                               & - & $v_{OP}$, $v_{Arg}$, $v_{FV}$, $he_{DF}$, $he_{CF}$\\
 $V_{Op}$  & Operator node                    & Operators                               & $v_{Arg}$, $v_{FV}$, $v_{C}$, $he_{DF}$ &$v_{Arg}$, $v_{Op}$, $v_{FV}$, $he_{DF}$, $he_{CF}$\\
 $HE_{CF}$ & Guarded control flow hyperedge   & -                                       & ($v_{OP}$ or $v_{C}$, $v_{CL}$) & $v_{CL}$\\
 $HE_{DF}$ & Guarded data flow hyperedge      & -                                       & ($v_{OP}$ or $v_{C}$, $v_{Arg}$ or $v_{FV}$) & $v_{Arg}$\\
-$E_{CFI}$ & Control flow in hyperedge             & -                                       & $v_{CL}$                                  & $he_{CF}$\\
-$E_{CFO}$ & Control flow out hyperedge            & -                                       &$he_{CF}$&$v_{CL}$\\
-$E_{DFI}$ & Data flow in hyperedge                & -                                       &$v_{OP}$, $v_{Arg}$, $v_{FV}$, $v_{C}$& $he_{DF}$\\
-$E_{DFO}$ & Data flow out hyperedge               & -                                       &$he_{DF}$ &$v_{OP},v_{Arg}$\\
-$E_{CD}$ &  Condition edge                   & -                                       &$v_{C},v_{OP}$&($he_{DF},he_{CF}$)\\
-$E_{Arg}$ & Argument edge                    & -                                       &$v_{Arg}$ & $v_{CL}$\\
 \hline
 \end{tabular}
 \end{center}
 \end{table}
 
-
+\begin{table}\caption{Edges in graph} \label{GraphDescriptionEdges}
+\begin{center}
+\begin{tabular}{lp{5cm}p{3cm}p{3cm}p{3cm}p{3cm}}
+\hline
+Graph elements & Name  & Start from & End at \\
+\hline
+$E_{CFI}$ & Control flow in hyperedge                                               & $v_{CL}$                                  & $he_{CF}$\\
+$E_{CFO}$ & Control flow out hyperedge                                               &$he_{CF}$&$v_{CL}$\\
+$E_{DFI}$ & Data flow in hyperedge                                                     &$v_{OP}$, $v_{Arg}$, $v_{FV}$, $v_{C}$& $he_{DF}$\\
+$E_{DFO}$ & Data flow out hyperedge                                                    &$he_{DF}$ &$v_{OP},v_{Arg}$\\
+$E_{CD}$ &  Condition edge                                                       &$v_{C},v_{OP}$&($he_{DF},he_{CF}$)\\
+$E_{Arg}$ & Argument edge                                                        &$v_{Arg}$ & $v_{CL}$\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
 
 \textbf{Graph construction.} The graph is constructed by parsing the horn clauses line by line. The $Head$ contains a control location and arguments. Argument nodes (represented as circles) and the control location nodes (represented as rectangular) are connected by the $Argument edges$ (dotted edges).
-$Body$ has same structure with $Head$. 
-If $Head$ and $Body$ have the same control location, then they share the control location and arguments. 
- 
+$Body$ has same structure with $Head$.
+If $Head$ and $Body$ have the same control location, then they share the control location and arguments.
+
 The $Constraint$ contains the constraints to make the transition from $Body$ to $Head$ satisfiable. We parse it to two information, data flow AST and constraint AST.  Data flow AST takes $Body'$ arguments, constant value, or free variables in $constraint$ as inputs, and go through some arithmetic operator to the root as output (a value) eventually to an $Head'$ argument. The constraint AST takes $Body$' arguments, free variables in $constraint$ as the inputs. The root of the constraint AST tree is a boolean operator which can output a boolean value to all guarded control and data flow hyperedges from $Body$ to $Head$. If there is no $constraint$, the boolean value inputs to the hyperedges are set to true.
 
 We can represent the transition by the definition of graph:
@@ -195,9 +202,9 @@ We can represent the transition by the definition of graph:
 
 $Head(CL_{Main_{m}},Arg_{head}):-Body(CL_{Main_{n}},Arg_{body}),[Constraint(Arg_{head},Arg_{body},V_{C},V_{Op},V_{FV})]$, where $m$ and $n$ are positive integer numbers. They can be equal or not equal. $Arg_{head}$ and $Arg_{body}$ are the set of arguments in head and body respectively. If $m==n$, $Arg_{head} == Arg_{body}$.
 
-To associate $Head$ and $Body$, we represent control flow information first by connecting the control location from $Body$ to $Head$, and between the control locations, there is a guarded control flow hyperedge which takes $Body$' control location and the boolean value from AST tree constructed from $constraint$ as inputs and output the control location information to $Head$'s control location. Then, we build data flow between $Head$ and $Body$. Every argument in $Head$ is guarded by a guarded data flow hyper edge which takes $Body$' arguments, data flow AST tree root, or free variables and the boolean value from $constraint$'s AST tree as inputs. In summary, all the control and data flows from $Body$ to $Head$ are guarded by a hyperedge, and one of the inputs of the hyperedges is the boolean value from the root of constraint AST tree constructed by the predicates in $constraint$. 
+To associate $Head$ and $Body$, we represent control flow information first by connecting the control location from $Body$ to $Head$, and between the control locations, there is a guarded control flow hyperedge which takes $Body$' control location and the boolean value from AST tree constructed from $constraint$ as inputs and output the control location information to $Head$'s control location. Then, we build data flow between $Head$ and $Body$. Every argument in $Head$ is guarded by a guarded data flow hyper edge which takes $Body$' arguments, data flow AST tree root, or free variables and the boolean value from $constraint$'s AST tree as inputs. In summary, all the control and data flows from $Body$ to $Head$ are guarded by a hyperedge, and one of the inputs of the hyperedges is the boolean value from the root of constraint AST tree constructed by the predicates in $constraint$.
 
-\textbf{Graph Embedding.} 
+\textbf{Graph Embedding.}
 
 
 
@@ -336,7 +343,8 @@ We try to use balanced and imbalanced data set to train the neural network.
 %\end{center}
 %\end{table}
 
-
+\subsection{Argument labelling}
+After we separate templates according to their usefulness, for every argument in a location, we look at useful templates. If a template include the argument, then we increment score of that argument. After we go throng all templates and arguments. All arguments get their scores that are the training labels.
 
 \section{Training Model}
 
