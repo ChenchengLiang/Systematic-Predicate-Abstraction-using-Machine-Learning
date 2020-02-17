@@ -214,16 +214,16 @@ def testAccuracy(predictedY,trueY):
     print("test accuracy:", acc)
     return acc
 
-def pickleWrite(content,name):
+def pickleWrite(content,name,path=""):
     parenDir = os.path.abspath(os.path.pardir)
-    file=parenDir+'/pickleData/'+name+'.txt'
+    file=path+'../pickleData/'+name+'.txt'
     print('pickle write to '+file)
     with open(file,"wb") as fp :
         pickle.dump(content,fp)
 
-def pickleRead(name):
+def pickleRead(name,path=""):
     parenDir = os.path.abspath(os.path.pardir)
-    file=parenDir+'/pickleData/' + name + '.txt'
+    file=path+'../pickleData/' + name + '.txt'
     print('pickle read '+file)
     with open(file,"rb") as fp :
         content=pickle.load(fp)

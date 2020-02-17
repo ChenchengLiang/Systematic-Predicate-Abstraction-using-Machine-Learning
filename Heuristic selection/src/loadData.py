@@ -11,7 +11,7 @@ import glob
 import random
 import gensim
 import nltk
-from graphProcessing import readGraphFromGraphvizFromTrainData,getGraphEmbeddingNode2vec
+from graphProcessing import readGraphFromGraphvizFromTrainData,getGraphEmbeddingNode2vec,callEldaricaGenerateGraphs,getGraphNode2vecWalks
 nltk.download('punkt')
 import logging
 from collections import Counter
@@ -20,7 +20,6 @@ from keras.layers import Conv1D, Dense,Input,concatenate, Flatten
 from Miscellaneous import data2list, recoverPredictedText,printOnePredictedTextInStringForm,\
     doc2vecModelInferNewData,testAccuracy,pickleWrite,pickleRead,printList,sortHints
 from plot import plotHistory
-from graphProcessing import callEldaricaGenerateGraphs,getGraphNode2vecWalks
 #from trainDoc2VecModel import trainDoc2VectModel
 from distutils.dir_util import copy_tree
 

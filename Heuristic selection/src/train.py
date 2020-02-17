@@ -2,9 +2,9 @@
 import os
 import gensim
 
-from src.Miscellaneous import pickleRead
-from src.plot import plotHistory
-from src.loadData import train
+from Miscellaneous import pickleRead
+from plot import plotHistory
+from loadData import train
 def main():
     print("Start")
 

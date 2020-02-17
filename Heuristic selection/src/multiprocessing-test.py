@@ -1,7 +1,6 @@
 import os
 import sys
 from extractDataFromEldarica import extractPredicatesFromOneProgramForMultiprocess, extractPredicatesFromOneProgram,extractTemplatesFromOneProgram
-import subprocess
 import shutil
 import glob
 from distutils.dir_util import copy_tree
