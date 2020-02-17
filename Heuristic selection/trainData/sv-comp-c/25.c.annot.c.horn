@@ -1,7 +1,0 @@
-inv_main6(arg0, arg1, arg2, arg3) :- 0 = arg0 & 0 = arg1 & 0 = arg2 & 0 = arg3.
-inv_main8(x, y, i, j) :- inv_main6(x, y, i, j), __eval61 != 0.
-inv_main8(x, y, arg4, j) :- inv_main8(y, y, i, j), __eval62 != 0 & x = y & i + 1 = arg4.
-inv_main8(x, y, i, arg5) :- inv_main8(x, y, i, j), x != y & __eval62 != 0 & j + 1 = arg5.
-inv_main6(x, arg6, i, j) :- inv_main8(x, y, i, j), !(i >= j) & y + 1 = arg6.
-inv_main6(arg7, arg8, i, j) :- inv_main8(x, y, i, j), i >= j & x + 1 = arg7 & y + 1 = arg8.
-false :- inv_main6(x, y, i, j), !(i >= j).

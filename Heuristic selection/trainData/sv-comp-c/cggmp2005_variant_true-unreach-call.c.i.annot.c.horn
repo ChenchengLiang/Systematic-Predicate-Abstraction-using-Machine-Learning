@@ -1,3 +1,0 @@
-inv_main9(arg0, __eval40, arg1) :- __eval40 >= 1 & 1000000 >= __eval40 & 0 = arg0 & 2*__eval40 = arg1.
-inv_main9(arg2, arg3, arg4) :- inv_main9(lo, mid, hi), mid >= 1 & lo + 1 = arg2 & mid + -1 = arg3 & hi + -1 = arg4.
-false :- inv_main9(lo, mid, hi), lo != hi & !(mid >= 1).

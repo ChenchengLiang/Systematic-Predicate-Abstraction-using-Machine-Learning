@@ -1,5 +1,0 @@
-inv_main4(n, arg0, arg1) :- 0 = arg0 & 0 = arg1.
-inv_main4(n, arg2, x) :- inv_main4(n, x, m), __eval17 != 0 & n - x >= 1 & x + 1 = arg2.
-inv_main4(n, arg3, m) :- inv_main4(n, x, m), n - x >= 1 & x + 1 = arg3.
-false :- inv_main4(n, x, m), x >= n & m >= n & n >= 1.
-false :- inv_main4(n, x, m), x >= n & n >= 1 & -1 >= m.

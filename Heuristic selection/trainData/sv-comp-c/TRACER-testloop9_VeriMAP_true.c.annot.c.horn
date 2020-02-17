@@ -1,7 +1,0 @@
-inv_main6(arg0, arg1, y) :- 0 = arg0 & 1 = arg1.
-inv_main6(arg2, arg3, arg4) :- inv_main6(i, 1, y), -1*i + 10 >= 1 & i + 1 = arg2 & 2 = arg3 & 3 = arg4.
-inv_main6(arg5, arg6, arg7) :- inv_main6(i, 2, y), -1*i + 10 >= 1 & i + 1 = arg5 & 3 = arg6 & 4 = arg7.
-inv_main6(arg8, arg9, arg10) :- inv_main6(i, 3, y), -1*i + 10 >= 1 & i + 1 = arg8 & 1 = arg9 & 5 = arg10.
-inv_main6(arg11, arg12, y) :- inv_main6(i, x, y), x != 4 & x != 3 & x != 2 & x != 1 & -1*i + 10 >= 1 & i + 1 = arg11 & 2 = arg12.
-inv_main6(arg13, arg14, arg15) :- inv_main6(i, 4, y), -1*i + 10 >= 1 & i + 1 = arg13 & 1 = arg14 & 6 = arg15.
-false :- inv_main6(i, x, 6), !(-1*i + 10 >= 1).

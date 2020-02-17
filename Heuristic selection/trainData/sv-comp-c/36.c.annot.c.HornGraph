@@ -1,0 +1,249 @@
+-------------
+inv_main9(flag, arg4, arg6) :- 0 = arg4 & 0 = arg6.
+Head arguments: ListBuffer((flag,flag), (arg4,arg4), (arg6,arg6))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((flag,flag), (arg4,arg4), (arg6,arg6))
+variables in guard: ListBuffer()
+Data flow:
+arg4<-0
+arg6<-0
+Guard:
+dataflow number:2
+guard number:0
+-------------
+inv_main16(flag, z, w, arg7, arg8) :- inv_main16(flag, z, w, i, k), w - i >= 1 & i + 1 = arg7 & k + 1 = arg8.
+Head arguments: ListBuffer((flag,flag), (z,z), (w,w), (arg7,arg7), (arg8,arg8))
+Body arguments: ListBuffer((flag,flag), (z,z), (w,w), (i,i), (k,k))
+Common Arguments:ListBuffer((flag,flag), (z,z), (w,w))
+relativeComplimentOfHeadArg:ListBuffer((arg7,arg7), (arg8,arg8))
+variables in guard: ListBuffer(w, i)
+Data flow:
+arg7<-(i + 1)
+arg8<-(k + 1)
+flag<-flag
+z<-z
+w<-w
+Guard:
+(((w + -1 * i) + -1) >= 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main22(flag, z, k, arg9) :- inv_main16(flag, 2*arg12 + arg11, w, i, k), arg9 + -2*arg12 - arg11 = 0 & z + -2*arg12 - arg11 = 0 & arg11 != -1 & i >= w & 0 >= arg11 & arg11 >= -1.
+Head arguments: ListBuffer((flag,flag), (z,z), (k,k), (arg9,arg9))
+Body arguments: ListBuffer((flag,flag), ((2 * arg12 + arg11),(2 * arg12 + arg11)), (w,w), (i,i), (k,k))
+Common Arguments:ListBuffer((flag,flag), (k,k))
+relativeComplimentOfHeadArg:ListBuffer((z,z), (arg9,arg9))
+variables in guard: ListBuffer(arg11, i, w)
+Data flow:
+z<--1 * (-2 * arg12 + -1 * arg11)
+arg9<--1 * (-2 * arg12 + -1 * arg11)
+flag<-flag
+k<-k
+Guard:
+!((1 + arg11) = 0)
+((i + -1 * w) >= 0)
+(-1 * arg11 >= 0)
+((1 + arg11) >= 0)
+dataflow number:2
+guard number:4
+-------------
+inv_main22(flag, z, k, arg9) :- inv_main16(flag, 2*arg12 + arg11, w, i, k), arg9 + -2*arg12 - arg11 = 0 & z + -2*arg12 - arg11 = 0 & i >= w & 0 >= arg12 & 0 >= arg11 & arg11 >= -1.
+Head arguments: ListBuffer((flag,flag), (z,z), (k,k), (arg9,arg9))
+Body arguments: ListBuffer((flag,flag), ((2 * arg12 + arg11),(2 * arg12 + arg11)), (w,w), (i,i), (k,k))
+Common Arguments:ListBuffer((flag,flag), (k,k))
+relativeComplimentOfHeadArg:ListBuffer((z,z), (arg9,arg9))
+variables in guard: ListBuffer(i, w, arg12, arg11)
+Data flow:
+z<--1 * (-2 * arg12 + -1 * arg11)
+arg9<--1 * (-2 * arg12 + -1 * arg11)
+flag<-flag
+k<-k
+Guard:
+((i + -1 * w) >= 0)
+(-1 * arg12 >= 0)
+(-1 * arg11 >= 0)
+((1 + arg11) >= 0)
+dataflow number:2
+guard number:4
+-------------
+inv_main22(flag, arg13, arg14, z) :- inv_main16(flag, 2*arg16 + 1, w, i, k), 2*arg16 + 1 >= 1 & !(w - i >= 1) & z = 2*arg16 + 1 & 2*arg16 + 1 + 1 = arg13 & k + -1 = arg14.
+Head arguments: ListBuffer((flag,flag), (arg13,arg13), (arg14,arg14), (z,z))
+Body arguments: ListBuffer((flag,flag), ((2 * arg16 + 1),(2 * arg16 + 1)), (w,w), (i,i), (k,k))
+Common Arguments:ListBuffer((flag,flag))
+relativeComplimentOfHeadArg:ListBuffer((arg13,arg13), (arg14,arg14), (z,z))
+variables in guard: ListBuffer(arg16, w, i)
+Data flow:
+arg13<-((2 * arg16 + 1) + 1)
+arg14<-(k + -1)
+z<-(2 * arg16 + 1)
+flag<-flag
+Guard:
+(((2 * arg16 + 1) + -1) >= 0)
+!(((w + -1 * i) + -1) >= 0)
+dataflow number:3
+guard number:2
+-------------
+inv_main22(flag, arg17, arg18, z) :- inv_main22(flag, 2*arg20, y, z), __eval232 != 0 & 2*arg20 + 2 = arg17 & y + -2 = arg18.
+Head arguments: ListBuffer((flag,flag), (arg17,arg17), (arg18,arg18), (z,z))
+Body arguments: ListBuffer((flag,flag), (2 * arg20,2 * arg20), (y,y), (z,z))
+Common Arguments:ListBuffer((flag,flag), (z,z))
+relativeComplimentOfHeadArg:ListBuffer((arg17,arg17), (arg18,arg18))
+variables in guard: ListBuffer(__eval232)
+Data flow:
+arg17<-(2 * arg20 + 2)
+arg18<-(y + -2)
+flag<-flag
+z<-z
+Guard:
+!(__eval232 = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main22(flag, arg21, arg22, z) :- inv_main22(flag, 2*arg24 + 1, y, z), arg22 - y = -1 & arg21 = 2*arg24 & __eval232 != 0 & arg24 >= 0.
+Head arguments: ListBuffer((flag,flag), (arg21,arg21), (arg22,arg22), (z,z))
+Body arguments: ListBuffer((flag,flag), ((2 * arg24 + 1),(2 * arg24 + 1)), (y,y), (z,z))
+Common Arguments:ListBuffer((flag,flag), (z,z))
+relativeComplimentOfHeadArg:ListBuffer((arg21,arg21), (arg22,arg22))
+variables in guard: ListBuffer(__eval232, arg24)
+Data flow:
+arg21<--1 * -2 * arg24
+arg22<-(-1 + -1 * -1 * y)
+flag<-flag
+z<-z
+Guard:
+!(__eval232 = 0)
+(arg24 >= 0)
+dataflow number:2
+guard number:2
+-------------
+inv_main22(flag, arg21, arg22, z) :- inv_main22(flag, 2*arg24 + -1, y, z), arg22 - y = -1 & arg21 - 2*arg24 = -2 & __eval232 != 0 & 0 >= arg24.
+Head arguments: ListBuffer((flag,flag), (arg21,arg21), (arg22,arg22), (z,z))
+Body arguments: ListBuffer((flag,flag), ((2 * arg24 + -1),(2 * arg24 + -1)), (y,y), (z,z))
+Common Arguments:ListBuffer((flag,flag), (z,z))
+relativeComplimentOfHeadArg:ListBuffer((arg21,arg21), (arg22,arg22))
+variables in guard: ListBuffer(__eval232, arg24)
+Data flow:
+arg21<-(-2 + -1 * -2 * arg24)
+arg22<-(-1 + -1 * -1 * y)
+flag<-flag
+z<-z
+Guard:
+!(__eval232 = 0)
+(-1 * arg24 >= 0)
+dataflow number:2
+guard number:2
+-------------
+inv_main9(flag, arg25, arg26) :- inv_main22(flag, x, y, z), z + 1 = arg25 & x + y + 1 = arg26.
+Head arguments: ListBuffer((flag,flag), (arg25,arg25), (arg26,arg26))
+Body arguments: ListBuffer((flag,flag), (x,x), (y,y), (z,z))
+Common Arguments:ListBuffer((flag,flag))
+relativeComplimentOfHeadArg:ListBuffer((arg25,arg25), (arg26,arg26))
+variables in guard: ListBuffer()
+Data flow:
+arg25<-(z + 1)
+arg26<-((x + y) + 1)
+flag<-flag
+Guard:
+dataflow number:2
+guard number:0
+-------------
+inv_main36(flag, arg27, arg28, z, w, arg29, arg30) :- inv_main36(flag, a, b, z, w, c, d), flag != 0 & __eval299 != 0 & a + 1 = arg27 & b + 1 = arg28 & c + 1 = arg29 & d + 1 = arg30.
+Head arguments: ListBuffer((flag,flag), (arg27,arg27), (arg28,arg28), (z,z), (w,w), (arg29,arg29), (arg30,arg30))
+Body arguments: ListBuffer((flag,flag), (a,a), (b,b), (z,z), (w,w), (c,c), (d,d))
+Common Arguments:ListBuffer((flag,flag), (z,z), (w,w))
+relativeComplimentOfHeadArg:ListBuffer((arg27,arg27), (arg28,arg28), (arg29,arg29), (arg30,arg30))
+variables in guard: ListBuffer(flag, __eval299)
+Data flow:
+arg27<-(a + 1)
+arg28<-(b + 1)
+arg29<-(c + 1)
+arg30<-(d + 1)
+flag<-flag
+z<-z
+w<-w
+Guard:
+!(flag = 0)
+!(__eval299 = 0)
+dataflow number:4
+guard number:2
+-------------
+inv_main36(flag, arg31, arg32, z, w, arg33, arg34) :- inv_main36(0, a, b, z, w, c, d), __eval299 != 0 & a + c + 1 = arg31 & b + d + 1 = arg32 & c + 1 = arg33 & d + 1 = arg34 & flag = 0.
+Head arguments: ListBuffer((flag,flag), (arg31,arg31), (arg32,arg32), (z,z), (w,w), (arg33,arg33), (arg34,arg34))
+Body arguments: ListBuffer((0,0), (a,a), (b,b), (z,z), (w,w), (c,c), (d,d))
+Common Arguments:ListBuffer((z,z), (w,w))
+relativeComplimentOfHeadArg:ListBuffer((flag,flag), (arg31,arg31), (arg32,arg32), (arg33,arg33), (arg34,arg34))
+variables in guard: ListBuffer(__eval299)
+Data flow:
+flag<-0
+arg31<-(a + (c + 1))
+arg32<-(b + (d + 1))
+arg33<-(c + 1)
+arg34<-(d + 1)
+z<-z
+w<-w
+inv_main36_argument_0<-0
+Guard:
+!(__eval299 = 0)
+dataflow number:5
+guard number:1
+-------------
+inv_main16(flag, z, w, arg35, arg37) :- inv_main9(flag, arg35, w), __eval90 != 0 & z = arg35 & 0 = arg37.
+Head arguments: ListBuffer((flag,flag), (z,z), (w,w), (arg35,arg35), (arg37,arg37))
+Body arguments: ListBuffer((flag,flag), (arg35,arg35), (w,w))
+Common Arguments:ListBuffer((flag,flag), (w,w), (arg35,arg35))
+relativeComplimentOfHeadArg:ListBuffer((z,z), (arg37,arg37))
+variables in guard: ListBuffer(__eval90)
+Data flow:
+z<-arg35
+arg37<-0
+flag<-flag
+w<-w
+Guard:
+!(__eval90 = 0)
+dataflow number:2
+guard number:1
+-------------
+inv_main36(flag, a, b, z, w, arg38, arg39) :- inv_main9(flag, z, w), 0 = arg38 & 0 = arg39 & a = 0 & b = 0.
+Head arguments: ListBuffer((flag,flag), (a,a), (b,b), (z,z), (w,w), (arg38,arg38), (arg39,arg39))
+Body arguments: ListBuffer((flag,flag), (z,z), (w,w))
+Common Arguments:ListBuffer((flag,flag), (z,z), (w,w))
+relativeComplimentOfHeadArg:ListBuffer((a,a), (b,b), (arg38,arg38), (arg39,arg39))
+variables in guard: ListBuffer()
+Data flow:
+a<-0
+b<-0
+arg38<-0
+arg39<-0
+flag<-flag
+z<-z
+w<-w
+Guard:
+dataflow number:4
+guard number:0
+-------------
+false :- inv_main36(flag, a, b, z, w, c, d), b != a.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((flag,flag), (a,a), (b,b), (z,z), (w,w), (c,c), (d,d))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(b, a)
+Data flow:
+Guard:
+!((b + -1 * a) = 0)
+dataflow number:0
+guard number:1
+-------------
+false :- inv_main36(flag, a, b, z, w, c, d), z - w >= 1.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((flag,flag), (a,a), (b,b), (z,z), (w,w), (c,c), (d,d))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(z, w)
+Data flow:
+Guard:
+((-1 + (z + -1 * w)) >= 0)
+dataflow number:0
+guard number:1
+Hints:
+-----------

@@ -1,15 +1,11 @@
 digraph dag {
-0 [label="inv_main4"];
-1 [label="VerifHintInitPred"];
+0 [label="inv_main3"];
+1 [label="VerifHintTplPred"];
 2 [label="="];
 3 [label="0"];
-4 [label="+"];
-5 [label="-50"];
-6 [label="_0"];
+4 [label="0"];
 0->1
 1->2
 2->4
 2 -> 3
-4->6
-4 -> 5
 }

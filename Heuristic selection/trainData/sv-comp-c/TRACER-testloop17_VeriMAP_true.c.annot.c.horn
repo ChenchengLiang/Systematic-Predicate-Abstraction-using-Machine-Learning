@@ -1,4 +1,0 @@
-inv_main8(N, arg0, arg1, arg2) :- N + -1 >= 1 & 0 = arg0 & 0 = arg1 & 0 = arg2.
-inv_main8(N, arg3, arg4, arg5) :- inv_main8(N, i, j, k), -1*i + 1 >= 1 & N - i >= 1 & i + 1 = arg3 & j + 1 = arg4 & 1 = arg5.
-inv_main8(N, arg6, arg7, arg8) :- inv_main8(N, i, j, k), !(-1*i + 1 >= 1) & N - i >= 1 & i + 1 = arg6 & j + 1 = arg7 & 0 = arg8.
-false :- inv_main8(N, i, j, k), k >= 1 & !(N - i >= 1).

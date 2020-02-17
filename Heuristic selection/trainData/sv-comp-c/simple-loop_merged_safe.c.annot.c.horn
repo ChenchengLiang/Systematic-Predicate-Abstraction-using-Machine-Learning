@@ -1,5 +1,0 @@
-inv_main14(z, res1, arg0) :- inv_main14(z, res1, i), 10 >= i & i + 1 = arg0 & z = z.
-inv_main7(z, arg1) :- inv_main7(z, i), 10 >= i & i + 1 = arg1 & z = z.
-inv_main7(z, arg3) :- z = arg2 & 0 = arg3.
-inv_main14(z, i, arg5) :- inv_main7(arg4, i), !(10 >= i) & z = arg4 & z = arg4 & 1 = arg5.
-false :- inv_main14(z, res1, res2), res1 != res2 & !(10 >= res2).

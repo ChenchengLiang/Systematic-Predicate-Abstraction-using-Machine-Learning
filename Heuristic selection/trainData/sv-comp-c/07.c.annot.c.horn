@@ -1,4 +1,0 @@
-inv_main7(arg0, n, arg1, arg2) :- n >= 0 & 0 = arg0 & 0 = arg1 & 0 = arg2.
-inv_main7(arg3, n, arg4, arg5) :- inv_main7(i, n, a, b), __eval80 != 0 & n - i >= 1 & i + 1 = arg3 & a + 1 = arg4 & b + 2 = arg5.
-inv_main7(arg6, n, arg7, arg8) :- inv_main7(i, n, a, b), n - i >= 1 & i + 1 = arg6 & a + 2 = arg7 & b + 1 = arg8.
-false :- inv_main7(i, n, a, b), !(a + b = 3*n | n - i >= 1).

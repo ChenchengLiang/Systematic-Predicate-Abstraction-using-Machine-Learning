@@ -1,6 +1,0 @@
-inv_main6(arg0, arg1, arg2, arg3) :- 1 = arg0 & 0 = arg1 & 0 = arg2 & 0 = arg3.
-inv_main6(w, z, x, y) :- inv_main6(0, z, x, y), z != 0 & __eval16 != 0 & w = 0.
-inv_main6(w, arg4, x, arg5) :- inv_main6(0, 0, x, y), __eval16 != 0 & 1 = arg4 & w = 0 & y + 1 = arg5.
-inv_main6(arg6, z, arg7, y) :- inv_main6(w, z, x, y), arg7 - x = 1 & __eval16 != 0 & w != 0 & z != 0 & arg6 = 0.
-inv_main6(arg8, arg9, arg10, arg11) :- inv_main6(w, 0, x, y), arg11 - y = 1 & arg10 - x = 1 & __eval16 != 0 & w != 0 & arg9 = 1 & arg8 = 0.
-false :- inv_main6(w, z, x, y), x != y.

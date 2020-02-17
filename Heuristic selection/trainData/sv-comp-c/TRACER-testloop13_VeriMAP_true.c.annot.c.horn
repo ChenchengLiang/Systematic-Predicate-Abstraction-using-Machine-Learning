@@ -1,4 +1,0 @@
-inv_main5(arg0, old, arg1) :- 0 = arg0 & old + 1 = arg1.
-inv_main5(arg2, new, arg3) :- inv_main5(lock, old, arg3), arg3 != old & 1 = arg2 & new = arg3.
-inv_main5(arg4, new, arg5) :- inv_main5(lock, old, new), __eval30 != 0 & new != old & 0 = arg4 & new + 2 = arg5.
-false :- inv_main5(0, old, old).

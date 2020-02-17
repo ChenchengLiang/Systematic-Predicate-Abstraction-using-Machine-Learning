@@ -1,7 +1,0 @@
-inv_main10(i, j, arg0, n) :- inv_main7(i, arg0, n), n - arg0 >= 1 & j = arg0.
-inv_main7(i, arg1, n) :- inv_main10(i, j, k, n), !(n - k >= 1) & j + 1 = arg1.
-inv_main7(arg2, arg3, n) :- n >= 1 & 0 = arg2 & 0 = arg3.
-inv_main7(arg4, arg5, n) :- inv_main7(i, j, n), n + -1*(i + 1) >= 1 & !(n - j >= 1) & i + 1 = arg4 & i + 1 = arg5.
-inv_main10(i, j, arg6, n) :- inv_main10(i, j, k, n), k >= i & n - k >= 1 & k + 1 = arg6.
-inv_main10(i, j, arg7, n) :- inv_main10(i, j, k, n), !(k >= i) & n - k >= 1 & k + 1 = arg7.
-false :- inv_main10(i, j, k, n), !(k >= i | !(n - k >= 1)).

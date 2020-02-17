@@ -1,3 +1,0 @@
-inv_main13(__eval44, arg3, arg4) :- -1*__eval44 + 10 >= 1 & __eval44 >= 1 & 0 = arg3 & 0 = arg4.
-inv_main13(n, arg6, arg7) :- inv_main13(n, i, k), n - i >= 1 & k + 4000 = arg7 & i + 1 = arg6.
-false :- inv_main13(n, i, k), !(k - n >= 1) & !(n - i >= 1).

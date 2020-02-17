@@ -1,7 +1,0 @@
-inv_main8(arg0, arg1, arg2, arg3) :- 1 = arg0 & 1 = arg1 & 2 = arg2 & 2 = arg3.
-inv_main15(arg6, b, c, d) :- inv_main8(a, b, c, d), arg8 + -1*d - b = 0 & arg7 + -1*c - a = 0 & arg6 - a = -1 & 2*arg10 + -1*c - a - b - d = -1 & __eval72 != 0 & arg10 >= 0.
-inv_main15(arg6, b, c, d) :- inv_main8(a, b, c, d), arg8 + -1*d - b = 0 & arg7 + -1*c - a = 0 & arg6 - a = -1 & 2*arg10 + -1*c - a - b - d = 1 & __eval72 != 0 & arg10 + -1*c - a - b - d >= 1.
-inv_main15(arg11, b, c, arg12) :- inv_main8(a, b, c, d), a + c + b + d = 2*arg16 & __eval72 != 0 & a + 1 = arg11 & d + 1 = arg12.
-inv_main8(a, b, c, d) :- inv_main15(a, b, c, d).
-inv_main15(a, arg17, arg18, d) :- inv_main15(a, b, c, d), __eval89 != 0 & b + -1 = arg17 & c + -1 = arg18.
-false :- inv_main8(a, b, c, d), a + c != b + d.

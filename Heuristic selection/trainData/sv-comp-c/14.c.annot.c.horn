@@ -1,7 +1,0 @@
-inv_main11(a, arg1, m) :- !(0 >= m) & 1 = arg1 & 0 = a.
-inv_main11(arg2, arg3, m) :- inv_main11(a, j, m), __eval30 != 0 & m >= j & a + 1 = arg2 & j + 1 = arg3.
-inv_main11(arg4, arg5, m) :- inv_main11(a, j, m), m >= j & a + -1 = arg4 & j + 1 = arg5.
-inv_main26 :- inv_main11(a, j, m), !(m >= a | !(a + 1*m >= 0) | m >= j).
-inv_main26 :- inv_main11(a, j, m), !(m >= a) & !(a + 1*m >= 0 | m >= j).
-false :- inv_main11(a, j, m), !(a + 1*m >= 0 | m >= j).
-false :- inv_main26.

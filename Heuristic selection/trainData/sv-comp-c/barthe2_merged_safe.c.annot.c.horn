@@ -1,7 +1,0 @@
-inv_main7(n, arg0, arg1, arg2, arg3) :- 0 = arg0 & 0 = arg1 & 0 = arg2 & 1 = arg3.
-inv_main7(n, x1, x2, i1, i2) :- inv_main17(n, x1, x2, i1, i2).
-inv_main17(n, x1, arg4, i1, arg5) :- inv_main7(n, x1, x2, i1, i2), arg5 - i2 = 1 & arg4 + -1*x2 - i2 = 0 & n - i2 >= 1 & i1 - n >= 1.
-inv_main17(n, arg6, x2, arg7, i2) :- inv_main7(n, x1, x2, i1, i2), arg7 - i1 = 1 & arg6 + -1*x1 - i1 = 0 & i2 - n >= 1 & n - i1 >= 1.
-inv_main17(n, arg8, arg9, arg10, arg11) :- inv_main7(n, x1, x2, i1, i2), arg11 - i2 = 1 & arg10 - i1 = 1 & arg9 + -1*x2 - i2 = 0 & arg8 + -1*x1 - i1 = 0 & i2 != i1 & n >= i2 & n >= i1.
-inv_main17(n, arg8, arg9, arg10, arg11) :- inv_main7(n, x1, x2, i1, i2), arg11 - i2 = 1 & arg10 - i1 = 1 & arg9 + -1*x2 - i2 = 0 & arg8 + -1*x1 - i1 = 0 & n != i1 & n >= i2 & n >= i1.
-false :- inv_main17(n, x1, x2, i1, i2), x2 != x1 + i1.

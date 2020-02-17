@@ -21,19 +21,13 @@ xxxinv_main6___Initial_0xxxdataFlow_0_node_0 [label="0"];
 xxxinv_main6___Initial_0xxxdataFlow_0_node_0->DataFowHyperEdge_0_inv_main6_argument_0 [label=""];
 xxxinv_main6___inv_main6_1xxxguard_0_node_0 [label="!" shape="rect"];
 xxxinv_main6___inv_main6_1xxxguard_0_node_1 [label="=" shape="rect"];
-xxxinv_main6___inv_main6_1xxxguard_0_node_2 [label="-" shape="rect"];
-xxxinv_main6___inv_main6_1xxxguard_0_node_5 [label="1000000"];
+xxxinv_main6___inv_main6_1xxxguard_0_node_3 [label="1000000"];
 xxxinv_main6___inv_main6_1xxxguard_0_node_1->xxxinv_main6___inv_main6_1xxxguard_0_node_0
-xxxinv_main6___inv_main6_1xxxguard_0_node_2->xxxinv_main6___inv_main6_1xxxguard_0_node_1
-xxxinv_main6___inv_main6_1xxxguard_0_node_5->xxxinv_main6___inv_main6_1xxxguard_0_node_1
-inv_main6_argument_0->xxxinv_main6___inv_main6_1xxxguard_0_node_2
-xxxinv_main6___inv_main6_1xxxdataFlow_0_node_2->xxxinv_main6___inv_main6_1xxxguard_0_node_2
+xxxinv_main6___inv_main6_1xxxdataFlow_0_node_0->xxxinv_main6___inv_main6_1xxxguard_0_node_1
+xxxinv_main6___inv_main6_1xxxguard_0_node_3->xxxinv_main6___inv_main6_1xxxguard_0_node_1
 
 xxxinv_main6___inv_main6_1xxxguard_0_node_0->ControlFowHyperEdge_1 [label=""];
-xxxinv_main6___inv_main6_1xxxdataFlow_0_node_0 [label="-" shape="rect"];
-xxxinv_main6___inv_main6_1xxxdataFlow_0_node_2 [label="-1"];
-inv_main6_argument_0->xxxinv_main6___inv_main6_1xxxdataFlow_0_node_0
-xxxinv_main6___inv_main6_1xxxdataFlow_0_node_2->xxxinv_main6___inv_main6_1xxxdataFlow_0_node_0
+xxxinv_main6___inv_main6_1xxxdataFlow_0_node_0 [label="_arg1"];
 
 xxxinv_main6___inv_main6_1xxxdataFlow_0_node_0->DataFowHyperEdge_1_inv_main6_argument_0 [label=""];
 xxxFALSE___inv_main6_2xxxguard_0_node_0 [label="!" shape="rect"];
@@ -50,4 +44,48 @@ true_0->DataFowHyperEdge_0_inv_main6_argument_0 [label=""];
 DataFowHyperEdge_1_inv_main6_argument_0 [label="Guarded DataFlow Hyperedge" shape="diamond"];
 DataFowHyperEdge_1_inv_main6_argument_0 -> inv_main6_argument_0[label=""]
 xxxinv_main6___inv_main6_1xxxguard_0_node_0 -> DataFowHyperEdge_1_inv_main6_argument_0[label=""]
+
+
+
+
+inv_main6_VerifHintInitPred_0 [label="inv_main6_VerifHintInitPred_0" shape="rect"];
+inv_main6predicate_0_node_0 -> inv_main6_VerifHintInitPred_0[label="" ];
+inv_main6_VerifHintInitPred_0 -> inv_main6[label="" ];
+inv_main6predicate_0_node_0 [label="!" shape="rect"];
+inv_main6predicate_0_node_1 [label="=" shape="rect"];
+inv_main6_argument_0 [label="inv_main6_argument_0"];
+inv_main6predicate_0_node_3 [label="1000000"];
+inv_main6predicate_0_node_1->inv_main6predicate_0_node_0
+inv_main6predicate_0_node_3->inv_main6predicate_0_node_1
+inv_main6_argument_0->inv_main6predicate_0_node_1
+
+inv_main6_VerifHintInitPred_1 [label="inv_main6_VerifHintInitPred_1" shape="rect"];
+inv_main6predicate_1_node_0 -> inv_main6_VerifHintInitPred_1[label="" ];
+inv_main6_VerifHintInitPred_1 -> inv_main6[label="" ];
+inv_main6predicate_1_node_0 [label=">=" shape="rect"];
+inv_main6predicate_1_node_1 [label="-" shape="rect"];
+inv_main6_argument_0 [label="inv_main6_argument_0"];
+inv_main6predicate_1_node_4 [label="1"];
+inv_main6predicate_1_node_1->inv_main6predicate_1_node_0
+inv_main6predicate_1_node_4->inv_main6predicate_1_node_0
+inv_main6predicate_0_node_3->inv_main6predicate_1_node_1
+inv_main6_argument_0->inv_main6predicate_1_node_1
+
+inv_main6_VerifHintInitPred_2 [label="inv_main6_VerifHintInitPred_2" shape="rect"];
+inv_main6predicate_2_node_0 -> inv_main6_VerifHintInitPred_2[label="" ];
+inv_main6_VerifHintInitPred_2 -> inv_main6[label="" ];
+inv_main6predicate_2_node_0 [label=">=" shape="rect"];
+inv_main6_argument_0 [label="inv_main6_argument_0"];
+inv_main6predicate_0_node_3->inv_main6predicate_2_node_0
+inv_main6_argument_0->inv_main6predicate_2_node_0
+
+inv_main6_VerifHintInitPred_3 [label="inv_main6_VerifHintInitPred_3" shape="rect"];
+inv_main6predicate_3_node_0 -> inv_main6_VerifHintInitPred_3[label="" ];
+inv_main6_VerifHintInitPred_3 -> inv_main6[label="" ];
+inv_main6predicate_3_node_0 [label=">=" shape="rect"];
+inv_main6_argument_0 [label="inv_main6_argument_0"];
+inv_main6predicate_3_node_2 [label="0"];
+inv_main6predicate_3_node_2->inv_main6predicate_3_node_0
+inv_main6_argument_0->inv_main6predicate_3_node_0
+
 }

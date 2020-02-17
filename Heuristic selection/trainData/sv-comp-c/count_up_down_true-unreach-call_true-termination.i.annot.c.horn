@@ -1,3 +1,0 @@
-inv_main6(n, arg0, arg1) :- inv_main6(n, x, y), x >= 1 & x + -1 = arg0 & y + 1 = arg1.
-inv_main6(__eval0, arg2, arg3) :- arg2 >= 0 & __eval0 = arg2 & 0 = arg3.
-false :- inv_main6(n, x, y), y != n & !(x >= 1).

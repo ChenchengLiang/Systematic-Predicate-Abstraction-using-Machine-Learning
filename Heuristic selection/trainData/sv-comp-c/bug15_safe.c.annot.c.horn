@@ -1,5 +1,0 @@
-inv_main17(z, res1, arg1) :- inv_main17(z, res1, x), -1*x + 10 >= 1 & x + 2 = arg0 & x + 2 + x + 2 = arg1 & z = z.
-inv_main8(z, arg2) :- inv_main8(z, x), 9 >= x & 2*(x + 2) = arg2 & x + 2 = arg3 & z = z.
-inv_main8(z, arg6) :- z = arg5 & 1 = arg6 & 0 = arg7.
-inv_main17(z, arg8, arg11) :- inv_main8(arg9, x), !(9 >= x) & z = arg9 & 2*x = arg8 & z = arg9 & 0 = arg10 & 1 = arg11.
-false :- inv_main17(z, res1, x), res1 != 2*x & !(-1*x + 10 >= 1).

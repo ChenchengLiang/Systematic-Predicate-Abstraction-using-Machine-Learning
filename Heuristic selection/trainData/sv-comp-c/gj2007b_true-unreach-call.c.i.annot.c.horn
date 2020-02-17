@@ -1,5 +1,0 @@
-inv_main7(arg2, x, n) :- inv_main7(x, m, n), __eval24 != 0 & n - x >= 1 & x + 1 = arg2.
-inv_main7(arg3, m, n) :- inv_main7(x, m, n), n - x >= 1 & x + 1 = arg3.
-inv_main7(x, m, __eval8) :- 0 = x & 0 = m.
-false :- inv_main7(x, m, n), !(m >= 0 | 0 >= n) & !(n - x >= 1).
-false :- inv_main7(x, m, n), !(n - m >= 1 | 0 >= n) & !(n - x >= 1).

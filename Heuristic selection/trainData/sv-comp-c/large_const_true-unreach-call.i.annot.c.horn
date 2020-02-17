@@ -1,7 +1,0 @@
-inv_main13(__eval87, arg3, arg4) :- __eval87 >= 0 & -1*__eval87 + 10 >= 1 & 0 = arg3 & 0 = arg4 & 4000 = c1 & 2000 = c2 & 10000 = c3.
-inv_main13(n, arg5, arg6) :- inv_main13(n, i, k), -1*n + 2 >= 1 & n - i >= 1 & c1 = 4000 & __eval103 = 0 & i + 1 = arg5 & k + c1 = arg6 & c2 = 2000 & c3 = 10000.
-inv_main13(n, arg7, arg8) :- inv_main13(n, i, k), -1*n + 2 >= 1 & n - i >= 1 & c2 = 2000 & __eval103 = 1 & i + 1 = arg7 & k + c2 = arg8 & c1 = 4000 & c3 = 10000.
-inv_main13(n, arg9, arg10) :- inv_main13(n, i, k), __eval103 != 1 & __eval103 != 0 & __eval103 >= 0 & -1*n + 2 >= 1 & n - i >= 1 & c3 = 10000 & i + 1 = arg9 & k + c3 = arg10 & c1 = 4000 & c2 = 2000.
-inv_main27(n, k, arg11) :- inv_main13(n, i, k), n >= 1 & !(n - i >= 1) & 0 = arg11 & c1 = 4000 & c2 = 2000 & c3 = 10000.
-inv_main27(n, arg12, arg13) :- inv_main27(n, k, j), n + -1*(j + 1) >= 1 & k + -1 = arg12 & j + 1 = arg13 & c1 = 4000 & c2 = 2000 & c3 = 10000.
-false :- inv_main27(n, k, j), !(k >= 1).

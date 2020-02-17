@@ -1,0 +1,11 @@
+digraph dag {
+0 [label="inv_main90"];
+1 [label="VerifHintTplPred"];
+2 [label="="];
+3 [label="0"];
+4 [label="0"];
+0->1
+1->2
+2->4
+2 -> 3
+}

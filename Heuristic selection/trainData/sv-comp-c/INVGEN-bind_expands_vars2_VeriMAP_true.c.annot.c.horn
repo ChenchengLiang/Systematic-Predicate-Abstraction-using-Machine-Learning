@@ -1,3 +1,0 @@
-inv_main19(cp1_off, n2, arg0, MAXDATA) :- n2 >= 1 & 2*MAXDATA - n1 >= n2 & n1 >= cp1_off & 2*MAXDATA >= n1 & MAXDATA >= 1 & 0 = arg0.
-inv_main19(cp1_off, n2, arg1, MAXDATA) :- inv_main19(cp1_off, n2, mc_i, MAXDATA), n2 + -1*(mc_i + 1) >= 1 & mc_i + 1 = arg1.
-false :- inv_main19(cp1_off, n2, mc_i, MAXDATA), !(2*MAXDATA + -1*(cp1_off + mc_i) >= 1).

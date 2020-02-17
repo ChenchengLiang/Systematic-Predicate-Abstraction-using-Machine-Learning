@@ -1,7 +1,0 @@
-inv_main12(k, x, y) :- inv_main11(k, z, x, y, c).
-inv_main11(k, z, arg0, arg1, arg2) :- inv_main11(k, k + y - c, x, y, c), __eval44 != 0 & z = k + y - c & y + 1 = arg1 & c + 1 = arg2 & x + 1 = arg0.
-inv_main11(k, z, arg3, arg4, arg5) :- inv_main11(k, z, x, y, c), z != k + y - c & __eval44 != 0 & x + 1 = arg3 & y + -1 = arg4 & c + 1 = arg5.
-inv_main12(k, arg6, arg7) :- inv_main12(k, x, y), __eval58 != 0 & x + -1 = arg6 & y + -1 = arg7.
-inv_main11(k, arg8, x, y, arg9) :- inv_main12(k, x, y), __eval18 != 0 & k + y = arg8 & 0 = arg9.
-inv_main11(k, arg11, arg12, arg13, arg14) :- __eval18 != 0 & k = arg11 & 0 = arg12 & 0 = arg13 & 0 = arg14.
-false :- inv_main12(k, x, y), x != y.

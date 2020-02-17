@@ -1,4 +1,0 @@
-inv_main12(k, flag, arg2, arg3, n) :- inv_main12(k, flag, i, j, n), k >= i & i + 1 = arg2 & j + n = arg3.
-inv_main12(k, flag, arg4, j, arg5) :- flag = 1 & 0 = arg4 & 1 = arg5 & 0 = j.
-inv_main12(k, flag, arg6, j, arg7) :- flag != 1 & 0 = arg6 & 2 = arg7 & 0 = j.
-false :- inv_main12(k, 1, i, j, n), j != i & !(k >= i).

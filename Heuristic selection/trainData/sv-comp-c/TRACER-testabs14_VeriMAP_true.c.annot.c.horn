@@ -1,6 +1,0 @@
-inv_main7(i, j) :- inv_main6(j), !(-1*j + 10 >= 1) & i = 0.
-inv_main6(arg2) :- 0 = arg2.
-inv_main6(arg3) :- inv_main6(j), -1*j + 10 >= 1 & j + 1 = arg3.
-inv_main7(arg4, j) :- inv_main7(i, j), -1*i + 10 >= 1 & i + 1 = arg4.
-false :- inv_main7(i, j), i != 10 & i >= 10.
-false :- inv_main7(i, j), j >= 11 & i >= 10.

@@ -11,16 +11,16 @@ Guard:
 dataflow number:1
 guard number:0
 -------------
-inv_main6(arg1) :- inv_main6(i), i + 1 != 1000000 & i + 1 = arg1.
+inv_main6(arg1) :- inv_main6(arg1 + -1), arg1 + -1 + 1 != 1000000.
 Head arguments: ListBuffer((arg1,arg1))
-Body arguments: ListBuffer((i,i))
+Body arguments: ListBuffer(((arg1 + -1),(arg1 + -1)))
 Common Arguments:ListBuffer()
 relativeComplimentOfHeadArg:ListBuffer((arg1,arg1))
-variables in guard: ListBuffer(i)
+variables in guard: ListBuffer(arg1)
 Data flow:
-arg1<-(i + 1)
+arg1<-_arg1
 Guard:
-!(((i + 1) + -1000000) = 0)
+!((-1000000 + _arg1) = 0)
 dataflow number:1
 guard number:1
 -------------
@@ -35,4 +35,5 @@ Guard:
 !((1000000 + -1 * i) >= 0)
 dataflow number:0
 guard number:1
+Hints:
 -----------

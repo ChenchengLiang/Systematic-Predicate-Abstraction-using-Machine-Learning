@@ -1,6 +1,0 @@
-inv_main13(x, arg0, NONDET) :- inv_main13(x, i, NONDET), NONDET != 0 & i + 1 = arg0.
-inv_main13(arg1, arg2, NONDET) :- q >= 1 & p >= 1 & 1 = arg1 & 0 = arg2 & 4 = arg3.
-inv_main13(arg4, arg5, NONDET) :- !(q >= 1) & p >= 1 & 1 = arg4 & 0 = arg5 & 5 = arg6.
-inv_main13(arg7, arg8, NONDET) :- q >= 1 & !(p >= 1) & 3 = arg7 & 0 = arg8 & 4 = arg9.
-inv_main13(arg10, arg11, NONDET) :- !(q >= 1) & !(p >= 1) & 3 = arg10 & 0 = arg11 & 5 = arg12.
-false :- inv_main13(2, i, 0).

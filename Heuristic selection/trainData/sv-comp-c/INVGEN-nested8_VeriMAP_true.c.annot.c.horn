@@ -1,7 +1,0 @@
-inv_main11(arg1, arg2, n, m) :- n >= 1 & m >= n & 0 = arg1 & 0 = arg2 & 0 = __BLAST_NONDET.
-inv_main11(arg3, arg4, n, m) :- inv_main11(i, j, n, m), n + -1*(i + 1) >= 1 & !(n - j >= 1) & i + 1 = arg3 & 0 = arg4 & __BLAST_NONDET = 0.
-inv_main15(i, j, arg5, n, m) :- inv_main11(i, arg5, n, m), n + m - arg5 >= 1 & n - arg5 >= 1 & j = arg5 & __BLAST_NONDET = 0.
-inv_main11(i, arg6, n, m) :- inv_main11(i, j, n, m), !(n + m - j >= 1) & n - j >= 1 & j + 1 = arg6 & __BLAST_NONDET = 0.
-inv_main15(i, j, arg7, n, m) :- inv_main15(i, j, k, n, m), n + m + -1*(k + 1) >= 1 & k + 1 = arg7 & __BLAST_NONDET = 0.
-inv_main11(i, arg8, n, m) :- inv_main15(i, j, k, n, m), !(n + m + -1*(k + 1) >= 1) & j + 1 = arg8 & k + 1 = arg9 & __BLAST_NONDET = 0.
-false :- inv_main15(i, j, k, n, m), !(n + k + m + -1*(i + j) >= 0).

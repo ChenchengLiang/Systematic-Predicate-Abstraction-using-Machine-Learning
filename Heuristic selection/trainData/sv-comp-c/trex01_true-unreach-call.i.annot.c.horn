@@ -1,6 +1,0 @@
-inv_main18(k, arg0) :- inv_main18(k, z), k - z >= 1 & 2*z = arg0 & d = 1.
-inv_main45(k, arg1) :- inv_main45(k, z), k - z >= 1 & 2*z = arg1 & c = 0 & d = 2.
-inv_main18(__eval32, arg3) :- __eval0 != 0 & 1 = arg2 & 1 = arg3.
-inv_main45(__eval147, arg5) :- __eval0 = 0 & 2 = arg4 & 1 = arg5.
-false :- inv_main18(k, z), !(z >= 1) & !(k - z >= 1).
-false :- inv_main45(k, z), !(z >= 1) & !(k - z >= 1).

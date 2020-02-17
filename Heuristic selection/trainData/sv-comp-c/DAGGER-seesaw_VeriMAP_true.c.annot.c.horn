@@ -1,7 +1,0 @@
-inv_main8(x, y) :- y = 0 & x = 0.
-inv_main8(arg0, arg1) :- inv_main8(x, y), x >= 9 & i != 0 & i != 0 & x + 2 = arg0 & y + 1 = arg1.
-inv_main8(arg2, arg3) :- inv_main8(x, y), 9 >= x & x >= 7 & i != 0 & i != 0 & x + 1 = arg2 & y + 3 = arg3.
-inv_main8(arg4, arg5) :- inv_main8(x, y), 0 >= x + -7 & x >= 5 & i != 0 & i != 0 & x + 2 = arg4 & y + 1 = arg5.
-inv_main8(arg6, arg7) :- inv_main8(x, y), 0 >= x + -4 & i != 0 & x + 1 = arg6 & y + 2 = arg7.
-false :- inv_main8(x, y), !(2*y >= x).
-false :- inv_main8(x, y), !(3*x >= y).

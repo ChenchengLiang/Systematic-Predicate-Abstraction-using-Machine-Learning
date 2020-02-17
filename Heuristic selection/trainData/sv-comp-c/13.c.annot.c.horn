@@ -1,4 +1,0 @@
-inv_main5(flag, arg0, arg1) :- 2 = arg0 & 0 = arg1.
-inv_main5(flag, arg2, k) :- inv_main5(flag, j, k), flag != 0 & __eval24 != 0 & j + 4 = arg2.
-inv_main5(flag, arg3, arg4) :- inv_main5(0, j, k), __eval24 != 0 & flag = 0 & j + 2 = arg3 & k + 1 = arg4.
-false :- inv_main5(flag, j, k), j != 2*k + 2 & k != 0.
