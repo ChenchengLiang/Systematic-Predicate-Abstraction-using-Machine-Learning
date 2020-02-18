@@ -154,7 +154,7 @@ Text streamed Horn clauses as inputs are not enough to make multilayer perceptro
 The graph in Figure represents horn clauses in Figure \ref{while-C-horn-clauses}.
 
 
-Formally, the graph consists of four categories of nodes, two categories of hyperedges, and six categories of edges. The graph is defined as $G=(V_{CL},V_{Vri},V_{C},V_{Op},HE_{CF},HE_{DF},E_{CFI},E_{CFO},E_{DFI},E_{DFO},E_{CD},E_{Arg})$, in which $V_{CL}=\{cl_{Initial},cl_{Main_{k}},cl_{false}\}$ is control location node set, $V_{Arg}=\{Arg_{k}\}$ is argument set, $V_{C}$ is constant value set, $V_{Op}=\{+,-,==,...\}$ is operator set,$V_{FV}=\{v_{k}\}$ is free variables set. $k$ is a positive integer. $HE_{CF}$ is a set of Guarded control flow hyper edges. it is used between two control locations. it takes two inputs, a control location $cl_{Initial}$ or $cl_{Mian_{k}}$ and a boolean value from operator. It has a control flow out edge $e_{CFO}$ (one element from $E_{CFO}$) connected to next control location node. Similarly, $HE_{DF}$ is a set of Guarded data flow hyper edges. It guards the data flow from $Body$ to $Head$. It takes two inputs, a value from argument $Arg_{k}$ or free variable $v_{k}$ and a boolean value and has a data flow out edge $e_{DFO}$ (one element from $E_{DFO}$) connected to next operator or argument node. $E_{CFI},E_{CFO}$ are control flow in and control flow out edges, they are only used when there are connections between nodes and guarded control flow hyperedges. similarly, $E_{DFI},E_{DFO}$ are data flow in and out edges, they are only corresponding to guarded data flow hyperedges. $E_{CD}$ is condition edge. It connects boolean operator to the hyperedges to send boolean values to the hyperedges. $E_{Arg}$ is argument edge. It connects arguments to corresponding control location node. We use lower case to represent one elements in the set. For example $v_{CL}$ means one control location node from $V_{CL}$.
+Formally, the graph consists of four categories of nodes, two categories of hyperedges, and six categories of edges. The graph is defined as $G=(V_{CL},V_{Vri},V_{C},V_{Op},HE_{CF},HE_{DF},E_{CFI},E_{CFO},E_{DFI},E_{DFO},E_{CD},E_{Arg},V_{Pred})$, in which $V_{CL}=\{cl_{Initial},cl_{Main_{k}},cl_{false}\}$ is control location node set, $V_{Arg}=\{Arg_{k}\}$ is argument set, $V_{C}$ is constant value set, $V_{Op}=\{+,-,==,...\}$ is operator set,$V_{FV}=\{v_{k}\}$ is free variables set. $k$ is a positive integer. $HE_{CF}$ is a set of Guarded control flow hyper edges. it is used between two control locations. it takes two inputs, a control location $cl_{Initial}$ or $cl_{Mian_{k}}$ and a boolean value from operator. It has a control flow out edge $e_{CFO}$ (one element from $E_{CFO}$) connected to next control location node. Similarly, $HE_{DF}$ is a set of Guarded data flow hyper edges. It guards the data flow from $Body$ to $Head$. It takes two inputs, a value from argument $Arg_{k}$ or free variable $v_{k}$ and a boolean value and has a data flow out edge $e_{DFO}$ (one element from $E_{DFO}$) connected to next operator or argument node. $E_{CFI},E_{CFO}$ are control flow in and control flow out edges, they are only used when there are connections between nodes and guarded control flow hyperedges. similarly, $E_{DFI},E_{DFO}$ are data flow in and out edges, they are only corresponding to guarded data flow hyperedges. $E_{CD}$ is condition edge. It connects boolean operator to the hyperedges to send boolean values to the hyperedges. $E_{Arg}$ is argument edge. It connects arguments to corresponding control location node. We use lower case to represent one elements in the set. For example $v_{CL}$ means one control location node from $V_{CL}$. $V_{Pred}$ is predicate node set. It connects the predicate's AST tree and the predicate's location.
 
 The summary of $G$'s nodes and hyperedges are shown in Table \ref{GraphDescriptionNodes} and edges are shown in \ref{GraphDescriptionEdges} respectively.
 \begin{table}\caption{Nodes and hyperedges in graph} \label{GraphDescriptionNodes}
@@ -163,12 +163,13 @@ The summary of $G$'s nodes and hyperedges are shown in Table \ref{GraphDescripti
 \hline
 Graph elements & Name & Elements & Inputs & Outputs \\
 \hline
-$V_{CL}$  & Control location node            & $CL_{Initial}$, $CL_{Main_{k}}$, $CL_{false}$   & $he_{CL}$ & $he_{CF}$\\
-$V_{Vri}$ & Variable node                    & $Arg_{k}$(argument),$FV_{k}$ (free variable)    &  $v_{OP}$, $v_{Vri}$,  $v_{C}$,$he_{DF}$ & $he_{DF}$,$v_{OP}$\\
-$V_{C}$   & Constant node                    & Constants                               & - & $v_{OP}$, $v_{Arg}$, $v_{FV}$, $he_{DF}$, $he_{CF}$\\
-$V_{Op}$  & Operator node                    & Operators                               & $v_{Arg}$, $v_{FV}$, $v_{C}$, $he_{DF}$ &$v_{Arg}$, $v_{Op}$, $v_{FV}$, $he_{DF}$, $he_{CF}$\\
-$HE_{CF}$ & Guarded control flow hyperedge   & -                                       & ($v_{OP}$ or $v_{C}$, $v_{CL}$) & $v_{CL}$\\
-$HE_{DF}$ & Guarded data flow hyperedge      & -                                       & ($v_{OP}$ or $v_{C}$, $v_{Arg}$ or $v_{FV}$) & $v_{Arg}$\\
+$V_{CL}$  & Control location node            & $CL_{Initial}$, $CL_{Main_{k}}$, $CL_{false}$   & $he_{CL}$                                        & $he_{CF}$\\
+$V_{Vri}$ & Variable node                    & $Arg_{k}$(argument),$FV_{k}$ (free variable)    &  $v_{OP}$, $v_{Vri}$,  $v_{C}$,$he_{DF}$         & $he_{DF}$\\
+$V_{C}$   & Constant node                    & Constants                                       & -                                                & $v_{OP}$, $v_{Arg}$, $v_{FV}$, $he_{DF}$, $he_{CF}$\\
+$V_{Op}$  & Operator node                    & Operators                                       & $v_{Arg}$, $v_{FV}$, $v_{C}$, $he_{DF}$          &$v_{Arg}$, $v_{Op}$, $v_{FV}$, $he_{DF}$, $he_{CF}$\\
+$V_{Pred}$ &Predicate node                   & Template types                                  & $v_{OP}$, $v_{Vri}$, $v_{C}$                      & $v_{CL}$ \\
+$HE_{CF}$ & Guarded control flow hyperedge   & -                                               & ($v_{OP}$ or $v_{C}$, $v_{CL}$)                  & $v_{CL}$\\
+$HE_{DF}$ & Guarded data flow hyperedge      & -                                               & ($v_{OP}$ or $v_{C}$, $v_{Arg}$ or $v_{FV}$)     & $v_{Arg}$\\
 \hline
 \end{tabular}
 \end{center}
@@ -461,7 +462,7 @@ Guiding formal method's search process.
 
 Program graph representation.
 
-end-to-end graph embedding. Message passing, convolutional graph neural network.
+Graph neural networks. End-to-end graph embedding. Message passing, convolutional graph neural network.
 Define a the first state of nodes. Update node representations by edges type and the connected node. Iteration is intuitively the filters of CNNs.
 The edges, hyper-edges, messages should capture the characteristics or relations between nodes.
 To deal with arbitrary length of information (different number of nodes), aggregation or abstraction then aggregation.
@@ -471,8 +472,9 @@ AST embedding: code2vec \cite{Alon:2019:CLD:3302515.3290353}. TBCNN \cite{DBLP:j
 
 FormulaNet \cite{NIPS2017_6871}. GAT \cite{2017arXiv171010903V}.
 
-
-fake task graph embedding.
+Unsupervised graph embedding
+Before combining with deep learning, graph embedding works in the context of dimensionality reduction. The typical techniques are principle component analysis (PCA) and multidimensional scaling (MDS)
+DeepWalk maps the graph's nodes to sentence's words and uses word embedding technique skip-gram to perform the node embedding. along with skip-gram word embedding later on been extended to Doc2Vec, DeepWalk node embedding is extended to Graph2Vec. 
 
 
 
