@@ -5,7 +5,7 @@ import shutil
 import sys
 from graphProcessing import readGraphFromGraphvizFromTrainData,getGraphNode2vecWalks
 from Miscellaneous import pickleWrite,pickleRead
-
+import networkx as nx
 class trainInputs:
     def __init__(self,graph,hornText,argumentID,argumentHead,argument,argumentScore):
         self.graph = graph
@@ -102,14 +102,15 @@ def transformDataToTrainingVector(data):
     return train_X,train_Y
 
 def main():
-    #programList=readMultiplePrograms()
-    #trainData,testData=shuffleData(programList, 0.8)
+    programList=readMultiplePrograms()
+    trainData,testData=shuffleData(programList, 0.8)
     trainData_X,trainData_Y=transformDataToTrainingVector(pickleRead("argumentTrainData",path="../"))
     testData_X,testData_Y=transformDataToTrainingVector(pickleRead("argumentTestData",path="../"))
     pickleWrite(trainData_X, "argumentTrainData_X", path="../")
     pickleWrite(trainData_Y, "argumentTrainData_Y", path="../")
     pickleWrite(testData_X, "argumentTestData_X", path="../")
     pickleWrite(testData_Y, "argumentTestData_Y", path="../")
+
 
 
 main()

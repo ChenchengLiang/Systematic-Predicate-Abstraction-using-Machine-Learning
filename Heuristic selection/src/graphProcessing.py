@@ -52,7 +52,7 @@ def readGraphFromGraphvizFromTrainData(fileName,vitualize=True):
         for successor in G.successors(node):
             print(successor, nodes[successor]['label'])
     '''
-    G = nodeRelabel(G)
+    #G = nodeRelabel(G)
     #prerryPrintOneGraph(G)
 
     return G
