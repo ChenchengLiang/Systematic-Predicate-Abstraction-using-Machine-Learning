@@ -473,8 +473,9 @@ AST embedding: code2vec \cite{Alon:2019:CLD:3302515.3290353}. TBCNN \cite{DBLP:j
 FormulaNet \cite{NIPS2017_6871}. GAT \cite{2017arXiv171010903V}.
 
 Unsupervised graph embedding
-Before combining with deep learning, graph embedding works in the context of dimensionality reduction. The typical techniques are principle component analysis (PCA) and multidimensional scaling (MDS)
-DeepWalk maps the graph's nodes to sentence's words and uses word embedding technique skip-gram to perform the node embedding. along with skip-gram word embedding later on been extended to Doc2Vec, DeepWalk node embedding is extended to Graph2Vec. 
+Before combining with deep learning, graph embedding works in the context of dimensionality reduction. 
+The typical techniques are principle component analysis (PCA), multidimensional scaling (MDS),Isomap \cite{Isomap}, Locally Linear Embedding (LLE) \cite{Roweis2323}, and Laplacian Eigenmap \cite{NIPS2001_1961}. Their complexities are quadratic corresponding to the number of vertices.
+DeepWalk maps the graph's nodes to sentence's words and uses word embedding technique skip-gram to perform the node embedding. along with skip-gram word embedding later on been extended to Doc2Vec, DeepWalk node embedding is extended to Graph2Vec.
 
 
 
