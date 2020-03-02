@@ -33,7 +33,12 @@ def initializeNodeState(graph):
     #     for n in nx.all_neighbors(graph,node):
     #         print("neighbor:",n, graph.node[n]['stateVector'])
 
+def initializeEdgeState(graph):
+    print(getGraphClass(graph))
+    for edge in nx.edges(graph):
+        graph.edges[edge]['edgeVector'] = 0
 
+        print(graph.edges[edge]['label'])
 
 def main():
 
@@ -44,6 +49,7 @@ def main():
     #todo:initialize node state
     for x in train_X:
         initializeNodeState(x[0])
+        initializeEdgeState(x[0])
 
 
 main()

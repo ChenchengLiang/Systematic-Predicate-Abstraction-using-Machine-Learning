@@ -74,6 +74,10 @@ def train(embeddedHornGraphp_train,embeddedArgument_train,Y_train,embeddedHornGr
     model.save(parenDir + '/models/my_model.h5')
     plotHistory(history, fileName="text", show=False)
 
+
+
+
+
 def main():
     print("start")
     embeddedHornGraphp_train=[]
