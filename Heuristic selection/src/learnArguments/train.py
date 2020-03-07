@@ -1,18 +1,22 @@
-from keras.layers import Conv1D, Dense,Input,concatenate, Flatten
+from keras.layers import Conv1D, Dense,Input,concatenate, Flatten,Embedding
 from keras.models import Model
 from keras.layers import Dense
 import keras as k
 import os
 from Miscellaneous import pickleWrite,pickleRead
 from plot import plotHistory
-def getRegressionModel(embeddedHornGraph,embeddedArgument):
+def getRegressionModel(embeddedHornGraph,embeddedArgument,vocabularySize):
     # create model
     inputA = Input(shape=(embeddedHornGraph.shape[1], 1))
     inputB = Input(shape=(embeddedArgument.shape[1], 1))
 
+    embedding_dim = 32
+
+    x = Embedding(vocabularySize, embedding_dim)(inputA)
+
     # the first branch operates on the first input
     # x = Dense(8, activation="relu")(inputA)
-    x = Conv1D(filters=50, kernel_size=5, activation="relu")(inputA)
+    x = Conv1D(filters=50, kernel_size=5, activation="relu")(x)
     x = Conv1D(filters=25, kernel_size=5, activation="relu")(x)
     x = Conv1D(filters=10, kernel_size=5, activation="relu")(x)
     x = Flatten()(x)
