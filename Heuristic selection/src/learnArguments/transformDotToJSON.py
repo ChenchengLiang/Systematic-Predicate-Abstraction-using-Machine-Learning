@@ -40,10 +40,20 @@ class graphInfo:
         print("hyperedge_senders",self.hyperedge_senders)
         print("hyperedge_receivers",self.hyperedge_receivers)
 
-
+class ArgumentInfo:
+    def __init__(self,ID, head, arg, score):
+        self.ID = ID
+        self.head = head
+        self.arg = arg
+        self.score = score
+        self.nodeUniqueIDInGraph=-1
+        self.nodeLabelUniqueIDInGraph=-1
+    def printArgs(self):
+        print("ID:"+self.ID,"head:"+self.head,"arg:"+
+              self.arg,"score:"+self.score,"nodeIDInGraph:"+str(self.nodeUniqueIDInGraph),
+              "nodeLabelUniqueIDInGraph:"+str(self.nodeLabelUniqueIDInGraph))
 def edgeIntegerEncoding(graphList):
-    #todo:not include edge which connect to hyperedge
-
+    #not include edge which connect to hyperedge
     #edge normalization
     edgeClassList=[]
     for G in graphList:
@@ -132,23 +142,7 @@ def hyperedgeIntegerEncoding(graphList):
 
     return graphList
 
-def readGraphsFromDot():
-    graphList = []
 
-    path = "../../trainData/"
-    suffix = ".c"  # some file name include .horn
-    print("graph file", len(sorted(glob.glob(path + '*' + suffix + '.gv'))))
-    for fileGraph in sorted(glob.glob(path + '*' + suffix + '.gv')
-                            ):
-        fileName = fileGraph[:fileGraph.find(suffix + ".gv") + len(suffix)]
-        fileName = fileName[fileName.rindex("/") + 1:]
-        print(fileName)
-        # read graph
-        print(fileGraph)
-        hornGraph = Source.from_file(fileGraph)
-        G = nx.DiGraph(nx.drawing.nx_pydot.read_dot(fileGraph))
-        graphList.append(G)
-    return graphList
 
 def normalizeNodeLabel(graphList):
     vocabList=[]
@@ -301,8 +295,93 @@ def addSenderReceiverInfoToEdge(graphList):
 
     return graphList
 
+
+def readGraphsFromDot():
+    graphList = []
+    argumentList=[]
+
+    path = "../../trainData/"
+    suffix = ".c"  # some file name include .horn
+    print("graph file", len(sorted(glob.glob(path + '*' + suffix + '.gv'))))
+    print("argument file", len(sorted(glob.glob(path + '*' + suffix + '.arguments'))))
+    for fileGraph,fileArgument in zip(sorted(glob.glob(path + '*' + suffix + '.gv')),sorted(glob.glob(path + '*'+suffix+'.arguments'))):
+        fileName = fileGraph[:fileGraph.find(suffix + ".gv") + len(suffix)]
+        fileName = fileName[fileName.rindex("/") + 1:]
+        print(fileName)
+        # read graph
+        print(fileGraph)
+        hornGraph = Source.from_file(fileGraph)
+        G = nx.DiGraph(nx.drawing.nx_pydot.read_dot(fileGraph))
+        graphList.append(G)
+
+        #read argument
+        print(fileArgument)
+        f = open(fileArgument, "r")
+        arguments = f.read()
+        f.close()
+        argumentList.append(arguments)
+
+    return graphList,argumentList
+
+def parseArguments(arguments):
+    ParsedArgumentList=[]
+    argumentLines=arguments.splitlines()
+    for line in argumentLines:
+        ID,head,hint,score =line.split(":")
+        ParsedArgumentList.append(ArgumentInfo(ID,head,hint,score))
+        #print(ID,head,hint,score)
+    return ParsedArgumentList
+
+
+def getGraphInfoList(graphList):
+    graphInfoList = []
+    for G in graphList:
+        nodeLabelList = []
+        hyperedgeLabelList = []
+        hyperedgeSenderList = []
+        hyperedgeReceiverList = []
+        for node in G.nodes:
+            if (G.nodes[node]['class'] == "DataFlowHyperedge" or G.nodes[node]['class'] == "controlFlowHyperEdge"):
+                hyperedgeLabelList.append(G.nodes[node]['hyperedgeLabelUniqueID'])
+                hyperedgeSenderList.append(G.nodes[node]['from'])
+                hyperedgeReceiverList.append(G.nodes[node]['to'])
+            else:
+                nodeLabelList.append(G.nodes[node]['nodeLabelUniqueID'])
+
+        edgeLabelList = []
+        edgeSenderList = []
+        edgeReceiverList = []
+        for edge in G.edges:
+            if (G.nodes[edge[0]]['class'] != "DataFlowHyperedge" and G.nodes[edge[1]][
+                'class'] != "DataFlowHyperedge" and
+                    G.nodes[edge[0]]['class'] != "controlFlowHyperEdge" and G.nodes[edge[1]][
+                        'class'] != "controlFlowHyperEdge"):
+                edgeLabelList.append(G.edges[edge]['edgeLabelUniqueID'])
+                edgeSenderList.append(G.edges[edge]['from'])
+                edgeReceiverList.append(G.edges[edge]['to'])
+
+        graphInfoList.append(
+            graphInfo(nodeLabelList, edgeLabelList, hyperedgeLabelList, edgeSenderList, edgeReceiverList,
+                      hyperedgeSenderList, hyperedgeReceiverList))
+
+    return graphInfoList
+def getArgumentIDFromGraph(graphList,parsedArgumentList):
+    #connect integer encoding from the graph to input argument
+    for G, args in zip(graphList, parsedArgumentList):
+        for node in G.nodes:
+            for arg in args:
+                nodeDir = G.nodes[node]
+                if(nodeDir['class']=="argument"):
+                    if(nodeDir['nodeName']==arg.arg and nodeDir['head']==arg.head[:arg.head.find("/")]):
+                        arg.nodeUniqueIDInGraph=nodeDir['nodeUniqueID']
+                        arg.nodeLabelUniqueIDInGraph = nodeDir['nodeLabelUniqueID']
+    return graphList,parsedArgumentList
 def main():
-    graphList=readGraphsFromDot()
+    graphList,argumentList=readGraphsFromDot()
+    parsedArgumentList=[]
+    for args in argumentList:
+        parsedArgumentList.append(parseArguments(args))
+
     vocabList,graphList=normalizeNodeLabel(graphList)
 
     graphList=encodeNodeLabelToInteger(graphList, vocabList)
@@ -349,39 +428,17 @@ def main():
     hyperedge_receivers:[nodeUniqueID_a,nodeUniqueID_b,...,nodeUniqueID_c]
     #according to our definition, hyperedge has multiple input node and one output node.
     '''
-    graphInfoList=[]
-    for G in graphList:
-        nodeLabelList=[]
-        hyperedgeLabelList=[]
-        hyperedgeSenderList=[]
-        hyperedgeReceiverList=[]
-        for node in G.nodes:
-            if(G.nodes[node]['class']=="DataFlowHyperedge" or G.nodes[node]['class']=="controlFlowHyperEdge"):
-                hyperedgeLabelList.append(G.nodes[node]['hyperedgeLabelUniqueID'])
-                hyperedgeSenderList.append(G.nodes[node]['from'])
-                hyperedgeReceiverList.append(G.nodes[node]['to'])
-            else:
-                nodeLabelList.append(G.nodes[node]['nodeLabelUniqueID'])
-
-        edgeLabelList=[]
-        edgeSenderList = []
-        edgeReceiverList = []
-        for edge in G.edges:
-            if (G.nodes[edge[0]]['class'] != "DataFlowHyperedge" and G.nodes[edge[1]][
-                'class'] != "DataFlowHyperedge" and
-                    G.nodes[edge[0]]['class'] != "controlFlowHyperEdge" and G.nodes[edge[1]][
-                        'class'] != "controlFlowHyperEdge"):
-                edgeLabelList.append(G.edges[edge]['edgeLabelUniqueID'])
-                edgeSenderList.append(G.edges[edge]['from'])
-                edgeReceiverList.append(G.edges[edge]['to'])
-
-        graphInfoList.append(graphInfo(nodeLabelList,edgeLabelList,hyperedgeLabelList,edgeSenderList,edgeReceiverList,hyperedgeSenderList,hyperedgeReceiverList))
 
 
 
-    for g in graphInfoList:
+    graphList,parsedArgumentList=getArgumentIDFromGraph(graphList,parsedArgumentList)
+
+    graphInfoList = getGraphInfoList(graphList)
+    for g,args in zip(graphInfoList,parsedArgumentList):
         print("----------")
         g.printInfo()
+        for arg in args:
+            arg.printArgs()
 
 
 
