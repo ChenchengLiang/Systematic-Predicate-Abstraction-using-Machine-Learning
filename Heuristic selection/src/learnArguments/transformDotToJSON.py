@@ -20,7 +20,7 @@ JSON:
 """
 
 class graphInfo:
-    def __init__(self,nodesAttributes,edgesAttributes,hyperedgesAttributes,edge_senders,edge_receivers,hyperedge_senders,hyperedge_receivers):
+    def __init__(self,nodesAttributes,edgesAttributes,hyperedgesAttributes,edge_senders,edge_receivers,hyperedge_senders,hyperedge_receivers,edgeEmbeddingInputs,hyperedgeEmbeddingInputs,nodeEmbeddingInputs):
         self.nodesAttributes = nodesAttributes
         self.edgesAttributes=edgesAttributes
         self.hyperedgesAttributes = hyperedgesAttributes
@@ -31,6 +31,9 @@ class graphInfo:
         self.numberOfNodes=len(nodesAttributes)
         self.numberOfEdges = len(edgesAttributes)
         self.numberOfHyperedges=len(hyperedgesAttributes)
+        self.edgeEmbeddingInputs=edgeEmbeddingInputs
+        self.hyperedgeEmbeddingInputs=hyperedgeEmbeddingInputs
+        self.nodeEmbeddingInputs = nodeEmbeddingInputs
     def printInfo(self):
         print("nodesAttributes",self.nodesAttributes)
         print("edgesAttributes",self.edgesAttributes)
@@ -39,6 +42,9 @@ class graphInfo:
         print("edge_receivers",self.edge_receivers)
         print("hyperedge_senders",self.hyperedge_senders)
         print("hyperedge_receivers",self.hyperedge_receivers)
+        print("edgeEmbeddingInputs", self.edgeEmbeddingInputs)
+        print("hyperedgeEmbeddingInputs", self.hyperedgeEmbeddingInputs)
+        print("nodeEmbeddingInputs", self.nodeEmbeddingInputs)
 
 class ArgumentInfo:
     def __init__(self,ID, head, arg, score):
@@ -340,17 +346,58 @@ def getGraphInfoList(graphList):
         hyperedgeLabelList = []
         hyperedgeSenderList = []
         hyperedgeReceiverList = []
+        hyperedgeEmbeddingInputs = []
+        nodeEmbeddingInputs=[]
         for node in G.nodes:
             if (G.nodes[node]['class'] == "DataFlowHyperedge" or G.nodes[node]['class'] == "controlFlowHyperEdge"):
                 hyperedgeLabelList.append(G.nodes[node]['hyperedgeLabelUniqueID'])
                 hyperedgeSenderList.append(G.nodes[node]['from'])
                 hyperedgeReceiverList.append(G.nodes[node]['to'])
+                senderLabelList=[]
+                receiverLabelList=[]
+                for pre in G.predecessors(node):
+                    senderLabelList.append(G.nodes[pre]['nodeLabelUniqueID'])
+                for suc in G.successors(node):
+                    receiverLabelList.append(G.nodes[suc]['nodeLabelUniqueID'])
+
+                hyperedgeEmbeddingInputs.append({'hyperedgeLabelUniqueID':G.nodes[node]['hyperedgeLabelUniqueID'],
+                                                 'senderIDList':G.nodes[node]['from'],'receiverIDList':G.nodes[node]['to'],
+                                                 'senderLabelList':senderLabelList,'receiverLabelList':receiverLabelList,
+                                                 'hyperedgeEmbedding':'dummy'})
             else:
                 nodeLabelList.append(G.nodes[node]['nodeLabelUniqueID'])
+                #todo:node embedding inputs
+                # if node connect to normal edges
+                incommingEdgeList = []
+                incommingHyperedgeList = []
+                for edge in G.edges:
+                    if(edge[1]==node):
+                        if(G.nodes[edge[0]]['class']!="DataFlowHyperedge" and
+                                G.nodes[edge[1]]['class']!="DataFlowHyperedge"and
+                                G.nodes[edge[0]]['class']!="controlFlowHyperEdge" and
+                                G.nodes[edge[1]]['class']!="controlFlowHyperEdge"):
+                            incommingEdgeList.append(G.edges[edge]['edgeUniqueID'])#edge
+                # if node connect to hyperedges
+                for hyperedge in G.nodes:
+                    for suc in G.successors(hyperedge):
+                        if(suc==node and (G.node[hyperedge]['class']=="DataFlowHyperedge" or G.node[hyperedge]['class']=="controlFlowHyperEdge")):
+                            incommingHyperedgeList.append(G.nodes[hyperedge]['hyperedgeUniqueID'])#nodeName
+
+
+                nodeEmbeddingInputs.append({'nodeName':G.nodes[node]['nodeName'],
+                                            'nodeID':G.nodes[node]['nodeUniqueID'],
+                                            'nodeLabel': G.nodes[node]['nodeLabelUniqueID'],
+                                            'incommingEdgeID': incommingEdgeList,
+                                            'incommingHyperedgeID':incommingHyperedgeList,
+                                            'incomingEdgeEmbedding': 'dummy',
+                                            'incomingHyperedgeEmbedding':'dummy',
+                                            'nodeEmbedding':'dummy'})
+
 
         edgeLabelList = []
         edgeSenderList = []
         edgeReceiverList = []
+        edgeEmbeddingInputs=[]
         for edge in G.edges:
             if (G.nodes[edge[0]]['class'] != "DataFlowHyperedge" and G.nodes[edge[1]][
                 'class'] != "DataFlowHyperedge" and
@@ -359,10 +406,15 @@ def getGraphInfoList(graphList):
                 edgeLabelList.append(G.edges[edge]['edgeLabelUniqueID'])
                 edgeSenderList.append(G.edges[edge]['from'])
                 edgeReceiverList.append(G.edges[edge]['to'])
+                edgeEmbeddingInputs.append({'edgeLabelUniqueID':G.edges[edge]['edgeLabelUniqueID'],
+                                            'sender':G.edges[edge]['from'],'receiver':G.edges[edge]['to'],
+                                            'senderLabel':G.nodes[edge[0]]['nodeLabelUniqueID'],
+                                            'receiverLabel':G.nodes[edge[1]]['nodeLabelUniqueID'],
+                                            'edgeEmbedding':'dummy'})
 
         graphInfoList.append(
             graphInfo(nodeLabelList, edgeLabelList, hyperedgeLabelList, edgeSenderList, edgeReceiverList,
-                      hyperedgeSenderList, hyperedgeReceiverList))
+                      hyperedgeSenderList, hyperedgeReceiverList,edgeEmbeddingInputs,hyperedgeEmbeddingInputs,nodeEmbeddingInputs))
 
     return graphInfoList
 def getArgumentIDFromGraph(graphList,parsedArgumentList):
