@@ -3,46 +3,45 @@ import tf2_gnn
 def main():
 
     '''
+    horn graph node IDs
     #graph 1 node ID [0,1,2,3,...,7]
     #graph 2 node ID [0,1,2,3]
     #graph 3 node ID [0,1,2]
 
     Should transform to
-
     #graph 1 node ID [0,1,2,3,...,7]
     #graph 2 node ID [8,9,10,11]
     #graph 3 node ID [12,13,14]
 
 
-    Current format:
+    Finally transform to format:
     node_to_graph_map [0 0 0 0 0 0 0 0 1 1 1 1 2 2 2]
     graph node ID list [0,1,2,...,14]
     '''
 
 
-    #first graph has 8 nodes, second graph has 4 nodes, ...
     nodeFeatureDim=3
+    # first graph has 8 nodes, second graph has 4 nodes, third graph has 3 nodes
     NodeNumberList=[8,4,3]
-    numberOfNode=sum(NodeNumberList)
-
-
-    graph_node_ID_list=list(range(0, numberOfNode))
+    numberOfNode=sum(NodeNumberList) #total nodes in three graph
+    #generate an example graph ID list
+    graph_node_ID_list=list(range(0, numberOfNode))# output graph_node_ID_list=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
     print(graph_node_ID_list)
-    #todo: add embedding layer transform ID to features
+    #add embedding layer transform ID to features
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.Embedding(numberOfNode,nodeFeatureDim))
     model.compile('rmsprop', 'mse')
     graph_node_ID_list_embedding = model.predict(tf.constant(graph_node_ID_list))
-    graph_node_ID_list_embedding=tf.reshape(graph_node_ID_list_embedding,[15,3])
+    graph_node_ID_list_embedding=tf.reshape(graph_node_ID_list_embedding,[numberOfNode,nodeFeatureDim])
     print(graph_node_ID_list_embedding)
 
-
+    #get node_to_graph_map from NodeNumberList
     node_to_graph_map=[]
     for i, nodeNumber in enumerate(NodeNumberList):
         node_to_graph_map.append(tf.fill(dims=(nodeNumber,), value=i))
     node_to_graph_map=tf.concat(node_to_graph_map, 0)
-    #print(node_to_graph_map)
 
+    #form GNNInput
     layer_input = tf2_gnn.GNNInput(
          node_features = graph_node_ID_list_embedding,
          #tf.random.normal(shape=(numberOfNode, 3)),
@@ -57,8 +56,6 @@ def main():
          )
 
 
-
-    print(layer_input.node_to_graph_map)
     params = tf2_gnn.GNN.get_default_hyperparameters()
     params["hidden_dim"] = 12
     params["num_layers"]= 1
