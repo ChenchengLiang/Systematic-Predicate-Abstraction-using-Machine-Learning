@@ -2,6 +2,9 @@ import networkx as nx
 from graphviz import Source
 import glob
 from networkx.readwrite import json_graph
+import tf2_gnn
+
+
 
 """
 Preprocess:
