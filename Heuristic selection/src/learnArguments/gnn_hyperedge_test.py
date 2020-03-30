@@ -33,7 +33,7 @@ def main():
     model.compile('rmsprop', 'mse')
     graph_node_ID_list_embedding = model.predict(tf.constant(graph_node_ID_list))
     graph_node_ID_list_embedding=tf.reshape(graph_node_ID_list_embedding,[numberOfNode,nodeFeatureDim])
-    print(graph_node_ID_list_embedding)
+    print("graph_node_ID_list_embedding",graph_node_ID_list_embedding)
 
     #get node_to_graph_map from NodeNumberList
     node_to_graph_map=[]
@@ -66,6 +66,7 @@ def main():
 
 
     print("----")
+
 
 
 main()
