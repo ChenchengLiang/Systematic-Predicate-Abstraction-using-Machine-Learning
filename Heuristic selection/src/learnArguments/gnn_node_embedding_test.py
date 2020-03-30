@@ -1,9 +1,6 @@
-
-from typing import Dict,Any
+from typing import Dict,Any,Union,Tuple,List
 import tensorflow as tf
 import tf2_gnn
-
-
 
 class InvariantArgumentSelectionModel(tf.keras.Model):
     def __init__(self, params: Dict[str, Any],  **kwargs):
@@ -24,9 +21,6 @@ class InvariantArgumentSelectionModel(tf.keras.Model):
             tf2_gnn.GNNInput(
                 node_features=tf.TensorShape((None, self._params["node_label_embedding_size"])),
                 adjacency_lists=tuple(
-                    # tf.Tensor(edges.shape[1], dtype=tf.int32)
-                    # tf.TensorSpec(shape=(None, edges[1]), dtype=tf.int32)
-                    # for edges in input_shapes.adjacency_lists
                     input_shapes[f"adjacency_list_{edge_type_idx}"]
                     for edge_type_idx in range(self._num_edge_types)
                 ),
@@ -34,7 +28,7 @@ class InvariantArgumentSelectionModel(tf.keras.Model):
                 num_graphs=tf.TensorShape(()),
             )
         )
-        #todo: build task layer
+        #todo: build task-specific layer
         super().build([])
 
 
@@ -50,14 +44,35 @@ class InvariantArgumentSelectionModel(tf.keras.Model):
             num_graphs=len(inputs['NodeNumberList']),
         )
         final_node_representations = self._gnn(gnn_input, training=training)
-        #todo:call task layers
 
-        # Here, predictions should be made, based on the node representations
+        #self.compute_task_output(inputs, final_node_representations, training)
+        #todo: Here, predictions should be made, based on the node representations
 
         return final_node_representations
 
+    '''
+    Why not extend GraphTaskModel ?
+    
+    def compute_task_output(
+            self,
+            batch_features: Dict[str, tf.Tensor],
+            final_node_representations: Union[tf.Tensor, Tuple[tf.Tensor, List[tf.Tensor]]],
+            training: bool,
+        ) -> Any:
+        # todo:implement task
+        pass
 
+    def compute_epoch_metrics(self, task_results: List[Any]) -> Tuple[float, str]:
+        pass
 
+    def compute_task_metrics(
+            self,
+            batch_features: Dict[str, tf.Tensor],
+            task_output: Any,
+            batch_labels: Dict[str, tf.Tensor],
+    ) -> Dict[str, tf.Tensor]:
+        pass
+    '''
 
 def main():
     nodeFeatureDim=3
