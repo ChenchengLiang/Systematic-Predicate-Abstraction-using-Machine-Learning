@@ -23,7 +23,8 @@ JSON:
 """
 
 class graphInfo:
-    def __init__(self,nodesAttributes,edgesAttributes,hyperedgesAttributes,edge_senders,edge_receivers,hyperedge_senders,hyperedge_receivers,edgeEmbeddingInputs,hyperedgeEmbeddingInputs,nodeEmbeddingInputs):
+    def __init__(self,nodeUniqueIDList,nodesAttributes,edgesAttributes,hyperedgesAttributes,edge_senders,edge_receivers,hyperedge_senders,hyperedge_receivers,edgeEmbeddingInputs,hyperedgeEmbeddingInputs,nodeEmbeddingInputs):
+        self.nodeUniqueIDList=nodeUniqueIDList
         self.nodesAttributes = nodesAttributes
         self.edgesAttributes=edgesAttributes
         self.hyperedgesAttributes = hyperedgesAttributes
@@ -31,15 +32,16 @@ class graphInfo:
         self.edge_receivers = edge_receivers
         self.hyperedge_senders=hyperedge_senders
         self.hyperedge_receivers = hyperedge_receivers
-        self.numberOfNodes=len(nodesAttributes)
-        self.numberOfEdges = len(edgesAttributes)
-        self.numberOfHyperedges=len(hyperedgesAttributes)
+        self.numberOfNodesAttributes=len(nodesAttributes)
+        self.numberOfEdgesAttributes = len(edgesAttributes)
+        self.numberOfHyperedgesAttributes=len(hyperedgesAttributes)
         self.edgeEmbeddingInputs=edgeEmbeddingInputs
         self.hyperedgeEmbeddingInputs=hyperedgeEmbeddingInputs
         self.nodeEmbeddingInputs = nodeEmbeddingInputs
     def printInfo(self):
-        print("nodesAttributes",self.nodesAttributes)
-        print("edgesAttributes",self.edgesAttributes)
+        print("nodeUniqueIDList", sorted(self.nodeUniqueIDList))
+        print("nodesAttributes",sorted(self.nodesAttributes))
+        print("edgesAttributes",sorted(self.edgesAttributes))
         print("hyperedgesAttributes",self.hyperedgesAttributes)
         print("edge_senders",self.edge_senders)
         print("edge_receivers",self.edge_receivers)
@@ -345,6 +347,7 @@ def parseArguments(arguments):
 def getGraphInfoList(graphList):
     graphInfoList = []
     for G in graphList:
+        nodeUniqueIDList=[]
         nodeLabelList = []
         hyperedgeLabelList = []
         hyperedgeSenderList = []
@@ -369,6 +372,7 @@ def getGraphInfoList(graphList):
                                                  'hyperedgeEmbedding':'dummy'})
             else:
                 nodeLabelList.append(G.nodes[node]['nodeLabelUniqueID'])
+                nodeUniqueIDList.append(G.nodes[node]['nodeUniqueID'])
                 #todo:node embedding inputs
                 # if node connect to normal edges
                 incommingEdgeList = []
@@ -416,7 +420,7 @@ def getGraphInfoList(graphList):
                                             'edgeEmbedding':'dummy'})
 
         graphInfoList.append(
-            graphInfo(nodeLabelList, edgeLabelList, hyperedgeLabelList, edgeSenderList, edgeReceiverList,
+            graphInfo(nodeUniqueIDList,nodeLabelList, edgeLabelList, hyperedgeLabelList, edgeSenderList, edgeReceiverList,
                       hyperedgeSenderList, hyperedgeReceiverList,edgeEmbeddingInputs,hyperedgeEmbeddingInputs,nodeEmbeddingInputs))
 
     return graphInfoList
