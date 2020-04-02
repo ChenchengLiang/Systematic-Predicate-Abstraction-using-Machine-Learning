@@ -55,7 +55,6 @@ def main():
          num_graphs = len(NodeNumberList),
          )
 
-
     params = tf2_gnn.GNN.get_default_hyperparameters()
     params["hidden_dim"] = 12
     params["num_layers"]= 1

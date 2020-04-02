@@ -1,9 +1,11 @@
-import networkx as nx
-from graphviz import Source
-import glob
+from typing import Any, Dict,Optional
 import tensorflow as tf
 from learnArguments.dotToGraphInfo import GraphInfo,ArgumentInfo,DotToGraphInfo
 from typing import Tuple
+import tf2_gnn
+from learnArguments.invariantArgumentSelectionModel import InvariantArgumentSelectionModel
+from learnArguments.horn_graph_argument_selection_task import InvariantArgumentSelectionTask
+from tf2_gnn.data import GraphDataset,GraphSample
 '''
 horn graph node IDs
 #graph 1 node ID [0,1,2,3,...,7]
@@ -33,46 +35,64 @@ numberOfNode=sum(NodeNumberList) #total nodes in three graph
 
 def main():
 
-    #read graph file
     graphInfoList = DotToGraphInfo()
-    graphInfoList.readGraphsFromDot()
-    # parse argument to graph info
-    graphInfoList.getParsedArgument()
-
-    # give every node unique ID, differentiate hyperedges and nodes
-
-    graphInfoList.giveNodeUniqueID()
-    graphInfoList.giveEdgeUniqueID()
-    graphInfoList.giveHyperedgeUniqueID()
-
-
-    graphInfoList.normalizeNodeLabel()
-    graphInfoList.encodeNodeLabelToInteger()
-    graphInfoList.hyperedgeIntegerEncoding()
-    graphInfoList.edgeIntegerEncoding()
-
-
-    #parse argument to graph info
-    graphInfoList.getArgumentIDFromGraph()
-
-
-    #find sender and receiver for all edges
-    graphInfoList.addSenderReceiverInfoToEdge()
-    graphInfoList.addSenderReceiverInfoToHyperedge()
-
-    graphInfoList.getGraphInfoList()
-
-    #graphInfoList.printFinalGraphInfo()
-
     #get raw gnn inputs
-    node_features,adjacency_lists,node_to_graph_map,nodeNumberList=graphInfoList.getGNNInputs()
+    node_label_ids,adjacency_lists,node_to_graph_map,nodeNumberList,numberOfNode=graphInfoList.getGNNInputs()
 
     print("---")
-    print("node_features",node_features)
-    adjacency_lists=tuple(tf.constant(edges) for edges in adjacency_lists)
-    print("adjacency_lists",adjacency_lists)
-    print("node_to_graph_map",node_to_graph_map)
-    print("len(nodeNumberList)",len(nodeNumberList))
+    # print("node_label_ids",node_label_ids)
+    # print("adjacency_lists",adjacency_lists)
+    # print("node_to_graph_map",node_to_graph_map)
+    # print("numberOfNode",numberOfNode)
+
+
+    #set parameters
+    nodeFeatureDim=3
+    parameters = tf2_gnn.GNN.get_default_hyperparameters()
+    parameters['hidden_dim'] = 4
+    parameters['num_layers'] = 1
+    parameters['node_label_vocab_size'] = numberOfNode
+    parameters['node_label_embedding_size'] = nodeFeatureDim
+    parameters['num_edge_types'] = len(adjacency_lists)
+    #formulate gnn inputs
+    inputs = {'NodeNumberList': nodeNumberList,  # [8,4,3]
+              'node_to_graph_map': node_to_graph_map,  # [0 0 0 0 0 0 0 0 1 1 1 1 2 2 2]
+              'node_label_ids': node_label_ids,  # [0, 1, 2,..., 14]
+              'num_edge_types': len(adjacency_lists),  # 2
+              'adjacency_lists': adjacency_lists}
+    for edge_type_idx, edgeType in enumerate(adjacency_lists):  # 3,4,2
+        inputs[f"adjacency_list_{edge_type_idx}"] = tf.TensorSpec(shape=(None, edgeType.shape[1]), dtype=tf.int32)
+
+
+
+    dataset=HornGraphDataset(parameters)
+    layers = InvariantArgumentSelectionTask(parameters,dataset)
+    output = layers(inputs)
+    print(output)
+
+
+
+class HronGraphSample(GraphSample):
+    """Data structure holding a single PPI graph."""
+    pass
+
+
+class HornGraphDataset(GraphDataset[HronGraphSample]):
+    def __init__(self, params: Dict[str, Any], metadata: Optional[Dict[str, Any]] = None):
+        super().__init__(params, metadata=metadata)
+        self._num_edge_types = params['num_edge_types']
+    def _graph_iterator(self):
+        pass
+    def load_data(self):
+        pass
+    def load_data_from_list(self):
+        pass
+    def node_feature_shape(self):
+        pass
+
+    @property
+    def num_edge_types(self) -> int:
+        return self._num_edge_types
 
 
 

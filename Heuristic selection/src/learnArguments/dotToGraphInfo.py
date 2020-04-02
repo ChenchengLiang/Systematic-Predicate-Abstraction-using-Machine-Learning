@@ -80,7 +80,36 @@ class DotToGraphInfo:
         self.parsedArgumentList=[]
         self.finalGraphInfoList=[]
 
+    def getFinalGraphInfoList(self):
+        # read graph file
+        self.readGraphsFromDot()
+        # parse argument to graph info
+        self.getParsedArgument()
+
+        # give every node unique ID, differentiate hyperedges and nodes
+
+        self.giveNodeUniqueID()
+        self.giveEdgeUniqueID()
+        self.giveHyperedgeUniqueID()
+
+        self.normalizeNodeLabel()
+        self.encodeNodeLabelToInteger()
+        self.hyperedgeIntegerEncoding()
+        self.edgeIntegerEncoding()
+
+        # parse argument to graph info
+        self.getArgumentIDFromGraph()
+
+        # find sender and receiver for all edges
+        self.addSenderReceiverInfoToEdge()
+        self.addSenderReceiverInfoToHyperedge()
+
+        self.getGraphInfoList()
+
+        # graphInfoList.printFinalGraphInfo()
+
     def getGNNInputs(self):
+        self.getFinalGraphInfoList()
         totalGraphNodeIDList=[]
         for graphInfo, args in zip(self.finalGraphInfoList, self.parsedArgumentList):
             totalGraphNodeIDList.append(graphInfo.nodeUniqueIDList)
@@ -134,13 +163,14 @@ class DotToGraphInfo:
         #eleminate empty edge type
         for typeKey in edgeTypeList:
             if len(edgeTypeList[str(typeKey)])!=0:
-                adjacent_list.append(edgeTypeList[typeKey])
+                adjacent_list.append(tf.constant(edgeTypeList[typeKey],dtype=tf.int32))
         #print edge types
         # for i,edges in enumerate(adjacent_list):
         #     print(f"edge type {i}",edges)
 
 
-        return uniformedTotalGraphNodeIDList,adjacent_list,node_to_graph_map_tensor,nodeNumberList
+        return tf.constant(uniformedTotalGraphNodeIDList),\
+               tuple(adjacent_list),node_to_graph_map_tensor,nodeNumberList,sum(nodeNumberList)
 
 
     def printFinalGraphInfo(self):
