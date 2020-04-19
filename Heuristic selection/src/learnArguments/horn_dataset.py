@@ -12,27 +12,13 @@ from tf2_gnn.cli_utils.training_utils import train,log_line,make_run_id
 import os
 
 def main():
-    graphInfoList = DotToGraphInfo()
-    #get raw gnn inputs
-    node_label_ids,adjacency_lists,node_to_graph_map,nodeNumberList,argumentNumberList,\
-    numberOfNode,argument_indices,argument_scores,edgeTypeNumberList=graphInfoList.getGNNInputs()
-    print("---")
-    print("node_label_ids",node_label_ids)
-    print("argument_indices", argument_indices)
-    print("argument_scores",argument_scores)
-    #print("adjacency_lists",adjacency_lists)
-    print("node_to_graph_map",node_to_graph_map)
-    print("numberOfNode",numberOfNode)
-    print("nodeNumberList",nodeNumberList)
-    print("argumentNumberList",argumentNumberList)
+
 
     nodeFeatureDim = 3
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
     parameters['hidden_dim'] = 4
     parameters['num_layers'] = 1
-    parameters['node_label_vocab_size'] = numberOfNode
     parameters['node_label_embedding_size'] = nodeFeatureDim
-    parameters['num_edge_types'] = len(adjacency_lists)
     parameters['max_nodes_per_batch']=10000
     parameters['classification_hidden_layer_size'] = 42
 
@@ -65,7 +51,7 @@ def main():
     model_name="GNN"
     task_name="argument_selection"
     run_id = make_run_id(model_name, task_name)
-    save_dir="trained_model"
+    save_dir=os.path.abspath("trained_model")
     log_file = os.path.join(save_dir, f"{run_id}.log")
     def log(msg):
         log_line(log_file, msg)
@@ -83,8 +69,7 @@ def main():
     )
 
 
-
-    #statistics of positive and negative examples
+    #todo:statistics of positive and negative examples
 
 class HornGraphSample(GraphSample):
     """Data structure holding a single horn graph."""
@@ -109,7 +94,8 @@ class HornGraphSample(GraphSample):
 class HornGraphDataset(GraphDataset[HornGraphSample]):
     def __init__(self, params: Dict[str, Any], metadata: Optional[Dict[str, Any]] = None):
         super().__init__(params, metadata=metadata)
-        self._num_edge_types = params['num_edge_types']
+        self._num_edge_types = None
+        self._total_number_of_nodes=None
         #self._node_number_per_edge_type = list()
         self._node_feature_shape: Optional[Tuple[int]] = None
         self._loaded_data: Dict[DataFold, List[GraphSample]] = {}
@@ -117,8 +103,8 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
     def load_data(self, folds_to_load: Optional[Set[DataFold]] = None) -> None:
         '''been run automatically when create the object of this class'''
         if folds_to_load is None:
-            #folds_to_load = {DataFold.TRAIN, DataFold.VALIDATION, DataFold.TEST}
-            folds_to_load = {DataFold.TRAIN}
+            folds_to_load = {DataFold.TRAIN, DataFold.VALIDATION, DataFold.TEST}
+            #folds_to_load = {DataFold.TRAIN}
 
         if DataFold.TRAIN in folds_to_load:
             self._loaded_data[DataFold.TRAIN] = self.__load_data(DataFold.TRAIN)
@@ -144,9 +130,11 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         # get raw gnn inputs
 
         #todo: uniform node ID again for every data point
-        graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,graphs_argument_scores=graphInfoList.getHornGraphSample()
+        graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,graphs_argument_scores,total_number_of_node=graphInfoList.getHornGraphSample()
 
-        #todo:get self._num_edge_types
+        self._num_edge_types=len(graphs_adjacency_lists[0])
+        self._total_number_of_nodes=total_number_of_node
+        print("self._total_number_of_nodes",self._total_number_of_nodes)
         for edge_type in graphs_adjacency_lists[0]:
             self._node_number_per_edge_type.append(len(edge_type[0]))
 
@@ -160,15 +148,20 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
             #print("normalized argument_scores", argument_scores)
             #loop per data point
             argument_scores = np.concatenate(argument_scores).ravel().tolist()#flatten
+
+
+            number_of_node=len(node_label_ids)
+            arg_offset=0
             for arg, score in zip(argument_indices,argument_scores):
                 final_graphs.append(
                     HornGraphSample(
                         adjacency_lists=tuple(adjacency_lists),
                         node_features=tf.constant(node_label_ids),
                         node_label=score,
-                        node_argument=tf.constant(arg),
+                        node_argument=tf.constant(arg+arg_offset),
                     )
                 )
+                arg_offset=arg_offset+number_of_node
         return final_graphs
 
     def load_data_from_list(self):
@@ -184,6 +177,10 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
     @property
     def num_edge_types(self) -> int:
         return self._num_edge_types
+
+    @property
+    def total_number_of_nodes(self) -> int:
+        return self._total_number_of_nodes
 
     # -------------------- Minibatching --------------------
     def get_batch_tf_data_description(self) -> GraphBatchTFDataDescription:

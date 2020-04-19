@@ -198,7 +198,7 @@ class DotToGraphInfo:
         #print(len(all_graphs_adjacent_list))
         #print(all_graphs_adjacent_list)
 
-        return uniformedGraphNodeIDList,uniformedGraphArgumentIDList,all_graphs_adjacent_list,argumentScoreList
+        return uniformedGraphNodeIDList,uniformedGraphArgumentIDList,all_graphs_adjacent_list,argumentScoreList,sum(nodeNumberList)
 
 
 

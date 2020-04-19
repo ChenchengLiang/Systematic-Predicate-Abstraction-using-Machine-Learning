@@ -14,9 +14,9 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
     def __init__(self, params: Dict[str, Any], dataset: GraphDataset, name: str = None):
         super().__init__(params, dataset=dataset, name=name)
         self._params = params
-        self._num_edge_types = params['num_edge_types']
+        self._num_edge_types = dataset.num_edge_types
         self._embedding_layer = tf.keras.layers.Embedding(
-            input_dim=params["node_label_vocab_size"],
+            input_dim=dataset.total_number_of_nodes,
             output_dim=params["node_label_embedding_size"]
         )
         self._gnn = GNN(params)
