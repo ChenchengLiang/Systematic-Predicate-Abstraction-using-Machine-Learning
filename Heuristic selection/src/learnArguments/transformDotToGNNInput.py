@@ -6,6 +6,10 @@ import tf2_gnn
 from learnArguments.invariantArgumentSelectionModel import InvariantArgumentSelectionModel
 from learnArguments.horn_graph_argument_selection_task import InvariantArgumentSelectionTask
 from tf2_gnn.data import GraphDataset,GraphSample
+import numpy as np
+from typing import List,Set,Iterator
+from tf2_gnn.data.graph_dataset import DataFold
+from learnArguments.horn_dataset import HornGraphDataset
 '''
 horn graph node IDs
 #graph 1 node ID [0,1,2,3,...,7]
@@ -37,13 +41,19 @@ def main():
 
     graphInfoList = DotToGraphInfo()
     #get raw gnn inputs
-    node_label_ids,adjacency_lists,node_to_graph_map,nodeNumberList,numberOfNode=graphInfoList.getGNNInputs()
-
+    node_label_ids,adjacency_lists,node_to_graph_map,nodeNumberList,argumentNumberList,\
+    numberOfNode,argument_indices,argument_scores,edgeTypeNumberList=graphInfoList.getGNNInputs()
     print("---")
-    # print("node_label_ids",node_label_ids)
-    # print("adjacency_lists",adjacency_lists)
-    # print("node_to_graph_map",node_to_graph_map)
-    # print("numberOfNode",numberOfNode)
+    print("node_label_ids",node_label_ids)
+    print("argument_indices", argument_indices)
+    print("argument_scores",argument_scores)
+    #print("adjacency_lists",adjacency_lists)
+    print("node_to_graph_map",node_to_graph_map)
+    print("numberOfNode",numberOfNode)
+    print("nodeNumberList",nodeNumberList)
+    print("argumentNumberList",argumentNumberList)
+
+
 
 
     #set parameters
@@ -64,35 +74,16 @@ def main():
         inputs[f"adjacency_list_{edge_type_idx}"] = tf.TensorSpec(shape=(None, edgeType.shape[1]), dtype=tf.int32)
 
 
-
+    #node inference
+    #
     dataset=HornGraphDataset(parameters)
     layers = InvariantArgumentSelectionTask(parameters,dataset)
     output = layers(inputs)
-    print(output)
+    print("---")
+    print("output",output)
+    print("gather", tf.gather(params=output, indices=argument_indices))
 
-
-
-class HronGraphSample(GraphSample):
-    """Data structure holding a single PPI graph."""
-    pass
-
-
-class HornGraphDataset(GraphDataset[HronGraphSample]):
-    def __init__(self, params: Dict[str, Any], metadata: Optional[Dict[str, Any]] = None):
-        super().__init__(params, metadata=metadata)
-        self._num_edge_types = params['num_edge_types']
-    def _graph_iterator(self):
-        pass
-    def load_data(self):
-        pass
-    def load_data_from_list(self):
-        pass
-    def node_feature_shape(self):
-        pass
-
-    @property
-    def num_edge_types(self) -> int:
-        return self._num_edge_types
+    #statistics of positive and negative examples
 
 
 

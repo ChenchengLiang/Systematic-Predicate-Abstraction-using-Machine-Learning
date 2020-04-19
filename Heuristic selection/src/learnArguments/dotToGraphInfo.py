@@ -108,21 +108,138 @@ class DotToGraphInfo:
 
         # graphInfoList.printFinalGraphInfo()
 
+    def getHornGraphSample(self):
+        self.getFinalGraphInfoList()
+        totalGraphNodeIDList = []
+        totalGraphArgumentIDList = []
+        argumentScoreList = []
+        for graphInfo, args in zip(self.finalGraphInfoList, self.parsedArgumentList):
+            totalGraphNodeIDList.append(graphInfo.nodeUniqueIDList)
+            tempArgList = []
+            tempArgScoreList=[]
+            for arg in args:
+                tempArgList.append(arg.nodeUniqueIDInGraph)
+                tempArgScoreList.append(int(arg.score))
+            totalGraphArgumentIDList.append(tempArgList)
+            argumentScoreList.append(tempArgScoreList)
+
+
+        nodeNumberList = []
+        argumentNumberList = []
+        for graphNodeIDList, graphArgumentIDList in zip(totalGraphNodeIDList, totalGraphArgumentIDList):
+            nodeNumberList.append(len(graphNodeIDList))
+            argumentNumberList.append(len(graphArgumentIDList))
+
+        #get uniformed node ID and argument ID per graph
+        totalGraphNodeIDList = np.concatenate(totalGraphNodeIDList).ravel().tolist()  # flatten
+        uniformedTotalGraphNodeIDList = list(range(0, len(totalGraphNodeIDList)))
+        uniformedTotalGraphArgumentIDList = []
+        counter = 0
+        for args, graphOffset in zip(totalGraphArgumentIDList, nodeNumberList):
+            for arg in args:
+                uniformedTotalGraphArgumentIDList.append(arg + counter)
+            counter = counter + graphOffset
+
+
+        uniformedGraphNodeIDList=[]
+        uniformedGraphArgumentIDList=[]
+        nodeCounter=0
+        for nodeOffset,args in zip(nodeNumberList,totalGraphArgumentIDList):
+            uniformedGraphNodeIDList.append(list(range(nodeCounter, nodeCounter+nodeOffset)))
+            tempArgList=[]
+            for arg in args:
+                tempArgList.append(arg + nodeCounter)
+            uniformedGraphArgumentIDList.append(tempArgList)
+            nodeCounter = nodeCounter +nodeOffset
+
+        #print("uniformedGraphNodeIDList",uniformedGraphNodeIDList)
+        #print("uniformedGraphArgumentIDList",uniformedGraphArgumentIDList)
+
+        #get adjacent_list per graph
+        edgeTypeList = {}
+        edgeTypeNumberDict = {}
+        edgeTypeNumberList = {}
+        all_graphs_adjacent_list = []
+        maxNodeForAHypedEdge = 10
+        for i in range(2, maxNodeForAHypedEdge):
+            edgeTypeList[str(i)] = list()
+            edgeTypeNumberDict[str(i)] = [0] * len(self.finalGraphInfoList)
+        for j, graphInfo in enumerate(self.finalGraphInfoList):
+            # print('numberOfUniqueNodeID',graphInfo.numberOfUniqueNodeID)
+            # map local node ID to uniformed node ID
+            offset = sum(nodeNumberList[:j])
+            local_node_ID_to_uniformed_node_ID = list(range(offset, offset + graphInfo.numberOfUniqueNodeID))
+            # print(local_node_ID_to_uniformed_node_ID)
+            edgeTypeNumberDict['2'][j] = len(graphInfo.edgeEmbeddingInputs)
+            for edge in graphInfo.edgeEmbeddingInputs:
+                edgeTypeList['2'].append([local_node_ID_to_uniformed_node_ID[edge['sender']],
+                                          local_node_ID_to_uniformed_node_ID[edge['receiver']]])
+            # print(graphInfo.hyperedgeEmbeddingInputs)
+            for hyperedge in graphInfo.hyperedgeEmbeddingInputs:
+                localNodeIDList = [hyperedge['senderIDList'], hyperedge['receiverIDList']]
+                localNodeIDList = np.concatenate(localNodeIDList).ravel().tolist()
+                uniformedNodeIDList = []
+                for localID in localNodeIDList:
+                    uniformedNodeIDList.append(local_node_ID_to_uniformed_node_ID[localID])
+                for i in range(2, maxNodeForAHypedEdge):
+                    if (len(uniformedNodeIDList) == i):
+                        edgeTypeList[str(i)].append(uniformedNodeIDList)
+                        edgeTypeNumberDict[str(i)][j] = edgeTypeNumberDict[str(i)][j] + 1
+            one_graph_adjacent_list=[]
+            for typeKey in edgeTypeList:
+                if len(edgeTypeList[str(typeKey)]) != 0:
+                    one_graph_adjacent_list.append(np.array(edgeTypeList[typeKey]))
+            all_graphs_adjacent_list.append(one_graph_adjacent_list)
+        #     print("one graph type",len(one_graph_adjacent_list))
+        #     print("one graph binary edage number", len(one_graph_adjacent_list[0]))
+        #     print("one graph trianry edage number", len(one_graph_adjacent_list[1]))
+        #     print("---")
+        #
+        #print(len(all_graphs_adjacent_list))
+        #print(all_graphs_adjacent_list)
+
+        return uniformedGraphNodeIDList,uniformedGraphArgumentIDList,all_graphs_adjacent_list,argumentScoreList
+
+
+
+
+
+
+
     def getGNNInputs(self):
         self.getFinalGraphInfoList()
         totalGraphNodeIDList=[]
+        totalGraphArgumentIDList = []
+        argumentScoreList=[]
         for graphInfo, args in zip(self.finalGraphInfoList, self.parsedArgumentList):
             totalGraphNodeIDList.append(graphInfo.nodeUniqueIDList)
+            tempArgList=[]
+            for arg in args:
+                tempArgList.append(arg.nodeUniqueIDInGraph)
+                argumentScoreList.append(int(arg.score))
+            totalGraphArgumentIDList.append(tempArgList)
 
         nodeNumberList=[]
-        for graphNodeIDList in totalGraphNodeIDList:
+        argumentNumberList=[]
+        for graphNodeIDList,graphArgumentIDList in zip(totalGraphNodeIDList,totalGraphArgumentIDList):
             nodeNumberList.append(len(graphNodeIDList))
+            argumentNumberList.append(len(graphArgumentIDList))
 
         totalGraphNodeIDList=np.concatenate(totalGraphNodeIDList).ravel().tolist()#flatten
         uniformedTotalGraphNodeIDList=list(range(0, len(totalGraphNodeIDList)))
+        uniformedTotalGraphArgumentIDList=[]
+        counter=0
+        for args, graphOffset in zip(totalGraphArgumentIDList,nodeNumberList):
+            for arg in args:
+                uniformedTotalGraphArgumentIDList.append(arg+counter)
+            counter=counter+graphOffset
+
         # print("totalGraphNodeIDList",totalGraphNodeIDList)
+        # print("totalGraphArgumentIDList", totalGraphArgumentIDList)
         # print("uniformedTotalGraphNodeIDList",uniformedTotalGraphNodeIDList)
-        # print("NodeNumberList",nodeNumberList)
+        # print("uniformedTotalGraphArgumentIDList",uniformedTotalGraphArgumentIDList)
+        # print("nodeNumberList",nodeNumberList)
+        # print("argumentNumberList", argumentNumberList)
 
         # get node_to_graph_map from nodeNumberList
         node_to_graph_map_tensor = []
@@ -137,16 +254,20 @@ class DotToGraphInfo:
 
         # get adjacent_list
         edgeTypeList={}
+        edgeTypeNumberDict={}
+        edgeTypeNumberList={}
         adjacent_list=[]
         maxNodeForAHypedEdge=10
         for i in range(2,maxNodeForAHypedEdge):
             edgeTypeList[str(i)]=list()
-        for i,graphInfo in enumerate(self.finalGraphInfoList):
+            edgeTypeNumberDict[str(i)] = [0]*len(self.finalGraphInfoList)
+        for j,graphInfo in enumerate(self.finalGraphInfoList):
             #print('numberOfUniqueNodeID',graphInfo.numberOfUniqueNodeID)
             #map local node ID to uniformed node ID
-            offset=sum(nodeNumberList[:i])
+            offset=sum(nodeNumberList[:j])
             local_node_ID_to_uniformed_node_ID=list(range(offset,offset+graphInfo.numberOfUniqueNodeID))
             #print(local_node_ID_to_uniformed_node_ID)
+            edgeTypeNumberDict['2'][j]=len(graphInfo.edgeEmbeddingInputs)
             for edge in graphInfo.edgeEmbeddingInputs:
                 edgeTypeList['2'].append([local_node_ID_to_uniformed_node_ID[edge['sender']],local_node_ID_to_uniformed_node_ID[edge['receiver']]])
             #print(graphInfo.hyperedgeEmbeddingInputs)
@@ -159,18 +280,23 @@ class DotToGraphInfo:
                 for i in range(2,maxNodeForAHypedEdge):
                     if(len(uniformedNodeIDList)==i):
                         edgeTypeList[str(i)].append(uniformedNodeIDList)
+                        edgeTypeNumberDict[str(i)][j]=edgeTypeNumberDict[str(i)][j]+1
+
 
         #eleminate empty edge type
         for typeKey in edgeTypeList:
             if len(edgeTypeList[str(typeKey)])!=0:
                 adjacent_list.append(tf.constant(edgeTypeList[typeKey],dtype=tf.int32))
+                edgeTypeNumberList[typeKey]=edgeTypeNumberDict[typeKey]
+        print(edgeTypeNumberList)
         #print edge types
         # for i,edges in enumerate(adjacent_list):
         #     print(f"edge type {i}",edges)
 
 
         return tf.constant(uniformedTotalGraphNodeIDList),\
-               tuple(adjacent_list),node_to_graph_map_tensor,nodeNumberList,sum(nodeNumberList)
+               tuple(adjacent_list),node_to_graph_map_tensor,nodeNumberList,argumentNumberList,sum(nodeNumberList),\
+               tf.constant(uniformedTotalGraphArgumentIDList),argumentScoreList,edgeTypeNumberList
 
 
     def printFinalGraphInfo(self):
@@ -532,14 +658,27 @@ class DotToGraphInfo:
                 GraphInfo(nodeUniqueIDList,nodeLabelList, edgeLabelList, hyperedgeLabelList, edgeSenderList, edgeReceiverList,
                           hyperedgeSenderList, hyperedgeReceiverList,edgeEmbeddingInputs,hyperedgeEmbeddingInputs,nodeEmbeddingInputs))
 
+    def getArgumentHead(self):
+        for G, args in zip(self.graphList, self.parsedArgumentList):
+            for node in G.nodes:
+                nodeDir = G.nodes[node]
+                if(nodeDir['class']=="argument"):
+                    tempString=nodeDir['label']
+                    head=tempString[1:tempString.find('argument')-1]
+                    nodeDir['head'] = head
+                    argument = "argument"+tempString[tempString.find('argument_') +9 :-1]
+                    nodeDir['argument'] = argument
+
     def getArgumentIDFromGraph(self):
+        self.getArgumentHead()
         #connect integer encoding from the graph to input argument
         for G, args in zip(self.graphList, self.parsedArgumentList):
             for node in G.nodes:
                 for arg in args:
                     nodeDir = G.nodes[node]
                     if(nodeDir['class']=="argument"):
-                        if(nodeDir['nodeName']==arg.arg and nodeDir['head']==arg.head[:arg.head.find("/")]):
+                        #nodeName
+                        if(nodeDir['argument']==arg.arg and nodeDir['head']==arg.head[:arg.head.find("/")]):
                             arg.nodeUniqueIDInGraph=nodeDir['nodeUniqueID']
                             arg.nodeLabelUniqueIDInGraph = nodeDir['nodeLabelUniqueID']
 
