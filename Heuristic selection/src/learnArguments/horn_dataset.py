@@ -62,14 +62,19 @@ def main():
         log_fun=log,
         run_id=run_id,
         max_epochs=100,
-        patience=5,
+        patience=10,
         save_dir=save_dir,
         quiet=quiet,
         aml_run=None,
     )
 
+    #predict
+    #model_loaded = tf.keras.models.load_model('trained_model/GNN_argument_selection__2020-04-28_14-33-57_best.pkl')
+
 
     #todo:statistics of positive and negative examples
+
+
 
 class HornGraphSample(GraphSample):
     """Data structure holding a single horn graph."""
@@ -77,8 +82,8 @@ class HornGraphSample(GraphSample):
         self,
         adjacency_lists: List[np.ndarray],
         node_features: np.ndarray,
-        node_label: float,
-        node_argument:int,
+        node_label: np.ndarray,
+        node_argument: np.ndarray,
     ):
         super().__init__(adjacency_lists, node_features)
         self._node_label = node_label
@@ -125,16 +130,15 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
             self._node_number_per_edge_type=[]
 
 
-        final_graphs = []
+        final_graphs_v1=[]
         graphInfoList = DotToGraphInfo()
         # get raw gnn inputs
 
-        #todo: uniform node ID again for every data point
         graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,graphs_argument_scores,total_number_of_node=graphInfoList.getHornGraphSample()
 
         self._num_edge_types=len(graphs_adjacency_lists[0])
         self._total_number_of_nodes=total_number_of_node
-        print("self._total_number_of_nodes",self._total_number_of_nodes)
+        #print("self._total_number_of_nodes",self._total_number_of_nodes)
         for edge_type in graphs_adjacency_lists[0]:
             self._node_number_per_edge_type.append(len(edge_type[0]))
 
@@ -146,23 +150,22 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
             #print("argument_scores",argument_scores)
             argument_scores = tf.keras.utils.normalize(np.array(argument_scores))
             #print("normalized argument_scores", argument_scores)
-            #loop per data point
             argument_scores = np.concatenate(argument_scores).ravel().tolist()#flatten
 
-
-            number_of_node=len(node_label_ids)
-            arg_offset=0
-            for arg, score in zip(argument_indices,argument_scores):
-                final_graphs.append(
-                    HornGraphSample(
-                        adjacency_lists=tuple(adjacency_lists),
-                        node_features=tf.constant(node_label_ids),
-                        node_label=score,
-                        node_argument=tf.constant(arg+arg_offset),
-                    )
+            final_graphs_v1.append(
+                HornGraphSample(
+                    adjacency_lists=tuple(adjacency_lists),
+                    node_features=tf.constant(node_label_ids),
+                    node_label=tf.constant(argument_scores),
+                    node_argument=tf.constant(argument_indices),
                 )
-                arg_offset=arg_offset+number_of_node
-        return final_graphs
+            )
+            # print("node_label_ids",node_label_ids)
+            # print("adjacency_lists",adjacency_lists)
+            # print("argument_scores",argument_scores)
+            # print("argument_indices", argument_indices)
+
+        return final_graphs_v1
 
     def load_data_from_list(self):
         raise NotImplementedError()
@@ -192,16 +195,17 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
             "node_argument": tf.int32
         }
         batch_features_shapes = {
-            "node_features": (None, ),
+            "node_features": (None, ), # + self.node_feature_shape,  offset
             "node_to_graph_map": (None,),
             "num_graphs_in_batch": (),
-            "node_argument": (None,),
+            "node_argument": (None, ),
         }
-        print("self._node_number_per_edge_type",self._node_number_per_edge_type)
+        #print("self._node_number_per_edge_type",self._node_number_per_edge_type)
         for edge_type_idx, edge_number in enumerate(self._node_number_per_edge_type):
             # print("edge_number",edge_number)
             batch_features_types[f"adjacency_list_{edge_type_idx}"] = tf.int32
             batch_features_shapes[f"adjacency_list_{edge_type_idx}"] = (None, edge_number)
+
         return GraphBatchTFDataDescription(
             batch_features_types=batch_features_types,
             batch_features_shapes=batch_features_shapes,
@@ -223,15 +227,56 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         return new_batch
 
     def _add_graph_to_batch(self, raw_batch, graph_sample: HornGraphSample) -> None:
-        super()._add_graph_to_batch(raw_batch, graph_sample)
-        raw_batch["node_argument"].append(graph_sample._node_argument)
-        raw_batch["node_labels"].append(graph_sample._node_label)
+        #super()._add_graph_to_batch(raw_batch, graph_sample)
+
+        num_nodes_in_graph = len(graph_sample.node_features)
+        raw_batch["node_features"].extend(graph_sample.node_features)
+        raw_batch["node_to_graph_map"].append(
+            np.full(
+                shape=[num_nodes_in_graph],
+                fill_value=raw_batch["num_graphs_in_batch"],
+                dtype=np.int32,
+            )
+        )
+
+        #print("before add raw batch", raw_batch["adjacency_lists"])
+        for edge_type_idx, (batch_adjacency_list,sample_adjacency_list) in enumerate(zip(raw_batch["adjacency_lists"],graph_sample.adjacency_lists)):
+            edge_number=sample_adjacency_list.shape[1]
+            #print("edge_number",edge_number)
+            batch_adjacency_list.append(
+                graph_sample.adjacency_lists[edge_type_idx].reshape(-1, edge_number)
+                # + raw_batch["num_nodes_in_batch"] #offset
+            )
+        #print("after add raw batch", raw_batch["adjacency_lists"])
+
+
+        # raw_batch["node_argument"].append(graph_sample._node_argument)
+        raw_batch["node_argument"].extend(graph_sample._node_argument)
+        #raw_batch["node_labels"].append(graph_sample._node_label)
+        raw_batch["node_labels"].extend(graph_sample._node_label)
+
+
+        #print("before add raw batch", raw_batch["adjacency_lists"])
+        for edge_type_idx, (batch_adjacency_list,sample_adjacency_list) in enumerate(zip(raw_batch["adjacency_lists"],graph_sample.adjacency_lists)):
+            edge_number=sample_adjacency_list.shape[1]
+            #print("edge_number",edge_number)
+            batch_adjacency_list.append(
+                graph_sample.adjacency_lists[edge_type_idx]
+                # .reshape(-1, edge_number)
+                # + raw_batch["num_nodes_in_batch"] #offset
+            )
+
+        #print("after add raw batch", raw_batch["adjacency_lists"])
+
 
 
     def _finalise_batch(self, raw_batch) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         batch_features, batch_labels = super()._finalise_batch(raw_batch)
         batch_features["node_argument"] = raw_batch["node_argument"]
         return batch_features, {"node_labels": raw_batch["node_labels"]}
+
+
+
 
 
 main()

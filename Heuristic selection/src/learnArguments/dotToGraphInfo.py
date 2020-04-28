@@ -188,7 +188,8 @@ class DotToGraphInfo:
             one_graph_adjacent_list=[]
             for typeKey in edgeTypeList:
                 if len(edgeTypeList[str(typeKey)]) != 0:
-                    one_graph_adjacent_list.append(np.array(edgeTypeList[typeKey]))
+                    one_graph_adjacent_list.append(np.array(edgeTypeList[typeKey])[-edgeTypeNumberDict[typeKey][j]:])
+            #print("one_graph_adjacent_list",len(one_graph_adjacent_list[0]),len(one_graph_adjacent_list[1]))
             all_graphs_adjacent_list.append(one_graph_adjacent_list)
         #     print("one graph type",len(one_graph_adjacent_list))
         #     print("one graph binary edage number", len(one_graph_adjacent_list[0]))

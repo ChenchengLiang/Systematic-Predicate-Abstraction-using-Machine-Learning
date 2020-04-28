@@ -7,7 +7,7 @@ import tensorflow as tf
 from tf2_gnn.data import GraphDataset
 from tf2_gnn.models import GraphTaskModel
 from tf2_gnn.layers import WeightedSumGraphRepresentation, NodesToGraphRepresentationInput
-
+from tf2_gnn.utils.gather_dense_gradient import gather_dense_gradient
 from tf2_gnn import GNNInput, GNN
 
 class InvariantArgumentSelectionTask(GraphTaskModel):
@@ -20,7 +20,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
             output_dim=params["node_label_embedding_size"]
         )
         self._gnn = GNN(params)
-        self._argument_repr_to_classification_layer = tf.keras.layers.Dense(
+        self._argument_repr_to_regression_layer = tf.keras.layers.Dense(
             units=self._params["classification_hidden_layer_size"], activation=tf.nn.relu, use_bias=True) #decide layer output shape
         self._argument_classification_layer = tf.keras.layers.Dense(
             units=1, activation=tf.nn.sigmoid, use_bias=True) #decide layer input shape
@@ -31,7 +31,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
 
     def build(self, input_shapes):
         # build node embedding layer
-        print("--build--")
+        #print("--build--")
         self._embedding_layer.build(tf.TensorShape((None,)))
         # build gnn layers
         self._gnn.build(
@@ -48,7 +48,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
 
         # todo: build task-specific layer
 
-        self._argument_repr_to_classification_layer.build(tf.TensorShape((None, self._params["hidden_dim"]))) #decide layer input shape
+        self._argument_repr_to_regression_layer.build(tf.TensorShape((None, self._params["hidden_dim"]))) #decide layer input shape
         #
         self._argument_classification_layer.build(
             tf.TensorShape((None, self._params["classification_hidden_layer_size"])) #decide layer input shape
@@ -60,7 +60,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
 
 
     def call(self, inputs, training: bool = False):
-        print("--call--")
+        #print("--call--")
         # call node embedding layer
         #node_labels_embedded = self._embedding_layer(inputs["node_label_ids"], training=training)
         node_labels_embedded = self._embedding_layer(inputs["node_features"], training=training)
@@ -71,13 +71,13 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
             for edge_type_idx in range(self._num_edge_types)
         )
 
-
-        print("node_features",inputs["node_features"])
-        print("node_features len",len(set(np.array(inputs["node_features"]))))
-        print("arguments",inputs["node_argument"])
-        print("node_to_graph_map",inputs['node_to_graph_map'])
-        print("num_graphs_in_batch",inputs['num_graphs_in_batch'])
-        print("adjacency_lists",adjacency_lists)
+        #before feed into gnn
+        # print("node_features",inputs["node_features"])
+        # print("node_features len",len(set(np.array(inputs["node_features"]))))
+        # print("arguments",inputs["node_argument"])
+        # print("node_to_graph_map",inputs['node_to_graph_map'])
+        # print("num_graphs_in_batch",inputs['num_graphs_in_batch'])
+        # print("adjacency_lists",adjacency_lists)
 
         # call gnn and get graph representation
         gnn_input = GNNInput(
@@ -89,13 +89,58 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
             adjacency_lists=adjacency_lists
         )
         final_node_representations = self._gnn(gnn_input, training=training)
-        # todo: find the target argument representation
-        #*1 solution from https://github.com/tensorflow/tensorflow/issues/36236
+        #BUG fixed:*1 solution from https://github.com/tensorflow/tensorflow/issues/36236
         argument_representations=tf.gather(params=final_node_representations*1,indices=inputs["node_argument"])
-        #print("argument_representations",argument_representations)
+        #argument_representations = gather_dense_gradient(params=final_node_representations*1 , indices=inputs["node_argument"])
 
         return self.compute_task_output(inputs, argument_representations, training)
 
+    def compute_task_output(
+            self,
+            batch_features: Dict[str, tf.Tensor],
+            final_argument_representations: tf.Tensor,
+            training: bool,
+    ) -> Any:
+        #print("compute_task_output")
+        #call task specific layers
+        argument_regression_hidden_layer_output=self._argument_repr_to_regression_layer(final_argument_representations)
+
+        predicted_argument_score = self._argument_classification_layer(
+            argument_regression_hidden_layer_output
+        )  # Shape [argument number, 1]
+
+        return tf.squeeze(predicted_argument_score, axis=-1) #Shape [argument number]
+
+    def compute_task_metrics(
+            self,
+            batch_features: Dict[str, tf.Tensor],
+            task_output: Any,
+            batch_labels: Dict[str, tf.Tensor],
+    ) -> Dict[str, tf.Tensor]:
+        mse = tf.losses.mean_squared_error(batch_labels["node_labels"], task_output)
+        mae = tf.losses.mean_absolute_error(batch_labels["node_labels"], task_output)
+        num_graphs = tf.cast(batch_features["num_graphs_in_batch"], tf.float32)
+        return {
+            "loss": mse,
+            "batch_squared_error": mse * num_graphs,
+            "batch_absolute_error": mae * num_graphs,
+            "num_graphs": num_graphs,
+        }
+
+    def compute_epoch_metrics(self, task_results: List[Any]) -> Tuple[float, str]:
+        total_num_graphs = sum(
+            batch_task_result["num_graphs"] for batch_task_result in task_results
+        )
+        total_absolute_error = sum(
+            batch_task_result["batch_absolute_error"] for batch_task_result in task_results
+        )
+        epoch_mae = total_absolute_error / total_num_graphs
+        return epoch_mae.numpy(), f"Mean Absolute Error = {epoch_mae.numpy():.3f}"
+
+
+
+    '''
+    classification
 
     def compute_task_output(
         self,
@@ -104,11 +149,11 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
         training: bool,
     ) -> Any:
         print("compute_task_output")
-        #todo:call task specific layers
-        argument_classification_hidden_layer_output=self._argument_repr_to_classification_layer(final_argument_representations)
+        #call task specific layers
+        argument_regression_hidden_layer_output=self._argument_repr_to_regression_layer(final_argument_representations)
 
         predicted_argument_score = self._argument_classification_layer(
-            argument_classification_hidden_layer_output
+            argument_regression_hidden_layer_output
         )  # Shape [G, 1]
 
         return tf.squeeze(predicted_argument_score, axis=-1)
@@ -149,6 +194,6 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
         return -epoch_acc.numpy(), f"Accuracy = {epoch_acc.numpy():.3f}"
 
 
-
+    '''
 
 
