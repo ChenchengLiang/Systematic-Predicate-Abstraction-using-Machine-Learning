@@ -1,6 +1,0 @@
-inv_main4(arg0) :- 0 = arg0.
-inv_main4(arg1) :- inv_main4(i), __eval22 != 0 & -1*i + 1000000 >= 1 & i + 1 = arg1.
-inv_main12(i, arg2) :- inv_main4(i), 99 >= i & arg2 = 0.
-inv_main12(arg3, arg4) :- inv_main12(i, j), __eval32 != 0 & -1*i + 1000000 >= 1 & i + 1 = arg3 & j + 1 = arg4.
-false :- inv_main12(i, j), 99 >= j & i >= 200.
-false :- inv_main12(i, j), 99 >= j & i >= 1000000.

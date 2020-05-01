@@ -1,0 +1,5 @@
+inv_main8(arg2, arg3, arg4, arg5) :- inv_main8(z, arg3 + -1, arg4 + -1, arg5 + -2), z + arg3 + -1 + arg4 + -1 + arg5 + -2 >= 1 & z + arg3 + -1 + arg4 + -1 + arg5 + -2 = 2*arg7 + 1 & __eval75 != 0 & z + arg3 + -1 + arg4 + -1 + arg5 + -2 = arg2.
+inv_main8(arg8, x, arg9, arg10) :- inv_main8(z, x, arg9 + -1, arg10 + -2), arg8 + -1*x - z - arg9 - arg10 = -3 & 2*arg12 + arg11 - z - x - arg9 - arg10 = -3 & __eval75 != 0 & arg11 != -1 & 0 >= arg11 & arg11 >= -1.
+inv_main8(arg8, x, arg9, arg10) :- inv_main8(z, x, arg9 + -1, arg10 + -2), arg8 + -1*x - z - arg9 - arg10 = -3 & 2*arg12 + arg11 - z - x - arg9 - arg10 = -3 & __eval75 != 0 & -1*x - z - arg9 - arg10 >= -2 & 0 >= arg11 & arg11 >= -1.
+inv_main8(arg13, arg14, arg15, arg16) :- 0 = arg14 & 0 = arg15 & 0 = arg16 & 1 = arg13.
+false :- inv_main8(z, x, y, w), x != y.

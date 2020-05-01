@@ -1,5 +1,0 @@
-inv_main14(arg2, arg3) :- inv_main14(k, j), j + -1 >= 1 & k + -1 = arg2 & j + -1 = arg3.
-inv_main6(__eval23, k, i) :- 0 = k & 0 = i.
-inv_main14(k, arg4) :- inv_main6(arg4, k, i), arg4 >= 1 & !(arg4 - i >= 1) & n = arg4.
-inv_main6(n, arg5, arg6) :- inv_main6(n, k, i), n - i >= 1 & k + 1 = arg5 & i + 1 = arg6.
-false :- inv_main14(k, j), !(k >= 1).

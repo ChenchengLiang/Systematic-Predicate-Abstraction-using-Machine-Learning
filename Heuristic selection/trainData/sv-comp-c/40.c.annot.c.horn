@@ -1,8 +1,0 @@
-inv_main16(flag, i, j, arg0, arg1) :- inv_main16(flag, i, j, a, b), __eval45 != 0 & a + 1 = arg0 & b + j - i = arg1.
-inv_main5(flag, arg2, arg3) :- flag != 0 & 0 = arg2 & 1 = arg3.
-inv_main5(flag, arg4, arg5) :- flag = 0 & 1 = arg4 & 1 = arg5.
-inv_main16(flag, i, j, arg6, arg7) :- inv_main5(flag, i, j), 0 = arg6 & 0 = arg7.
-inv_main5(flag, arg8, arg9) :- inv_main5(flag, i, j), i + 2 = 2*arg11 & __eval21 != 0 & i + 2 = arg8 & j + 2 = arg9.
-inv_main5(flag, arg12, arg13) :- inv_main5(flag, i, j), arg13 - j = 1 & arg12 - i = 2 & 2*arg15 - i = 1 & __eval21 != 0 & arg15 >= 0.
-inv_main5(flag, arg12, arg13) :- inv_main5(flag, i, j), arg13 - j = 1 & arg12 - i = 2 & 2*arg15 - i = 3 & __eval21 != 0 & arg15 - i >= 3.
-false :- inv_main16(flag, i, j, a, b), a != b & flag != 0.

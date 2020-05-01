@@ -1,5 +1,0 @@
-inv_main3(arg0) :- 0 = arg0.
-inv_main4(x) :- inv_main3(x), !(-1*x + 100 >= 1).
-inv_main4(arg1) :- inv_main3(x), x + 1 = 50 & -1*x + 100 >= 1 & x + 1 = arg1.
-inv_main3(arg2) :- inv_main3(x), x + 1 != 50 & -1*x + 100 >= 1 & x + 1 = arg2.
-false :- inv_main4(x), x != 50.

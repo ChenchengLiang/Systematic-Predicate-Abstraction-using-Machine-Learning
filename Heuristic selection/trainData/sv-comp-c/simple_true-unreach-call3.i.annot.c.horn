@@ -1,4 +1,0 @@
-inv_main6(arg1, N) :- inv_main6(x, N), N - x >= 1 & x + 2 = arg1.
-inv_main6(x, __eval10) :- __eval10 >= 0 & 0 = x.
-false :- inv_main6(2*arg3 + 1, N), 2*arg3 - N >= -1 & arg3 >= 0.
-false :- inv_main6(2*arg3 + -1, N), 2*arg3 - N >= 1 & 0 >= arg3.

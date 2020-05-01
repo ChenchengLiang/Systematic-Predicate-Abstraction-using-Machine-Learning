@@ -1,5 +1,0 @@
-inv_main5(arg0, arg1) :- 0 = arg0 & 0 = arg1.
-inv_main6(x, y) :- inv_main5(x, y).
-inv_main5(arg2, arg3) :- inv_main5(x, y), __eval33 != 0 & x + 1 = arg2 & y + 1 = arg3.
-inv_main6(arg4, arg5) :- inv_main6(x, y), arg5 - y = -1 & arg4 - x = -1 & x != 0.
-false :- inv_main6(0, y), y != 0.
