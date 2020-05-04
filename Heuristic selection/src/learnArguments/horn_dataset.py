@@ -2,21 +2,20 @@ from typing import Any, Dict,Optional
 import tensorflow as tf
 from learnArguments.dotToGraphInfo import GraphInfo,ArgumentInfo,DotToGraphInfo
 import tf2_gnn
-from learnArguments.invariantArgumentSelectionModel import InvariantArgumentSelectionModel
 from learnArguments.horn_graph_argument_selection_task import InvariantArgumentSelectionTask
 from tf2_gnn.data import GraphDataset,GraphSample,DataFold,GraphBatchTFDataDescription
 import numpy as np
 from typing import List,Set,Iterator,Tuple
 from sklearn.preprocessing import MinMaxScaler,Normalizer
 from tf2_gnn.cli_utils.training_utils import train,log_line,make_run_id
+from Miscellaneous import pickleWrite,pickleRead
 import os
 
 def main():
-
-
-    nodeFeatureDim = 3
+    read_graph_to_pickle_file()
+    nodeFeatureDim = 8
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
-    parameters['hidden_dim'] = 4
+    parameters['hidden_dim'] = 16
     parameters['num_layers'] = 1
     parameters['node_label_embedding_size'] = nodeFeatureDim
     parameters['max_nodes_per_batch']=10000
@@ -33,23 +32,14 @@ def main():
     parameters.update(these_hypers)
     #get dataset
     dataset=HornGraphDataset(parameters)
-    dataset.load_data([DataFold.TRAIN,DataFold.VALIDATION])
+    dataset.load_data([DataFold.TRAIN,DataFold.VALIDATION,DataFold.TEST])
     #get model
     model = InvariantArgumentSelectionTask(parameters, dataset)
 
     #train
     quiet=False
-    #train_data = dataset.get_tensorflow_dataset(DataFold.TRAIN).prefetch(3)
-    # train_data = dataset.get_tensorflow_dataset(DataFold.TRAIN)
-    # print("--dataset.get_tensorflow_dataset finished--")
-    # train_loss, train_speed, train_results = model.run_one_epoch(
-    #     train_data, training=True, quiet=quiet)
-    # print("train_loss",train_loss)
-    # print("train_speed",train_speed)
-    # print("train_results",train_results)
-
     model_name="GNN"
-    task_name="argument_selection"
+    task_name="Argument_selection"
     run_id = make_run_id(model_name, task_name)
     save_dir=os.path.abspath("trained_model")
     log_file = os.path.join(save_dir, f"{run_id}.log")
@@ -61,7 +51,7 @@ def main():
         dataset,
         log_fun=log,
         run_id=run_id,
-        max_epochs=100,
+        max_epochs=10,
         patience=10,
         save_dir=save_dir,
         quiet=quiet,
@@ -69,11 +59,36 @@ def main():
     )
 
     #predict
-    #model_loaded = tf.keras.models.load_model('trained_model/GNN_argument_selection__2020-04-28_14-33-57_best.pkl')
+    test_data = dataset.get_tensorflow_dataset(DataFold.TEST)
+    dataset_test = HornGraphDataset(parameters)
+    dataset_test.load_data([DataFold.TEST])
+
+    loaded_model=tf2_gnn.cli_utils.model_utils.load_model_for_prediction(trained_model_path,dataset_test)
+    #loaded_model = tf.keras.models.load_model(trained_model_path[:-4])
+
+    predicted_Y_loaded_model=loaded_model.predict(test_data)
+    print("predicted_Y_loaded_model Y\n",predicted_Y_loaded_model)
+    predicted_Y_memory_model_1 = model.predict(test_data)
+    print("predicted_Y_memory_model_1 Y\n", predicted_Y_memory_model_1)
+    predicted_Y_memory_model_2 = model.predict(test_data)
+    print("predicted_Y_memory_model_2 Y\n", predicted_Y_memory_model_2)
+    for data in test_data:
+        #print(data[0]) #input
+        print("True Y\n",data[1]["node_labels"]) #labels
+
+        mse_loaded_model = tf.keras.losses.MSE(
+            data[1]["node_labels"], predicted_Y_loaded_model)
+        print("mse_loaded_model", mse_loaded_model)
+        mes_memory_model_1=tf.keras.losses.MSE(
+            data[1]["node_labels"], predicted_Y_memory_model_1)
+        print("mes_memory_model_1",mes_memory_model_1)
+        mes_memory_model_2=tf.keras.losses.MSE(
+            data[1]["node_labels"], predicted_Y_memory_model_2)
+        print("mes_memory_model_2",mes_memory_model_2)
+
 
 
     #todo:statistics of positive and negative examples
-
 
 
 class HornGraphSample(GraphSample):
@@ -93,7 +108,6 @@ class HornGraphSample(GraphSample):
     def node_label(self) -> np.ndarray:
         """Node labels to predict as ndarray of shape [V, C]"""
         return self._node_label
-
 
 
 class HornGraphDataset(GraphDataset[HornGraphSample]):
@@ -129,43 +143,18 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
             data_name = "test"
             self._node_number_per_edge_type=[]
 
+        #whatever the data_fold is, use the same dataset to debug
+        print("data_fold",data_fold)
+        raw_inputs=pickleRead("gnnInput_train_data","../")
+        final_graphs=raw_inputs.final_graphs
 
-        final_graphs_v1=[]
-        graphInfoList = DotToGraphInfo()
-        # get raw gnn inputs
+        self._num_edge_types=raw_inputs._num_edge_types
+        self._total_number_of_nodes=raw_inputs._total_number_of_nodes
+        self._node_number_per_edge_type=raw_inputs._node_number_per_edge_type
 
-        graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,graphs_argument_scores,total_number_of_node=graphInfoList.getHornGraphSample()
 
-        self._num_edge_types=len(graphs_adjacency_lists[0])
-        self._total_number_of_nodes=total_number_of_node
-        #print("self._total_number_of_nodes",self._total_number_of_nodes)
-        for edge_type in graphs_adjacency_lists[0]:
-            self._node_number_per_edge_type.append(len(edge_type[0]))
 
-        #scaler=MinMaxScaler()
-        #normalizer=Normalizer()
-        #loop per graph
-        for node_label_ids,argument_indices,adjacency_lists,argument_scores in zip(graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,graphs_argument_scores):
-            #print("argument_indices",argument_indices)
-            #print("argument_scores",argument_scores)
-            argument_scores = tf.keras.utils.normalize(np.array(argument_scores))
-            #print("normalized argument_scores", argument_scores)
-            argument_scores = np.concatenate(argument_scores).ravel().tolist()#flatten
-
-            final_graphs_v1.append(
-                HornGraphSample(
-                    adjacency_lists=tuple(adjacency_lists),
-                    node_features=tf.constant(node_label_ids),
-                    node_label=tf.constant(argument_scores),
-                    node_argument=tf.constant(argument_indices),
-                )
-            )
-            # print("node_label_ids",node_label_ids)
-            # print("adjacency_lists",adjacency_lists)
-            # print("argument_scores",argument_scores)
-            # print("argument_indices", argument_indices)
-
-        return final_graphs_v1
+        return final_graphs
 
     def load_data_from_list(self):
         raise NotImplementedError()
@@ -228,7 +217,6 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
 
     def _add_graph_to_batch(self, raw_batch, graph_sample: HornGraphSample) -> None:
         #super()._add_graph_to_batch(raw_batch, graph_sample)
-
         num_nodes_in_graph = len(graph_sample.node_features)
         raw_batch["node_features"].extend(graph_sample.node_features)
         raw_batch["node_to_graph_map"].append(
@@ -277,6 +265,50 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
 
 
 
+class raw_graph_inputs():
+    def __init__(self,num_edge_types,total_number_of_nodes ):
+        self._num_edge_types=num_edge_types
+        self._total_number_of_nodes=total_number_of_nodes
+        self._node_number_per_edge_type=[]
+        self.final_graphs=None
+
+
+def read_graph_to_pickle_file():
+
+    final_graphs_v1 = []
+    graphInfoList = DotToGraphInfo()
+    # get raw gnn inputs
+    graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node = graphInfoList.getHornGraphSample()
+
+
+    raw_data_graph=raw_graph_inputs(len(graphs_adjacency_lists[0]),total_number_of_node)
+    # print("self._total_number_of_nodes",self._total_number_of_nodes)
+    for edge_type in graphs_adjacency_lists[0]:
+        raw_data_graph._node_number_per_edge_type.append(len(edge_type[0]))
+
+    # loop per graph
+    for node_label_ids, argument_indices, adjacency_lists, argument_scores in zip(graphs_node_label_ids,
+                                                                                  graphs_argument_indices,
+                                                                                  graphs_adjacency_lists,
+                                                                                  graphs_argument_scores):
+
+        argument_scores = tf.keras.utils.normalize(np.array(argument_scores))
+        argument_scores = np.concatenate(argument_scores).ravel().tolist()  # flatten
+
+        final_graphs_v1.append(
+            HornGraphSample(
+                adjacency_lists=tuple(adjacency_lists),
+                node_features=tf.constant(node_label_ids),
+                node_label=tf.constant(argument_scores),
+                node_argument=tf.constant(argument_indices),
+            )
+        )
+        # print("node_label_ids",node_label_ids)
+        # print("adjacency_lists",adjacency_lists)
+        # print("argument_scores",argument_scores)
+        # print("argument_indices", argument_indices)
+    raw_data_graph.final_graphs=final_graphs_v1.copy()
+    pickleWrite(raw_data_graph,"gnnInput_train_data","../")
 
 
 main()

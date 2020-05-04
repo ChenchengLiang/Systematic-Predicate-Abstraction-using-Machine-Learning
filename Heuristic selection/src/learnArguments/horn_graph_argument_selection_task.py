@@ -23,7 +23,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
         self._argument_repr_to_regression_layer = tf.keras.layers.Dense(
             units=self._params["classification_hidden_layer_size"], activation=tf.nn.relu, use_bias=True) #decide layer output shape
         self._argument_classification_layer = tf.keras.layers.Dense(
-            units=1, activation=tf.nn.sigmoid, use_bias=True) #decide layer input shape
+            units=1, activation=tf.nn.sigmoid, use_bias=True)
         self._node_to_graph_aggregation = None
 
 
@@ -32,7 +32,8 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
     def build(self, input_shapes):
         # build node embedding layer
         #print("--build--")
-        self._embedding_layer.build(tf.TensorShape((None,)))
+        with tf.name_scope("Node_embedding_layer"):
+            self._embedding_layer.build(tf.TensorShape((None,)))
         # build gnn layers
         self._gnn.build(
             GNNInput(
@@ -48,11 +49,12 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
 
         # todo: build task-specific layer
 
-        self._argument_repr_to_regression_layer.build(tf.TensorShape((None, self._params["hidden_dim"]))) #decide layer input shape
-        #
-        self._argument_classification_layer.build(
-            tf.TensorShape((None, self._params["classification_hidden_layer_size"])) #decide layer input shape
-        )
+        with tf.name_scope("Argument_repr_to_regression_layer"):
+            self._argument_repr_to_regression_layer.build(tf.TensorShape((None, self._params["hidden_dim"]))) #decide layer input shape
+        with tf.name_scope("Argument_classification_layer"):
+            self._argument_classification_layer.build(
+                tf.TensorShape((None, self._params["classification_hidden_layer_size"])) #decide layer input shape
+            )
 
 
         super().build([],True)#by pass graph_task_mode (GraphTaskModel)' build
@@ -60,17 +62,13 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
 
 
     def call(self, inputs, training: bool = False):
-        #print("--call--")
-        # call node embedding layer
-        #node_labels_embedded = self._embedding_layer(inputs["node_label_ids"], training=training)
-        node_labels_embedded = self._embedding_layer(inputs["node_features"], training=training)
 
+        node_labels_embedded = self._embedding_layer(inputs["node_features"], training=training)
 
         adjacency_lists: Tuple[tf.Tensor, ...] = tuple(
             inputs[f"adjacency_list_{edge_type_idx}"]
             for edge_type_idx in range(self._num_edge_types)
         )
-
         #before feed into gnn
         # print("node_features",inputs["node_features"])
         # print("node_features len",len(set(np.array(inputs["node_features"]))))
@@ -83,9 +81,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
         gnn_input = GNNInput(
             node_features=node_labels_embedded,
             num_graphs=inputs['num_graphs_in_batch'],
-            # Here, the adjacency lists would need to be extracted from the input, which is easiest as Dict[str, tf.Tensor/np.ndarray]
             node_to_graph_map=inputs['node_to_graph_map'],
-            #adjacency_lists=inputs['adjacency_lists'],
             adjacency_lists=adjacency_lists
         )
         final_node_representations = self._gnn(gnn_input, training=training)
@@ -101,7 +97,6 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
             final_argument_representations: tf.Tensor,
             training: bool,
     ) -> Any:
-        #print("compute_task_output")
         #call task specific layers
         argument_regression_hidden_layer_output=self._argument_repr_to_regression_layer(final_argument_representations)
 
@@ -109,7 +104,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
             argument_regression_hidden_layer_output
         )  # Shape [argument number, 1]
 
-        return tf.squeeze(predicted_argument_score, axis=-1) #Shape [argument number]
+        return tf.squeeze(predicted_argument_score, axis=-1) #Shape [argument number,]
 
     def compute_task_metrics(
             self,
