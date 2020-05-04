@@ -1,0 +1,10 @@
+inv_main24(i, j, arg0, n, m) :- inv_main24(i, j, arg0 + -1, n, m), j + -1*(arg0 + -1) >= 1.
+inv_main10(arg1, arg2, n, m) :- n >= 1 & n + -1*(m + 1) >= 1 & 0 = arg1 & 0 = arg2.
+inv_main10(arg3, arg4, n, m) :- inv_main10(arg4 + -4, j, n, m), n + -1*(arg4 + -4 + 4) >= 1 & !(m - j >= 1) & arg3 + -4 + 4 = arg4.
+inv_main24(i, arg5, arg6, n, m) :- inv_main10(i, arg5 + -1, n, m), arg5 >= 1 & __eval102 != 0 & m + -1*(arg5 + -1) >= 1 & 0 = arg6.
+inv_main24(i, arg7, arg8, n, m) :- inv_main10(i, arg7 + -1, n, m), !(arg7 >= 1) & __eval102 != 0 & m + -1*(arg7 + -1) >= 1 & 0 = arg8.
+inv_main10(i, j, n, m) :- inv_main24(i, j, k, n, m), !(j - k >= 1).
+inv_main10(i, arg9, n, m) :- inv_main10(i, arg9 + -2, n, m), n + arg9 + -2 + 5 - i >= 1 & m + -1*(arg9 + -2) >= 1.
+inv_main10(i, arg10, n, m) :- inv_main10(i, arg10 + -2, n, m), !(n + arg10 + -2 + 5 - i >= 1) & m + -1*(arg10 + -2) >= 1.
+false :- inv_main10(i, j, n, m), !(j >= 0 | __eval102 = 0 | !(m - j >= 1)).
+false :- inv_main10(i, j, n, m), !(n + j + 5 - i >= 1) & m - j >= 1.

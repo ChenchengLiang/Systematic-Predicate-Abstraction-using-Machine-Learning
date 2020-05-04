@@ -1,0 +1,17 @@
+inv_main8(flag, arg0, arg1, arg2, arg3) :- 0 = arg0 & 0 = arg1 & 0 = arg2 & 0 = arg3.
+inv_main25(x, y, w, z) :- inv_main23(x, y, w, z), __eval94 != 0.
+inv_main23(x, y, arg6, arg7) :- inv_main25(x, y, w, z), x + y + 1 = arg6 & x + y = arg7.
+inv_main25(arg8, arg9, w, z) :- inv_main25(arg8 + -1, arg9 + -1, w, z), z = 2*arg11 & w >= 1 & w = 2*arg13 + 1 & __eval95 != 0.
+inv_main25(arg14, y, w, z) :- inv_main25(arg14 + -1, y, w, z), 2*arg18 - w = -1 & 2*arg16 - z = -1 & __eval95 != 0 & arg18 >= 0 & arg16 >= 0.
+inv_main25(arg14, y, w, z) :- inv_main25(arg14 + -1, y, w, z), 2*arg18 - w = -1 & 2*arg16 - z = 1 & __eval95 != 0 & arg18 >= 0 & arg16 - z >= 1.
+inv_main25(x, arg19, w, z) :- inv_main25(x, arg19 + -1, w, z), 2*arg23 + arg22 - w = 0 & 2*arg21 = z & __eval95 != 0 & arg22 != -1 & 0 >= arg22 & arg22 >= -1.
+inv_main25(x, arg19, w, z) :- inv_main25(x, arg19 + -1, w, z), 2*arg23 + arg22 - w = 0 & 2*arg21 = z & __eval95 != 0 & -1 >= w & 0 >= arg22 & arg22 >= -1.
+inv_main25(x, y, w, z) :- inv_main25(x, y, w, z), 2*arg27 - w = 1 & 2*arg25 - z = -1 & __eval95 != 0 & arg27 - w >= 1 & arg25 >= 0.
+inv_main25(x, y, w, z) :- inv_main25(x, y, w, z), 2*arg27 = w & 2*arg25 - z = -1 & __eval95 != 0 & arg25 >= 0.
+inv_main25(x, y, w, z) :- inv_main25(x, y, w, z), 2*arg27 - w = 1 & 2*arg25 - z = 1 & __eval95 != 0 & arg27 - w >= 1 & arg25 - z >= 1.
+inv_main25(x, y, w, z) :- inv_main25(x, y, w, z), 2*arg27 = w & 2*arg25 - z = 1 & __eval95 != 0 & arg25 - z >= 1.
+inv_main8(flag, arg28, arg29, arg30, arg31) :- inv_main8(flag, arg28 + -1, arg29 + -1, j, i), flag != 0 & __eval72 != 0 & j + arg29 + -1 + 1 + 1 = arg30 & i + arg28 + -1 + 1 = arg31.
+inv_main8(flag, arg32, arg33, arg34, arg35) :- inv_main8(0, arg32 + -1, arg33 + -1, j, i), __eval72 != 0 & j + arg33 + -1 + 1 = arg34 & i + arg32 + -1 + 1 = arg35 & flag = 0.
+inv_main23(y, arg36, arg37, arg38) :- inv_main8(flag, x, arg36, j, i), j >= i & y = arg36 & 1 = arg37 & 0 = arg38.
+inv_main23(arg39, y, arg40, arg41) :- inv_main8(flag, x, arg39 + -1, j, i), !(j >= i) & y + 1 = arg39 & 1 = arg40 & 0 = arg41.
+false :- inv_main23(x, y, w, z), x != y.

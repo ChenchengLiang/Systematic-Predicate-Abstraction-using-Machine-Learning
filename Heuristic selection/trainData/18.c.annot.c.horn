@@ -1,0 +1,4 @@
+inv_main8(flag, arg1, j) :- 0 = arg1 & 0 = j.
+inv_main8(flag, arg2, arg3) :- inv_main8(flag, arg2 + -1, arg3 + -1), flag != 0 & -1*(arg2 + -1) + 100 >= 1.
+inv_main8(flag, arg4, j) :- inv_main8(0, arg4 + -1, j), -1*(arg4 + -1) + 100 >= 1 & flag = 0.
+false :- inv_main8(flag, b, j), !(j = 100 | flag = 0 | -1*b + 100 >= 1).
