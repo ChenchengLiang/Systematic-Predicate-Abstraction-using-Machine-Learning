@@ -12,14 +12,14 @@ from Miscellaneous import pickleWrite,pickleRead
 import os
 
 def main():
-    read_graph_to_pickle_file()
+    #read_graph_to_pickle_file()
     nodeFeatureDim = 8
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
     parameters['hidden_dim'] = 16
     parameters['num_layers'] = 1
     parameters['node_label_embedding_size'] = nodeFeatureDim
     parameters['max_nodes_per_batch']=10000
-    parameters['classification_hidden_layer_size'] = 42
+    parameters['regression_hidden_layer_size'] = 42
 
     these_hypers: Dict[str, Any] = {
         "optimizer": "Adam",  # One of "SGD", "RMSProp", "Adam"
@@ -51,41 +51,28 @@ def main():
         dataset,
         log_fun=log,
         run_id=run_id,
-        max_epochs=10,
-        patience=10,
+        max_epochs=1000,
+        patience=20,
         save_dir=save_dir,
         quiet=quiet,
         aml_run=None,
     )
 
     #predict
-    test_data = dataset.get_tensorflow_dataset(DataFold.TEST)
     dataset_test = HornGraphDataset(parameters)
     dataset_test.load_data([DataFold.TEST])
 
     loaded_model=tf2_gnn.cli_utils.model_utils.load_model_for_prediction(trained_model_path,dataset_test)
-    #loaded_model = tf.keras.models.load_model(trained_model_path[:-4])
-
+    test_data = dataset.get_tensorflow_dataset(DataFold.TEST)
     predicted_Y_loaded_model=loaded_model.predict(test_data)
     print("predicted_Y_loaded_model Y\n",predicted_Y_loaded_model)
-    predicted_Y_memory_model_1 = model.predict(test_data)
-    print("predicted_Y_memory_model_1 Y\n", predicted_Y_memory_model_1)
-    predicted_Y_memory_model_2 = model.predict(test_data)
-    print("predicted_Y_memory_model_2 Y\n", predicted_Y_memory_model_2)
+
     for data in test_data:
         #print(data[0]) #input
         print("True Y\n",data[1]["node_labels"]) #labels
-
         mse_loaded_model = tf.keras.losses.MSE(
             data[1]["node_labels"], predicted_Y_loaded_model)
-        print("mse_loaded_model", mse_loaded_model)
-        mes_memory_model_1=tf.keras.losses.MSE(
-            data[1]["node_labels"], predicted_Y_memory_model_1)
-        print("mes_memory_model_1",mes_memory_model_1)
-        mes_memory_model_2=tf.keras.losses.MSE(
-            data[1]["node_labels"], predicted_Y_memory_model_2)
-        print("mes_memory_model_2",mes_memory_model_2)
-
+        print("\n mse_loaded_model_predicted_Y_and_True_Y", mse_loaded_model)
 
 
     #todo:statistics of positive and negative examples
@@ -152,8 +139,6 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         self._total_number_of_nodes=raw_inputs._total_number_of_nodes
         self._node_number_per_edge_type=raw_inputs._node_number_per_edge_type
 
-
-
         return final_graphs
 
     def load_data_from_list(self):
@@ -189,9 +174,7 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
             "num_graphs_in_batch": (),
             "node_argument": (None, ),
         }
-        #print("self._node_number_per_edge_type",self._node_number_per_edge_type)
         for edge_type_idx, edge_number in enumerate(self._node_number_per_edge_type):
-            # print("edge_number",edge_number)
             batch_features_types[f"adjacency_list_{edge_type_idx}"] = tf.int32
             batch_features_shapes[f"adjacency_list_{edge_type_idx}"] = (None, edge_number)
 
@@ -226,25 +209,16 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
                 dtype=np.int32,
             )
         )
-
-        #print("before add raw batch", raw_batch["adjacency_lists"])
         for edge_type_idx, (batch_adjacency_list,sample_adjacency_list) in enumerate(zip(raw_batch["adjacency_lists"],graph_sample.adjacency_lists)):
             edge_number=sample_adjacency_list.shape[1]
-            #print("edge_number",edge_number)
             batch_adjacency_list.append(
                 graph_sample.adjacency_lists[edge_type_idx].reshape(-1, edge_number)
                 # + raw_batch["num_nodes_in_batch"] #offset
             )
-        #print("after add raw batch", raw_batch["adjacency_lists"])
-
-
-        # raw_batch["node_argument"].append(graph_sample._node_argument)
         raw_batch["node_argument"].extend(graph_sample._node_argument)
-        #raw_batch["node_labels"].append(graph_sample._node_label)
         raw_batch["node_labels"].extend(graph_sample._node_label)
 
 
-        #print("before add raw batch", raw_batch["adjacency_lists"])
         for edge_type_idx, (batch_adjacency_list,sample_adjacency_list) in enumerate(zip(raw_batch["adjacency_lists"],graph_sample.adjacency_lists)):
             edge_number=sample_adjacency_list.shape[1]
             #print("edge_number",edge_number)
@@ -253,9 +227,6 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
                 # .reshape(-1, edge_number)
                 # + raw_batch["num_nodes_in_batch"] #offset
             )
-
-        #print("after add raw batch", raw_batch["adjacency_lists"])
-
 
 
     def _finalise_batch(self, raw_batch) -> Tuple[Dict[str, Any], Dict[str, Any]]:

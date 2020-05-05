@@ -1,9 +1,7 @@
 """General task for graph binary classification."""
 from typing import Any, Dict, List, Tuple, Optional
-
 import numpy as np
 import tensorflow as tf
-
 from tf2_gnn.data import GraphDataset
 from tf2_gnn.models import GraphTaskModel
 from tf2_gnn.layers import WeightedSumGraphRepresentation, NodesToGraphRepresentationInput
@@ -21,7 +19,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
         )
         self._gnn = GNN(params)
         self._argument_repr_to_regression_layer = tf.keras.layers.Dense(
-            units=self._params["classification_hidden_layer_size"], activation=tf.nn.relu, use_bias=True) #decide layer output shape
+            units=self._params["regression_hidden_layer_size"], activation=tf.nn.relu, use_bias=True) #decide layer output shape
         self._argument_classification_layer = tf.keras.layers.Dense(
             units=1, activation=tf.nn.sigmoid, use_bias=True)
         self._node_to_graph_aggregation = None
@@ -51,9 +49,9 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
 
         with tf.name_scope("Argument_repr_to_regression_layer"):
             self._argument_repr_to_regression_layer.build(tf.TensorShape((None, self._params["hidden_dim"]))) #decide layer input shape
-        with tf.name_scope("Argument_classification_layer"):
+        with tf.name_scope("Argument_regression_layer"):
             self._argument_classification_layer.build(
-                tf.TensorShape((None, self._params["classification_hidden_layer_size"])) #decide layer input shape
+                tf.TensorShape((None, self._params["regression_hidden_layer_size"])) #decide layer input shape
             )
 
 
