@@ -12,7 +12,7 @@ from Miscellaneous import pickleWrite,pickleRead
 import os
 
 def main():
-    #read_graph_to_pickle_file()
+    read_graph_to_pickle_file()
     nodeFeatureDim = 8
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
     parameters['hidden_dim'] = 16
@@ -246,40 +246,42 @@ class raw_graph_inputs():
 
 def read_graph_to_pickle_file():
 
-    final_graphs_v1 = []
-    graphInfoList = DotToGraphInfo()
-    # get raw gnn inputs
-    graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node = graphInfoList.getHornGraphSample()
+    if os.path.isfile('../../pickleData/gnnInput_train_data.txt'):
+        print("read existed training data")
 
+    else:
+        final_graphs_v1 = []
+        graphInfoList = DotToGraphInfo()
+        # get raw gnn inputs
+        graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node = graphInfoList.getHornGraphSample()
 
-    raw_data_graph=raw_graph_inputs(len(graphs_adjacency_lists[0]),total_number_of_node)
-    # print("self._total_number_of_nodes",self._total_number_of_nodes)
-    for edge_type in graphs_adjacency_lists[0]:
-        raw_data_graph._node_number_per_edge_type.append(len(edge_type[0]))
+        raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists[0]), total_number_of_node)
+        # print("self._total_number_of_nodes",self._total_number_of_nodes)
+        for edge_type in graphs_adjacency_lists[0]:
+            raw_data_graph._node_number_per_edge_type.append(len(edge_type[0]))
 
-    # loop per graph
-    for node_label_ids, argument_indices, adjacency_lists, argument_scores in zip(graphs_node_label_ids,
-                                                                                  graphs_argument_indices,
-                                                                                  graphs_adjacency_lists,
-                                                                                  graphs_argument_scores):
+        # loop per graph
+        for node_label_ids, argument_indices, adjacency_lists, argument_scores in zip(graphs_node_label_ids,
+                                                                                      graphs_argument_indices,
+                                                                                      graphs_adjacency_lists,
+                                                                                      graphs_argument_scores):
+            argument_scores = tf.keras.utils.normalize(np.array(argument_scores))
+            argument_scores = np.concatenate(argument_scores).ravel().tolist()  # flatten
 
-        argument_scores = tf.keras.utils.normalize(np.array(argument_scores))
-        argument_scores = np.concatenate(argument_scores).ravel().tolist()  # flatten
-
-        final_graphs_v1.append(
-            HornGraphSample(
-                adjacency_lists=tuple(adjacency_lists),
-                node_features=tf.constant(node_label_ids),
-                node_label=tf.constant(argument_scores),
-                node_argument=tf.constant(argument_indices),
+            final_graphs_v1.append(
+                HornGraphSample(
+                    adjacency_lists=tuple(adjacency_lists),
+                    node_features=tf.constant(node_label_ids),
+                    node_label=tf.constant(argument_scores),
+                    node_argument=tf.constant(argument_indices),
+                )
             )
-        )
-        # print("node_label_ids",node_label_ids)
-        # print("adjacency_lists",adjacency_lists)
-        # print("argument_scores",argument_scores)
-        # print("argument_indices", argument_indices)
-    raw_data_graph.final_graphs=final_graphs_v1.copy()
-    pickleWrite(raw_data_graph,"gnnInput_train_data","../")
+            # print("node_label_ids",node_label_ids)
+            # print("adjacency_lists",adjacency_lists)
+            # print("argument_scores",argument_scores)
+            # print("argument_indices", argument_indices)
+        raw_data_graph.final_graphs = final_graphs_v1.copy()
+        pickleWrite(raw_data_graph, "gnnInput_train_data", "../")
 
 
 main()
