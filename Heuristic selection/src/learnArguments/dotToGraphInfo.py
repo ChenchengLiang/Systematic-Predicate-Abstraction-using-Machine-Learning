@@ -550,6 +550,11 @@ class DotToGraphInfo:
 
         path = "../../trainData/"
         suffix = ".c"  # some file name include .horn
+        first_file_name=glob.glob(path+"*")[0]
+        if ".smt2" in first_file_name:
+            suffix = ".smt2"
+        else:
+            suffix=".c"
         print("graph file", len(sorted(glob.glob(path + '*' + suffix + '.gv'))))
         print("argument file", len(sorted(glob.glob(path + '*' + suffix + '.arguments'))))
         for fileGraph,fileArgument in zip(sorted(glob.glob(path + '*' + suffix + '.gv')),sorted(glob.glob(path + '*'+suffix+'.arguments'))):

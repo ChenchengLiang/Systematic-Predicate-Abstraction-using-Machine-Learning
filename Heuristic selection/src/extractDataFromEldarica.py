@@ -325,7 +325,7 @@ def main():
 
 
     #copy graph to trainData file
-    copy_tree("../graphs/", "../trainData/")
+    #copy_tree("../graphs/", "../trainData/")
 
     print("Finished")
 if __name__ == '__main__':

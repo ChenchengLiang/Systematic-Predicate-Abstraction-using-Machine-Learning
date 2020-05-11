@@ -10,8 +10,11 @@ from sklearn.preprocessing import MinMaxScaler,Normalizer
 from tf2_gnn.cli_utils.training_utils import train,log_line,make_run_id
 from Miscellaneous import pickleWrite,pickleRead
 import os
-
+import warnings
 def main():
+    #os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+    #warnings.filterwarnings('ignore')
+
     read_graph_to_pickle_file()
     nodeFeatureDim = 8
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
