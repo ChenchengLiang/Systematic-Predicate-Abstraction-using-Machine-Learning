@@ -575,11 +575,26 @@ class DotToGraphInfo:
             self.argumentList.append(arguments)
 
 
+
+    def transform_list_to_string(self,head_list):
+        head=""
+        if len(head_list)>1:
+            for s in head_list:
+                head=head+":"+s
+            head=head[1:]
+        else:
+            head=head_list[0]
+        return head
+
     def parseArguments(self,arguments):
         ParsedArgumentList=[]
         argumentLines=arguments.splitlines()
         for line in argumentLines:
-            ID,head,hint,score =line.split(":")
+            argument_content_list = line.split(":")
+            ID=argument_content_list[0]
+            head=self.transform_list_to_string(argument_content_list[1:-2])
+            hint=argument_content_list[-2]
+            score=argument_content_list[-1]
             ParsedArgumentList.append(ArgumentInfo(ID,head,hint,score))
             #print(ID,head,hint,score)
         return ParsedArgumentList

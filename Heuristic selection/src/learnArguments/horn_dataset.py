@@ -15,13 +15,13 @@ def main():
     #os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
     #warnings.filterwarnings('ignore')
 
-    read_graph_to_pickle_file()
+    read_graph_from_pickle_file(force_read=True)
     nodeFeatureDim = 8
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
     parameters['hidden_dim'] = 16
     parameters['num_layers'] = 1
     parameters['node_label_embedding_size'] = nodeFeatureDim
-    parameters['max_nodes_per_batch']=10000
+    parameters['max_nodes_per_batch']=100000 #todo: some problem in _batch_would_be_too_full
     parameters['regression_hidden_layer_size'] = 42
 
     these_hypers: Dict[str, Any] = {
@@ -247,9 +247,9 @@ class raw_graph_inputs():
         self.final_graphs=None
 
 
-def read_graph_to_pickle_file():
+def read_graph_from_pickle_file(force_read=False):
 
-    if os.path.isfile('../../pickleData/gnnInput_train_data.txt'):
+    if os.path.isfile('../../pickleData/gnnInput_train_data.txt') and force_read==False:
         print("read existed training data")
 
     else:

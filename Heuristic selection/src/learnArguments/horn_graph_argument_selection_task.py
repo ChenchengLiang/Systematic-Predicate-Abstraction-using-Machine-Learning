@@ -84,7 +84,9 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
         )
         final_node_representations = self._gnn(gnn_input, training=training)
         #BUG fixed:*1 solution from https://github.com/tensorflow/tensorflow/issues/36236
+        #print(inputs["node_argument"])
         argument_representations=tf.gather(params=final_node_representations*1,indices=inputs["node_argument"])
+        #argument_representations = tf.gather(params=final_node_representations, indices=inputs["node_argument"])
         #argument_representations = gather_dense_gradient(params=final_node_representations*1 , indices=inputs["node_argument"])
 
         return self.compute_task_output(inputs, argument_representations, training)
