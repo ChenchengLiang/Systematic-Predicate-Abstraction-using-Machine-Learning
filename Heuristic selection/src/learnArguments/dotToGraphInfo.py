@@ -108,6 +108,75 @@ class DotToGraphInfo:
 
         # graphInfoList.printFinalGraphInfo()
 
+    #todo: get no offset graph sample
+    def getHornGraphSample_no_offset(self):
+        self.getFinalGraphInfoList()
+        totalGraphNodeIDList = []
+        totalGraphArgumentIDList = []
+        argumentScoreList = []
+        for graphInfo, args in zip(self.finalGraphInfoList, self.parsedArgumentList):
+            totalGraphNodeIDList.append(graphInfo.nodeUniqueIDList)
+            tempArgList = []
+            tempArgScoreList=[]
+            for arg in args:
+                tempArgList.append(arg.nodeUniqueIDInGraph)
+                tempArgScoreList.append(int(arg.score))
+            totalGraphArgumentIDList.append(tempArgList)
+            argumentScoreList.append(tempArgScoreList)
+
+        nodeNumberList = []
+        argumentNumberList = []
+        for graphNodeIDList, graphArgumentIDList in zip(totalGraphNodeIDList, totalGraphArgumentIDList):
+            nodeNumberList.append(len(graphNodeIDList))
+            argumentNumberList.append(len(graphArgumentIDList))
+
+        #totalGraphNodeIDList = np.concatenate(totalGraphNodeIDList).ravel().tolist()  # flatten
+
+        # get adjacent_list per graph
+        edgeTypeList = {}
+        edgeTypeNumberDict = {}
+        edgeTypeNumberList = {}
+        all_graphs_adjacent_list = []
+        maxNodeForAHypedEdge = 10
+        for i in range(2, maxNodeForAHypedEdge):
+            edgeTypeList[str(i)] = list()
+            edgeTypeNumberDict[str(i)] = [0] * len(self.finalGraphInfoList)
+        for j, graphInfo in enumerate(self.finalGraphInfoList):
+
+            #offset = sum(nodeNumberList[:j])
+            #local_node_ID_to_uniformed_node_ID = list(range(offset, offset + graphInfo.numberOfUniqueNodeID))
+            # print(local_node_ID_to_uniformed_node_ID)
+            edgeTypeNumberDict['2'][j] = len(graphInfo.edgeEmbeddingInputs)
+            for edge in graphInfo.edgeEmbeddingInputs:
+                edgeTypeList['2'].append([edge['sender'],edge['receiver']])
+
+
+            # print(graphInfo.hyperedgeEmbeddingInputs)
+            for hyperedge in graphInfo.hyperedgeEmbeddingInputs:
+                localNodeIDList = [hyperedge['senderIDList'], hyperedge['receiverIDList']]
+                localNodeIDList = np.concatenate(localNodeIDList).ravel().tolist()
+                #uniformedNodeIDList = []
+                # for localID in localNodeIDList:
+                #     uniformedNodeIDList.append(local_node_ID_to_uniformed_node_ID[localID])
+                for i in range(2, maxNodeForAHypedEdge):
+                    if (len(localNodeIDList) == i):
+                        edgeTypeList[str(i)].append(localNodeIDList)
+                        edgeTypeNumberDict[str(i)][j] = edgeTypeNumberDict[str(i)][j] + 1
+            one_graph_adjacent_list = []
+            for typeKey in edgeTypeList:
+                if len(edgeTypeList[str(typeKey)]) != 0:
+                    #one_graph_adjacent_list.append(np.array(edgeTypeList[typeKey]))
+                    one_graph_adjacent_list.append(np.array(edgeTypeList[typeKey])[-edgeTypeNumberDict[typeKey][j]:])
+            # print("one_graph_adjacent_list",len(one_graph_adjacent_list[0]),len(one_graph_adjacent_list[1]))
+            all_graphs_adjacent_list.append(one_graph_adjacent_list)
+
+        return totalGraphNodeIDList, totalGraphArgumentIDList, all_graphs_adjacent_list, argumentScoreList, sum(
+            nodeNumberList)
+
+
+
+
+
     def getHornGraphSample(self):
         self.getFinalGraphInfoList()
         totalGraphNodeIDList = []
@@ -551,6 +620,7 @@ class DotToGraphInfo:
         path = "../../trainData/"
         suffix = ".c"  # some file name include .horn
         first_file_name=glob.glob(path+"*")[0]
+        #todo: read both smt and c file togather
         if ".smt2" in first_file_name:
             suffix = ".smt2"
         else:
@@ -699,6 +769,10 @@ class DotToGraphInfo:
                     nodeDir = G.nodes[node]
                     if(nodeDir['class']=="argument"):
                         #nodeName
+                        # print("nodeDir['argument']",nodeDir['argument'])
+                        # print("arg.arg",arg.arg)
+                        # print("nodeDir['head']",nodeDir['head'])
+                        # print("arg.head[:arg.head.find",arg.head[:arg.head.find("/")])
                         if(nodeDir['argument']==arg.arg and nodeDir['head']==arg.head[:arg.head.find("/")]):
                             arg.nodeUniqueIDInGraph=nodeDir['nodeUniqueID']
                             arg.nodeLabelUniqueIDInGraph = nodeDir['nodeLabelUniqueID']

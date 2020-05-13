@@ -7,6 +7,7 @@ from tf2_gnn.models import GraphTaskModel
 from tf2_gnn.layers import WeightedSumGraphRepresentation, NodesToGraphRepresentationInput
 from tf2_gnn.utils.gather_dense_gradient import gather_dense_gradient
 from tf2_gnn import GNNInput, GNN
+from tf2_gnn.layers.message_passing import RGCN,GGNN,RGIN
 
 class InvariantArgumentSelectionTask(GraphTaskModel):
     def __init__(self, params: Dict[str, Any], dataset: GraphDataset, name: str = None):
@@ -17,7 +18,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
             input_dim=dataset.total_number_of_nodes,
             output_dim=params["node_label_embedding_size"]
         )
-        self._gnn = GNN(params)
+        self._gnn = GNN(params) #RGCN,RGIN,RGAT,GGNN
         self._argument_repr_to_regression_layer = tf.keras.layers.Dense(
             units=self._params["regression_hidden_layer_size"], activation=tf.nn.relu, use_bias=True) #decide layer output shape
         self._argument_classification_layer = tf.keras.layers.Dense(
