@@ -1,8 +1,0 @@
-inv_main7(flag, arg0, arg1, arg2, arg3) :- 0 = arg0 & 0 = arg1 & 0 = arg2 & 0 = arg3.
-inv_main22(x, arg4) :- inv_main22(x, arg4 + -1), __eval108 != 0 & x + -1*(arg4 + -1) >= 0.
-inv_main22(x, arg5) :- inv_main22(x, arg5 + -2), x + -1*(arg5 + -2) >= 0.
-inv_main22(arg6, arg7) :- inv_main7(flag, t, s, a, b), flag != 0 & t - 2*s + 2 = arg6 & 0 = arg7.
-inv_main22(arg8, arg9) :- inv_main7(0, t, s, a, b), flag = 0 & 1 = arg8 & 0 = arg9.
-inv_main7(flag, arg10, arg11, arg12, arg13) :- inv_main7(flag, t, s, arg12 + -1, arg13 + -1), flag != 0 & __eval64 != 0 & t + arg13 + -1 + 1 + arg12 + -1 + 1 = arg10 & s + arg12 + -1 + 1 = arg11.
-inv_main7(flag, arg14, arg15, arg16, arg17) :- inv_main7(0, t, s, arg16 + -1, arg17 + -1), __eval64 != 0 & t + arg17 + -1 + 1 = arg14 & s + arg16 + -1 + 1 = arg15 & flag = 0.
-false :- inv_main22(x, y), !(4 >= y | x >= y).

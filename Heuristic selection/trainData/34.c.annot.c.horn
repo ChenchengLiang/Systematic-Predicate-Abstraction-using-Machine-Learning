@@ -1,5 +1,0 @@
-inv_main6(n, arg0, arg1, arg2) :- 0 = arg0 & 0 = arg1 & 0 = arg2.
-inv_main6(n, arg4, arg5, arg6) :- inv_main6(n, arg4 + -1, arg5 + -1, arg6 + -1), arg6 + -1 + 1 = 2*arg8 & n + -1*(arg6 + -1) >= 1.
-inv_main6(n, arg9, y, arg10) :- inv_main6(n, arg9 + -1, y, arg10 + -1), 2*arg12 - arg10 = -1 & n >= arg10 & arg12 >= 0.
-inv_main6(n, arg9, y, arg10) :- inv_main6(n, arg9 + -1, y, arg10 + -1), 2*arg12 - arg10 = 1 & n >= arg10 & arg12 - arg10 >= 1.
-false :- inv_main6(n, x, y, 10), x != 2*y & !(n + -10 >= 1).

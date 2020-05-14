@@ -29,8 +29,8 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
 
 
     def build(self, input_shapes):
+        # print("--build--")
         # build node embedding layer
-        #print("--build--")
         with tf.name_scope("Node_embedding_layer"):
             self._embedding_layer.build(tf.TensorShape((None,)))
         # build gnn layers
@@ -46,7 +46,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
             )
         )
 
-        # todo: build task-specific layer
+        #build task-specific layer
 
         with tf.name_scope("Argument_repr_to_regression_layer"):
             self._argument_repr_to_regression_layer.build(tf.TensorShape((None, self._params["hidden_dim"]))) #decide layer input shape
@@ -56,7 +56,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
             )
 
 
-        super().build([],True)#by pass graph_task_mode (GraphTaskModel)' build
+        super().build([],True)#by pass graph_task_mode (GraphTaskModel)' build because it will build another gnn layer
         #tf.keras.Model.build([])
 
 
@@ -84,11 +84,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
             adjacency_lists=adjacency_lists
         )
         final_node_representations = self._gnn(gnn_input, training=training)
-        #BUG fixed:*1 solution from https://github.com/tensorflow/tensorflow/issues/36236
-        #print(inputs["node_argument"])
         argument_representations=tf.gather(params=final_node_representations*1,indices=inputs["node_argument"])
-        #argument_representations = tf.gather(params=final_node_representations, indices=inputs["node_argument"])
-        #argument_representations = gather_dense_gradient(params=final_node_representations*1 , indices=inputs["node_argument"])
 
         return self.compute_task_output(inputs, argument_representations, training)
 
