@@ -15,7 +15,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
         self._params = params
         self._num_edge_types = dataset.num_edge_types
         self._embedding_layer = tf.keras.layers.Embedding(
-            input_dim=dataset.total_number_of_nodes,
+            input_dim=params["max_nodes_per_batch"], #size of the vocabulary
             output_dim=params["node_label_embedding_size"]
         )
         self._gnn = GNN(params) #RGCN,RGIN,RGAT,GGNN
@@ -61,7 +61,6 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
 
 
     def call(self, inputs, training: bool = False):
-
         node_labels_embedded = self._embedding_layer(inputs["node_features"], training=training)
 
         adjacency_lists: Tuple[tf.Tensor, ...] = tuple(

@@ -73,12 +73,13 @@ class RawGNNInput:
         self.nodeNumberList=nodeNumberList
         self.nodeIDList=nodeIDList
 class DotToGraphInfo:
-    def __init__(self):
+    def __init__(self,data_fold="trainData"):
         self.graphList=[]
         self.vocabList=[]
         self.argumentList=[]
         self.parsedArgumentList=[]
         self.finalGraphInfoList=[]
+        self._data_fold=data_fold
 
     def getFinalGraphInfoList(self):
         # read graph file
@@ -108,7 +109,7 @@ class DotToGraphInfo:
 
         # graphInfoList.printFinalGraphInfo()
 
-    #todo: get no offset graph sample
+
     def getHornGraphSample_no_offset(self):
         self.getFinalGraphInfoList()
         totalGraphNodeIDList = []
@@ -616,18 +617,18 @@ class DotToGraphInfo:
 
 
     def readGraphsFromDot(self):
+        path = "../../"+self._data_fold+"/"
+        self.read_graph(path, suffix=".smt2")
+        self.read_graph(path, suffix=".c")
 
-        path = "../../trainData/"
-        suffix = ".c"  # some file name include .horn
-        first_file_name=glob.glob(path+"*")[0]
-        #todo: read both smt and c file togather
-        if ".smt2" in first_file_name:
-            suffix = ".smt2"
-        else:
-            suffix=".c"
+
+
+    def read_graph(self,path,suffix):
+        print("read",suffix,"files")
         print("graph file", len(sorted(glob.glob(path + '*' + suffix + '.gv'))))
         print("argument file", len(sorted(glob.glob(path + '*' + suffix + '.arguments'))))
-        for fileGraph,fileArgument in zip(sorted(glob.glob(path + '*' + suffix + '.gv')),sorted(glob.glob(path + '*'+suffix+'.arguments'))):
+        for fileGraph, fileArgument in zip(sorted(glob.glob(path + '*' + suffix + '.gv')),
+                                           sorted(glob.glob(path + '*' + suffix + '.arguments'))):
             fileName = fileGraph[:fileGraph.find(suffix + ".gv") + len(suffix)]
             fileName = fileName[fileName.rindex("/") + 1:]
             print(fileName)
@@ -637,13 +638,12 @@ class DotToGraphInfo:
             G = nx.DiGraph(nx.drawing.nx_pydot.read_dot(fileGraph))
             self.graphList.append(G)
 
-            #read argument
+            # read argument
             print(fileArgument)
             f = open(fileArgument, "r")
             arguments = f.read()
             f.close()
             self.argumentList.append(arguments)
-
 
 
     def transform_list_to_string(self,head_list):

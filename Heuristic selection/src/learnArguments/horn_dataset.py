@@ -13,11 +13,12 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import random
+import glob
 import warnings
-def main():
-    #os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-    #warnings.filterwarnings('ignore')
 
+
+
+def train_on_graphs(benchmark="unknown"):
     read_graph_from_pickle_file(force_read=True)
     nodeFeatureDim = 8
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
@@ -25,7 +26,7 @@ def main():
     parameters['num_layers'] = 1
     parameters['node_label_embedding_size'] = nodeFeatureDim
     parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
-    parameters['regression_hidden_layer_size'] = 42
+    parameters['regression_hidden_layer_size'] = 64
 
     these_hypers: Dict[str, Any] = {
         "optimizer": "Adam",  # One of "SGD", "RMSProp", "Adam"
@@ -52,13 +53,13 @@ def main():
     def log(msg):
         log_line(log_file, msg)
 
-    trained_model_path,train_loss_list,valid_loss_list = train(
+    trained_model_path,train_loss_list,valid_loss_list,best_valid_epoch = train(
         model,
         dataset,
         log_fun=log,
         run_id=run_id,
-        max_epochs=100,
-        patience=10,
+        max_epochs=1000,
+        patience=50,
         save_dir=save_dir,
         quiet=quiet,
         aml_run=None,
@@ -95,9 +96,51 @@ def main():
     valid_loss_legend = mpatches.Patch(color='green', label='valid_loss')
     mean_loss_legend = mpatches.Patch(color='red', label='mean_loss')
     plt.legend(handles=[train_loss_legend,valid_loss_legend,mean_loss_legend])
-    plt.show()
+    plt.savefig("trained_model/" + benchmark + ".png")
+    plt.clf()
+    #plt.show()
+
+    write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss_list[-1], valid_loss_list[-1], mse_loaded_model, mse_mean,best_valid_epoch, benchmark=benchmark)
+
+
+
+
     #todo: statistics of positive and negative examples
 
+def write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss,valid_loss,test_loss,mean_loss,best_valid_epoch,benchmark="unknown"):
+    with open("trained_model/"+benchmark+".log", 'w') as out_file:
+        out_file.write("best_valid_epoch:" + str(best_valid_epoch) + "\n")
+        out_file.write("train loss:"+ str(train_loss)+"\n")
+        out_file.write("valid loss:"+ str(valid_loss)+"\n")
+        out_file.write("test loss:"+ str(test_loss)+"\n")
+        out_file.write("mean loss:"+ str(mean_loss)+"\n")
+
+        # transform results to ranks
+        argument_number_lists = []
+        for arguments in dataset._argument_scores["test"]:
+            argument_number_lists.append(len(arguments))
+        argument_lists = []
+        for i, n in enumerate(argument_number_lists):
+            argument_lists.append(
+                predicted_Y_loaded_model[sum(argument_number_lists[:i]):sum(argument_number_lists[:i]) + n])
+
+        with open("trained_model/" + benchmark + ".log", 'w') as out_file:
+            for predicted_arguments, arguments, normalized_arguments in zip(argument_lists,
+                                                                            dataset._argument_scores["test"],
+                                                                            dataset._normalized_argument_scores["test"]):
+                out_file.write("-------"+ "\n")
+                out_file.write("original argument scores:"+ str(arguments)+ "\n")
+                out_file.write("normalized original argument scores:" + str(normalized_arguments)+ "\n")
+                out_file.write("original rank:"+ str(rank_arguments(arguments))+ "\n")
+                out_file.write("predicted argument scores:"+ str(predicted_arguments)+ "\n")
+                out_file.write("predicted rank:"+ str(rank_arguments(predicted_arguments))+ "\n")
+
+def rank_arguments(arr):
+    array = np.array(arr)
+    temp = array.argsort()
+    ranks = np.empty_like(temp)
+    ranks[temp] = np.arange(len(array))
+    return ranks
 
 class HornGraphSample(GraphSample):
     """Data structure holding a single horn graph."""
@@ -126,6 +169,8 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         #self._node_number_per_edge_type = list()
         self._node_feature_shape: Optional[Tuple[int]] = None
         self._loaded_data: Dict[DataFold, List[GraphSample]] = {}
+        self._argument_scores={}
+        self._normalized_argument_scores={}
 
     def load_data(self, folds_to_load: Optional[Set[DataFold]] = None) -> None:
         '''been run automatically when create the object of this class'''
@@ -153,14 +198,18 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
 
 
 
+
         #whatever the data_fold is, use the same dataset to debug
-        print("data_fold",data_fold)
-        raw_inputs=pickleRead("gnnInput_train_data","../")
+        print("data_fold",data_name)
+        raw_inputs=pickleRead("gnnInput_"+data_name+"_data","../")
         final_graphs=raw_inputs.final_graphs
 
         self._num_edge_types=raw_inputs._num_edge_types
         self._total_number_of_nodes=raw_inputs._total_number_of_nodes
         self._node_number_per_edge_type=raw_inputs._node_number_per_edge_type
+
+        self._argument_scores[data_name]=raw_inputs.argument_scores
+        self._normalized_argument_scores[data_name]=raw_inputs.normalized_argument_scores
 
         return final_graphs
 
@@ -191,7 +240,7 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
             "num_graphs_in_batch": tf.int32,
             "node_argument": tf.int32
         }
-        print("self.node_feature_shape",self.node_feature_shape)
+        #print("self.node_feature_shape",self.node_feature_shape)
         batch_features_shapes = {
             "node_features": (None, ),  #+ self.node_feature_shape,  #do offset in minibatch
             "node_to_graph_map": (None,),
@@ -238,7 +287,8 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         offset = raw_batch["num_nodes_in_batch"]
         #print("num_nodes_in_graph",num_nodes_in_graph)
         #print("offset",offset)
-        raw_batch["node_features"].extend(graph_sample.node_features+offset)
+        #raw_batch["node_features"].extend(graph_sample.node_features+offset)
+        raw_batch["node_features"].extend(graph_sample.node_features)
 
         raw_batch["node_to_graph_map"].append(
             np.full(
@@ -254,7 +304,7 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
                  + offset #offset
             )
             #print("graph_sample.adjacency_lists",graph_sample.adjacency_lists[edge_type_idx] + offset)
-        raw_batch["node_argument"].extend(graph_sample._node_argument+offset)
+        raw_batch["node_argument"].extend(graph_sample._node_argument + offset)
         raw_batch["node_labels"].extend(graph_sample._node_label)
 
         #print("graph_sample.node_features+offset",graph_sample.node_features+offset)
@@ -296,51 +346,57 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
 
 
 class raw_graph_inputs():
-    def __init__(self,num_edge_types,total_number_of_nodes ):
+    def __init__(self,num_edge_types,total_number_of_nodes):
         self._num_edge_types=num_edge_types
         self._total_number_of_nodes=total_number_of_nodes
         self._node_number_per_edge_type=[]
         self.final_graphs=None
+        self.argument_scores=[]
+        self.normalized_argument_scores=[]
 
 
-def read_graph_from_pickle_file(force_read=False):
+def read_graph_from_pickle_file(force_read=False, data_fold=["train","valid","test"]):
 
     if os.path.isfile('../../pickleData/gnnInput_train_data.txt') and force_read==False:
         print("read existed training data")
 
     else:
-        final_graphs_v1 = []
-        graphInfoList = DotToGraphInfo()
-        # get raw gnn inputs
-        #graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node = graphInfoList.getHornGraphSample()
-        graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node = graphInfoList.getHornGraphSample_no_offset()
-        raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists[0]), total_number_of_node)
-        # print("self._total_number_of_nodes",self._total_number_of_nodes)
-        for edge_type in graphs_adjacency_lists[0]:
-            raw_data_graph._node_number_per_edge_type.append(len(edge_type[0]))
+        for df in data_fold:
+            print("read data_fold to pickle data:",df)
+            final_graphs_v1 = []
+            graphInfoList = DotToGraphInfo(df+"Data")
+            # get raw gnn inputs
+            #graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node = graphInfoList.getHornGraphSample()
+            graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node = graphInfoList.getHornGraphSample_no_offset()
+            raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists[0]), total_number_of_node)
+            for edge_type in graphs_adjacency_lists[0]:
+                raw_data_graph._node_number_per_edge_type.append(len(edge_type[0]))
 
-        # loop per graph
-        for node_label_ids, argument_indices, adjacency_lists, argument_scores in zip(graphs_node_label_ids,
-                                                                                      graphs_argument_indices,
-                                                                                      graphs_adjacency_lists,
-                                                                                      graphs_argument_scores):
-            argument_scores = tf.keras.utils.normalize(np.array(argument_scores))
-            argument_scores = np.concatenate(argument_scores).ravel().tolist()  # flatten
+            # loop per graph
+            for node_label_ids, argument_indices, adjacency_lists, argument_scores in zip(graphs_node_label_ids,
+                                                                                          graphs_argument_indices,
+                                                                                          graphs_adjacency_lists,
+                                                                                          graphs_argument_scores):
+                raw_data_graph.argument_scores.append(argument_scores)#todo: convert to ranking
+                #argument_scores = tf.keras.utils.normalize(np.array(argument_scores))
+                #argument_scores = np.concatenate(argument_scores).ravel().tolist()  # flatten
+                #print("argument_scores", argument_scores)
+                raw_data_graph.normalized_argument_scores.append(argument_scores)
 
-            final_graphs_v1.append(
-                HornGraphSample(
-                    adjacency_lists=tuple(adjacency_lists),
-                    node_features=tf.constant(node_label_ids),
-                    node_label=tf.constant(argument_scores),
-                    node_argument=tf.constant(argument_indices),
+                final_graphs_v1.append(
+                    HornGraphSample(
+                        adjacency_lists=tuple(adjacency_lists),
+                        node_features=tf.constant(node_label_ids),
+                        node_label=tf.constant(argument_scores),
+                        node_argument=tf.constant(argument_indices),
+                    )
                 )
-            )
-            # print("node_label_ids",node_label_ids)
-            # print("adjacency_lists",adjacency_lists)
-            # print("argument_scores",argument_scores)
-            # print("argument_indices", argument_indices)
-        raw_data_graph.final_graphs = final_graphs_v1.copy()
-        pickleWrite(raw_data_graph, "gnnInput_train_data", "../")
+                # print("node_label_ids",node_label_ids)
+                # print("adjacency_lists",adjacency_lists)
+                # print("argument_scores",argument_scores)
+                # print("argument_indices", argument_indices)
+            raw_data_graph.final_graphs = final_graphs_v1.copy()
+            pickleWrite(raw_data_graph, "gnnInput_"+df+"_data", "../")
 
 
-main()
+
