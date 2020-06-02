@@ -240,6 +240,12 @@ def sortHints(unsortedList):
     #printList(unsortedList)
     return unsortedList
 
+def rank_arguments_naive(arr):
+    array = np.array(arr)
+    temp = array.argsort()
+    ranks = np.empty_like(temp)
+    ranks[temp] = np.arange(len(array))
+    return ranks
 
 
 

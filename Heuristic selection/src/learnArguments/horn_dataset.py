@@ -13,13 +13,12 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import random
-import glob
-import warnings
+import scipy.stats as ss
 
 
 
 def train_on_graphs(benchmark="unknown"):
-    read_graph_from_pickle_file(force_read=True)
+    read_graph_from_pickle_file(benchmark,force_read=False)
     nodeFeatureDim = 8
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
     parameters['hidden_dim'] = 16
@@ -27,6 +26,7 @@ def train_on_graphs(benchmark="unknown"):
     parameters['node_label_embedding_size'] = nodeFeatureDim
     parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
     parameters['regression_hidden_layer_size'] = 64
+    parameters["benchmark"]=benchmark
 
     these_hypers: Dict[str, Any] = {
         "optimizer": "Adam",  # One of "SGD", "RMSProp", "Adam"
@@ -71,6 +71,7 @@ def train_on_graphs(benchmark="unknown"):
     predicted_Y_loaded_model=loaded_model.predict(test_data)
     print("predicted_Y_loaded_model Y\n",predicted_Y_loaded_model)
 
+
     mean_loss_list=0
     for data in test_data:
         #print(data[0]) #input
@@ -90,12 +91,14 @@ def train_on_graphs(benchmark="unknown"):
     plt.plot(train_loss_list,color="blue")
     plt.plot(valid_loss_list,color="green")
     plt.plot([mean_loss_list]*len(valid_loss_list), color="red")
+    plt.plot([mse_loaded_model] * len(valid_loss_list), color="black")
     plt.ylabel('loss')
     plt.xlabel('epochs')
     train_loss_legend = mpatches.Patch(color='blue', label='train_loss')
     valid_loss_legend = mpatches.Patch(color='green', label='valid_loss')
     mean_loss_legend = mpatches.Patch(color='red', label='mean_loss')
-    plt.legend(handles=[train_loss_legend,valid_loss_legend,mean_loss_legend])
+    test_loss_legend = mpatches.Patch(color='black', label='test_loss')
+    plt.legend(handles=[train_loss_legend,valid_loss_legend,mean_loss_legend,test_loss_legend])
     plt.savefig("trained_model/" + benchmark + ".png")
     plt.clf()
     #plt.show()
@@ -124,23 +127,13 @@ def write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss,valid
             argument_lists.append(
                 predicted_Y_loaded_model[sum(argument_number_lists[:i]):sum(argument_number_lists[:i]) + n])
 
-        with open("trained_model/" + benchmark + ".log", 'w') as out_file:
-            for predicted_arguments, arguments, normalized_arguments in zip(argument_lists,
-                                                                            dataset._argument_scores["test"],
-                                                                            dataset._normalized_argument_scores["test"]):
-                out_file.write("-------"+ "\n")
-                out_file.write("original argument scores:"+ str(arguments)+ "\n")
-                out_file.write("normalized original argument scores:" + str(normalized_arguments)+ "\n")
-                out_file.write("original rank:"+ str(rank_arguments(arguments))+ "\n")
-                out_file.write("predicted argument scores:"+ str(predicted_arguments)+ "\n")
-                out_file.write("predicted rank:"+ str(rank_arguments(predicted_arguments))+ "\n")
+        for predicted_arguments, arguments,ranks in zip(argument_lists,dataset._argument_scores["test"],dataset._ranked_argument_scores["test"]):
+            out_file.write("-------"+ "\n")
+            out_file.write("original argument scores:"+ str(arguments)+ "\n")
+            out_file.write("original rank:"+ str(ranks)+ "\n")
+            out_file.write("predicted argument scores:"+ str(predicted_arguments)+ "\n")
+            out_file.write("predicted rank:"+ str(ss.rankdata(predicted_arguments))+ "\n")
 
-def rank_arguments(arr):
-    array = np.array(arr)
-    temp = array.argsort()
-    ranks = np.empty_like(temp)
-    ranks[temp] = np.arange(len(array))
-    return ranks
 
 class HornGraphSample(GraphSample):
     """Data structure holding a single horn graph."""
@@ -170,7 +163,9 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         self._node_feature_shape: Optional[Tuple[int]] = None
         self._loaded_data: Dict[DataFold, List[GraphSample]] = {}
         self._argument_scores={}
-        self._normalized_argument_scores={}
+        self._ranked_argument_scores = {}
+        self._benchmark=params["benchmark"]
+
 
     def load_data(self, folds_to_load: Optional[Set[DataFold]] = None) -> None:
         '''been run automatically when create the object of this class'''
@@ -201,7 +196,7 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
 
         #whatever the data_fold is, use the same dataset to debug
         print("data_fold",data_name)
-        raw_inputs=pickleRead("gnnInput_"+data_name+"_data","../")
+        raw_inputs=pickleRead(self._benchmark+"-gnnInput_"+data_name+"_data","../")
         final_graphs=raw_inputs.final_graphs
 
         self._num_edge_types=raw_inputs._num_edge_types
@@ -209,7 +204,8 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         self._node_number_per_edge_type=raw_inputs._node_number_per_edge_type
 
         self._argument_scores[data_name]=raw_inputs.argument_scores
-        self._normalized_argument_scores[data_name]=raw_inputs.normalized_argument_scores
+        self._ranked_argument_scores[data_name] = raw_inputs.ranked_argument_scores
+
 
         return final_graphs
 
@@ -352,12 +348,13 @@ class raw_graph_inputs():
         self._node_number_per_edge_type=[]
         self.final_graphs=None
         self.argument_scores=[]
-        self.normalized_argument_scores=[]
+        self.ranked_argument_scores=[]
 
 
-def read_graph_from_pickle_file(force_read=False, data_fold=["train","valid","test"]):
 
-    if os.path.isfile('../../pickleData/gnnInput_train_data.txt') and force_read==False:
+def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","valid","test"]):
+    benchmark=benchmark.replace("/", "-")
+    if os.path.isfile("../../pickleData/"+benchmark+"-gnnInput_train_data.txt") and force_read==False:
         print("read existed training data")
 
     else:
@@ -377,17 +374,19 @@ def read_graph_from_pickle_file(force_read=False, data_fold=["train","valid","te
                                                                                           graphs_argument_indices,
                                                                                           graphs_adjacency_lists,
                                                                                           graphs_argument_scores):
-                raw_data_graph.argument_scores.append(argument_scores)#todo: convert to ranking
-                #argument_scores = tf.keras.utils.normalize(np.array(argument_scores))
-                #argument_scores = np.concatenate(argument_scores).ravel().tolist()  # flatten
-                #print("argument_scores", argument_scores)
-                raw_data_graph.normalized_argument_scores.append(argument_scores)
+                # todo: convert to ranking
+                ranked_argument_scores=ss.rankdata(argument_scores)
+                raw_data_graph.ranked_argument_scores.append(ranked_argument_scores)
+                raw_data_graph.argument_scores.append(argument_scores)
+
+
 
                 final_graphs_v1.append(
                     HornGraphSample(
                         adjacency_lists=tuple(adjacency_lists),
                         node_features=tf.constant(node_label_ids),
-                        node_label=tf.constant(argument_scores),
+                        node_label=tf.constant(ranked_argument_scores),
+                        #node_label=tf.constant(argument_scores),
                         node_argument=tf.constant(argument_indices),
                     )
                 )
@@ -396,7 +395,7 @@ def read_graph_from_pickle_file(force_read=False, data_fold=["train","valid","te
                 # print("argument_scores",argument_scores)
                 # print("argument_indices", argument_indices)
             raw_data_graph.final_graphs = final_graphs_v1.copy()
-            pickleWrite(raw_data_graph, "gnnInput_"+df+"_data", "../")
+            pickleWrite(raw_data_graph, benchmark+"-gnnInput_"+df+"_data", "../")
 
 
 

@@ -210,7 +210,7 @@ def extractPredicatesFromOneProgram(filePath,abstractionOption,timeOut):
 
 
 def extractPredicatesFromOneProgramForMultiprocess(parameterList):
-
+    #parameterList=[file,abstractOption,60]
     filePath=parameterList[0]
     abstractionOption = parameterList[1]
     timeOut = parameterList[2]
@@ -244,7 +244,6 @@ def extractPredicatesFromOneProgramForMultiprocess(parameterList):
         eld.wait()
         #eld.terminate()
         #os.system(run)
-        gc.collect()  # clear memory
         return True
     else:
         return False

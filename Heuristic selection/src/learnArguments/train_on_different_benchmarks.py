@@ -32,19 +32,19 @@ def separate_dataset_to_train_valid_test_files(source,train=120,valid=11,test=30
 
 def main():
     data_fold_list=[]
-    data_fold_list.append(["../../trainData-chc-comp-predicates/", 120, 11, 30])
-    data_fold_list.append(["../../trainData-chc-comp-templates/", 25, 5, 5])
-    data_fold_list.append(["../../trainData-sv-comp-c-predicates/", 70, 10, 26])
-    data_fold_list.append(["../../trainData-sv-comp-c-templates/", 25, 5, 8])
-    data_fold_list.append(["../../trainData-sv-comp-smt-predicates/", 100, 20, 20])
-    data_fold_list.append(["../../trainData-sv-comp-smt-templates/", 25, 5, 8])
-    data_fold_list.append(["../../trainData-chc-comp-predicates+sv-comp-smt-predicates/", 220, 30, 51])
-    data_fold_list.append(["../../trainData-chc-comp-predicates+sv-comp-smt-predicates+sv-comp-c-predicates/", 330, 30, 57])
+    #data_fold_list.append(["../../benchmarks/trainData-chc-comp-predicates/", 120, 11, 30])
+    #data_fold_list.append(["../../benchmarks/trainData-chc-comp-templates/", 25, 5, 5])
+    #data_fold_list.append(["../../benchmarks/trainData-sv-comp-c-predicates/", 70, 10, 26])
+    #data_fold_list.append(["../../benchmarks/trainData-sv-comp-c-templates/", 25, 5, 8])
+    data_fold_list.append(["../../benchmarks/trainData-sv-comp-smt-predicates/", 100, 20, 20])
+    data_fold_list.append(["../../benchmarks/trainData-sv-comp-smt-templates/", 25, 5, 8])
+    data_fold_list.append(["../../benchmarks/trainData-chc-comp-predicates+sv-comp-smt-predicates/", 220, 30, 51])
+    data_fold_list.append(["../../benchmarks/trainData-chc-comp-predicates+sv-comp-smt-predicates+sv-comp-c-predicates/", 330, 30, 57])
 
 
     for data_fold in data_fold_list:
         separate_dataset_to_train_valid_test_files(source=data_fold[0],train=data_fold[1],valid=data_fold[2],test=data_fold[3])
-        train_on_graphs(benchmark=data_fold[0][6:-1])
+        train_on_graphs(benchmark=data_fold[0][17:-1])
 
     #train_on_graphs()
 

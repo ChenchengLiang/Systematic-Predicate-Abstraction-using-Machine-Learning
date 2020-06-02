@@ -7,14 +7,19 @@ from loadData import readHornClausesAndHints_resplitTrainAndVerifyData
 from datetime import datetime
 import numpy as np
 import random
+from multiprocessing import Pool
+import subprocess
+from subprocess import check_output
+import time
 
 
+def sleep(seconds=1):
+    time.sleep(seconds)
+    print("wait for",seconds)
 
 def main():
-    np.random.seed(1)
-    test_list=[1,2,3,4]
-    np.random.shuffle(test_list)
-    print(test_list)
 
+    #subprocess.call(sleep(5),timeout=3)
+    check_output(sleep(5),timeout=3)
 if __name__ == '__main__':
     main()
