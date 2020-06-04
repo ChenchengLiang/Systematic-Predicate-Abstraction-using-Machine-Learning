@@ -23,9 +23,10 @@ JSON:
 }
 
 """
-
 class GraphInfo:
-    def __init__(self,nodeUniqueIDList,nodesAttributes,edgesAttributes,hyperedgesAttributes,edge_senders,edge_receivers,hyperedge_senders,hyperedge_receivers,edgeEmbeddingInputs,hyperedgeEmbeddingInputs,nodeEmbeddingInputs):
+    def __init__(self,nodeUniqueIDList,nodesAttributes,edgesAttributes,hyperedgesAttributes,edge_senders,edge_receivers,
+                 hyperedge_senders,hyperedge_receivers,edgeEmbeddingInputs,hyperedgeEmbeddingInputs,nodeEmbeddingInputs,
+                 controlFlowNodes,operatorNodes,constantNodes,literalNodes,trueNodes,boolValueNode,dataFlowHyperedges,controlFlowHyperedges):
         self.nodeUniqueIDList=nodeUniqueIDList
         self.nodesAttributes = nodesAttributes
         self.edgesAttributes=edgesAttributes
@@ -41,6 +42,14 @@ class GraphInfo:
         self.edgeEmbeddingInputs=edgeEmbeddingInputs
         self.hyperedgeEmbeddingInputs=hyperedgeEmbeddingInputs
         self.nodeEmbeddingInputs = nodeEmbeddingInputs
+        self.controlFlowNodes=controlFlowNodes
+        self.operatorNodes=operatorNodes
+        self.constantNodes=constantNodes
+        self.literalNodes=literalNodes
+        self.trueNodes=trueNodes
+        self.boolValueNode=boolValueNode
+        self.dataFlowHyperedges=dataFlowHyperedges
+        self.controlFlowHyperedges=controlFlowHyperedges
     def printInfo(self):
         print("nodeUniqueIDList", sorted(self.nodeUniqueIDList))
         print("nodesAttributes",sorted(self.nodesAttributes))
@@ -53,6 +62,15 @@ class GraphInfo:
         print("edgeEmbeddingInputs", self.edgeEmbeddingInputs)
         print("hyperedgeEmbeddingInputs", self.hyperedgeEmbeddingInputs)
         print("nodeEmbeddingInputs", self.nodeEmbeddingInputs)
+        print("controlFlowNodes",self.controlFlowNodes)
+        print("operatorNodes", self.operatorNodes)
+        print("constantNodes", self.constantNodes)
+        print("literalNodes", self.literalNodes)
+        print("trueNodes", self.trueNodes)
+        print("boolValueNode", self.boolValueNode)
+        print("dataFlowHyperedges", self.dataFlowHyperedges)
+        print("controlFlowHyperedges", self.controlFlowHyperedges)
+
 
 class ArgumentInfo:
     def __init__(self,ID, head, arg, score):
@@ -73,13 +91,14 @@ class RawGNNInput:
         self.nodeNumberList=nodeNumberList
         self.nodeIDList=nodeIDList
 class DotToGraphInfo:
-    def __init__(self,data_fold="trainData"):
+    def __init__(self,data_fold="trainData",path="../../"):
         self.graphList=[]
         self.vocabList=[]
         self.argumentList=[]
         self.parsedArgumentList=[]
         self.finalGraphInfoList=[]
         self._data_fold=data_fold
+        self._path=path
 
     def getFinalGraphInfoList(self):
         # read graph file
@@ -617,7 +636,7 @@ class DotToGraphInfo:
 
 
     def readGraphsFromDot(self):
-        path = "../../"+self._data_fold+"/"
+        path = self._path+self._data_fold+"/"
         self.read_graph(path, suffix=".smt2")
         self.read_graph(path, suffix=".c")
 
@@ -680,7 +699,36 @@ class DotToGraphInfo:
             hyperedgeReceiverList = []
             hyperedgeEmbeddingInputs = []
             nodeEmbeddingInputs=[]
+
+            control_flow_node_list = []
+            operator_node_list = []
+            constant_node_list = []
+            literal_node_list = []
+            true_node_list = []
+            boolvalue_node_list = []
+            data_flow_hyperedge_list=[]
+            control_flow_hyperedge_list=[]
             for node in G.nodes:
+
+                if G.nodes[node]['class'] == "cfn":
+                    control_flow_node_list.append(G.nodes[node]['nodeUniqueID'])
+                if G.nodes[node]['class'] == "Operator":
+                    operator_node_list.append(G.nodes[node]['nodeUniqueID'])
+                if G.nodes[node]['class'] == "Constant":
+                    constant_node_list.append(G.nodes[node]['nodeUniqueID'])
+                if G.nodes[node]['class'] == "Literal":
+                    literal_node_list.append(G.nodes[node]['nodeUniqueID'])
+                if G.nodes[node]['class'] == "true":
+                    true_node_list.append(G.nodes[node]['nodeUniqueID'])
+                if G.nodes[node]['class'] == "BoolValue":
+                    boolvalue_node_list.append(G.nodes[node]['nodeUniqueID'])
+                if G.nodes[node]['class'] == "DataFlowHyperedge":
+                    data_flow_hyperedge_list.append(G.nodes[node]['hyperedgeUniqueID'])
+                if G.nodes[node]['class'] == "controlFlowHyperEdge":
+                    control_flow_hyperedge_list.append(G.nodes[node]['hyperedgeUniqueID'])
+
+
+
                 if (G.nodes[node]['class'] == "DataFlowHyperedge" or G.nodes[node]['class'] == "controlFlowHyperEdge"):
                     hyperedgeLabelList.append(G.nodes[node]['hyperedgeLabelUniqueID'])
                     hyperedgeSenderList.append(G.nodes[node]['from'])
@@ -732,6 +780,7 @@ class DotToGraphInfo:
             edgeReceiverList = []
             edgeEmbeddingInputs=[]
             for edge in G.edges:
+
                 if (G.nodes[edge[0]]['class'] != "DataFlowHyperedge" and G.nodes[edge[1]][
                     'class'] != "DataFlowHyperedge" and
                         G.nodes[edge[0]]['class'] != "controlFlowHyperEdge" and G.nodes[edge[1]][
@@ -745,9 +794,12 @@ class DotToGraphInfo:
                                                 'receiverLabel':G.nodes[edge[1]]['nodeLabelUniqueID'],
                                                 'edgeEmbedding':'dummy'})
 
+
             self.finalGraphInfoList.append(
                 GraphInfo(nodeUniqueIDList,nodeLabelList, edgeLabelList, hyperedgeLabelList, edgeSenderList, edgeReceiverList,
-                          hyperedgeSenderList, hyperedgeReceiverList,edgeEmbeddingInputs,hyperedgeEmbeddingInputs,nodeEmbeddingInputs))
+                          hyperedgeSenderList, hyperedgeReceiverList,edgeEmbeddingInputs,hyperedgeEmbeddingInputs,nodeEmbeddingInputs,
+                          control_flow_node_list,operator_node_list,constant_node_list,literal_node_list,true_node_list,boolvalue_node_list,
+                          data_flow_hyperedge_list,control_flow_hyperedge_list))
 
     def getArgumentHead(self):
         for G, args in zip(self.graphList, self.parsedArgumentList):

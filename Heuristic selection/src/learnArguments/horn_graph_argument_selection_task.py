@@ -20,9 +20,11 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
         )
         self._gnn = GNN(params) #RGCN,RGIN,RGAT,GGNN
         self._argument_repr_to_regression_layer = tf.keras.layers.Dense(
-            units=self._params["regression_hidden_layer_size"], activation=tf.nn.relu, use_bias=True) #decide layer output shape
+            units=self._params["regression_hidden_layer_size"][0], activation=tf.nn.relu, use_bias=True) #decide layer output shape
+        self._regression_layer_1 = tf.keras.layers.Dense(
+            units=self._params["regression_hidden_layer_size"][1], activation=tf.nn.relu, use_bias=True)
         self._argument_classification_layer = tf.keras.layers.Dense(
-            units=1, activation=tf.nn.sigmoid, use_bias=True)
+            units=1, use_bias=True)#we didn't normalize label so this should not be sigmoid
         self._node_to_graph_aggregation = None
 
 
@@ -50,9 +52,11 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
 
         with tf.name_scope("Argument_repr_to_regression_layer"):
             self._argument_repr_to_regression_layer.build(tf.TensorShape((None, self._params["hidden_dim"]))) #decide layer input shape
+        with tf.name_scope("regression_layer_1"):
+            self._regression_layer_1.build(tf.TensorShape((None, self._params["regression_hidden_layer_size"][0])))
         with tf.name_scope("Argument_regression_layer"):
             self._argument_classification_layer.build(
-                tf.TensorShape((None, self._params["regression_hidden_layer_size"])) #decide layer input shape
+                tf.TensorShape((None, self._params["regression_hidden_layer_size"][1])) #decide layer input shape
             )
 
 
@@ -95,9 +99,9 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
     ) -> Any:
         #call task specific layers
         argument_regression_hidden_layer_output=self._argument_repr_to_regression_layer(final_argument_representations)
-
+        argument_regression_1=self._regression_layer_1(argument_regression_hidden_layer_output)
         predicted_argument_score = self._argument_classification_layer(
-            argument_regression_hidden_layer_output
+            argument_regression_1
         )  # Shape [argument number, 1]
 
         return tf.squeeze(predicted_argument_score, axis=-1) #Shape [argument number,]

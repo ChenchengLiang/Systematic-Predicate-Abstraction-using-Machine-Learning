@@ -6,6 +6,7 @@ import os
 from multiprocessing import Pool
 from functools import partial
 from distutils.dir_util import copy_tree
+import gc
 
 def check_solvability(timeOut,abstractionOption,benchmark_solvability_folders,file):
 
@@ -72,9 +73,12 @@ def extract_one_file(parameterList):
                                 "-absTimeout:" + str(timeOut), \
                                 "-extractPredicates"], stdout=subprocess.DEVNULL, shell=False)
         eld.wait(timeout=600)
+
+        gc.collect()
     except:
         print("Time out","Command:", run_p)
         shutil.copy2(filePath, "../benchmarks/extracting_time_out_samples/")
+        os.kill(eld.pid)
 
 def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
     for root, subdirs, files in os.walk(rootdir):
