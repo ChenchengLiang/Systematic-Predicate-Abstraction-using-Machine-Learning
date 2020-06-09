@@ -13,6 +13,7 @@ from subprocess import check_output
 import time
 import itertools
 import scipy.stats as ss
+import signal
 
 def sleep(seconds=1):
     time.sleep(seconds)
@@ -47,10 +48,25 @@ def occurance_to_rank_examples(x=[0,1,1,1,1,0,5]):
     print("max rank",ss.rankdata(x, method="max"))  # 'average', 'min', 'max', 'dense', 'ordinal'
     print("ordinal rank",ss.rankdata(x, method="ordinal"))  # 'average', 'min', 'max', 'dense', 'ordinal'
 
+def pool_kill_popen_test(to):
+    try:
+        x = subprocess.Popen(["../venv/bin/python3", "learnArguments/sleep.py"])
+        x.wait(timeout=to)
+        print(x.pid)
+    except:
+        print(x.pid)
+        os.kill(x.pid, signal.SIGKILL)
+
+
 def main():
     #pairwise_ranking_label_example(x,2)
 
-    occurance_to_rank_examples()
+    #occurance_to_rank_examples()
+
+    parameterList=[10,15,20]
+    pool = Pool(processes=8)
+    pool.map(pool_kill_popen_test, parameterList)
+
 
 
 

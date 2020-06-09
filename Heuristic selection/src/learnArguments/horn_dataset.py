@@ -70,8 +70,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             dataset,
             log_fun=log,
             run_id=run_id,
-            max_epochs=200,
-            patience=200,
+            max_epochs=1000,
+            patience=50,
             save_dir=save_dir,
             quiet=quiet,
             aml_run=None,
@@ -82,11 +82,12 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         test_data = dataset.get_tensorflow_dataset(DataFold.TEST)
         predicted_Y_loaded_model=loaded_model.predict(test_data)
         print("predicted_Y_loaded_model Y\n",predicted_Y_loaded_model)
-
+        true_Y=None
 
         mean_loss_list=0
         for data in test_data:
             #print(data[0]) #input
+            true_Y=data[1]["node_labels"]
             print("True Y\n",data[1]["node_labels"]) #labels
             mse_loaded_model = tf.keras.losses.MSE(
                 data[1]["node_labels"], predicted_Y_loaded_model)
@@ -113,21 +114,9 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     best_valid_epoch_average=np.mean(best_valid_epoch_average)
 
     #visualize results
-    plt.plot(train_loss_list_average,color="blue")
-    plt.plot(valid_loss_list_average,color="green")
-    plt.plot([mean_loss_list_average]*len(valid_loss_list), color="red")
-    plt.plot([mse_loaded_model_average] * len(valid_loss_list), color="black")
-    plt.ylabel('loss')
-    plt.xlabel('epochs')
-    train_loss_legend = mpatches.Patch(color='blue', label='train_loss')
-    valid_loss_legend = mpatches.Patch(color='green', label='valid_loss')
-    mean_loss_legend = mpatches.Patch(color='red', label='mean_loss')
-    test_loss_legend = mpatches.Patch(color='black', label='test_loss')
-    plt.legend(handles=[train_loss_legend,valid_loss_legend,mean_loss_legend,test_loss_legend])
-    plt.savefig("trained_model/" + label+"-"+ benchmark_name + ".png")
-    plt.clf()
-    #plt.show()
-
+    draw_training_results(train_loss_list_average, valid_loss_list_average, mean_loss_list_average,
+                          mse_loaded_model_average, valid_loss_list, true_Y, predicted_Y_loaded_model, label,
+                          benchmark_name)
     write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss_average,
                                valid_loss_average, mse_loaded_model_average, mean_loss_list_average,best_valid_epoch_average,
                                benchmark=benchmark_name,label=label)
@@ -136,6 +125,45 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
 
 
     #todo: statistics of positive and negative examples
+
+
+def draw_training_results(train_loss_list_average,valid_loss_list_average,mean_loss_list_average,
+                          mse_loaded_model_average,valid_loss_list,true_Y,predicted_Y_loaded_model,label,benchmark_name):
+    # mse on train, validation,test,mean
+    plt.plot(train_loss_list_average, color="blue")
+    plt.plot(valid_loss_list_average, color="green")
+    plt.plot([mean_loss_list_average] * len(valid_loss_list), color="red")
+    plt.plot([mse_loaded_model_average] * len(valid_loss_list), color="black")
+    plt.ylabel('loss')
+    plt.xlabel('epochs')
+    train_loss_legend = mpatches.Patch(color='blue', label='train_loss')
+    valid_loss_legend = mpatches.Patch(color='green', label='valid_loss')
+    mean_loss_legend = mpatches.Patch(color='red', label='mean_loss')
+    test_loss_legend = mpatches.Patch(color='black', label='test_loss')
+    plt.legend(handles=[train_loss_legend, valid_loss_legend, mean_loss_legend, test_loss_legend])
+    plt.savefig("trained_model/" + label + "-" + benchmark_name + ".png")
+    plt.clf()
+    # plt.show()
+
+    # scatter on true y and predicted y
+    a = plt.axes(aspect='equal')
+    plt.scatter(true_Y, predicted_Y_loaded_model)
+    plt.xlabel('True Values')
+    plt.ylabel('Predictions')
+    lims = [0, np.max([np.max(true_Y), np.max(predicted_Y_loaded_model)])]
+    plt.xlim(lims)
+    plt.ylim(lims)
+    _ = plt.plot(lims, lims)
+    plt.savefig("trained_model/" + label + "-" + benchmark_name + "-scatter.png")
+    plt.clf()
+
+    # error distribution on true y and predicted y
+    error = predicted_Y_loaded_model - true_Y
+    plt.hist(error, bins=25)
+    plt.xlabel("Prediction Error [occurence]")
+    _ = plt.ylabel("Count")
+    plt.savefig("trained_model/" + label + "-" + benchmark_name + "-error-distribution.png")
+    plt.clf()
 
 def write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss,valid_loss,test_loss,mean_loss,best_valid_epoch,benchmark="unknown",label="rank"):
     with open("trained_model/"+label+"-"+benchmark+".log", 'w') as out_file:
@@ -402,7 +430,7 @@ def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","
                                                                                           graphs_argument_indices,
                                                                                           graphs_adjacency_lists,
                                                                                           graphs_argument_scores):
-                # todo: convert to ranking
+                #convert to rank
                 ranked_argument_scores=ss.rankdata(argument_scores,method="dense")
                 raw_data_graph.ranked_argument_scores.append(ranked_argument_scores)
                 raw_data_graph.argument_scores.append(argument_scores)

@@ -7,6 +7,7 @@ from multiprocessing import Pool
 from functools import partial
 from distutils.dir_util import copy_tree
 import gc
+import signal
 
 def check_solvability(timeOut,abstractionOption,benchmark_solvability_folders,file):
 
@@ -67,20 +68,23 @@ def extract_one_file(parameterList):
     run_p = command + filePath
 
     print("Command:", run_p)
+
     try:
         eld = subprocess.Popen(["../eldarica-graph-generation/eld", \
                                 filePath, abstractionOption, \
                                 "-absTimeout:" + str(timeOut), \
                                 "-extractPredicates"], stdout=subprocess.DEVNULL, shell=False)
         eld.wait(timeout=600)
-
         gc.collect()
     except:
         print("Time out","Command:", run_p)
         shutil.copy2(filePath, "../benchmarks/extracting_time_out_samples/")
-        os.kill(eld.pid)
+        os.kill(eld.pid,signal.SIGKILL)
 
 def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
+
+
+
     for root, subdirs, files in os.walk(rootdir):
         if os.path.exists(root + "/trainData"):
             shutil.rmtree(root + "/trainData")
@@ -109,7 +113,7 @@ def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
     pass
 
 def main():
-    benchmark_list = ["../benchmarks/LIA-lin/", "../benchmarks/LIA-nonlin/"]
+    benchmark_list = ["../benchmarks/LIA-nonlin/"]
     for benchmark in benchmark_list:
         # check_solvability_pool()
         extract_data_pool(benchmark)

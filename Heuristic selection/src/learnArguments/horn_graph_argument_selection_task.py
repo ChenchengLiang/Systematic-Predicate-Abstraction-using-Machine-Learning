@@ -106,13 +106,14 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
 
         return tf.squeeze(predicted_argument_score, axis=-1) #Shape [argument number,]
 
-    def compute_task_metrics(
+    def compute_task_metrics(#todo:change to hinge loss or lasso
             self,
             batch_features: Dict[str, tf.Tensor],
             task_output: Any,
             batch_labels: Dict[str, tf.Tensor],
     ) -> Dict[str, tf.Tensor]:
         mse = tf.losses.mean_squared_error(batch_labels["node_labels"], task_output)
+        hinge_loss=tf.losses.hinge(batch_labels["node_labels"], task_output)
         mae = tf.losses.mean_absolute_error(batch_labels["node_labels"], task_output)
         num_graphs = tf.cast(batch_features["num_graphs_in_batch"], tf.float32)
         return {
