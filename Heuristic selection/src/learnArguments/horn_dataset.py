@@ -17,8 +17,8 @@ import scipy.stats as ss
 
 
 
-def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../../"):
-    read_graph_from_pickle_file(benchmark_name,force_read=force_read,label=label,path=path)
+def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../../",file_type=".smt2"):
+    read_graph_from_pickle_file(benchmark_name,force_read=force_read,label=label,path=path,file_type=file_type)
     nodeFeatureDim = 8
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
     parameters['hidden_dim'] = 64
@@ -408,18 +408,19 @@ class raw_graph_inputs():
 
 
 
-def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","valid","test"],label="rank",path="../../"):
+def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","valid","test"],label="rank",path="../../",file_type=".smt2"):
     benchmark_name=benchmark.replace("/", "-")
-    if os.path.isfile("../../pickleData/"+label+"-"+benchmark_name+"-gnnInput_train_data.txt") and force_read==False:
+    #if os.path.isfile("../../pickleData/"+label+"-"+benchmark_name+"-gnnInput_train_data.txt") and force_read==False:
+    if force_read==False:
         print("read existed training data")
 
     else:
         for df in data_fold:
-            print("read data_fold to pickle data:",df)
+            print("write data_fold to pickle data:",df)
             final_graphs_v1 = []
             graphInfoList = DotToGraphInfo(df+"Data",path)
+            graphInfoList._file_type=file_type
             # get raw gnn inputs
-            #graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node = graphInfoList.getHornGraphSample()
             graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node = graphInfoList.getHornGraphSample_no_offset()
             raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists[0]), total_number_of_node)
             for edge_type in graphs_adjacency_lists[0]:

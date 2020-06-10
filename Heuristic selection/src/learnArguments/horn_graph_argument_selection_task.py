@@ -117,7 +117,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
         mae = tf.losses.mean_absolute_error(batch_labels["node_labels"], task_output)
         num_graphs = tf.cast(batch_features["num_graphs_in_batch"], tf.float32)
         return {
-            "loss": mse,
+            "loss": mae, #mse
             "batch_squared_error": mse * num_graphs,
             "batch_absolute_error": mae * num_graphs,
             "num_graphs": num_graphs,

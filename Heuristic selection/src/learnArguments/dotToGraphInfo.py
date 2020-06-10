@@ -99,6 +99,8 @@ class DotToGraphInfo:
         self.finalGraphInfoList=[]
         self._data_fold=data_fold
         self._path=path
+        self._split_flag=0
+        self._file_type=".smt2"
 
     def getFinalGraphInfoList(self):
         # read graph file
@@ -637,32 +639,66 @@ class DotToGraphInfo:
 
     def readGraphsFromDot(self):
         path = self._path+self._data_fold+"/"
-        self.read_graph(path, suffix=".smt2")
-        self.read_graph(path, suffix=".c")
+        if self._file_type==".smt2":
+            self.read_graph(path, suffix=".smt2")
+        if self._file_type == ".c":
+            self.read_graph(path, suffix=".c")
 
 
 
     def read_graph(self,path,suffix):
-        print("read",suffix,"files")
-        print("graph file", len(sorted(glob.glob(path + '*' + suffix + '.gv'))))
-        print("argument file", len(sorted(glob.glob(path + '*' + suffix + '.arguments'))))
-        for fileGraph, fileArgument in zip(sorted(glob.glob(path + '*' + suffix + '.gv')),
-                                           sorted(glob.glob(path + '*' + suffix + '.arguments'))):
-            fileName = fileGraph[:fileGraph.find(suffix + ".gv") + len(suffix)]
-            fileName = fileName[fileName.rindex("/") + 1:]
-            print(fileName)
-            # read graph
-            print(fileGraph)
-            hornGraph = Source.from_file(fileGraph)
-            G = nx.DiGraph(nx.drawing.nx_pydot.read_dot(fileGraph))
-            self.graphList.append(G)
+        if self._split_flag==0:
+            print("read",suffix,"files")
+            number_of_graphs=len(glob.glob(path + '*' + suffix + '.gv'))
+            print("graph file", number_of_graphs)
+            print("argument file", len(glob.glob(path + '*' + suffix + '.arguments')))
+            gv_list=sorted(glob.glob(path + '*' + suffix + '.gv'))
+            argument_list=sorted(glob.glob(path + '*' + suffix + '.arguments'))
+            for fileGraph, fileArgument in zip(gv_list,
+                                               argument_list):
+                fileName = fileGraph[:fileGraph.find(suffix + ".gv") + len(suffix)]
+                fileName = fileName[fileName.rindex("/") + 1:]
+                print(fileName)
+                # read graph
+                print(fileGraph)
+                #hornGraph = Source.from_file(fileGraph)
+                G = nx.DiGraph(nx.drawing.nx_pydot.read_dot(fileGraph))
+                self.graphList.append(G)
 
-            # read argument
-            print(fileArgument)
-            f = open(fileArgument, "r")
-            arguments = f.read()
-            f.close()
-            self.argumentList.append(arguments)
+                # read argument
+                print(fileArgument)
+                f = open(fileArgument, "r")
+                arguments = f.read()
+                f.close()
+                self.argumentList.append(arguments)
+        else:
+            print("read", suffix, "files")
+            number_of_graphs = len(glob.glob(path + '*' + suffix + '.gv'))
+            print("graph file", number_of_graphs)
+            print("argument file", len(glob.glob(path + '*' + suffix + '.arguments')))
+            gv_list = sorted(glob.glob(path + '*' + suffix + '.gv'))
+            argument_list = sorted(glob.glob(path + '*' + suffix + '.arguments'))
+            buket_size=int(len(gv_list)/10)
+            gv_list=gv_list[(self._split_flag-1)*buket_size:self._split_flag*buket_size]
+            argument_list=argument_list[(self._split_flag-1)*buket_size:self._split_flag*buket_size]
+            for fileGraph, fileArgument in zip(gv_list,
+                                               argument_list):
+                fileName = fileGraph[:fileGraph.find(suffix + ".gv") + len(suffix)]
+                fileName = fileName[fileName.rindex("/") + 1:]
+                print(fileName)
+                # read graph
+                print(fileGraph)
+                # hornGraph = Source.from_file(fileGraph)
+                G = nx.DiGraph(nx.drawing.nx_pydot.read_dot(fileGraph))
+                self.graphList.append(G)
+
+                # read argument
+                print(fileArgument)
+                f = open(fileArgument, "r")
+                arguments = f.read()
+                f.close()
+                self.argumentList.append(arguments)
+
 
 
     def transform_list_to_string(self,head_list):

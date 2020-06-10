@@ -45,7 +45,7 @@ def separate_dataset_to_train_valid_test_files(source,train=120,valid=11,test=30
             copy(positive_hint, source + fold + "Data/")
             copy(negative_hint, source + fold + "Data/")
 
-def get_statistic_data(path=""):
+def get_statistic_data(path="",file_type=".smt2"):
     try:
         rmtree(path + "statistic")
         os.mkdir(path + "statistic")
@@ -69,7 +69,7 @@ def get_statistic_data(path=""):
 
 
             graphInfoList = DotToGraphInfo(data_fold + "Data", path)
-
+            graphInfoList._file_type=file_type
             graphs_node_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node = graphInfoList.getHornGraphSample_no_offset()
             for g, a, i, p, n, graph_info,adjacency_list in zip(sorted(glob.glob(path + data_fold+"Data/" + '*' + '.gv')),
                                      sorted(glob.glob(path + data_fold+"Data/" + '*' + '.arguments')),
@@ -133,10 +133,16 @@ def get_statistic_data(path=""):
                     out_file.write("max_ternary_edge" + " :" + str(np.max(ternary_edge_list)) + "\n")
 
                 else:
-                    out_file.write("average_"+l[:l.rfind("_list")] +" :"+str(np.mean(statistic_list[l])) + "\n")
-                    out_file.write("std_" + l[:l.rfind("_list")] + " :" + str(np.std(statistic_list[l])) + "\n")
-                    out_file.write("min_" + l[:l.rfind("_list")] + " :" + str(np.min(statistic_list[l])) + "\n")
-                    out_file.write("max_" + l[:l.rfind("_list")] + " :" + str(np.max(statistic_list[l])) + "\n")
+                    if len(statistic_list[l])>0:
+                        out_file.write("average_"+l[:l.rfind("_list")] +" :"+str(np.mean(statistic_list[l])) + "\n")
+                        out_file.write("std_" + l[:l.rfind("_list")] + " :" + str(np.std(statistic_list[l])) + "\n")
+                        out_file.write("min_" + l[:l.rfind("_list")] + " :" + str(np.min(statistic_list[l])) + "\n")
+                        out_file.write("max_" + l[:l.rfind("_list")] + " :" + str(np.max(statistic_list[l])) + "\n")
+                    else:
+                        out_file.write("average_" + l[:l.rfind("_list")] + " :" + str(0) + "\n")
+                        out_file.write("std_" + l[:l.rfind("_list")] + " :" + str(0) + "\n")
+                        out_file.write("min_" + l[:l.rfind("_list")] + " :" + str(0) + "\n")
+                        out_file.write("max_" + l[:l.rfind("_list")] + " :" + str(0) + "\n")
 
 
             out_file.write("\n")
@@ -210,13 +216,24 @@ def gather_all_train_data(rootdir="../../benchmarks/LIA-lin/"):
 
 
 def main():
-    #separate_dataset_to_train_valid_test_files("../../benchmarks/trainData-chc-comp-templates/", 25, 5, 5)
-    #get_statistic_data("../../benchmarks/trainData-chc-comp-templates/")
+    benchmark_list = []
+    #benchmark_list.append(["../../benchmarks/trainData-chc-comp-predicates/", 120, 11, 30,".smt2"])
+    # benchmark_list.append(["../../benchmarks/trainData-sv-comp-c-predicates/", 70, 10, 26,".c"])
+    # benchmark_list.append(["../../benchmarks/trainData-sv-comp-smt-predicates/", 100, 20, 20,".smt2"])
+    # benchmark_list.append(["../../benchmarks/trainData-chc-comp-predicates+sv-comp-smt-predicates/", 220, 30, 51,".smt2"])
+    # benchmark_list.append(
+    #     ["../../benchmarks/trainData-chc-comp-predicates+sv-comp-smt-predicates+sv-comp-c-predicates/", 330, 30, 57,".c"])
+    # benchmark_list.append(["../../benchmarks/trainData-sv-comp-smt-templates/", 25, 8, 5,".smt2"])
+    ###benchmark_list.append(["../../benchmarks/trainData-sv-comp-c-templates/", 25, 5, 8,".c"])
+    benchmark_list.append(["../../benchmarks/trainData-chc-comp-templates/", 25, 5, 5,".smt2"])
+    for benchmark in benchmark_list:
+        #separate_dataset_to_train_valid_test_files(benchmark[0], benchmark[1], benchmark[2], benchmark[3])
+        get_statistic_data(benchmark[0],file_type=benchmark[4])
 
     #separate_datafold_and_get_statistic_data()
     #gather_all_train_data()
 
-    separate_dataset_to_train_valid_test_files("../../benchmarks/LIA-lin-traiData/", int(414*0.6), int(414*0.2), int(414*0.2))
+    #separate_dataset_to_train_valid_test_files("../../benchmarks/LIA-lin-traiData/", int(413*0.6), int(413*0.2), int(413*0.2))
     #get_statistic_data("../../benchmarks/LIA-lin-traiData/")
 
 main()
