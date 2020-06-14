@@ -55,22 +55,23 @@ def separate_dataset_to_train_valid_test_files(source,train=120,valid=11,test=30
 
 def main():
     benchmark_list=[]
-    benchmark_list.append(["../../benchmarks/trainData-chc-comp-predicates/", 120, 11, 30])
-    benchmark_list.append(["../../benchmarks/trainData-sv-comp-c-predicates/", 70, 10, 26])
-    benchmark_list.append(["../../benchmarks/trainData-sv-comp-smt-predicates/", 100, 20, 20])
-    benchmark_list.append(["../../benchmarks/trainData-chc-comp-predicates+sv-comp-smt-predicates/", 220, 30, 51])
-    benchmark_list.append(["../../benchmarks/trainData-chc-comp-predicates+sv-comp-smt-predicates+sv-comp-c-predicates/", 330, 30, 57])
-    benchmark_list.append(["../../benchmarks/trainData-sv-comp-smt-templates/", 25, 8, 5])
-    benchmark_list.append(["../../benchmarks/trainData-sv-comp-c-templates/", 25, 5, 8])
-    benchmark_list.append(["../../benchmarks/trainData-chc-comp-templates/", 25, 5, 5])
-    #benchmark_list.append(["../../benchmarks/LIA-lin-traiData/", int(413*0.6), int(413*0.2), int(413*0.2)])
-    # benchmark_list.append(["../../benchmarks/LIA-lin-traiData/", int(413*0.6), int(413*0.2), int(413*0.2)])
+    #benchmark_list.append(["../../benchmarks/trainData-chc-comp-predicates/", 120, 11, 30])
+    # benchmark_list.append(["../../benchmarks/trainData-sv-comp-c-predicates/", 70, 10, 26])
+    #benchmark_list.append(["../../benchmarks/trainData-sv-comp-smt-predicates/", 100, 20, 20])
+    # benchmark_list.append(["../../benchmarks/trainData-chc-comp-predicates+sv-comp-smt-predicates/", 220, 30, 51])
+    # benchmark_list.append(["../../benchmarks/trainData-chc-comp-predicates+sv-comp-smt-predicates+sv-comp-c-predicates/", 330, 30, 57])
+    # benchmark_list.append(["../../benchmarks/trainData-sv-comp-smt-templates/", 25, 8, 5])
+    # benchmark_list.append(["../../benchmarks/trainData-sv-comp-c-templates/", 25, 5, 8])
+    # benchmark_list.append(["../../benchmarks/trainData-chc-comp-templates/", 25, 5, 5])
+    benchmark_list.append(["../../benchmarks/LIA-lin-traiData/", int(413*0.6), int(413*0.2), int(413*0.2)])
+    #benchmark_list.append(["../../benchmarks/LIA-lin-traiData-temp/", int(413*0.6), int(413*0.2), int(413*0.2)])
 
     force_read=False
     file_type=".smt2"
+    split_flag=True
     for benchmark in benchmark_list:
-        train_on_graphs(benchmark_name=benchmark[0][17:-1],label="occurance",force_read=force_read,train_n_times=1,path=benchmark[0],file_type=file_type)
-        train_on_graphs(benchmark_name=benchmark[0][17:-1], label="rank", force_read=force_read, train_n_times=1,path=benchmark[0],file_type=file_type)
+        train_on_graphs(benchmark_name=benchmark[0][17:-1],label="occurance",force_read=force_read,train_n_times=1,path=benchmark[0],file_type=file_type,split_flag=split_flag)
+        #train_on_graphs(benchmark_name=benchmark[0][17:-1], label="rank", force_read=force_read, train_n_times=1,path=benchmark[0],file_type=file_type,split_flag=split_flag)
 
     #train_on_graphs()
 

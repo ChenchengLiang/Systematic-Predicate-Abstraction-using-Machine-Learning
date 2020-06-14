@@ -14,7 +14,7 @@ import time
 import itertools
 import scipy.stats as ss
 import signal
-
+import matplotlib.pyplot as plt
 def sleep(seconds=1):
     time.sleep(seconds)
     print("wait for",seconds)
@@ -63,9 +63,11 @@ def main():
 
     #occurance_to_rank_examples()
 
-    parameterList=[10,15,20]
-    pool = Pool(processes=8)
-    pool.map(pool_kill_popen_test, parameterList)
+    # parameterList=[10,15,20]
+    # pool = Pool(processes=8)
+    # pool.map(pool_kill_popen_test, parameterList)
+
+    pass
 
 
 

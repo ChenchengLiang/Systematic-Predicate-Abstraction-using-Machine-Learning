@@ -674,13 +674,19 @@ class DotToGraphInfo:
         else:
             print("read", suffix, "files")
             number_of_graphs = len(glob.glob(path + '*' + suffix + '.gv'))
-            print("graph file", number_of_graphs)
-            print("argument file", len(glob.glob(path + '*' + suffix + '.arguments')))
+            print("total graph file", number_of_graphs)
+            print("total argument file", len(glob.glob(path + '*' + suffix + '.arguments')))
             gv_list = sorted(glob.glob(path + '*' + suffix + '.gv'))
             argument_list = sorted(glob.glob(path + '*' + suffix + '.arguments'))
             buket_size=int(len(gv_list)/10)
-            gv_list=gv_list[(self._split_flag-1)*buket_size:self._split_flag*buket_size]
-            argument_list=argument_list[(self._split_flag-1)*buket_size:self._split_flag*buket_size]
+            if self._split_flag<10:
+                gv_list=gv_list[(self._split_flag-1)*buket_size:self._split_flag*buket_size]
+                argument_list=argument_list[(self._split_flag-1)*buket_size:self._split_flag*buket_size]
+            else:
+                gv_list = gv_list[(self._split_flag - 1) * buket_size:]
+                argument_list = argument_list[(self._split_flag - 1) * buket_size:]
+            print("read graph file", len(gv_list))
+            print("read argument file", len(argument_list))
             for fileGraph, fileArgument in zip(gv_list,
                                                argument_list):
                 fileName = fileGraph[:fileGraph.find(suffix + ".gv") + len(suffix)]

@@ -162,6 +162,8 @@ def get_statistic_data(path="",file_type=".smt2"):
                     ax1.plot(binary_edge_list,label=fold+"-"+"binary_edge_number")#, label=fold+"-"+label  #label[:label.rfind("_list")]
                     ax2.plot(ternary_edge_list, label=fold + "-" + "ternary_edge_number")
                 plt.legend()
+                plt.ylabel('graph index')
+                plt.xlabel('edge number')
                 plt.savefig(path + "statistic/"+ label + ".png")
                 plt.clf()
 
@@ -169,6 +171,8 @@ def get_statistic_data(path="",file_type=".smt2"):
                 for fold in statistic_list_datafold:
                     plt.plot(statistic_list_datafold[fold][label],label=fold+"-"+label[:label.rfind("_list")])
                 plt.legend()
+                plt.ylabel('graph index')
+                plt.xlabel('node numbers')
                 plt.savefig(path + "statistic/"+ label + ".png")
                 plt.clf()
 
@@ -217,15 +221,15 @@ def gather_all_train_data(rootdir="../../benchmarks/LIA-lin/"):
 
 def main():
     benchmark_list = []
-    #benchmark_list.append(["../../benchmarks/trainData-chc-comp-predicates/", 120, 11, 30,".smt2"])
+    benchmark_list.append(["../../benchmarks/trainData-chc-comp-predicates/", 120, 11, 30,".smt2"])
     # benchmark_list.append(["../../benchmarks/trainData-sv-comp-c-predicates/", 70, 10, 26,".c"])
-    # benchmark_list.append(["../../benchmarks/trainData-sv-comp-smt-predicates/", 100, 20, 20,".smt2"])
+    benchmark_list.append(["../../benchmarks/trainData-sv-comp-smt-predicates/", 100, 20, 20,".smt2"])
     # benchmark_list.append(["../../benchmarks/trainData-chc-comp-predicates+sv-comp-smt-predicates/", 220, 30, 51,".smt2"])
     # benchmark_list.append(
     #     ["../../benchmarks/trainData-chc-comp-predicates+sv-comp-smt-predicates+sv-comp-c-predicates/", 330, 30, 57,".c"])
     # benchmark_list.append(["../../benchmarks/trainData-sv-comp-smt-templates/", 25, 8, 5,".smt2"])
     ###benchmark_list.append(["../../benchmarks/trainData-sv-comp-c-templates/", 25, 5, 8,".c"])
-    benchmark_list.append(["../../benchmarks/trainData-chc-comp-templates/", 25, 5, 5,".smt2"])
+    #benchmark_list.append(["../../benchmarks/trainData-chc-comp-templates/", 25, 5, 5,".smt2"])
     for benchmark in benchmark_list:
         #separate_dataset_to_train_valid_test_files(benchmark[0], benchmark[1], benchmark[2], benchmark[3])
         get_statistic_data(benchmark[0],file_type=benchmark[4])

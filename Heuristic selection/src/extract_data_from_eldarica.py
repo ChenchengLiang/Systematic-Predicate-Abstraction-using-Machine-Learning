@@ -74,7 +74,7 @@ def extract_one_file(parameterList):
                                 filePath, abstractionOption, \
                                 "-absTimeout:" + str(timeOut), \
                                 "-extractPredicates"], stdout=subprocess.DEVNULL, shell=False)
-        eld.wait(timeout=600)
+        eld.wait()#timeout=600
         gc.collect()
     except:
         print("Time out","Command:", run_p)
@@ -102,7 +102,7 @@ def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
 
             parameterList=[]
             for file in files:
-                parameterList.append([root+"/"+file,"-abstract",30])
+                parameterList.append([root+"/"+file,"-abstract",60])
             pool = Pool(processes=8)
             pool.map(extract_one_file, parameterList)
 
@@ -113,7 +113,7 @@ def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
     pass
 
 def main():
-    benchmark_list = ["../benchmarks/LIA-nonlin/"]
+    benchmark_list = ["../benchmarks/LIA-lin/"]
     for benchmark in benchmark_list:
         # check_solvability_pool()
         extract_data_pool(benchmark)

@@ -14,17 +14,20 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import random
 import scipy.stats as ss
+import subprocess
+
+def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../../",file_type=".smt2",split_flag=False):
+    if split_flag==True and not os.path.isfile("../../pickleData/"+label+"-"+benchmark_name+"-gnnInput_train_data.txt"):
+        write_graph_to_pickle(benchmark_name,  data_fold=["train", "valid", "test"], label=label,path=path)
 
 
-
-def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../../",file_type=".smt2"):
     read_graph_from_pickle_file(benchmark_name,force_read=force_read,label=label,path=path,file_type=file_type)
     nodeFeatureDim = 8
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
     parameters['hidden_dim'] = 64
     parameters['num_layers'] = 2
     parameters['node_label_embedding_size'] = nodeFeatureDim
-    parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
+    parameters['max_nodes_per_batch']=100000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
     parameters['regression_hidden_layer_size'] = [64,32]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
@@ -48,10 +51,12 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     #todo:train n times and get average results
     train_loss_list_average=[]
     valid_loss_list_average=[]
+    test_loss_list_average=[]
     mean_loss_list_average=[]
     mse_loaded_model_average=[]
     train_loss_average=[]
     valid_loss_average=[]
+    test_loss_average=[]
     best_valid_epoch_average=[]
     for n in range(train_n_times):
         #get model
@@ -100,21 +105,24 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
 
         train_loss_list_average.append(train_loss_list)
         valid_loss_list_average.append(valid_loss_list)
+        test_loss_list_average.append(predicted_Y_loaded_model)
         mean_loss_list_average.append(mean_loss_list)
         mse_loaded_model_average.append(mse_loaded_model)
         train_loss_average.append(train_loss_list[-1])
         valid_loss_average.append(valid_loss_list[-1])
+        test_loss_average.append(predicted_Y_loaded_model[-1])
         best_valid_epoch_average.append(best_valid_epoch)
 
     train_loss_list_average=np.mean(train_loss_list_average,axis=0)
     valid_loss_list_average=np.mean(valid_loss_list_average,axis=0)
+    test_loss_list_average=np.mean(test_loss_list_average,axis=0)
     mean_loss_list_average=np.mean(mean_loss_list)
     mse_loaded_model_average=np.mean(mse_loaded_model)
     train_loss_average=np.mean(train_loss_average)
     best_valid_epoch_average=np.mean(best_valid_epoch_average)
 
     #visualize results
-    draw_training_results(train_loss_list_average, valid_loss_list_average, mean_loss_list_average,
+    draw_training_results(train_loss_list_average, valid_loss_list_average,test_loss_list_average, mean_loss_list_average,
                           mse_loaded_model_average, valid_loss_list, true_Y, predicted_Y_loaded_model, label,
                           benchmark_name)
     write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss_average,
@@ -127,7 +135,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     #todo: statistics of positive and negative examples
 
 
-def draw_training_results(train_loss_list_average,valid_loss_list_average,mean_loss_list_average,
+def draw_training_results(train_loss_list_average,valid_loss_list_average,test_loss_list_average,mean_loss_list_average,
                           mse_loaded_model_average,valid_loss_list,true_Y,predicted_Y_loaded_model,label,benchmark_name):
     # mse on train, validation,test,mean
     plt.plot(train_loss_list_average, color="blue")
@@ -165,7 +173,8 @@ def draw_training_results(train_loss_list_average,valid_loss_list_average,mean_l
     plt.savefig("trained_model/" + label + "-" + benchmark_name + "-error-distribution.png")
     plt.clf()
 
-def write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss,valid_loss,test_loss,mean_loss,best_valid_epoch,benchmark="unknown",label="rank"):
+def write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss,valid_loss,test_loss,mean_loss,
+                               best_valid_epoch,benchmark="unknown",label="rank"):
     with open("trained_model/"+label+"-"+benchmark+".log", 'w') as out_file:
         out_file.write("best_valid_epoch:" + str(best_valid_epoch) + "\n")
         out_file.write("train loss:"+ str(train_loss)+"\n")
@@ -182,12 +191,22 @@ def write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss,valid
             argument_lists.append(
                 predicted_Y_loaded_model[sum(argument_number_lists[:i]):sum(argument_number_lists[:i]) + n])
 
+        mse_list=[]
         for predicted_arguments, arguments,ranks in zip(argument_lists,dataset._argument_scores["test"],dataset._ranked_argument_scores["test"]):
             out_file.write("-------"+ "\n")
             out_file.write("original argument scores:"+ str(arguments)+ "\n")
             out_file.write("original rank:"+ str(ranks)+ "\n")
             out_file.write("predicted argument scores:"+ str(predicted_arguments)+ "\n")
             out_file.write("predicted rank:"+ str(ss.rankdata(predicted_arguments,method="dense"))+ "\n")
+            mse_list.append(tf.keras.losses.MSE(arguments,predicted_arguments))
+        plt.xlabel('graph number')
+        plt.ylabel('mse of predicted argument score')
+        plt.plot(mse_list,label="predicted_data_mse")
+        plt.plot([mean_loss]*len(mse_list),label="mean_mse")
+        plt.legend()
+        plt.savefig("trained_model/" + label + "-" + benchmark + "-test-mse.png")
+        plt.clf()
+
 
 
 class HornGraphSample(GraphSample):
@@ -207,7 +226,14 @@ class HornGraphSample(GraphSample):
     def node_label(self) -> np.ndarray:
         """Node labels to predict as ndarray of shape [V, C]"""
         return self._node_label
-
+class raw_graph_inputs():
+    def __init__(self,num_edge_types,total_number_of_nodes):
+        self._num_edge_types=num_edge_types
+        self._total_number_of_nodes=total_number_of_nodes
+        self._node_number_per_edge_type=[]
+        self.final_graphs=None
+        self.argument_scores=[]
+        self.ranked_argument_scores=[]
 
 class HornGraphDataset(GraphDataset[HornGraphSample]):
     def __init__(self, params: Dict[str, Any], metadata: Optional[Dict[str, Any]] = None):
@@ -252,6 +278,7 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
 
         #whatever the data_fold is, use the same dataset to debug
         print("data_fold",data_name)
+        print(self.label_type+"-"+self._benchmark+"-gnnInput_"+data_name+"_data")
         raw_inputs=pickleRead(self.label_type+"-"+self._benchmark+"-gnnInput_"+data_name+"_data","../")
         final_graphs=raw_inputs.final_graphs
 
@@ -397,21 +424,12 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
 
 
 
-class raw_graph_inputs():
-    def __init__(self,num_edge_types,total_number_of_nodes):
-        self._num_edge_types=num_edge_types
-        self._total_number_of_nodes=total_number_of_nodes
-        self._node_number_per_edge_type=[]
-        self.final_graphs=None
-        self.argument_scores=[]
-        self.ranked_argument_scores=[]
 
 
 
 def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","valid","test"],label="rank",path="../../",file_type=".smt2"):
     benchmark_name=benchmark.replace("/", "-")
-    #if os.path.isfile("../../pickleData/"+label+"-"+benchmark_name+"-gnnInput_train_data.txt") and force_read==False:
-    if force_read==False:
+    if os.path.isfile("../../pickleData/"+label+"-"+benchmark_name+"-gnnInput_train_data.txt") and force_read==False:
         print("read existed training data")
 
     else:
@@ -466,4 +484,65 @@ def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","
             pickleWrite(raw_data_graph, label+"-"+benchmark+"-gnnInput_"+df+"_data", "../")
 
 
+def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../../", curssor=0):
+    benchmark_name = benchmark.replace("/", "-")
+    for df in data_fold:
+        print("write data_fold to pickle data:", df)
+        final_graphs_v1 = []
+        graphs_node_label_ids=[]
+        graphs_argument_indices=[]
+        graphs_adjacency_lists=[]
+        graphs_argument_scores=[]
+        total_number_of_node=0
+        file_type=".smt2"
+        for i in range(1,11):
+            p = subprocess.Popen(["../../venv/bin/python3", "split_read_graphs.py", path,df,str(i),file_type,label])
+            p.wait()
+            # os.kill(p.pid,signal.SIGKILL)
+            print("curssor=",i)
 
+        for i in range(1,11):
+            graphs_node_label_ids.extend(pickleRead(label+"-graphs_node_label_ids-"+str(i),path="../"))
+            graphs_argument_indices.extend(pickleRead(label+"-graphs_argument_indices-"+str(i),path="../"))
+            graphs_adjacency_lists.extend(pickleRead(label+"-graphs_adjacency_lists-" + str(i), path="../"))
+            graphs_argument_scores.extend(pickleRead(label+"-graphs_argument_scores-" + str(i), path="../"))
+            total_number_of_node+=pickleRead(label+"-total_number_of_node-" + str(i), path="../")
+
+
+        raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists[0]), total_number_of_node)
+        for edge_type in graphs_adjacency_lists[0]:
+            raw_data_graph._node_number_per_edge_type.append(len(edge_type[0]))
+
+        # loop per graph
+        for node_label_ids, argument_indices, adjacency_lists, argument_scores in zip(graphs_node_label_ids,
+                                                                                      graphs_argument_indices,
+                                                                                      graphs_adjacency_lists,
+                                                                                      graphs_argument_scores):
+            # convert to rank
+            ranked_argument_scores = ss.rankdata(argument_scores, method="dense")
+            raw_data_graph.ranked_argument_scores.append(ranked_argument_scores)
+            raw_data_graph.argument_scores.append(argument_scores)
+
+            if label == "rank":
+                final_graphs_v1.append(
+                    HornGraphSample(
+                        adjacency_lists=tuple(adjacency_lists),
+                        node_features=tf.constant(node_label_ids),
+                        node_label=tf.constant(ranked_argument_scores),
+                        # node_label=tf.constant(argument_scores),
+                        node_argument=tf.constant(argument_indices),
+                    )
+                )
+            else:
+                final_graphs_v1.append(
+                    HornGraphSample(
+                        adjacency_lists=tuple(adjacency_lists),
+                        node_features=tf.constant(node_label_ids),
+                        # node_label=tf.constant(ranked_argument_scores),
+                        node_label=tf.constant(argument_scores),
+                        node_argument=tf.constant(argument_indices),
+                    )
+                )
+
+        raw_data_graph.final_graphs = final_graphs_v1.copy()
+        pickleWrite(raw_data_graph, label + "-" + benchmark_name + "-gnnInput_" + df + "_data", "../")
