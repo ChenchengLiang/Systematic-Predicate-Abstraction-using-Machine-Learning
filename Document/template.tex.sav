@@ -311,23 +311,44 @@ The final goal is to have proper predicates that can represent the abstract tran
 Extracting data with variable timeout: First, confirm the solvability (i.e. the program can be solved within 60 seconds with the abstraction heuristic).
 Second, record the solving time with and without the abstraction heuristic. If Eldarica takes less solving time with abstraction heuristic, pass this solving time as timeout to Eldarica to label the templates used in the program.
 
-\begin{enumerate}
-  \item chc-comp benchmarks: 40/1216.  32 programs (204 templates)for training and 8 (47 templates) for testing. 8/8 solved by read templates. Read templates time consumption/original templates consumption =  40.25/40.86 (in seconds)
-  \item sv-comp smt benchmarks: 15/5911.  12 programs (254 templates)for training and 3 (74 templates) for testing. 3/3 solved by read templates. Read templates time consumption/original templates consumption =  28.07/27.28 (in seconds)
-  \item sv-comp c benchmarks: 41/555.  32 programs (4635 templates)for training and 9 (350 templates) for testing. 8/9 solved by read templates. Read templates time consumption/original templates consumption = 34.04/53.46  (in seconds)
-\end{enumerate}
 
-96 training programs. 76 programs for training, 20 programs for testing.
-18/20 solved by read templates. Read templates time consumption/original templates consumption =  140.67/126.84 (in seconds)
-
-Extracting data on larger benchmarks, and use these three benchmarks only for testing.
+\subsection{Benchmarks}
 
 
 
+\begin{table}\caption{Benchmarks}
+\begin{center}
+\begin{tabular}{lp{1cm}p{1cm}p{1.5cm}p{1.5cm}p{1.5cm}p{1.5cm}p{1.5cm}p{1.5cm}}
+\hline
+Benchmarks & File type & Total file & Solved & sat & unsat & Unsolved  \\
+\hline
+chc-comp-smt & .smt2 & 1216 & 421  & 339  & 82    & 795 \\
+sv-comp-smt &.smt2   & 5911 & 4730 & 4516 & 214  & 1181 \\
+sv-comp-c &.c        & 555  & 323  & 262  & 61   & 231 \\
+In total  & - & - & -&-&-&-&-&-\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
 
 
 
-We try to use balanced and imbalanced data set to train the neural network.
+%
+%\begin{enumerate}
+%  \item chc-comp benchmarks: 40/1216.  32 programs (204 templates)for training and 8 (47 templates) for testing. 8/8 solved by read templates. Read templates time consumption/original templates consumption =  40.25/40.86 (in seconds)
+%  \item sv-comp smt benchmarks: 15/5911.  12 programs (254 templates)for training and 3 (74 templates) for testing. 3/3 solved by read templates. Read templates time consumption/original templates consumption =  28.07/27.28 (in seconds)
+%  \item sv-comp c benchmarks: 41/555.  32 programs (4635 templates)for training and 9 (350 templates) for testing. 8/9 solved by read templates. Read templates time consumption/original templates consumption = 34.04/53.46  (in seconds)
+%\end{enumerate}
+%
+%96 training programs. 76 programs for training, 20 programs for testing.
+%18/20 solved by read templates. Read templates time consumption/original templates consumption =  140.67/126.84 (in seconds)
+%
+%Extracting data on larger benchmarks, and use these three benchmarks only for testing.
+
+
+%We try to use balanced and imbalanced data set to train the neural network.
+
+
 
 %\begin{table}
 %\begin{center}\caption{Balanced Predicates}

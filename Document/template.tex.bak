@@ -311,16 +311,19 @@ The final goal is to have proper predicates that can represent the abstract tran
 Extracting data with variable timeout: First, confirm the solvability (i.e. the program can be solved within 60 seconds with the abstraction heuristic).
 Second, record the solving time with and without the abstraction heuristic. If Eldarica takes less solving time with abstraction heuristic, pass this solving time as timeout to Eldarica to label the templates used in the program.
 
-\begin{enumerate}
-  \item chc-comp benchmarks: 40/1216.  32 programs (204 templates)for training and 8 (47 templates) for testing. 8/8 solved by read templates. Read templates time consumption/original templates consumption =  40.25/40.86 (in seconds)
-  \item sv-comp smt benchmarks: 15/5911.  12 programs (254 templates)for training and 3 (74 templates) for testing. 3/3 solved by read templates. Read templates time consumption/original templates consumption =  28.07/27.28 (in seconds)
-  \item sv-comp c benchmarks: 41/555.  32 programs (4635 templates)for training and 9 (350 templates) for testing. 8/9 solved by read templates. Read templates time consumption/original templates consumption = 34.04/53.46  (in seconds)
-\end{enumerate}
 
-96 training programs. 76 programs for training, 20 programs for testing.
-18/20 solved by read templates. Read templates time consumption/original templates consumption =  140.67/126.84 (in seconds)
-
-Extracting data on larger benchmarks, and use these three benchmarks only for testing.
+\subsection{Benchmarks}
+%
+%\begin{enumerate}
+%  \item chc-comp benchmarks: 40/1216.  32 programs (204 templates)for training and 8 (47 templates) for testing. 8/8 solved by read templates. Read templates time consumption/original templates consumption =  40.25/40.86 (in seconds)
+%  \item sv-comp smt benchmarks: 15/5911.  12 programs (254 templates)for training and 3 (74 templates) for testing. 3/3 solved by read templates. Read templates time consumption/original templates consumption =  28.07/27.28 (in seconds)
+%  \item sv-comp c benchmarks: 41/555.  32 programs (4635 templates)for training and 9 (350 templates) for testing. 8/9 solved by read templates. Read templates time consumption/original templates consumption = 34.04/53.46  (in seconds)
+%\end{enumerate}
+%
+%96 training programs. 76 programs for training, 20 programs for testing.
+%18/20 solved by read templates. Read templates time consumption/original templates consumption =  140.67/126.84 (in seconds)
+%
+%Extracting data on larger benchmarks, and use these three benchmarks only for testing.
 
 
 
@@ -472,7 +475,7 @@ AST embedding: code2vec \cite{Alon:2019:CLD:3302515.3290353}. TBCNN \cite{DBLP:j
 
 FormulaNet \cite{NIPS2017_6871}. GAT \cite{2017arXiv171010903V}.
 
-Semi-supervised or unsupervised graph embedding
+Semi-supervised or unsupervised graph embedding aims at using various methods to represent the graph to low-dimensional vector, then the down stream applications (e.g. classification, recommendation, etc.) can take the low-dimensional vector as input data. Learning tasks using graph embedding usually consist of two models and are not trained in end-to-end manner.
 Before combining with deep learning, graph embedding works in the context of dimensionality reduction.
 The typical techniques are principle component analysis (PCA), multidimensional scaling (MDS),Isomap \cite{Isomap}, Locally Linear Embedding (LLE) \cite{Roweis2323}, and Laplacian Eigenmap \cite{NIPS2001_1961}. Their complexities are quadratic corresponding to the number of vertices.
 DeepWalk maps the graph's nodes to sentence's words and uses word embedding technique skip-gram to perform the node embedding. along with skip-gram word embedding later on been extended to Doc2Vec, DeepWalk node embedding is extended to Graph2Vec.
