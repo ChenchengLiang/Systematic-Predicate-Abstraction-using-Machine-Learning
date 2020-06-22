@@ -14,79 +14,94 @@
 \global\let\hyper@last\relax 
 \gdef\HyperFirstAtBeginDocument#1{#1}
 \providecommand\HyField@AuxAddToFields[1]{}
-\citation{10.1007/10722167_15}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}}
-\@writefile{toc}{\contentsline {section}{\numberline {2}Background}{1}{section.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Abstraction Based Model Checking}{1}{subsection.2.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Problem overview and working pipeline}{1}{subsection.1.1}}
+\citation{10.1007/10722167_15}
+\citation{10.1007/978-3-319-57288-8_18}
+\citation{10.1007/978-3-319-57288-8_18}
+\citation{2017arXiv171010903V}
+\citation{schlichtkrull2017modeling}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Contribution}{2}{subsection.1.2}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Background}{2}{section.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Abstraction Based Model Checking}{2}{subsection.2.1}}
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces CEGAR framework\relax }}{2}{figure.caption.1}}
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
 \newlabel{CEGAR}{{1}{2}{CEGAR framework\relax \relax }{figure.caption.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Abstract Interpolation}{2}{subsection.2.2}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Problem Overview}{2}{section.3}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Program representation}{2}{section.4}}
-\newlabel{while-C-program}{{2a}{2}{An input example: C program\relax \relax }{figure.caption.2}{}}
-\newlabel{sub@while-C-program}{{a}{2}{An input example: C program\relax \relax }{figure.caption.2}{}}
-\newlabel{while-C-horn-clauses}{{2b}{2}{Horn clauses for C program\relax \relax }{figure.caption.2}{}}
-\newlabel{sub@while-C-horn-clauses}{{b}{2}{Horn clauses for C program\relax \relax }{figure.caption.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces \relax }}{2}{figure.caption.2}}
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Nodes and hyperedges in graph\relax }}{3}{table.caption.3}}
-\newlabel{GraphDescriptionNodes}{{1}{3}{Nodes and hyperedges in graph\relax \relax }{table.caption.3}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Edges in graph\relax }}{3}{table.caption.4}}
-\newlabel{GraphDescriptionEdges}{{2}{3}{Edges in graph\relax \relax }{table.caption.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Templates Representation}{4}{subsection.4.1}}
-\newlabel{templateGraphviz}{{3a}{4}{Template graph example in graphviz format\relax \relax }{figure.caption.5}{}}
-\newlabel{sub@templateGraphviz}{{a}{4}{Template graph example in graphviz format\relax \relax }{figure.caption.5}{}}
-\newlabel{templateGraph}{{3b}{4}{Template graph example\relax \relax }{figure.caption.5}{}}
-\newlabel{sub@templateGraph}{{b}{4}{Template graph example\relax \relax }{figure.caption.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Graph representation for an example template "inv\_main8:VerifHintInitPred(((\_0 + -1 * \_2) >= 0))"\relax }}{4}{figure.caption.5}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.1}Heuristics for predicate generating}{2}{subsubsection.2.1.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}GNN}{2}{subsection.2.2}}
+\citation{mikolov2013efficient}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.1}Message passing and hyperedge extension}{3}{subsubsection.2.2.1}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Program representation}{3}{section.3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Program to Horn clauses}{3}{subsection.3.1}}
+\newlabel{while-C-program}{{2a}{3}{An input example: C program\relax \relax }{figure.caption.2}{}}
+\newlabel{sub@while-C-program}{{a}{3}{An input example: C program\relax \relax }{figure.caption.2}{}}
+\newlabel{while-C-horn-clauses}{{2b}{3}{Horn clauses for C program\relax \relax }{figure.caption.2}{}}
+\newlabel{sub@while-C-horn-clauses}{{b}{3}{Horn clauses for C program\relax \relax }{figure.caption.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces \relax }}{3}{figure.caption.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Horn clauses to Horn graph}{4}{subsection.3.2}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.1}Horn graph construction example}{4}{subsubsection.3.2.1}}
+\newlabel{Horn-graph-construction-example}{{3.2.1}{4}{Horn graph construction example\relax }{subsubsection.3.2.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Horn graph for horn clause inv\_main4(x, y) :- ,[n >= 0 \& x = n \& 0 = n \& y = n]\relax }}{4}{figure.caption.3}}
+\newlabel{horn-grapn-line-0}{{3}{4}{Horn graph for horn clause inv\_main4(x, y) :- ,[n >= 0 \& x = n \& 0 = n \& y = n]\relax \relax }{figure.caption.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Horn graph for horn clause inv\_main4(arg1, arg2) :- inv\_main4(x, y), [x != 0 \& x + -1 = arg1 \& y + -1 = arg2 \& n = 0]\relax }}{5}{figure.caption.4}}
+\newlabel{horn-grapn-line-1}{{4}{5}{Horn graph for horn clause inv\_main4(arg1, arg2) :- inv\_main4(x, y), [x != 0 \& x + -1 = arg1 \& y + -1 = arg2 \& n = 0]\relax \relax }{figure.caption.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Horn graph for horn clause false :- inv\_main4(0, y), [y != 0]\relax }}{5}{figure.caption.5}}
+\newlabel{horn-grapn-line-2}{{5}{5}{Horn graph for horn clause false :- inv\_main4(0, y), [y != 0]\relax \relax }{figure.caption.5}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.2}Horn graph Definition}{5}{subsubsection.3.2.2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Overview of Horn graph construction for Figure \ref  {while-C-horn-clauses}\relax }}{6}{figure.caption.6}}
+\newlabel{overall-transformation}{{6}{6}{Overview of Horn graph construction for Figure \ref {while-C-horn-clauses}\relax \relax }{figure.caption.6}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Nodes in graph\relax }}{6}{table.caption.7}}
+\newlabel{GraphDescriptionNodes}{{1}{6}{Nodes in graph\relax \relax }{table.caption.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Data Collection}{6}{section.4}}
 \citation{10.1007/978-3-319-57288-8_18}
 \citation{Leroux2016}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Data Collection}{5}{section.5}}
-\@writefile{loa}{\contentsline {algocf}{\numberline {1}{\ignorespaces Templates extracting process\relax }}{5}{algocf.1}}
-\@writefile{loa}{\contentsline {algocf}{\numberline {2}{\ignorespaces Predicates extracting process\relax }}{5}{algocf.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Benchmarks}{5}{subsection.5.1}}
-\citation{DBLP:journals/corr/LeM14}
-\citation{DBLP:journals/corr/NarayananCVCLJ17}
-\citation{WL_relabeling_process}
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Benchmarks\relax }}{6}{table.caption.6}}
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Training results\relax }}{6}{table.caption.7}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Argument labelling}{6}{subsection.5.2}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Training Model}{6}{section.6}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Neural network structure\relax }}{6}{figure.caption.8}}
-\newlabel{NNstructure}{{4}{6}{Neural network structure\relax \relax }{figure.caption.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Program Embedding}{6}{subsection.6.1}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.1.1}Text Level}{6}{subsubsection.6.1.1}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.1.2}Graph Level}{6}{subsubsection.6.1.2}}
-\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Benchmarks\relax }}{7}{table.caption.9}}
-\@writefile{toc}{\contentsline {section}{\numberline {7}Experiments}{7}{section.7}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Ablation studies}{7}{subsection.7.1}}
-\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Imbalanced Predicates with control flow and template graph\relax }}{7}{table.caption.10}}
-\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Imbalanced Templates with control flow and template graph\relax }}{7}{table.caption.11}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Edges in graph\relax }}{7}{table.caption.8}}
+\newlabel{GraphDescriptionEdges}{{2}{7}{Edges in graph\relax \relax }{table.caption.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}label collection}{7}{subsection.4.1}}
+\newlabel{Predicates-extracting-process}{{1}{8}{label collection\relax }{algocfline.1}{}}
+\@writefile{loa}{\contentsline {algocf}{\numberline {1}{\ignorespaces Predicates refining process\relax }}{8}{algocf.1}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Learning Model}{8}{section.5}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Training structure\relax }}{8}{figure.caption.9}}
+\newlabel{training-framework}{{7}{8}{Training structure\relax \relax }{figure.caption.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Training results and analysis}{8}{subsection.5.1}}
 \citation{NIPS2016_6280}
-\citation{Alon:2019:CLD:3302515.3290353}
+\citation{NIPS2017_6871}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Training results\relax }}{9}{table.caption.10}}
+\newlabel{training-results}{{3}{9}{Training results\relax \relax }{table.caption.10}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Feed learned heuristic back to Eldarica}{9}{section.6}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Evaluation}{9}{section.7}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Benchmarks}{9}{subsection.7.1}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Benchmarks\relax }}{9}{table.caption.11}}
+\newlabel{benchmark-train-valid-test}{{4}{9}{Benchmarks\relax \relax }{table.caption.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Setup}{9}{subsection.7.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Experimental results}{9}{subsection.7.3}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces The number of verified programs in fixed time\relax }}{9}{table.caption.12}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Related work}{9}{section.8}}
 \citation{DBLP:journals/corr/MouLJZW14}
 \citation{DBLP:journals/corr/abs-1711-00740}
-\citation{NIPS2017_6871}
-\citation{2017arXiv171010903V}
 \citation{Isomap}
 \citation{Roweis2323}
 \citation{NIPS2001_1961}
+\citation{DBLP:journals/corr/PerozziAS14}
+\citation{DBLP:journals/corr/MikolovSCCD13}
+\citation{DBLP:journals/corr/NarayananCVCLJ17}
 \bibstyle{unsrt}
 \bibdata{references}
 \bibcite{10.1007/10722167_15}{1}
 \bibcite{10.1007/978-3-319-57288-8_18}{2}
-\bibcite{Leroux2016}{3}
-\bibcite{DBLP:journals/corr/LeM14}{4}
-\bibcite{DBLP:journals/corr/NarayananCVCLJ17}{5}
-\bibcite{WL_relabeling_process}{6}
+\bibcite{2017arXiv171010903V}{3}
+\bibcite{schlichtkrull2017modeling}{4}
+\bibcite{mikolov2013efficient}{5}
+\bibcite{Leroux2016}{6}
 \bibcite{NIPS2016_6280}{7}
-\@writefile{toc}{\contentsline {section}{\numberline {8}Related work}{8}{section.8}}
-\@writefile{toc}{\contentsline {section}{\numberline {9}Discussion and Future work}{8}{section.9}}
-\bibcite{Alon:2019:CLD:3302515.3290353}{8}
+\bibcite{NIPS2017_6871}{8}
 \bibcite{DBLP:journals/corr/MouLJZW14}{9}
 \bibcite{DBLP:journals/corr/abs-1711-00740}{10}
-\bibcite{NIPS2017_6871}{11}
-\bibcite{2017arXiv171010903V}{12}
-\bibcite{Isomap}{13}
-\bibcite{Roweis2323}{14}
-\bibcite{NIPS2001_1961}{15}
+\bibcite{Isomap}{11}
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Average CEGAR iterations and time consumption\relax }}{10}{table.caption.13}}
+\@writefile{toc}{\contentsline {section}{\numberline {9}Discussion and Future work}{10}{section.9}}
+\bibcite{Roweis2323}{12}
+\bibcite{NIPS2001_1961}{13}
+\bibcite{DBLP:journals/corr/PerozziAS14}{14}
+\bibcite{DBLP:journals/corr/MikolovSCCD13}{15}
+\bibcite{DBLP:journals/corr/NarayananCVCLJ17}{16}

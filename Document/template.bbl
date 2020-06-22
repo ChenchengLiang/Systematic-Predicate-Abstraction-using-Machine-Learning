@@ -14,27 +14,25 @@ Yulia Demyanova, Philipp R{\"u}mmer, and Florian Zuleger.
   NASA Formal Methods}, pages 265--281, Cham, 2017. Springer International
   Publishing.
 
+\bibitem{2017arXiv171010903V}
+Petar {Veli{\v{c}}kovi{\'c}}, Guillem {Cucurull}, Arantxa {Casanova}, Adriana
+  {Romero}, Pietro {Li{\`o}}, and Yoshua {Bengio}.
+\newblock {Graph Attention Networks}.
+\newblock {\em arXiv e-prints}, page arXiv:1710.10903, Oct 2017.
+
+\bibitem{schlichtkrull2017modeling}
+Michael Schlichtkrull, Thomas~N. Kipf, Peter Bloem, Rianne van~den Berg, Ivan
+  Titov, and Max Welling.
+\newblock Modeling relational data with graph convolutional networks, 2017.
+
+\bibitem{mikolov2013efficient}
+Tomas Mikolov, Kai Chen, Greg Corrado, and Jeffrey Dean.
+\newblock Efficient estimation of word representations in vector space, 2013.
+
 \bibitem{Leroux2016}
 J{\'e}r{\^o}me Leroux, Philipp R{\"u}mmer, and Pavle Suboti{\'{c}}.
 \newblock Guiding craig interpolation with domain-specific abstractions.
 \newblock {\em Acta Informatica}, 53(4):387--424, Jun 2016.
-
-\bibitem{DBLP:journals/corr/LeM14}
-Quoc~V. Le and Tomas Mikolov.
-\newblock Distributed representations of sentences and documents.
-\newblock {\em CoRR}, abs/1405.4053, 2014.
-
-\bibitem{DBLP:journals/corr/NarayananCVCLJ17}
-Annamalai Narayanan, Mahinthan Chandramohan, Rajasekar Venkatesan, Lihui Chen,
-  Yang Liu, and Shantanu Jaiswal.
-\newblock graph2vec: Learning distributed representations of graphs.
-\newblock {\em CoRR}, abs/1707.05005, 2017.
-
-\bibitem{WL_relabeling_process}
-Nino Shervashidze, Pascal Schweitzer, Erik~Jan van Leeuwen, Kurt Mehlhorn, and
-  Karsten~M. Borgwardt.
-\newblock Weisfeiler-lehman graph kernels.
-\newblock {\em Journal of Machine Learning Research}, 12, 2011.
 
 \bibitem{NIPS2016_6280}
 Geoffrey Irving, Christian Szegedy, Alexander~A Alemi, Niklas Een, Francois
@@ -44,10 +42,12 @@ Geoffrey Irving, Christian Szegedy, Alexander~A Alemi, Niklas Een, Francois
   editors, {\em Advances in Neural Information Processing Systems 29}, pages
   2235--2243. Curran Associates, Inc., 2016.
 
-\bibitem{Alon:2019:CLD:3302515.3290353}
-Uri Alon, Meital Zilberstein, Omer Levy, and Eran Yahav.
-\newblock Code2vec: Learning distributed representations of code.
-\newblock {\em Proc. ACM Program. Lang.}, 3(POPL):40:1--40:29, January 2019.
+\bibitem{NIPS2017_6871}
+Mingzhe Wang, Yihe Tang, Jian Wang, and Jia Deng.
+\newblock Premise selection for theorem proving by deep graph embedding.
+\newblock In I.~Guyon, U.~V. Luxburg, S.~Bengio, H.~Wallach, R.~Fergus,
+  S.~Vishwanathan, and R.~Garnett, editors, {\em Advances in Neural Information
+  Processing Systems 30}, pages 2786--2796. Curran Associates, Inc., 2017.
 
 \bibitem{DBLP:journals/corr/MouLJZW14}
 Lili Mou, Ge~Li, Zhi Jin, Lu~Zhang, and Tao Wang.
@@ -59,19 +59,6 @@ Lili Mou, Ge~Li, Zhi Jin, Lu~Zhang, and Tao Wang.
 Miltiadis Allamanis, Marc Brockschmidt, and Mahmoud Khademi.
 \newblock Learning to represent programs with graphs.
 \newblock {\em CoRR}, abs/1711.00740, 2017.
-
-\bibitem{NIPS2017_6871}
-Mingzhe Wang, Yihe Tang, Jian Wang, and Jia Deng.
-\newblock Premise selection for theorem proving by deep graph embedding.
-\newblock In I.~Guyon, U.~V. Luxburg, S.~Bengio, H.~Wallach, R.~Fergus,
-  S.~Vishwanathan, and R.~Garnett, editors, {\em Advances in Neural Information
-  Processing Systems 30}, pages 2786--2796. Curran Associates, Inc., 2017.
-
-\bibitem{2017arXiv171010903V}
-Petar {Veli{\v{c}}kovi{\'c}}, Guillem {Cucurull}, Arantxa {Casanova}, Adriana
-  {Romero}, Pietro {Li{\`o}}, and Yoshua {Bengio}.
-\newblock {Graph Attention Networks}.
-\newblock {\em arXiv e-prints}, page arXiv:1710.10903, Oct 2017.
 
 \bibitem{Isomap}
 Joshua Tenenbaum, Vin Silva, and John Langford.
@@ -90,5 +77,22 @@ Mikhail Belkin and Partha Niyogi.
 \newblock In T.~G. Dietterich, S.~Becker, and Z.~Ghahramani, editors, {\em
   Advances in Neural Information Processing Systems 14}, pages 585--591. MIT
   Press, 2002.
+
+\bibitem{DBLP:journals/corr/PerozziAS14}
+Bryan Perozzi, Rami Al{-}Rfou, and Steven Skiena.
+\newblock Deepwalk: Online learning of social representations.
+\newblock {\em CoRR}, abs/1403.6652, 2014.
+
+\bibitem{DBLP:journals/corr/MikolovSCCD13}
+Tomas Mikolov, Ilya Sutskever, Kai Chen, Greg Corrado, and Jeffrey Dean.
+\newblock Distributed representations of words and phrases and their
+  compositionality.
+\newblock {\em CoRR}, abs/1310.4546, 2013.
+
+\bibitem{DBLP:journals/corr/NarayananCVCLJ17}
+Annamalai Narayanan, Mahinthan Chandramohan, Rajasekar Venkatesan, Lihui Chen,
+  Yang Liu, and Shantanu Jaiswal.
+\newblock graph2vec: Learning distributed representations of graphs.
+\newblock {\em CoRR}, abs/1707.05005, 2017.
 
 \end{thebibliography}

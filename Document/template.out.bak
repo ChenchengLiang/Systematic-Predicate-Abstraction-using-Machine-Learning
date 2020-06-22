@@ -1,18 +1,24 @@
 \BOOKMARK [1][-]{section.1}{Introduction}{}% 1
-\BOOKMARK [1][-]{section.2}{Background}{}% 2
-\BOOKMARK [2][-]{subsection.2.1}{Abstraction Based Model Checking}{section.2}% 3
-\BOOKMARK [2][-]{subsection.2.2}{Abstract Interpolation}{section.2}% 4
-\BOOKMARK [1][-]{section.3}{Problem Overview}{}% 5
-\BOOKMARK [1][-]{section.4}{Program representation}{}% 6
-\BOOKMARK [2][-]{subsection.4.1}{Templates Representation}{section.4}% 7
-\BOOKMARK [1][-]{section.5}{Data Collection}{}% 8
-\BOOKMARK [2][-]{subsection.5.1}{Benchmarks}{section.5}% 9
-\BOOKMARK [2][-]{subsection.5.2}{Argument labelling}{section.5}% 10
-\BOOKMARK [1][-]{section.6}{Training Model}{}% 11
-\BOOKMARK [2][-]{subsection.6.1}{Program Embedding}{section.6}% 12
-\BOOKMARK [3][-]{subsubsection.6.1.1}{Text Level}{subsection.6.1}% 13
-\BOOKMARK [3][-]{subsubsection.6.1.2}{Graph Level}{subsection.6.1}% 14
-\BOOKMARK [1][-]{section.7}{Experiments}{}% 15
-\BOOKMARK [2][-]{subsection.7.1}{Ablation studies}{section.7}% 16
-\BOOKMARK [1][-]{section.8}{Related work}{}% 17
-\BOOKMARK [1][-]{section.9}{Discussion and Future work}{}% 18
+\BOOKMARK [2][-]{subsection.1.1}{Problem overview and working pipeline}{section.1}% 2
+\BOOKMARK [2][-]{subsection.1.2}{Contribution}{section.1}% 3
+\BOOKMARK [1][-]{section.2}{Background}{}% 4
+\BOOKMARK [2][-]{subsection.2.1}{Abstraction Based Model Checking}{section.2}% 5
+\BOOKMARK [3][-]{subsubsection.2.1.1}{Heuristics for predicate generating}{subsection.2.1}% 6
+\BOOKMARK [2][-]{subsection.2.2}{GNN}{section.2}% 7
+\BOOKMARK [3][-]{subsubsection.2.2.1}{Message passing and hyperedge extension}{subsection.2.2}% 8
+\BOOKMARK [1][-]{section.3}{Program representation}{}% 9
+\BOOKMARK [2][-]{subsection.3.1}{Program to Horn clauses}{section.3}% 10
+\BOOKMARK [2][-]{subsection.3.2}{Horn clauses to Horn graph}{section.3}% 11
+\BOOKMARK [3][-]{subsubsection.3.2.1}{Horn graph construction example}{subsection.3.2}% 12
+\BOOKMARK [3][-]{subsubsection.3.2.2}{Horn graph Definition}{subsection.3.2}% 13
+\BOOKMARK [1][-]{section.4}{Data Collection}{}% 14
+\BOOKMARK [2][-]{subsection.4.1}{label collection}{section.4}% 15
+\BOOKMARK [1][-]{section.5}{Learning Model}{}% 16
+\BOOKMARK [2][-]{subsection.5.1}{Training results and analysis}{section.5}% 17
+\BOOKMARK [1][-]{section.6}{Feed learned heuristic back to Eldarica}{}% 18
+\BOOKMARK [1][-]{section.7}{Evaluation}{}% 19
+\BOOKMARK [2][-]{subsection.7.1}{Benchmarks}{section.7}% 20
+\BOOKMARK [2][-]{subsection.7.2}{Setup}{section.7}% 21
+\BOOKMARK [2][-]{subsection.7.3}{Experimental results}{section.7}% 22
+\BOOKMARK [1][-]{section.8}{Related work}{}% 23
+\BOOKMARK [1][-]{section.9}{Discussion and Future work}{}% 24
