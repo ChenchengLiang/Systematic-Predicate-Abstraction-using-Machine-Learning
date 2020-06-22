@@ -22,13 +22,15 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
 
 
     read_graph_from_pickle_file(benchmark_name,force_read=force_read,label=label,path=path,file_type=file_type)
-    nodeFeatureDim = 8
+    nodeFeatureDim = 64
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
+    parameters["message_calculation_class"]="rgcn"#rgcn,ggnn,rgat
+    #parameters['num_heads'] = 2
     parameters['hidden_dim'] = 64
-    parameters['num_layers'] = 2
+    parameters['num_layers'] = 1
     parameters['node_label_embedding_size'] = nodeFeatureDim
     parameters['max_nodes_per_batch']=100000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
-    parameters['regression_hidden_layer_size'] = [64,32]
+    parameters['regression_hidden_layer_size'] = [64,64]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
 
@@ -440,6 +442,7 @@ def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","
             graphInfoList._file_type=file_type
             # get raw gnn inputs
             graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node = graphInfoList.getHornGraphSample_no_offset()
+
             raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists[0]), total_number_of_node)
             for edge_type in graphs_adjacency_lists[0]:
                 raw_data_graph._node_number_per_edge_type.append(len(edge_type[0]))

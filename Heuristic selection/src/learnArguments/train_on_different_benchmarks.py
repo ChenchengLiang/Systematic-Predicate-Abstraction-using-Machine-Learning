@@ -64,14 +64,16 @@ def main():
     # benchmark_list.append(["../../benchmarks/trainData-sv-comp-c-templates/", 25, 5, 8])
     # benchmark_list.append(["../../benchmarks/trainData-chc-comp-templates/", 25, 5, 5])
     benchmark_list.append(["../../benchmarks/LIA-lin-traiData/", int(413*0.6), int(413*0.2), int(413*0.2)])
+    #benchmark_list.append(["../../benchmarks/LIA-nonlin-traiData/", int(413 * 0.6), int(413 * 0.2), int(413 * 0.2)])
     #benchmark_list.append(["../../benchmarks/LIA-lin-traiData-temp/", int(413*0.6), int(413*0.2), int(413*0.2)])
+    #benchmark_list.append(["../../benchmarks/one_graph_debug/", int(1), int(1), int(1)])
 
     force_read=False
     file_type=".smt2"
-    split_flag=True
+    split_flag=False
     for benchmark in benchmark_list:
         train_on_graphs(benchmark_name=benchmark[0][17:-1],label="occurance",force_read=force_read,train_n_times=1,path=benchmark[0],file_type=file_type,split_flag=split_flag)
-        #train_on_graphs(benchmark_name=benchmark[0][17:-1], label="rank", force_read=force_read, train_n_times=1,path=benchmark[0],file_type=file_type,split_flag=split_flag)
+        train_on_graphs(benchmark_name=benchmark[0][17:-1], label="rank", force_read=force_read, train_n_times=1,path=benchmark[0],file_type=file_type,split_flag=split_flag)
 
     #train_on_graphs()
 

@@ -23,7 +23,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
             units=self._params["regression_hidden_layer_size"][0], activation=tf.nn.relu, use_bias=True) #decide layer output shape
         self._regression_layer_1 = tf.keras.layers.Dense(
             units=self._params["regression_hidden_layer_size"][1], activation=tf.nn.relu, use_bias=True)
-        self._argument_classification_layer = tf.keras.layers.Dense(
+        self._argument_output_layer = tf.keras.layers.Dense(
             units=1, use_bias=True)#we didn't normalize label so this should not be sigmoid
         self._node_to_graph_aggregation = None
 
@@ -55,7 +55,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
         with tf.name_scope("regression_layer_1"):
             self._regression_layer_1.build(tf.TensorShape((None, self._params["regression_hidden_layer_size"][0])))
         with tf.name_scope("Argument_regression_layer"):
-            self._argument_classification_layer.build(
+            self._argument_output_layer.build(
                 tf.TensorShape((None, self._params["regression_hidden_layer_size"][1])) #decide layer input shape
             )
 
@@ -88,7 +88,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
         )
         final_node_representations = self._gnn(gnn_input, training=training)
         argument_representations=tf.gather(params=final_node_representations*1,indices=inputs["node_argument"])
-
+        #print("argument_representations",argument_representations)
         return self.compute_task_output(inputs, argument_representations, training)
 
     def compute_task_output(
@@ -100,7 +100,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
         #call task specific layers
         argument_regression_hidden_layer_output=self._argument_repr_to_regression_layer(final_argument_representations)
         argument_regression_1=self._regression_layer_1(argument_regression_hidden_layer_output)
-        predicted_argument_score = self._argument_classification_layer(
+        predicted_argument_score = self._argument_output_layer(
             argument_regression_1
         )  # Shape [argument number, 1]
 

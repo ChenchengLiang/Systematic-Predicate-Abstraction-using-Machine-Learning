@@ -8,6 +8,7 @@ from functools import partial
 from distutils.dir_util import copy_tree
 import gc
 import signal
+import psutil
 
 def check_solvability(timeOut,abstractionOption,benchmark_solvability_folders,file):
 
@@ -62,28 +63,50 @@ def check_solvability_pool(rootdir="../benchmarks/LIA-lin/"):
 def extract_one_file(parameterList):
     filePath=parameterList[0]
     abstractionOption = parameterList[1]
-    timeOut = parameterList[2]
+    absTimeOut = parameterList[2]
+    timeOut=parameterList[3]
     command = "../eldarica-graph-generation/./eld " \
-              + abstractionOption  + " -absTimeout:"+str(timeOut)+" -extractPredicates "
+              + abstractionOption  + " -absTimeout:"+str(absTimeOut)+" -extractPredicates " +" -t:"+str(timeOut) +" "
     run_p = command + filePath
 
     print("Command:", run_p)
 
+    print("os.pid",os.getpid())
+    pid=None
     try:
         eld = subprocess.Popen(["../eldarica-graph-generation/eld", \
                                 filePath, abstractionOption, \
-                                "-absTimeout:" + str(timeOut), \
-                                "-extractPredicates"], stdout=subprocess.DEVNULL, shell=False)
-        eld.wait()#timeout=600
-        gc.collect()
+                                "-absTimeout:" + str(absTimeOut), \
+                                "-extractPredicates","-t:"+str(timeOut)], stdout=subprocess.DEVNULL, shell=False)
+        # eld = subprocess.Popen(["../eldarica-graph-generation/eld", \
+        #                         filePath, abstractionOption, \
+        #                         "-absTimeout:" + str(absTimeOut), \
+        #                         "-extractPredicates", "-t:" + str(timeOut)], shell=False)
+        # eld = subprocess.run(["../eldarica-graph-generation/eld", \
+        #                         filePath, abstractionOption, \
+        #                         "-absTimeout:" + str(absTimeOut), \
+        #                         "-extractPredicates", "-t:" + str(timeOut)],stdout=subprocess.DEVNULL)
+        pid=eld.pid
+        print("popen PID",pid)
+        eld.wait(timeout=timeOut+10)#timeout=3600
+        if psutil.pid_exists(pid):
+            print("kill pid", pid)
+            os.kill(pid, signal.SIGKILL)
+        return True
     except:
         print("Time out","Command:", run_p)
+        print("Time out", "PID:", pid)
         shutil.copy2(filePath, "../benchmarks/extracting_time_out_samples/")
-        os.kill(eld.pid,signal.SIGKILL)
+        if psutil.pid_exists(pid):
+            print("kill pid", pid)
+            os.kill(pid,signal.SIGKILL)
+        return True
+
 
 def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
 
-
+    absTimeout=60
+    timeout=60*20
 
     for root, subdirs, files in os.walk(rootdir):
         if os.path.exists(root + "/trainData"):
@@ -102,21 +125,24 @@ def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
 
             parameterList=[]
             for file in files:
-                parameterList.append([root+"/"+file,"-abstract",60])
+                parameterList.append([root+"/"+file,"-abstract",absTimeout,timeout])
             pool = Pool(processes=8)
+
             pool.map(extract_one_file, parameterList)
+            pool.close()
 
 
             copy_tree("../trainData/", root + "/trainData")
 
+    return True
 
-    pass
 
 def main():
     benchmark_list = ["../benchmarks/LIA-lin/"]
     for benchmark in benchmark_list:
         # check_solvability_pool()
         extract_data_pool(benchmark)
+    return True
 
 
 main()

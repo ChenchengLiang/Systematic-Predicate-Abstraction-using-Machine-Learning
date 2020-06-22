@@ -66,8 +66,9 @@ def main():
     # parameterList=[10,15,20]
     # pool = Pool(processes=8)
     # pool.map(pool_kill_popen_test, parameterList)
+    x=[]
+    np.min(x)
 
-    pass
 
 
 

@@ -193,7 +193,7 @@ class DotToGraphInfo:
             all_graphs_adjacent_list.append(one_graph_adjacent_list)
 
         return totalGraphNodeIDList, totalGraphArgumentIDList, all_graphs_adjacent_list, argumentScoreList, sum(
-            nodeNumberList)
+            nodeNumberList),self.finalGraphInfoList
 
 
 
