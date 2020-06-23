@@ -1,0 +1,5 @@
+inv1(A,B,C,D,E,F) :- (E = F),(G =< 10),\+((B =< 10)),(G = (-1 + D)),inv1(A,B,C,G,E,F).
+inv1(A,B,C,D,E,F) :- (G = (-1 + B)),(E = F),(H =< 10),(G =< 10),(H = (-1 + D)),inv1(A,G,C,H,E,F).
+inv1(A,B,C,D,E,F) :- (E = F),(G =< 10),\+((D =< 10)),(G = (-1 + B)),inv1(A,G,C,D,E,F).
+inv1(A,B,C,D,E,F) :- (B = 0),(A = C),(D = 1),(E = A),(F = C).
+false :- \+((A = B)),\+((B =< 10)),\+((A =< 10)),(C = D),inv1(E,A,F,B,C,D).

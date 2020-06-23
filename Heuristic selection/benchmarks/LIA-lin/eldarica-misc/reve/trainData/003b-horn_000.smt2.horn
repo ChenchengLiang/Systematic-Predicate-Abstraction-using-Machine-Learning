@@ -1,0 +1,5 @@
+inv1(A,B,C,D,E,F,G,H,I,J,K,L,M,N) :- ((O + P) = J),\+(((A - C) >= 1)),((F - Q) >= 1),(K = M),(L = N),(Q = (-1 + H)),(P = (-5 + I)),inv1(A,B,C,D,E,F,G,Q,P,O,K,L,M,N).
+inv1(A,B,C,D,E,F,G,H,I,J,K,L,M,N) :- (((5 * O) + B) = D),((P + Q) = J),(Q = (-5 + I)),(R = (-1 + H)),(O = (-1 + C)),(L = N),(K = M),((A - O) >= 1),((F - R) >= 1),(((S + (5 * O)) + B) = E),inv1(A,B,O,T,S,F,G,R,Q,P,K,L,M,N).
+inv1(A,B,C,D,E,F,G,H,I,J,K,L,M,N) :- (((O + (5 * P)) + B) = E),((A - P) >= 1),\+(((F - H) >= 1)),(K = M),(L = N),(P = (-1 + C)),(((5 * P) + B) = D),inv1(A,B,P,Q,O,F,G,H,I,J,K,L,M,N).
+inv1(A,B,C,D,E,F,G,H,I,J,K,L,M,N) :- (H = 0),(E = 0),(D = 0),(C = 0),(B = G),(A = F),(J = 0),(I = G),(K = A),(L = B),(M = F),(N = G).
+false :- (A = B),\+(((C - D) >= 1)),\+(((E - F) >= 1)),\+((G = H)),(I = J),inv1(C,K,D,L,G,E,M,F,N,H,I,A,J,B).

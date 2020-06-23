@@ -1,0 +1,140 @@
+train:
+total graph: 22
+argument_number_list :[190, 168, 160, 160, 160, 151, 137, 137, 330, 330, 330, 342, 24, 23, 25, 58, 58, 78, 45, 20, 8, 25]
+argument_total_occurance_list :[27, 52, 80, 84, 84, 109, 40, 43, 21, 21, 21, 22, 3, 4, 2, 1, 1, 3, 2, 7, 3, 16]
+argument_average_occurance_list :[0.14210526315789473, 0.30952380952380953, 0.5, 0.525, 0.525, 0.7218543046357616, 0.291970802919708, 0.31386861313868614, 0.06363636363636363, 0.06363636363636363, 0.06363636363636363, 0.06432748538011696, 0.125, 0.17391304347826086, 0.08, 0.017241379310344827, 0.017241379310344827, 0.038461538461538464, 0.044444444444444446, 0.35, 0.375, 0.64]
+positive_hint_number_list :[19, 37, 21, 20, 20, 29, 39, 40, 21, 21, 21, 21, 2, 2, 2, 1, 1, 2, 2, 5, 3, 12]
+node_number_list :[1758, 4005, 4412, 4416, 4539, 4433, 4251, 4580, 3608, 3612, 3623, 3516, 2129, 1986, 2306, 2754, 2754, 3877, 1583, 19371, 212, 2613]
+adjacency_list_number_list :[{'binary edge': 2430, 'ternary edge': 1980}, {'binary edge': 5118, 'ternary edge': 3666}, {'binary edge': 5532, 'ternary edge': 3966}, {'binary edge': 5535, 'ternary edge': 4001}, {'binary edge': 5676, 'ternary edge': 4155}, {'binary edge': 5680, 'ternary edge': 3834}, {'binary edge': 5491, 'ternary edge': 3917}, {'binary edge': 5759, 'ternary edge': 4309}, {'binary edge': 5024, 'ternary edge': 2846}, {'binary edge': 5028, 'ternary edge': 2846}, {'binary edge': 5098, 'ternary edge': 2805}, {'binary edge': 4886, 'ternary edge': 2793}, {'binary edge': 3246, 'ternary edge': 965}, {'binary edge': 3017, 'ternary edge': 862}, {'binary edge': 3502, 'ternary edge': 1093}, {'binary edge': 4236, 'ternary edge': 742}, {'binary edge': 4236, 'ternary edge': 742}, {'binary edge': 5984, 'ternary edge': 1026}, {'binary edge': 2151, 'ternary edge': 855}, {'binary edge': 27723, 'ternary edge': 5665}, {'binary edge': 285, 'ternary edge': 56}, {'binary edge': 3735, 'ternary edge': 778}]
+binary_edge_sender_number_list :[2293, 4611, 5040, 5043, 5158, 5223, 4973, 5193, 4991, 4995, 5063, 4847, 3103, 2753, 3211, 4092, 4092, 5824, 2123, 27307, 285, 3696]
+binary_edge_receiver_number_list :[2293, 4611, 5040, 5043, 5158, 5223, 4973, 5193, 4991, 4995, 5063, 4847, 3103, 2753, 3211, 4092, 4092, 5824, 2123, 27307, 285, 3696]
+hyperedge_sender_number_list :[2117, 4173, 4458, 4493, 4673, 4291, 4435, 4875, 2879, 2879, 2840, 2832, 1108, 1126, 1384, 886, 886, 1186, 883, 6081, 56, 817]
+hyperedge_reiceiver_number_list :[2117, 4173, 4458, 4493, 4673, 4291, 4435, 4875, 2879, 2879, 2840, 2832, 1108, 1126, 1384, 886, 886, 1186, 883, 6081, 56, 817]
+control_flow_node_number_list :[15, 13, 14, 14, 14, 13, 12, 12, 22, 22, 22, 23, 4, 4, 4, 3, 3, 3, 8, 4, 4, 4]
+operator_node_number_list :[967, 2039, 2234, 2236, 2271, 2308, 2202, 2276, 2132, 2134, 2183, 2046, 1362, 1120, 1300, 2102, 2102, 2990, 936, 12321, 135, 1705]
+constant_node_number_list :[490, 1545, 1739, 1738, 1809, 1727, 1662, 1866, 1026, 1026, 989, 1000, 636, 735, 887, 569, 569, 784, 452, 5595, 58, 784]
+literal_node_number_list :[80, 232, 253, 255, 274, 211, 230, 281, 85, 86, 85, 90, 65, 69, 49, 20, 20, 20, 121, 719, 4, 80]
+true_node_number_list :[3, 4, 3, 4, 3, 3, 4, 4, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+bool_value_node_number_list :[0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+data_flow_hyperedge_number_list :[2002, 4017, 4296, 4329, 4504, 4129, 4258, 4690, 2701, 2701, 2664, 2661, 1030, 1046, 1283, 870, 870, 1170, 788, 5620, 46, 757]
+control_flow_hyperedge_number_list :[115, 156, 162, 164, 169, 162, 177, 185, 178, 178, 176, 171, 78, 80, 101, 16, 16, 16, 95, 461, 10, 60]
+---
+average_argument_number :134.5
+std_argument_number :109.7098445901734
+min_argument_number :8
+max_argument_number :342
+---
+average_argument_total_occurance :29.363636363636363
+std_argument_total_occurance :31.959556053557687
+min_argument_total_occurance :1
+max_argument_total_occurance :109
+---
+average_argument_average_occurance :0.24753914339409092
+std_argument_average_occurance :0.2152536393635032
+min_argument_average_occurance :0.017241379310344827
+max_argument_average_occurance :0.7218543046357616
+---
+average_positive_hint_number :15.5
+std_positive_hint_number :12.81245842565317
+min_positive_hint_number :1
+max_positive_hint_number :40
+---
+average_node_number :3924.4545454545455
+std_node_number :3559.435051282369
+min_node_number :212
+max_node_number :19371
+---
+average_binary_edge :5426.0
+average_ternary_edge :2450.090909090909
+std_binary_edge :5066.052506636701
+std_ternary_edge :1555.473646341464
+min_binary_edge :285
+min_ternary_edge :56
+max_binary_edge :27723
+max_ternary_edge :5665
+---
+average_binary_edge_sender_number :5178.0
+std_binary_edge_sender_number :5004.147316340353
+min_binary_edge_sender_number :285
+max_binary_edge_sender_number :27307
+---
+average_binary_edge_receiver_number :5178.0
+std_binary_edge_receiver_number :5004.147316340353
+min_binary_edge_receiver_number :285
+max_binary_edge_receiver_number :27307
+---
+average_hyperedge_sender_number :2698.090909090909
+std_hyperedge_sender_number :1705.1682910570576
+min_hyperedge_sender_number :56
+max_hyperedge_sender_number :6081
+---
+average_hyperedge_reiceiver_number :2698.090909090909
+std_hyperedge_reiceiver_number :1705.1682910570576
+min_hyperedge_reiceiver_number :56
+max_hyperedge_reiceiver_number :6081
+---
+average_control_flow_node_number :10.772727272727273
+std_control_flow_node_number :6.921191556515645
+min_control_flow_node_number :3
+max_control_flow_node_number :23
+---
+average_operator_node_number :2322.7727272727275
+std_operator_node_number :2267.718736203616
+min_operator_node_number :135
+max_operator_node_number :12321
+---
+average_constant_node_number :1258.4545454545455
+std_constant_node_number :1077.3076173866677
+min_constant_node_number :58
+max_constant_node_number :5595
+---
+average_literal_node_number :151.3181818181818
+std_literal_node_number :153.37547106355353
+min_literal_node_number :4
+max_literal_node_number :719
+---
+average_true_node_number :1.6363636363636365
+std_true_node_number :1.6109131951517588
+min_true_node_number :0
+max_true_node_number :4
+---
+average_bool_value_node_number :0.18181818181818182
+std_bool_value_node_number :0.38569460791993493
+min_bool_value_node_number :0
+max_bool_value_node_number :1
+---
+average_data_flow_hyperedge_number :2565.090909090909
+std_data_flow_hyperedge_number :1627.6194805769924
+min_data_flow_hyperedge_number :46
+max_data_flow_hyperedge_number :5620
+---
+average_control_flow_hyperedge_number :133.0
+std_control_flow_hyperedge_number :93.95018022141502
+min_control_flow_hyperedge_number :10
+max_control_flow_hyperedge_number :461
+
+valid:
+total graph: 7
+argument_number_list :[160, 149, 356, 12, 23, 13, 20]
+argument_total_occurance_list :[74, 101, 23, 3, 4, 2, 11]
+argument_average_occurance_list :[0.4625, 0.6778523489932886, 0.06460674157303371, 0.25, 0.17391304347826086, 0.15384615384615385, 0.55]
+positive_hint_number_list :[20, 27, 22, 2, 2, 2, 8]
+node_number_list :[4139, 3756, 3628, 1713, 2020, 1728, 637]
+adjacency_list_number_list :[{'binary edge': 5299, 'ternary edge': 3628}, {'binary edge': 4755, 'ternary edge': 3023}, {'binary edge': 5019, 'ternary edge': 2885}, {'binary edge': 2775, 'ternary edge': 503}, {'binary edge': 3027, 'ternary edge': 866}, {'binary edge': 2856, 'ternary edge': 463}, {'binary edge': 875, 'ternary edge': 188}]
+binary_edge_sender_number_list :[4834, 4375, 4974, 2632, 2767, 2589, 875]
+binary_edge_receiver_number_list :[4834, 4375, 4974, 2632, 2767, 2589, 875]
+hyperedge_sender_number_list :[4093, 3403, 2930, 646, 1126, 730, 188]
+hyperedge_reiceiver_number_list :[4093, 3403, 2930, 646, 1126, 730, 188]
+control_flow_node_number_list :[14, 13, 24, 4, 4, 4, 4]
+operator_node_number_list :[2157, 1945, 2098, 1196, 1121, 1091, 407]
+constant_node_number_list :[1585, 1455, 1044, 372, 743, 535, 181]
+literal_node_number_list :[212, 173, 94, 65, 94, 46, 25]
+true_node_number_list :[3, 4, 2, 1, 0, 2, 0]
+bool_value_node_number_list :[1, 1, 0, 0, 0, 0, 0]
+data_flow_hyperedge_number_list :[3938, 3271, 2755, 568, 1046, 635, 170]
+control_flow_hyperedge_number_list :[155, 132, 175, 78, 80, 95, 18]
+---
+average_argument_number :104.71428571428571
+std_argument_number :118.93781602851404
+min_argument_number :12
+max_argument_number :356

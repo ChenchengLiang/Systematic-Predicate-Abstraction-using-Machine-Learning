@@ -1,0 +1,280 @@
+-------------
+REC_f_f(P0, P4, P1, P2) :- REC__f(P1 + -1, P2), 1 >= P0 & !(1 >= P1) & !(P2 >= 0) & P4 = P0.
+Head arguments: ListBuffer((P0,P0), (P4,P4), (P1,P1), (P2,P2))
+Body arguments: ListBuffer(((P1 + -1),(P1 + -1)), (P2,P2))
+Common Arguments:ListBuffer((P2,P2))
+relativeComplimentOfHeadArg:ListBuffer((P0,P0), (P4,P4), (P1,P1))
+variables in guard: ListBuffer(P0, P1, P2)
+Data flow:
+P0 <- _P0
+P4 <- _P4
+P1 <- _P1
+P2<-P2
+Guard:
+((1 + -1 * _P0) >= 0)
+((-2 + _P1) >= 0)
+!(P2 >= 0)
+((_P4 + -1 * _P0) = 0)
+dataflow number:3
+guard number:4
+-------------
+REC_f_f(P0, P5, P1, P2) :- REC__f(P1 + -1, P3), P1 + P3 = P2 & !(1 >= P1) & 1 >= P0 & P3 >= 0 & P5 = P0.
+Head arguments: ListBuffer((P0,P0), (P5,P5), (P1,P1), (P2,P2))
+Body arguments: ListBuffer(((P1 + -1),(P1 + -1)), (P3,P3))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((P0,P0), (P5,P5), (P1,P1), (P2,P2))
+variables in guard: ListBuffer(P1, P0, P3)
+Data flow:
+P0 <- _P0
+P5 <- _P5
+P1 <- _P1
+P2 <- _P2
+Guard:
+((-2 + _P1) >= 0)
+((1 + -1 * _P0) >= 0)
+(P3 >= 0)
+((_P1 + (P3 + -1 * _P2)) = 0)
+((_P5 + -1 * _P0) = 0)
+dataflow number:4
+guard number:5
+-------------
+REC_f_f(P0, P2, P1, P3) :- 1 >= P1 & 1 >= P0 & P3 = P1 & P2 = P0.
+Head arguments: ListBuffer((P0,P0), (P2,P2), (P1,P1), (P3,P3))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((P0,P0), (P2,P2), (P1,P1), (P3,P3))
+variables in guard: ListBuffer(P1, P0)
+Data flow:
+P0 <- _P0
+P2 <- _P2
+P1 <- _P1
+P3 <- _P3
+Guard:
+((1 + -1 * _P1) >= 0)
+((1 + -1 * _P0) >= 0)
+((_P3 + -1 * _P1) = 0)
+((_P2 + -1 * _P0) = 0)
+dataflow number:4
+guard number:4
+-------------
+REC_f_f(P0, P1, P2, P3) :- REC_f_f(P0 + -1, P4, P2 + -1, P3), P0 + P4 = P1 & !(1 >= P2) & !(1 >= P0) & !(P3 >= 0).
+Head arguments: ListBuffer((P0,P0), (P1,P1), (P2,P2), (P3,P3))
+Body arguments: ListBuffer(((P0 + -1),(P0 + -1)), (P4,P4), ((P2 + -1),(P2 + -1)), (P3,P3))
+Common Arguments:ListBuffer((P3,P3))
+relativeComplimentOfHeadArg:ListBuffer((P0,P0), (P1,P1), (P2,P2))
+variables in guard: ListBuffer(P2, P0, P3)
+Data flow:
+P0 <- _P0
+P1 <- _P1
+P2 <- _P2
+P3<-P3
+Guard:
+((-2 + _P2) >= 0)
+((-2 + _P0) >= 0)
+!(P3 >= 0)
+((_P0 + (P4 + -1 * _P1)) = 0)
+dataflow number:3
+guard number:4
+-------------
+REC_f_f(P0, P1, P2, P3) :- REC_f_f(P0 + -1, P4, P2 + -1, P5), P0 + P4 = P1 & !(1 >= P2) & !(1 >= P0) & P5 >= 0 & P2 + P5 = P3.
+Head arguments: ListBuffer((P0,P0), (P1,P1), (P2,P2), (P3,P3))
+Body arguments: ListBuffer(((P0 + -1),(P0 + -1)), (P4,P4), ((P2 + -1),(P2 + -1)), (P5,P5))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((P0,P0), (P1,P1), (P2,P2), (P3,P3))
+variables in guard: ListBuffer(P2, P0, P5)
+Data flow:
+P0 <- _P0
+P1 <- _P1
+P2 <- _P2
+P3 <- _P3
+Guard:
+((-2 + _P2) >= 0)
+((-2 + _P0) >= 0)
+(P5 >= 0)
+((_P0 + (P4 + -1 * _P1)) = 0)
+((_P2 + (P5 + -1 * _P3)) = 0)
+dataflow number:4
+guard number:5
+-------------
+REC_f_f(P0, P1, P2, P5) :- REC_f_(P0 + -1, P3), P0 + P3 = P1 & 1 >= P2 & !(1 >= P0) & P5 = P2.
+Head arguments: ListBuffer((P0,P0), (P1,P1), (P2,P2), (P5,P5))
+Body arguments: ListBuffer(((P0 + -1),(P0 + -1)), (P3,P3))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((P0,P0), (P1,P1), (P2,P2), (P5,P5))
+variables in guard: ListBuffer(P2, P0)
+Data flow:
+P0 <- _P0
+P1 <- _P1
+P2 <- _P2
+P5 <- _P5
+Guard:
+((1 + -1 * _P2) >= 0)
+((-2 + _P0) >= 0)
+((_P0 + (P3 + -1 * _P1)) = 0)
+((_P5 + -1 * _P2) = 0)
+dataflow number:4
+guard number:4
+-------------
+REC_f_(P0, P1) :- 1 >= P0 & P1 = P0.
+Head arguments: ListBuffer((P0,P0), (P1,P1))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((P0,P0), (P1,P1))
+variables in guard: ListBuffer(P0)
+Data flow:
+P0 <- _P0
+P1 <- _P1
+Guard:
+((1 + -1 * _P0) >= 0)
+((_P1 + -1 * _P0) = 0)
+dataflow number:2
+guard number:2
+-------------
+REC_f_(P0, P1) :- REC_f_(P0 + -1, P2), P0 + P2 = P1 & !(1 >= P0).
+Head arguments: ListBuffer((P0,P0), (P1,P1))
+Body arguments: ListBuffer(((P0 + -1),(P0 + -1)), (P2,P2))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((P0,P0), (P1,P1))
+variables in guard: ListBuffer(P0)
+Data flow:
+P0 <- _P0
+P1 <- _P1
+Guard:
+((-2 + _P0) >= 0)
+((_P0 + (P2 + -1 * _P1)) = 0)
+dataflow number:2
+guard number:2
+-------------
+REC__f(P0, P1) :- 1 >= P0 & P1 = P0.
+Head arguments: ListBuffer((P0,P0), (P1,P1))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((P0,P0), (P1,P1))
+variables in guard: ListBuffer(P0)
+Data flow:
+P0 <- _P0
+P1 <- _P1
+Guard:
+((1 + -1 * _P0) >= 0)
+((_P1 + -1 * _P0) = 0)
+dataflow number:2
+guard number:2
+-------------
+REC__f(P0, P1) :- REC__f(P0 + -1, P2), P0 + P2 = P1 & !(1 >= P0) & P2 >= 0.
+Head arguments: ListBuffer((P0,P0), (P1,P1))
+Body arguments: ListBuffer(((P0 + -1),(P0 + -1)), (P2,P2))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((P0,P0), (P1,P1))
+variables in guard: ListBuffer(P0, P2)
+Data flow:
+P0 <- _P0
+P1 <- _P1
+Guard:
+((-2 + _P0) >= 0)
+(P2 >= 0)
+((_P0 + (P2 + -1 * _P1)) = 0)
+dataflow number:2
+guard number:3
+-------------
+REC__f(P0, P1) :- REC__f(P0 + -1, P1), !(1 >= P0) & !(P1 >= 0).
+Head arguments: ListBuffer((P0,P0), (P1,P1))
+Body arguments: ListBuffer(((P0 + -1),(P0 + -1)), (P1,P1))
+Common Arguments:ListBuffer((P1,P1))
+relativeComplimentOfHeadArg:ListBuffer((P0,P0))
+variables in guard: ListBuffer(P0, P1)
+Data flow:
+P0 <- _P0
+P1<-P1
+Guard:
+((-2 + _P0) >= 0)
+!(P1 >= 0)
+dataflow number:1
+guard number:2
+-------------
+CHC_COMP_FALSE :- REC_f_(P3, P1), P3 + 1 + P1 != P3 + 1 & !(-1*(P3 + 1) >= -1) & -1*(P3 + 1) >= -1.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((P3,P3), (P1,P1))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(P3, P1)
+Data flow:
+Guard:
+!((((P3 + 1) + P1) + -1 * (P3 + 1)) = 0)
+!((1 + -1 * (P3 + 1)) >= 0)
+((1 + -1 * (P3 + 1)) >= 0)
+dataflow number:0
+guard number:3
+-------------
+CHC_COMP_FALSE :- REC_f_f(P5, P1, P5, P3), P5 + 1 + P1 != P5 + 1 + P3 & !(-1*(P5 + 1) >= -1) & !(-1*(P5 + 1) >= -1) & P3 >= 0.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((P5,P5), (P1,P1), (P5,P5), (P3,P3))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(P5, P1, P3)
+Data flow:
+Guard:
+!((((P5 + 1) + P1) + -1 * ((P5 + 1) + P3)) = 0)
+!((1 + -1 * (P5 + 1)) >= 0)
+!((1 + -1 * (P5 + 1)) >= 0)
+(P3 >= 0)
+dataflow number:0
+guard number:4
+-------------
+CHC_COMP_FALSE :- REC_f_f(P5, P1, P5, P2), P5 + 1 + P1 != P2 & !(-1*(P5 + 1) >= -1) & !(-1*(P5 + 1) >= -1) & !(P2 >= 0).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((P5,P5), (P1,P1), (P5,P5), (P2,P2))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(P5, P1, P2)
+Data flow:
+Guard:
+!((((P5 + 1) + P1) + -1 * P2) = 0)
+!((1 + -1 * (P5 + 1)) >= 0)
+!((1 + -1 * (P5 + 1)) >= 0)
+!(P2 >= 0)
+dataflow number:0
+guard number:4
+-------------
+CHC_COMP_FALSE :- REC__f(P3, P2), -1*(P3 + 1) >= -1 & !(-1*(P3 + 1) >= -1) & P2 >= 0 & P3 + 1 != P3 + 1 + P2.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((P3,P3), (P2,P2))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(P3, P2)
+Data flow:
+Guard:
+((1 + -1 * (P3 + 1)) >= 0)
+!((1 + -1 * (P3 + 1)) >= 0)
+(P2 >= 0)
+!(((P3 + 1) + -1 * ((P3 + 1) + P2)) = 0)
+dataflow number:0
+guard number:4
+-------------
+CHC_COMP_FALSE :- REC__f(P3, P1), -1*(P3 + 1) >= -1 & !(-1*(P3 + 1) >= -1) & !(P1 >= 0) & P3 + 1 != P1.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((P3,P3), (P1,P1))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(P3, P1)
+Data flow:
+Guard:
+((1 + -1 * (P3 + 1)) >= 0)
+!((1 + -1 * (P3 + 1)) >= 0)
+!(P1 >= 0)
+!(((P3 + 1) + -1 * P1) = 0)
+dataflow number:0
+guard number:4
+-------------
+false :- CHC_COMP_FALSE.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(true)
+Data flow:
+Guard:
+true
+dataflow number:0
+guard number:1
+Hints:
+-----------

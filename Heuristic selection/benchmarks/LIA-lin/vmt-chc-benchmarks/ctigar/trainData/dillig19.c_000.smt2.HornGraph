@@ -1,0 +1,1356 @@
+-------------
+state(P3, P2, P0, P1, P8, P4, P5, P6, P7) :- P3 != 0 & P8 != 0 & P0 != 0 & P1 != 0 & P2 = 0.
+Head arguments: ListBuffer((P3,P3), (P2,P2), (P0,P0), (P1,P1), (P8,P8), (P4,P4), (P5,P5), (P6,P6), (P7,P7))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((P3,P3), (P2,P2), (P0,P0), (P1,P1), (P8,P8), (P4,P4), (P5,P5), (P6,P6), (P7,P7))
+variables in guard: ListBuffer(P3, P8, P0, P1)
+Data flow:
+P3 <- _P3
+P2 <- 0
+P0 <- _P0
+P1 <- _P1
+P8 <- _P8
+Guard:
+!(_P3 = 0)
+!(_P8 = 0)
+!(_P0 = 0)
+!(_P1 = 0)
+dataflow number:5
+guard number:4
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(P3, P2, P0, 0, 0, P10, P12, P14, P16).
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((P3,P3), (P2,P2), (P0,P0), (0,0), (0,0), (P10,P10), (P12,P12), (P14,P14), (P16,P16))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+variables in guard: ListBuffer(true)
+Data flow:
+state_argument_3<-0
+state_argument_4<-0
+state_argument_3<-0
+state_argument_4<-0
+Guard:
+true
+dataflow number:0
+guard number:1
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(P3, 0, P0, P1, 0, P9, P11, P13, P15), P5 != 0 & P8 != 0 & P3 != 0 & P0 != 0 & P4 = 0 & P6 = 0 & P7 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((P3,P3), (0,0), (P0,P0), (P1,P1), (0,0), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P5, P8, P3, P0)
+Data flow:
+P5 <- _P5
+P4 <- 0
+P6 <- 0
+P7 <- 0
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_1<-0
+state_argument_4<-0
+state_argument_1<-0
+state_argument_4<-0
+Guard:
+!(_P5 = 0)
+!(_P8 = 0)
+!(P3 = 0)
+!(P0 = 0)
+dataflow number:5
+guard number:4
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(P3, 0, 0, P1, 0, P9, P11, P13, P15), P4 != 0 & P7 != 0 & P3 != 0 & P5 = 0 & P6 = 0 & P8 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((P3,P3), (0,0), (0,0), (P1,P1), (0,0), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P7, P3)
+Data flow:
+P5 <- 0
+P4 <- _P4
+P6 <- 0
+P7 <- _P7
+P8 <- 0
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_1<-0
+state_argument_2<-0
+state_argument_4<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_4<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_4<-0
+Guard:
+!(_P4 = 0)
+!(_P7 = 0)
+!(P3 = 0)
+dataflow number:5
+guard number:3
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, 0, 0, P1, 0, P9, P11, P13, P15), P7 != 0 & P4 = 0 & P5 = 0 & P6 = 0 & P8 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (0,0), (0,0), (P1,P1), (0,0), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P7)
+Data flow:
+P5 <- 0
+P4 <- 0
+P6 <- 0
+P7 <- _P7
+P8 <- 0
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_4<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_4<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_4<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_4<-0
+Guard:
+!(_P7 = 0)
+dataflow number:5
+guard number:1
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, 0, P0, P1, 0, P9, P11, P13, P15), P4 != 0 & P5 != 0 & P6 != 0 & P7 != 0 & P8 != 0 & P0 != 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (0,0), (P0,P0), (P1,P1), (0,0), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P5, P6, P7, P8, P0)
+Data flow:
+P5 <- _P5
+P4 <- _P4
+P6 <- _P6
+P7 <- _P7
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_1<-0
+state_argument_4<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_4<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_4<-0
+Guard:
+!(_P4 = 0)
+!(_P5 = 0)
+!(_P6 = 0)
+!(_P7 = 0)
+!(_P8 = 0)
+!(P0 = 0)
+dataflow number:5
+guard number:6
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, P2, 0, P1, 0, P9, P11, P13, P15), P4 != 0 & P5 != 0 & P6 != 0 & P7 != 0 & P8 != 0 & P2 != 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (P2,P2), (0,0), (P1,P1), (0,0), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P5, P6, P7, P8, P2)
+Data flow:
+P5 <- _P5
+P4 <- _P4
+P6 <- _P6
+P7 <- _P7
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_2<-0
+state_argument_4<-0
+state_argument_0<-0
+state_argument_2<-0
+state_argument_4<-0
+state_argument_0<-0
+state_argument_2<-0
+state_argument_4<-0
+Guard:
+!(_P4 = 0)
+!(_P5 = 0)
+!(_P6 = 0)
+!(_P7 = 0)
+!(_P8 = 0)
+!(P2 = 0)
+dataflow number:5
+guard number:6
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, P2, P0, P1, 0, P9, P11, P13, P15), P6 != 0 & P7 != 0 & P2 != 0 & P0 != 0 & P9 - P11 >= 1 & P4 = 0 & P5 = 0 & P8 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (P2,P2), (P0,P0), (P1,P1), (0,0), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P6, P7, P2, P0, P11, P9)
+Data flow:
+P5 <- 0
+P4 <- 0
+P6 <- _P6
+P7 <- _P7
+P8 <- 0
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_4<-0
+state_argument_0<-0
+state_argument_4<-0
+Guard:
+!(_P6 = 0)
+!(_P7 = 0)
+!(P2 = 0)
+!(P0 = 0)
+((-1 + (-1 * P11 + P9)) >= 0)
+dataflow number:5
+guard number:5
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, P2, P0, P1, 0, P9, P11, P13, P15), P4 != 0 & P5 != 0 & P7 != 0 & P2 != 0 & P0 != 0 & P11 >= P9 & P6 = 0 & P8 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (P2,P2), (P0,P0), (P1,P1), (0,0), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P5, P7, P2, P0, P11, P9)
+Data flow:
+P5 <- _P5
+P4 <- _P4
+P6 <- 0
+P7 <- _P7
+P8 <- 0
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_4<-0
+state_argument_0<-0
+state_argument_4<-0
+Guard:
+!(_P4 = 0)
+!(_P5 = 0)
+!(_P7 = 0)
+!(P2 = 0)
+!(P0 = 0)
+((P11 + -1 * P9) >= 0)
+dataflow number:5
+guard number:6
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(P3, P2, P0, P1, 0, P9, P11, P13, P15), P4 != 0 & P5 != 0 & P6 != 0 & P7 != 0 & P8 != 0 & P3 != 0 & P2 != 0 & P0 != 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((P3,P3), (P2,P2), (P0,P0), (P1,P1), (0,0), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P5, P6, P7, P8, P3, P2, P0)
+Data flow:
+P5 <- _P5
+P4 <- _P4
+P6 <- _P6
+P7 <- _P7
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_4<-0
+Guard:
+!(_P4 = 0)
+!(_P5 = 0)
+!(_P6 = 0)
+!(_P7 = 0)
+!(_P8 = 0)
+!(P3 = 0)
+!(P2 = 0)
+!(P0 = 0)
+dataflow number:5
+guard number:8
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(P3, P2, 0, P1, 0, P9, P11, P13, P15), P7 != 0 & P3 != 0 & P2 != 0 & P15 - P9 >= 1 & P4 = 0 & P5 = 0 & P6 = 0 & P8 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((P3,P3), (P2,P2), (0,0), (P1,P1), (0,0), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P7, P3, P2, P15, P9)
+Data flow:
+P5 <- 0
+P4 <- 0
+P6 <- 0
+P7 <- _P7
+P8 <- 0
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_2<-0
+state_argument_4<-0
+state_argument_2<-0
+state_argument_4<-0
+Guard:
+!(_P7 = 0)
+!(P3 = 0)
+!(P2 = 0)
+((-1 + (P15 + -1 * P9)) >= 0)
+dataflow number:5
+guard number:4
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(P3, P2, 0, P1, 0, P9, P11, P13, P15), P5 != 0 & P7 != 0 & P3 != 0 & P2 != 0 & P9 >= P15 & P4 = 0 & P6 = 0 & P8 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((P3,P3), (P2,P2), (0,0), (P1,P1), (0,0), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P5, P7, P3, P2, P15, P9)
+Data flow:
+P5 <- _P5
+P4 <- 0
+P6 <- 0
+P7 <- _P7
+P8 <- 0
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_2<-0
+state_argument_4<-0
+state_argument_2<-0
+state_argument_4<-0
+Guard:
+!(_P5 = 0)
+!(_P7 = 0)
+!(P3 = 0)
+!(P2 = 0)
+((-1 * P15 + P9) >= 0)
+dataflow number:5
+guard number:5
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, 0, P0, P1, P17, P9, P11, P13, P15), P4 != 0 & P5 != 0 & P7 != 0 & P8 != 0 & P17 != 0 & P1 != 0 & P0 != 0 & -1 >= P9 & P6 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (0,0), (P0,P0), (P1,P1), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P5, P7, P8, P17, P1, P0, P9)
+Data flow:
+P5 <- _P5
+P4 <- _P4
+P6 <- 0
+P7 <- _P7
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_1<-0
+state_argument_0<-0
+state_argument_1<-0
+Guard:
+!(_P4 = 0)
+!(_P5 = 0)
+!(_P7 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P1 = 0)
+!(P0 = 0)
+((-1 + -1 * P9) >= 0)
+dataflow number:5
+guard number:8
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, 0, P0, 0, P17, P9, P11, P13, P15), P8 != 0 & P17 != 0 & P0 != 0 & P13 >= P11 & -1 >= P9 & P4 = 0 & P5 = 0 & P6 = 0 & P7 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (0,0), (P0,P0), (0,0), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P8, P17, P0, P13, P11, P9)
+Data flow:
+P5 <- 0
+P4 <- 0
+P6 <- 0
+P7 <- 0
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_1<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_3<-0
+Guard:
+!(_P8 = 0)
+!(P17 = 0)
+!(P0 = 0)
+((P13 + -1 * P11) >= 0)
+((-1 + -1 * P9) >= 0)
+dataflow number:5
+guard number:5
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, 0, 0, 0, P17, P9, P11, P13, P15), P5 != 0 & P6 != 0 & P7 != 0 & P17 != 0 & P13 >= P11 & -1 >= P9 & P4 = 0 & P8 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (0,0), (0,0), (0,0), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P5, P6, P7, P17, P13, P11, P9)
+Data flow:
+P5 <- _P5
+P4 <- 0
+P6 <- _P6
+P7 <- _P7
+P8 <- 0
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+Guard:
+!(_P5 = 0)
+!(_P6 = 0)
+!(_P7 = 0)
+!(P17 = 0)
+((P13 + -1 * P11) >= 0)
+((-1 + -1 * P9) >= 0)
+dataflow number:5
+guard number:6
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, 0, P0, 0, P17, P9, P11, P13, P15), P4 != 0 & P5 != 0 & P8 != 0 & P17 != 0 & P0 != 0 & P11 - P13 >= 1 & -1 >= P9 & P6 = 0 & P7 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (0,0), (P0,P0), (0,0), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P5, P8, P17, P0, P13, P11, P9)
+Data flow:
+P5 <- _P5
+P4 <- _P4
+P6 <- 0
+P7 <- 0
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_1<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_3<-0
+Guard:
+!(_P4 = 0)
+!(_P5 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P0 = 0)
+((-1 + (-1 * P13 + P11)) >= 0)
+((-1 + -1 * P9) >= 0)
+dataflow number:5
+guard number:7
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, 0, 0, 0, P17, P9, P11, P13, P15), P4 != 0 & P5 != 0 & P6 != 0 & P7 != 0 & P17 != 0 & P11 - P13 >= 1 & -1 >= P9 & P8 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (0,0), (0,0), (0,0), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P5, P6, P7, P17, P13, P11, P9)
+Data flow:
+P5 <- _P5
+P4 <- _P4
+P6 <- _P6
+P7 <- _P7
+P8 <- 0
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+Guard:
+!(_P4 = 0)
+!(_P5 = 0)
+!(_P6 = 0)
+!(_P7 = 0)
+!(P17 = 0)
+((-1 + (-1 * P13 + P11)) >= 0)
+((-1 + -1 * P9) >= 0)
+dataflow number:5
+guard number:7
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, 0, 0, P1, P17, P9, P11, P13, P15), P5 != 0 & P6 != 0 & P8 != 0 & P17 != 0 & P1 != 0 & P9 - P13 >= 1 & -1 >= P9 & P4 = 0 & P7 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (0,0), (0,0), (P1,P1), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P5, P6, P8, P17, P1, P13, P9)
+Data flow:
+P5 <- _P5
+P4 <- 0
+P6 <- _P6
+P7 <- 0
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+Guard:
+!(_P5 = 0)
+!(_P6 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P1 = 0)
+((-1 + (-1 * P13 + P9)) >= 0)
+((-1 + -1 * P9) >= 0)
+dataflow number:5
+guard number:7
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, 0, 0, P1, P17, P9, P11, P13, P15), P4 != 0 & P5 != 0 & P6 != 0 & P8 != 0 & P17 != 0 & P1 != 0 & P13 >= P9 & -1 >= P9 & P7 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (0,0), (0,0), (P1,P1), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P5, P6, P8, P17, P1, P13, P9)
+Data flow:
+P5 <- _P5
+P4 <- _P4
+P6 <- _P6
+P7 <- 0
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+Guard:
+!(_P4 = 0)
+!(_P5 = 0)
+!(_P6 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P1 = 0)
+((P13 + -1 * P9) >= 0)
+((-1 + -1 * P9) >= 0)
+dataflow number:5
+guard number:8
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, 0, 0, 0, P17, P9, P11, P13, P15), P5 != 0 & P6 != 0 & P7 != 0 & P17 != 0 & P13 >= P11 & P9 >= 0 & P4 = 0 & P8 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (0,0), (0,0), (0,0), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P5, P6, P7, P17, P13, P11, P9)
+Data flow:
+P5 <- _P5
+P4 <- 0
+P6 <- _P6
+P7 <- _P7
+P8 <- 0
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+Guard:
+!(_P5 = 0)
+!(_P6 = 0)
+!(_P7 = 0)
+!(P17 = 0)
+((P13 + -1 * P11) >= 0)
+(P9 >= 0)
+dataflow number:5
+guard number:6
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, 0, 0, 0, P17, P9, P11, P13, P15), P4 != 0 & P5 != 0 & P6 != 0 & P7 != 0 & P17 != 0 & P11 - P13 >= 1 & P9 >= 0 & P8 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (0,0), (0,0), (0,0), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P5, P6, P7, P17, P13, P11, P9)
+Data flow:
+P5 <- _P5
+P4 <- _P4
+P6 <- _P6
+P7 <- _P7
+P8 <- 0
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+Guard:
+!(_P4 = 0)
+!(_P5 = 0)
+!(_P6 = 0)
+!(_P7 = 0)
+!(P17 = 0)
+((-1 + (-1 * P13 + P11)) >= 0)
+(P9 >= 0)
+dataflow number:5
+guard number:7
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, 0, 0, P1, P17, P9, P11, P13, P15), P5 != 0 & P6 != 0 & P8 != 0 & P17 != 0 & P1 != 0 & P9 - P13 >= 1 & P9 >= 0 & P4 = 0 & P7 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (0,0), (0,0), (P1,P1), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P5, P6, P8, P17, P1, P13, P9)
+Data flow:
+P5 <- _P5
+P4 <- 0
+P6 <- _P6
+P7 <- 0
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+Guard:
+!(_P5 = 0)
+!(_P6 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P1 = 0)
+((-1 + (-1 * P13 + P9)) >= 0)
+(P9 >= 0)
+dataflow number:5
+guard number:7
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, 0, 0, P1, P17, P9, P11, P13, P15), P4 != 0 & P5 != 0 & P6 != 0 & P8 != 0 & P17 != 0 & P1 != 0 & P13 >= P9 & P9 >= 0 & P7 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (0,0), (0,0), (P1,P1), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P5, P6, P8, P17, P1, P13, P9)
+Data flow:
+P5 <- _P5
+P4 <- _P4
+P6 <- _P6
+P7 <- 0
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+Guard:
+!(_P4 = 0)
+!(_P5 = 0)
+!(_P6 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P1 = 0)
+((P13 + -1 * P9) >= 0)
+(P9 >= 0)
+dataflow number:5
+guard number:8
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, 0, P0, P1, P17, P9, P11, P13, P15), P5 != 0 & P7 != 0 & P8 != 0 & P17 != 0 & P1 != 0 & P0 != 0 & P9 >= 0 & P4 = 0 & P6 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (0,0), (P0,P0), (P1,P1), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P5, P7, P8, P17, P1, P0, P9)
+Data flow:
+P5 <- _P5
+P4 <- 0
+P6 <- 0
+P7 <- _P7
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_1<-0
+state_argument_0<-0
+state_argument_1<-0
+Guard:
+!(_P5 = 0)
+!(_P7 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P1 = 0)
+!(P0 = 0)
+(P9 >= 0)
+dataflow number:5
+guard number:7
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, 0, P0, 0, P17, P9, P11, P13, P15), P8 != 0 & P17 != 0 & P0 != 0 & P13 >= P11 & P9 >= 0 & P4 = 0 & P5 = 0 & P6 = 0 & P7 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (0,0), (P0,P0), (0,0), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P8, P17, P0, P13, P11, P9)
+Data flow:
+P5 <- 0
+P4 <- 0
+P6 <- 0
+P7 <- 0
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_1<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_3<-0
+Guard:
+!(_P8 = 0)
+!(P17 = 0)
+!(P0 = 0)
+((P13 + -1 * P11) >= 0)
+(P9 >= 0)
+dataflow number:5
+guard number:5
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, 0, P0, 0, P17, P9, P11, P13, P15), P4 != 0 & P5 != 0 & P8 != 0 & P17 != 0 & P0 != 0 & P11 - P13 >= 1 & P9 >= 0 & P6 = 0 & P7 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (0,0), (P0,P0), (0,0), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P5, P8, P17, P0, P13, P11, P9)
+Data flow:
+P5 <- _P5
+P4 <- _P4
+P6 <- 0
+P7 <- 0
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_1<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_3<-0
+Guard:
+!(_P4 = 0)
+!(_P5 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P0 = 0)
+((-1 + (-1 * P13 + P11)) >= 0)
+(P9 >= 0)
+dataflow number:5
+guard number:7
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, P2, 0, 0, P17, P9, P11, P13, P15), P5 != 0 & P6 != 0 & P8 != 0 & P17 != 0 & P2 != 0 & P4 = 0 & P7 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (P2,P2), (0,0), (0,0), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P5, P6, P8, P17, P2)
+Data flow:
+P5 <- _P5
+P4 <- 0
+P6 <- _P6
+P7 <- 0
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_2<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_2<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_2<-0
+state_argument_3<-0
+Guard:
+!(_P5 = 0)
+!(_P6 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P2 = 0)
+dataflow number:5
+guard number:5
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, P2, 0, P1, P17, P9, P11, P13, P15), P4 != 0 & P5 != 0 & P6 != 0 & P7 != 0 & P8 != 0 & P17 != 0 & P2 != 0 & P1 != 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (P2,P2), (0,0), (P1,P1), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P5, P6, P7, P8, P17, P2, P1)
+Data flow:
+P5 <- _P5
+P4 <- _P4
+P6 <- _P6
+P7 <- _P7
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_2<-0
+state_argument_0<-0
+state_argument_2<-0
+Guard:
+!(_P4 = 0)
+!(_P5 = 0)
+!(_P6 = 0)
+!(_P7 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P2 = 0)
+!(P1 = 0)
+dataflow number:5
+guard number:8
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, P2, P0, 0, P17, P9, P11 + -1, P13, P15), P6 != 0 & P8 != 0 & P17 != 0 & P2 != 0 & P0 != 0 & P4 = 0 & P5 = 0 & P7 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (P2,P2), (P0,P0), (0,0), (P17,P17), (P9,P9), ((P11 + -1),(P11 + -1)), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P11,P11))
+variables in guard: ListBuffer(P6, P8, P17, P2, P0)
+Data flow:
+P5 <- 0
+P4 <- 0
+P6 <- _P6
+P7 <- 0
+P8 <- _P8
+P9<-P9
+P13<-P13
+P15<-P15
+state_argument_0<-0
+state_argument_3<-0
+state_argument_0<-0
+state_argument_3<-0
+Guard:
+!(_P6 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P2 = 0)
+!(P0 = 0)
+dataflow number:5
+guard number:5
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(0, P2, P0, P1, P17, P9, P11, P15, P16), P6 != 0 & P7 != 0 & P8 != 0 & P17 != 0 & P2 != 0 & P1 != 0 & P0 != 0 & P4 = 0 & P5 = 0 & P13 = P15.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((0,0), (P2,P2), (P0,P0), (P1,P1), (P17,P17), (P9,P9), (P11,P11), (P15,P15), (P16,P16))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P13,P13))
+variables in guard: ListBuffer(P6, P7, P8, P17, P2, P1, P0)
+Data flow:
+P5 <- 0
+P4 <- 0
+P6 <- _P6
+P7 <- _P7
+P8 <- _P8
+P13 <- P15
+P9<-P9
+P11<-P11
+state_argument_0<-0
+Guard:
+!(_P6 = 0)
+!(_P7 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P2 = 0)
+!(P1 = 0)
+!(P0 = 0)
+dataflow number:6
+guard number:7
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(P3, 0, 0, 0, P17, P9, P11, P13, P15), P4 != 0 & P8 != 0 & P17 != 0 & P3 != 0 & P9 - P11 >= 1 & P5 = 0 & P6 = 0 & P7 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((P3,P3), (0,0), (0,0), (0,0), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P8, P17, P3, P11, P9)
+Data flow:
+P5 <- 0
+P4 <- _P4
+P6 <- 0
+P7 <- 0
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+Guard:
+!(_P4 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P3 = 0)
+((-1 + (-1 * P11 + P9)) >= 0)
+dataflow number:5
+guard number:5
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(P3, 0, P0, 0, P17, P9, P11, P13, P15), P4 != 0 & P6 != 0 & P8 != 0 & P17 != 0 & P3 != 0 & P0 != 0 & P9 - P11 >= 1 & P5 = 0 & P7 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((P3,P3), (0,0), (P0,P0), (0,0), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P6, P8, P17, P3, P0, P11, P9)
+Data flow:
+P5 <- 0
+P4 <- _P4
+P6 <- _P6
+P7 <- 0
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_1<-0
+state_argument_3<-0
+state_argument_1<-0
+state_argument_3<-0
+Guard:
+!(_P4 = 0)
+!(_P6 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P3 = 0)
+!(P0 = 0)
+((-1 + (-1 * P11 + P9)) >= 0)
+dataflow number:5
+guard number:7
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(P3, 0, 0, 0, P17, P9, P11, P13, P15), P4 != 0 & P8 != 0 & P17 != 0 & P3 != 0 & P11 >= P9 & P5 = 0 & P6 = 0 & P7 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((P3,P3), (0,0), (0,0), (0,0), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P8, P17, P3, P11, P9)
+Data flow:
+P5 <- 0
+P4 <- _P4
+P6 <- 0
+P7 <- 0
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_3<-0
+Guard:
+!(_P4 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P3 = 0)
+((P11 + -1 * P9) >= 0)
+dataflow number:5
+guard number:5
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(P3, 0, P0, 0, P17, P9, P11, P13, P15), P4 != 0 & P6 != 0 & P7 != 0 & P17 != 0 & P3 != 0 & P0 != 0 & P11 >= P9 & P5 = 0 & P8 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((P3,P3), (0,0), (P0,P0), (0,0), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P6, P7, P17, P3, P0, P11, P9)
+Data flow:
+P5 <- 0
+P4 <- _P4
+P6 <- _P6
+P7 <- _P7
+P8 <- 0
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_1<-0
+state_argument_3<-0
+state_argument_1<-0
+state_argument_3<-0
+Guard:
+!(_P4 = 0)
+!(_P6 = 0)
+!(_P7 = 0)
+!(P17 = 0)
+!(P3 = 0)
+!(P0 = 0)
+((P11 + -1 * P9) >= 0)
+dataflow number:5
+guard number:7
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(P3, P2, 0, 0, P17, P9, P11, P13, P15 + -1), P5 != 0 & P8 != 0 & P17 != 0 & P3 != 0 & P2 != 0 & P4 = 0 & P6 = 0 & P7 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((P3,P3), (P2,P2), (0,0), (0,0), (P17,P17), (P9,P9), (P11,P11), (P13,P13), ((P15 + -1),(P15 + -1)))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P15,P15))
+variables in guard: ListBuffer(P5, P8, P17, P3, P2)
+Data flow:
+P5 <- _P5
+P4 <- 0
+P6 <- 0
+P7 <- 0
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+state_argument_2<-0
+state_argument_3<-0
+state_argument_2<-0
+state_argument_3<-0
+Guard:
+!(_P5 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P3 = 0)
+!(P2 = 0)
+dataflow number:5
+guard number:5
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(P3, P2, P0, 0, P17, P9, P11, P13, P15), P4 != 0 & P5 != 0 & P6 != 0 & P7 != 0 & P8 != 0 & P17 != 0 & P3 != 0 & P2 != 0 & P0 != 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((P3,P3), (P2,P2), (P0,P0), (0,0), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P5, P6, P7, P8, P17, P3, P2, P0)
+Data flow:
+P5 <- _P5
+P4 <- _P4
+P6 <- _P6
+P7 <- _P7
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_3<-0
+Guard:
+!(_P4 = 0)
+!(_P5 = 0)
+!(_P6 = 0)
+!(_P7 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P3 = 0)
+!(P2 = 0)
+!(P0 = 0)
+dataflow number:5
+guard number:9
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(P3, P2, 0, P1, P17, P9, P11, P13, P15), P4 != 0 & P5 != 0 & P6 != 0 & P7 != 0 & P8 != 0 & P17 != 0 & P3 != 0 & P2 != 0 & P1 != 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((P3,P3), (P2,P2), (0,0), (P1,P1), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P5, P6, P7, P8, P17, P3, P2, P1)
+Data flow:
+P5 <- _P5
+P4 <- _P4
+P6 <- _P6
+P7 <- _P7
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_2<-0
+Guard:
+!(_P4 = 0)
+!(_P5 = 0)
+!(_P6 = 0)
+!(_P7 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P3 = 0)
+!(P2 = 0)
+!(P1 = 0)
+dataflow number:5
+guard number:9
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(P3, 0, 0, P1, P17, P9, P11, P13, P15), P7 != 0 & P8 != 0 & P17 != 0 & P3 != 0 & P1 != 0 & P13 >= 0 & P4 = 0 & P5 = 0 & P6 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((P3,P3), (0,0), (0,0), (P1,P1), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P7, P8, P17, P3, P1, P13)
+Data flow:
+P5 <- 0
+P4 <- 0
+P6 <- 0
+P7 <- _P7
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_1<-0
+state_argument_2<-0
+state_argument_1<-0
+state_argument_2<-0
+Guard:
+!(_P7 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P3 = 0)
+!(P1 = 0)
+(P13 >= 0)
+dataflow number:5
+guard number:6
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(P3, 0, 0, P1, P17, P9, P11, P13, P15), P4 != 0 & P7 != 0 & P8 != 0 & P17 != 0 & P3 != 0 & P1 != 0 & -1 >= P13 & P5 = 0 & P6 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((P3,P3), (0,0), (0,0), (P1,P1), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P7, P8, P17, P3, P1, P13)
+Data flow:
+P5 <- 0
+P4 <- _P4
+P6 <- 0
+P7 <- _P7
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+state_argument_1<-0
+state_argument_2<-0
+state_argument_1<-0
+state_argument_2<-0
+Guard:
+!(_P4 = 0)
+!(_P7 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P3 = 0)
+!(P1 = 0)
+((-1 + -1 * P13) >= 0)
+dataflow number:5
+guard number:7
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(P3, P2, P0, P1, P17, P9, P11, P13, P15), P4 != 0 & P5 != 0 & P6 != 0 & P7 != 0 & P8 != 0 & P17 != 0 & P3 != 0 & P2 != 0 & P1 != 0 & P0 != 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((P3,P3), (P2,P2), (P0,P0), (P1,P1), (P17,P17), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P11,P11), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8))
+variables in guard: ListBuffer(P4, P5, P6, P7, P8, P17, P3, P2, P1, P0)
+Data flow:
+P5 <- _P5
+P4 <- _P4
+P6 <- _P6
+P7 <- _P7
+P8 <- _P8
+P9<-P9
+P11<-P11
+P13<-P13
+P15<-P15
+Guard:
+!(_P4 = 0)
+!(_P5 = 0)
+!(_P6 = 0)
+!(_P7 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P3 = 0)
+!(P2 = 0)
+!(P1 = 0)
+!(P0 = 0)
+dataflow number:5
+guard number:10
+-------------
+state(P5, P4, P6, P7, P8, P9, P11, P13, P15) :- state(P3, 0, P0, P1, P17, P9, P12, P13, P15), P4 != 0 & P6 != 0 & P7 != 0 & P8 != 0 & P17 != 0 & P3 != 0 & P1 != 0 & P0 != 0 & P11 = 0 & P5 = 0.
+Head arguments: ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P9,P9), (P11,P11), (P13,P13), (P15,P15))
+Body arguments: ListBuffer((P3,P3), (0,0), (P0,P0), (P1,P1), (P17,P17), (P9,P9), (P12,P12), (P13,P13), (P15,P15))
+Common Arguments:ListBuffer((P9,P9), (P13,P13), (P15,P15))
+relativeComplimentOfHeadArg:ListBuffer((P5,P5), (P4,P4), (P6,P6), (P7,P7), (P8,P8), (P11,P11))
+variables in guard: ListBuffer(P4, P6, P7, P8, P17, P3, P1, P0)
+Data flow:
+P5 <- 0
+P4 <- _P4
+P6 <- _P6
+P7 <- _P7
+P8 <- _P8
+P11 <- 0
+P9<-P9
+P13<-P13
+P15<-P15
+state_argument_1<-0
+Guard:
+!(_P4 = 0)
+!(_P6 = 0)
+!(_P7 = 0)
+!(_P8 = 0)
+!(P17 = 0)
+!(P3 = 0)
+!(P1 = 0)
+!(P0 = 0)
+dataflow number:6
+guard number:8
+-------------
+false :- state(0, 0, 0, P1, 0, P4, P5, P6, P7), P1 != 0.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((0,0), (0,0), (0,0), (P1,P1), (0,0), (P4,P4), (P5,P5), (P6,P6), (P7,P7))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(P1)
+Data flow:
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_4<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_4<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_4<-0
+state_argument_0<-0
+state_argument_1<-0
+state_argument_2<-0
+state_argument_4<-0
+Guard:
+!(P1 = 0)
+dataflow number:0
+guard number:1
+Hints:
+-----------

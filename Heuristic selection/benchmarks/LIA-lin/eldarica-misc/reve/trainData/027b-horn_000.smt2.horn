@@ -1,0 +1,12 @@
+inv2(A,B,C) :- (D = A),(C = 0),\+((D >= 1)),(E = B).
+inv2(A,B,C) :- (D = E),(F = G),(H = (-1 + C)),(A >= 1),(I >= 1),\+((F >= 1)),(I = (1 + B)),inv2(A,I,H).
+inv2(A,B,C) :- (D = E),(F = (1 + B)),\+((A >= 1)),\+((D >= 1)),(F >= 1),(G = H),inv2(A,F,C).
+inv1(A,B,C,D,E,F,G,H,I,J) :- (F = 0),(C = 0),(B = E),(A >= 1),(A = D),(G = A),(H = B),(I = D),(J = E).
+inv1(A,B,C,D,E,F,G,H,I,J) :- (K = (-1 + C)),(L = (1 + B)),(H = J),\+((E >= 1)),(G >= 1),(L >= 1),(G = I),inv1(A,L,K,D,E,F,G,H,I,J).
+inv1(A,B,C,D,E,F,G,H,I,J) :- (G = I),(K = (1 + E)),(L = (-1 + C)),(M = (1 + B)),\+((D >= 1)),(G >= 1),(K >= 1),(M >= 1),(H = J),inv1(A,M,L,D,K,F,G,H,I,J).
+inv1(A,B,C,D,E,F,G,H,I,J) :- (H = J),(K = (-1 + F)),(L = (1 + E)),(M = (-1 + C)),(N = (1 + B)),(D >= 1),(G >= 1),(L >= 1),(N >= 1),(G = I),inv1(A,N,M,D,L,K,G,H,I,J).
+inv1(A,B,C,D,E,F,G,H,I,J) :- (H = J),(G = I),\+((B >= 1)),\+((D >= 1)),(K >= 1),(G >= 1),(K = (1 + E)),inv1(A,B,C,D,K,F,G,H,I,J).
+inv1(A,B,C,D,E,F,G,H,I,J) :- (K = (-1 + F)),(L = (1 + E)),(H = J),\+((B >= 1)),(D >= 1),(G >= 1),(L >= 1),(G = I),inv1(A,B,C,D,L,K,G,H,I,J).
+chc_comp_false :- (A = B),(C = D),\+((E >= 1)),\+((C >= 1)),\+((F = 0)),inv2(G,E,F).
+chc_comp_false :- (A = B),(C = D),\+((E >= 1)),\+((F >= 1)),(C >= 1),\+((G = H)),inv1(I,E,G,J,F,H,C,A,D,B).
+false :- chc_comp_false.

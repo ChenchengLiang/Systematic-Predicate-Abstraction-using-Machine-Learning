@@ -1,0 +1,207 @@
+-------------
+INV2(P0, P1, P2) :- !(P0 >= 1) & P2 = 0.
+Head arguments: ListBuffer((P0,P0), (P1,P1), (P2,P2))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((P0,P0), (P1,P1), (P2,P2))
+variables in guard: ListBuffer(P0)
+Data flow:
+P0 <- _P0
+P2 <- 0
+Guard:
+(-1 * _P0 >= 0)
+dataflow number:2
+guard number:1
+-------------
+INV2(P0, P1, P2) :- INV2(P0, P1 + 1, P2 + -1), !(P6 >= 1) & P1 + 1 >= 1 & P0 >= 1.
+Head arguments: ListBuffer((P0,P0), (P1,P1), (P2,P2))
+Body arguments: ListBuffer((P0,P0), ((P1 + 1),(P1 + 1)), ((P2 + -1),(P2 + -1)))
+Common Arguments:ListBuffer((P0,P0))
+relativeComplimentOfHeadArg:ListBuffer((P1,P1), (P2,P2))
+variables in guard: ListBuffer(P6, P1, P0)
+Data flow:
+P1 <- _P1
+P0<-P0
+Guard:
+!((P6 + -1) >= 0)
+(_P1 >= 0)
+((P0 + -1) >= 0)
+dataflow number:1
+guard number:3
+-------------
+INV2(P0, P1, P2) :- INV2(P0, P1 + 1, P2), P1 + 1 >= 1 & !(P5 >= 1) & !(P0 >= 1).
+Head arguments: ListBuffer((P0,P0), (P1,P1), (P2,P2))
+Body arguments: ListBuffer((P0,P0), ((P1 + 1),(P1 + 1)), (P2,P2))
+Common Arguments:ListBuffer((P0,P0), (P2,P2))
+relativeComplimentOfHeadArg:ListBuffer((P1,P1))
+variables in guard: ListBuffer(P1, P5, P0)
+Data flow:
+P1 <- _P1
+P0<-P0
+P2<-P2
+Guard:
+(_P1 >= 0)
+!((P5 + -1) >= 0)
+!((P0 + -1) >= 0)
+dataflow number:1
+guard number:3
+-------------
+INV1(P0, P1, P2, P4, P5) :- P3 >= 1 & P0 = P3 & P1 = P4 & P2 = 0 & P5 = 0.
+Head arguments: ListBuffer((P0,P0), (P1,P1), (P2,P2), (P4,P4), (P5,P5))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((P0,P0), (P1,P1), (P2,P2), (P4,P4), (P5,P5))
+variables in guard: ListBuffer(P3)
+Data flow:
+P0 <- P3
+P1 <- _P1
+P2 <- 0
+P4 <- _P4
+P5 <- 0
+Guard:
+((P3 + -1) >= 0)
+((_P1 + -1 * _P4) = 0)
+dataflow number:5
+guard number:2
+-------------
+INV1(P0, P1, P2, P4, P5) :- INV1(P0, P1 + 1, P2 + -1, P4, P5), P9 >= 1 & P1 + 1 >= 1 & !(P4 >= 1) & P3 = P0.
+Head arguments: ListBuffer((P0,P0), (P1,P1), (P2,P2), (P4,P4), (P5,P5))
+Body arguments: ListBuffer((P0,P0), ((P1 + 1),(P1 + 1)), ((P2 + -1),(P2 + -1)), (P4,P4), (P5,P5))
+Common Arguments:ListBuffer((P0,P0), (P4,P4), (P5,P5))
+relativeComplimentOfHeadArg:ListBuffer((P1,P1), (P2,P2))
+variables in guard: ListBuffer(P9, P1, P4, P3, P0)
+Data flow:
+P1 <- _P1
+P0<-P0
+P4<-P4
+P5<-P5
+Guard:
+((P9 + -1) >= 0)
+(_P1 >= 0)
+!((P4 + -1) >= 0)
+((P3 + -1 * P0) = 0)
+dataflow number:1
+guard number:4
+-------------
+INV1(P0, P1, P2, P4, P5) :- INV1(P0, P1 + 1, P2 + -1, P4 + 1, P5), P4 + 1 >= 1 & P10 >= 1 & P1 + 1 >= 1 & !(P0 >= 1) & P3 = P0.
+Head arguments: ListBuffer((P0,P0), (P1,P1), (P2,P2), (P4,P4), (P5,P5))
+Body arguments: ListBuffer((P0,P0), ((P1 + 1),(P1 + 1)), ((P2 + -1),(P2 + -1)), ((P4 + 1),(P4 + 1)), (P5,P5))
+Common Arguments:ListBuffer((P0,P0), (P5,P5))
+relativeComplimentOfHeadArg:ListBuffer((P1,P1), (P2,P2), (P4,P4))
+variables in guard: ListBuffer(P4, P10, P1, P0, P3)
+Data flow:
+P1 <- _P1
+P4 <- _P4
+P0<-P0
+P5<-P5
+Guard:
+(_P4 >= 0)
+((P10 + -1) >= 0)
+(_P1 >= 0)
+!((P0 + -1) >= 0)
+((P3 + -1 * P0) = 0)
+dataflow number:2
+guard number:5
+-------------
+INV1(P0, P1, P2, P4, P5) :- INV1(P0, P1 + 1, P2 + -1, P4 + 1, P5 + -1), P11 >= 1 & P4 + 1 >= 1 & P1 + 1 >= 1 & P0 >= 1 & P3 = P0.
+Head arguments: ListBuffer((P0,P0), (P1,P1), (P2,P2), (P4,P4), (P5,P5))
+Body arguments: ListBuffer((P0,P0), ((P1 + 1),(P1 + 1)), ((P2 + -1),(P2 + -1)), ((P4 + 1),(P4 + 1)), ((P5 + -1),(P5 + -1)))
+Common Arguments:ListBuffer((P0,P0))
+relativeComplimentOfHeadArg:ListBuffer((P1,P1), (P2,P2), (P4,P4), (P5,P5))
+variables in guard: ListBuffer(P11, P4, P1, P0, P3)
+Data flow:
+P1 <- _P1
+P4 <- _P4
+P0<-P0
+Guard:
+((P11 + -1) >= 0)
+(_P4 >= 0)
+(_P1 >= 0)
+((P0 + -1) >= 0)
+((P3 + -1 * P0) = 0)
+dataflow number:2
+guard number:5
+-------------
+INV1(P0, P1, P2, P4, P5) :- INV1(P0, P1, P2, P4 + 1, P5), P4 + 1 >= 1 & P8 >= 1 & !(P0 >= 1) & !(P1 >= 1) & P3 = P0.
+Head arguments: ListBuffer((P0,P0), (P1,P1), (P2,P2), (P4,P4), (P5,P5))
+Body arguments: ListBuffer((P0,P0), (P1,P1), (P2,P2), ((P4 + 1),(P4 + 1)), (P5,P5))
+Common Arguments:ListBuffer((P0,P0), (P1,P1), (P2,P2), (P5,P5))
+relativeComplimentOfHeadArg:ListBuffer((P4,P4))
+variables in guard: ListBuffer(P4, P8, P0, P1, P3)
+Data flow:
+P4 <- _P4
+P0<-P0
+P1<-P1
+P2<-P2
+P5<-P5
+Guard:
+(_P4 >= 0)
+((P8 + -1) >= 0)
+!((P0 + -1) >= 0)
+!((P1 + -1) >= 0)
+((P3 + -1 * P0) = 0)
+dataflow number:1
+guard number:5
+-------------
+INV1(P0, P1, P2, P4, P5) :- INV1(P0, P1, P2, P4 + 1, P5 + -1), P9 >= 1 & P4 + 1 >= 1 & P0 >= 1 & !(P1 >= 1) & P3 = P0.
+Head arguments: ListBuffer((P0,P0), (P1,P1), (P2,P2), (P4,P4), (P5,P5))
+Body arguments: ListBuffer((P0,P0), (P1,P1), (P2,P2), ((P4 + 1),(P4 + 1)), ((P5 + -1),(P5 + -1)))
+Common Arguments:ListBuffer((P0,P0), (P1,P1), (P2,P2))
+relativeComplimentOfHeadArg:ListBuffer((P4,P4), (P5,P5))
+variables in guard: ListBuffer(P9, P4, P0, P1, P3)
+Data flow:
+P4 <- _P4
+P0<-P0
+P1<-P1
+P2<-P2
+Guard:
+((P9 + -1) >= 0)
+(_P4 >= 0)
+((P0 + -1) >= 0)
+!((P1 + -1) >= 0)
+((P3 + -1 * P0) = 0)
+dataflow number:1
+guard number:5
+-------------
+CHC_COMP_FALSE :- INV2(P2, P1, P0), P0 != 0 & !(P4 >= 1) & !(P1 >= 1).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((P2,P2), (P1,P1), (P0,P0))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(P0, P4, P1)
+Data flow:
+Guard:
+!(P0 = 0)
+!((P4 + -1) >= 0)
+!((P1 + -1) >= 0)
+dataflow number:0
+guard number:3
+-------------
+CHC_COMP_FALSE :- INV1(P4, P2, P0, P3, P1), P0 != P1 & P7 >= 1 & !(P3 >= 1) & !(P2 >= 1).
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((P4,P4), (P2,P2), (P0,P0), (P3,P3), (P1,P1))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(P0, P1, P7, P3, P2)
+Data flow:
+Guard:
+!((P0 + -1 * P1) = 0)
+((P7 + -1) >= 0)
+!((P3 + -1) >= 0)
+!((P2 + -1) >= 0)
+dataflow number:0
+guard number:4
+-------------
+false :- CHC_COMP_FALSE.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+variables in guard: ListBuffer(true)
+Data flow:
+Guard:
+true
+dataflow number:0
+guard number:1
+Hints:
+-----------

@@ -1,0 +1,5 @@
+inv1(A,B,C,D,E,F,G,H) :- (I = (-2 + F)),(J >= 1),\+((((2 * A) - B) >= 1)),(G = H),(J = (1 + E)),inv1(A,B,C,D,J,I,G,H).
+inv1(A,B,C,D,E,F,G,H) :- (I = (1 + E)),(J = (-1 + C)),(K = (-1 + B)),(G = H),(((2 * A) - K) >= 1),(I >= 1),(L = (-2 + F)),inv1(A,K,J,D,I,L,G,H).
+inv1(A,B,C,D,E,F,G,H) :- (I = (-1 + B)),(G = H),(((2 * A) - I) >= 1),\+((E >= 1)),(J = (-1 + C)),inv1(A,I,J,D,E,F,G,H).
+inv1(A,B,C,D,E,F,G,H) :- (C = 0),(B = 0),(A = D),(F = 0),(E = D),(G = A),(H = D).
+false :- (A = B),\+((C >= 1)),\+((((2 * D) - E) >= 1)),\+((F = G)),inv1(D,E,F,H,C,G,A,B).
