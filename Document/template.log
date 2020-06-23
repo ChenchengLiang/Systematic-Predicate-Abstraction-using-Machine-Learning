@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9) (preloaded format=pdflatex 2018.7.2)  22 JUN 2020 22:07
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9) (preloaded format=pdflatex 2018.7.2)  23 JUN 2020 12:02
 entering extended mode
 **C:/Users/kamis/Desktop/Document/template.tex
 (C:/Users/kamis/Desktop/Document/template.tex
@@ -672,7 +672,11 @@ File: microtype.cfg 2010/01/10 v2.4 microtype main configuration file (RS)
 Package: lipsum 2011/04/14 v1.2 150 paragraphs of Lorem Ipsum dummy text
 \c@lips@count=\count151
 )
-(C:\Users\kamis\Desktop\Document\template.aux)
+(C:\Users\kamis\Desktop\Document\template.aux
+
+LaTeX Warning: Label `training-results' multiply defined.
+
+)
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 77.
 LaTeX Font Info:    ... okay on input line 77.
 LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 77.
@@ -688,8 +692,7 @@ LaTeX Font Info:    ... okay on input line 77.
 LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 77.
 LaTeX Font Info:    ... okay on input line 77.
 LaTeX Font Info:    Try loading font information for T1+ptm on input line 77.
-
-(D:\Software\Latex\Ctex\MiKTeX\tex\latex\psnfss\t1ptm.fd
+ (D:\Software\Latex\Ctex\MiKTeX\tex\latex\psnfss\t1ptm.fd
 File: t1ptm.fd 2001/06/04 font definitions for T1/ptm.
 )
 (D:\Software\Latex\Ctex\MiKTeX\tex\context\base\supp-pdf.mkii
@@ -986,20 +989,82 @@ Package pdftex.def Info: graph/training-framework.jpg used on input line 503.
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \hbox (badness 1122) in paragraph at lines 539--539
+[]\T1/ptm/m/n/10 (+20) average ar-gu-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 539--539
+\T1/ptm/m/n/10 (+20) men-t quan-ti-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 539--539
+[]\T1/ptm/m/n/10 (+20) average n-ode
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 539--539
+[]\T1/ptm/m/n/10 (+20) average bi-na-ry
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 539--540
+[]\T1/ptm/m/n/10 (+20) average ternary
+ []
+
+
+Overfull \hbox (3.24474pt too wide) in paragraph at lines 541--541
+[]\T1/ptm/m/n/10 (-20) 1070.25[14,31264]| 
+ []
+
+
+Overfull \hbox (3.24474pt too wide) in paragraph at lines 541--541
+[]\T1/ptm/m/n/10 (-20) 1514.30[12,50849]| 
+ []
+
+
+Overfull \hbox (3.24474pt too wide) in paragraph at lines 542--542
+[]\T1/ptm/m/n/10 (-20) 1213.35[18,16315]| 
+ []
+
+
+Overfull \hbox (3.24474pt too wide) in paragraph at lines 543--543
+[]\T1/ptm/m/n/10 (-20) 1096.42[20,19371]| 
+ []
+
+
+Overfull \hbox (3.24474pt too wide) in paragraph at lines 543--543
+[]\T1/ptm/m/n/10 (-20) 1512.16[15,27723]| 
+ []
+
+
+Overfull \hbox (3.13734pt too wide) in paragraph at lines 537--546
+ [] 
+ []
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Underfull \vbox (badness 4416) has occurred while \output is active []
 
  [8 <C:/Users/kamis/Desktop/Document/graph/training-framework.jpg>]
-Underfull \hbox (badness 7151) in paragraph at lines 604--604
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Underfull \hbox (badness 7151) in paragraph at lines 629--629
 []\T1/ptm/m/n/10 (+20) Average time con-
  []
 
 
-Underfull \hbox (badness 7151) in paragraph at lines 604--605
+Underfull \hbox (badness 7151) in paragraph at lines 629--630
 []\T1/ptm/m/n/10 (+20) Average time con-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 604--605
+Underfull \hbox (badness 10000) in paragraph at lines 629--630
 \T1/ptm/m/n/10 (+20) sump-tion (learned
  []
 
@@ -1007,20 +1072,24 @@ Underfull \hbox (badness 10000) in paragraph at lines 604--605
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 [9] (C:\Users\kamis\Desktop\Document\template.bbl [10])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 867.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 892.
  [11]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 867.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 892.
 
 (C:\Users\kamis\Desktop\Document\template.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 867.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 867.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 892.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 892.
 Package rerunfilecheck Info: File `template.out' has not changed.
 (rerunfilecheck)             Checksum: DB9F0A9ECF8E08110083F3EDAC3F66FA;1628.
+
+
+LaTeX Warning: There were multiply-defined labels.
+
  ) 
 Here is how much of TeX's memory you used:
- 12865 strings out of 495354
- 188058 string characters out of 3183020
- 486709 words of memory out of 3000000
+ 12866 strings out of 495354
+ 188074 string characters out of 3183020
+ 486750 words of memory out of 3000000
  15579 multiletter control sequences out of 15000+200000
  60023 words of font info for 163 fonts, out of 3000000 for 9000
  14 hyphenation exceptions out of 8191
@@ -1040,9 +1109,9 @@ re/Latex/Ctex/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><D:/Software/Latex/Ctex/M
 iKTeX/fonts/type1/urw/times/utmbi8a.pfb><D:/Software/Latex/Ctex/MiKTeX/fonts/ty
 pe1/urw/times/utmr8a.pfb><D:/Software/Latex/Ctex/MiKTeX/fonts/type1/urw/times/u
 tmri8a.pfb>
-Output written on template.pdf (11 pages, 1777440 bytes).
+Output written on template.pdf (11 pages, 1778278 bytes).
 PDF statistics:
- 342 PDF objects out of 1000 (max. 8388607)
- 92 named destinations out of 1000 (max. 500000)
+ 343 PDF objects out of 1000 (max. 8388607)
+ 93 named destinations out of 1000 (max. 500000)
  26335 words of extra memory for PDF output out of 29859 (max. 10000000)
 

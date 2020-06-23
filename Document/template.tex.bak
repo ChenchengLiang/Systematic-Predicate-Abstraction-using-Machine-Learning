@@ -8,9 +8,7 @@
 \usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{blindtext}
-
 \usepackage{subcaption}
-
 \usepackage{arxiv}
 \usepackage{listings}
 \lstset
@@ -139,7 +137,11 @@ $\widehat{M}$ is built by a set of predicates $P$. To update $\widehat{M}$ to $\
 \subsubsection{Heuristics for predicate generating}
 ---
 %\subsection{Abstract Interpolation}
+Abstract Interpolation \cite{10.1007/978-3-319-57288-8_18}.
 
+Manually constructed templates \cite{10.1007/978-3-319-57288-8_18}
+
+Learned argument importance as heuristic.
 
 \subsection{GNN}
 The program is transformed to horn graph which preserves the structural information of the graph by catching control flow and data flow. We apply tf2\_gnn framework to learn the node features from graph inputs. tf2\_gnn is a implementation of general GNN framework which provides standard inputs and outputs for graph learning. Except implementing several popular GNN algorithms, such as \cite{2017arXiv171010903V,schlichtkrull2017modeling}, it also provides great flexibility to implement customized GNNs. The inputs of tf2\_gnn is node vector and edges which represent the relations between node vectors. The output can be node features or a graph feature. Since we want to learn the importance of arguments. We take node features as outputs. We gather these learned argument node features and apply multilayer perceptrons to learn the importance of them.
@@ -248,7 +250,7 @@ $E_{CF}$ is control flow edge. It connects $V_{CL}$. $E_{DF}$ is data flow edge.
 %$V_{Arg}=\{Arg_{k}\}$ is argument set, $V_{C}$ is constant value set, $V_{Op}=\{+,-,==,...\}$ is operator set,$V_{FV}=\{v_{k}\}$ is free variables set. $k$ is a positive integer. $HE_{CF}$ is a set of Guarded control flow hyper edges. it is used between two control locations. it takes two inputs, a control location $cl_{Initial}$ or $cl_{Mian_{k}}$ and a boolean value from operator. It has a control flow out edge $e_{CFO}$ (one element from $E_{CFO}$) connected to next control location node. Similarly, $HE_{DF}$ is a set of Guarded data flow hyper edges. It guards the data flow from $Body$ to $Head$. It takes two inputs, a value from argument $Arg_{k}$ or free variable $v_{k}$ and a boolean value and has a data flow out edge $e_{DFO}$ (one element from $E_{DFO}$) connected to next operator or argument node. $E_{CFI},E_{CFO}$ are control flow in and control flow out edges, they are only used when there are connections between nodes and guarded control flow hyperedges. similarly, $E_{DFI},E_{DFO}$ are data flow in and out edges, they are only corresponding to guarded data flow hyperedges. $E_{CD}$ is condition edge. It connects boolean operator to the hyperedges to send boolean values to the hyperedges. $E_{Arg}$ is argument edge. It connects arguments to corresponding control location node. We use lower case to represent one elements in the set. For example $v_{CL}$ means one control location node from $V_{CL}$. $V_{Pred}$ is predicate node set. It connects the predicate's AST tree and the predicate's location.
 
 The summary of $G$'s nodes and edges is shown in Table \ref{GraphDescriptionNodes} and \ref{GraphDescriptionEdges} respectively.
-\begin{table}\caption{Nodes in graph} \label{GraphDescriptionNodes}
+\begin{table}[h]\caption{Nodes in graph} \label{GraphDescriptionNodes}
 \begin{center}
 \begin{tabular}{lp{3cm}p{3cm}p{6cm}p{8cm}}
 \hline
@@ -263,7 +265,7 @@ $V_{Op}$  & Operator node                    & -                       & $E_{DF}
 \end{center}
 \end{table}
 %$V_{Pred}$ &Predicate node                   & Template types                                  & $v_{OP}$, $v_{Vri}$, $v_{C}$                      & $v_{CL}$ \\
-\begin{table}\caption{Edges in graph} \label{GraphDescriptionEdges}
+\begin{table}[h]\caption{Edges in graph} \label{GraphDescriptionEdges}
 \begin{center}
 \begin{tabular}{lp{5cm}p{3cm}p{3cm}p{3cm}p{3cm}}
 \hline
@@ -506,14 +508,14 @@ The learning model is shown in Figure \ref{training-framework}. The input horn g
 We collected the number of arguments' occurrence to be our training label. Since we care about the importance of the arguments, we can transform the occurrence label to ranking and learn the ranking of arguments. So we have two variances of our training. One is to predict the occurrence using occurrence label directly, then rank the predicted number or normalize them to represent the importance and feed back to Eldarica. Another variance is to predict the ranking using ranking label.
 
 The numerical results of training using different labels are shown in \ref{training-results}
-\begin{table}\caption{Training results}\label{training-results}
+\begin{table}[h]\caption{Training results}\label{training-results}
 \begin{center}
 \begin{tabular}{lp{1.5cm}p{1.5cm}p{1.5cm}p{1.5cm}p{1.5cm}p{1.5cm}p{1.5cm}p{1.5cm}}
 \hline
 Benchmarks  & Label & Train loss & Valid loss & Test loss & Mean loss & Best valid epoch  \\
 \hline
-LIA-lin       & occurrence & - & - & - & - & - \\
-LIA-lin       & rank & - & - & - & - & - \\
+LIA-lin       & occurrence & 0.003 & 0.548 & 20.603 & 20.848 & 8 \\
+LIA-lin       & rank & 0.0002 & 0.0092 & 3.194 & 0.684 & 52 \\
 LIA-nonlin    & occurrence & - & - & - & - & - \\
 LIA-nonlin    & rank & - & - & - & - & - \\
 In total      & occurrence & - & - & - & - & - \\
@@ -523,7 +525,7 @@ In total      & rank & - & - & - & - & - \\
 \end{center}
 \end{table}
 
-Parameters: max\_epochs=1000,patience=50
+Parameters: max\_epochs=1000,patience=50, Node dimension=64. MLP=[64x64]
 %\begin{figure}[h]
 %\centering
 %  \includegraphics[width=10cm]{graph/NNstructure}\\
@@ -553,7 +555,7 @@ Parameters: max\_epochs=1000,patience=50
 We separate our benchmarks to linear or nonlinear group. All programs in the benchmarks can be verified by Eldarica in a limited time.
 In these verifiable programs, we use Algorithm \ref{Predicates-extracting-process} to select programs that need initial predicates to be verified. Then we transform these selected programs to horn graphs and divide them to train, valid, and test set randomly. The numerical details can be found in Table \ref{benchmark-train-valid-test}
 
-\begin{table}\caption{Benchmarks}\label{benchmark-train-valid-test}
+\begin{table}[h]\caption{Benchmarks}\label{benchmark-train-valid-test}
 \begin{center}
 \begin{tabular}{lp{2cm}p{3cm}p{2cm}p{2cm}p{2cm}}
 \hline
@@ -581,7 +583,7 @@ All code regarding the experiment can be found in Git repository \href{https://g
 
 \subsection{Experimental results}
 
-\begin{table}
+\begin{table}[h]
 \begin{center}
 \begin{tabular}{lp{2cm}p{2cm}p{3.5cm}p{3cm}}
 \hline
@@ -595,7 +597,7 @@ Total  & - & -&-&-\\
 \end{center}
 \end{table}
 
-\begin{table}
+\begin{table}[h]
 \begin{center}
 \begin{tabular}{lp{3cm}p{3cm}p{3cm}p{3cm}p{3cm}p{3cm}p{3cm} }
 \hline
@@ -701,9 +703,13 @@ DeepMath \cite{NIPS2016_6280} is the first trial that perform text-level learnin
 
 FormulaNet \cite{NIPS2017_6871} performs the same task (premise selection for theorem proving) like DeepMath. But, FormulaNet represent represent the input (a higher-order logic formula) as a graph and provide a embedding method to catch the formula's representation.
 
-Our input is program.  There are different ways to learn the program representations. 
+Our input is program.  Graph is a natural way to represent programs. There are different ways to learn the program graphs.
 
-(1) End-to-end learning: TBCNN \cite{DBLP:journals/corr/MouLJZW14} takes AST as input and propose a tree-based convolutional neural network to learn program representation. \textit{Learning to represent programs with graphs} \cite{DBLP:journals/corr/abs-1711-00740} define a program graph based on AST to catch syntactic and semantic structure. Then, it uses GNN to learn the program representation. 
+(1) End-to-end learning: TBCNN \cite{DBLP:journals/corr/MouLJZW14} takes AST as input and propose a tree-based convolutional neural network to learn program representation. \textit{Learning to represent programs with graphs} \cite{DBLP:journals/corr/abs-1711-00740} define a program graph based on AST to catch syntactic and semantic structure. Then, it uses GNN to learn the program representation.
+
+(2) Semi-supervised or unsupervised graph embedding aims at using various methods to represent the graph to low-dimensional vector for down stream applications (e.g. classification, recommendation, etc.). The graph embedding and downstream networks are not trained jointly.
+Before combining with deep learning, graph embedding works in the context of dimensionality reduction.
+The typical techniques are principle component analysis (PCA), multidimensional scaling (MDS),Isomap \cite{Isomap}, Locally Linear Embedding (LLE) \cite{Roweis2323}, and Laplacian Eigenmap \cite{NIPS2001_1961}. Their complexities are quadratic corresponding to the number of vertices. DeepWalk \cite{DBLP:journals/corr/PerozziAS14} maps the graph's nodes to sentence's words and uses word embedding technique skip-gram \cite{DBLP:journals/corr/MikolovSCCD13} to perform the node embedding. And, it is extended to Graph2Vec \cite{DBLP:journals/corr/NarayananCVCLJ17} to learn the graph representation.
 %
 %
 %Graph neural networks (GNNs) are deep learning model for graph-related task in end-to-end manner. The first state of nodes are given. Update node representations by edges type and the connected node.
@@ -722,15 +728,14 @@ Our input is program.  There are different ways to learn the program representat
 %
 %FormulaNet \cite{NIPS2017_6871}. GAT \cite{2017arXiv171010903V}.
 
-Semi-supervised or unsupervised graph embedding aims at using various methods to represent the graph to low-dimensional vector for down stream applications (e.g. classification, recommendation, etc.). The graph embedding and downstream networks are not trained jointly.  
-Before combining with deep learning, graph embedding works in the context of dimensionality reduction.
+%Semi-supervised or unsupervised graph embedding aims at using various methods to represent the graph to low-dimensional vector for down stream applications (e.g. classification, recommendation, etc.). The graph embedding and downstream networks are not trained jointly.
+%Before combining with deep learning, graph embedding works in the context of dimensionality reduction.
+%The typical techniques are principle component analysis (PCA), multidimensional scaling (MDS),Isomap \cite{Isomap}, Locally Linear Embedding (LLE) \cite{Roweis2323}, and Laplacian Eigenmap \cite{NIPS2001_1961}. Their complexities are quadratic corresponding to the number of vertices.
 
+%DeepWalk maps the graph's nodes to sentence's words and uses word embedding technique skip-gram to perform the node embedding. along with skip-gram word embedding later on been extended to Doc2Vec, DeepWalk node embedding is extended to Graph2Vec.
+%The idea of Skip-gram word embedding later on is used in Doc2Vec,
 
-The typical techniques are principle component analysis (PCA), multidimensional scaling (MDS),Isomap \cite{Isomap}, Locally Linear Embedding (LLE) \cite{Roweis2323}, and Laplacian Eigenmap \cite{NIPS2001_1961}. Their complexities are quadratic corresponding to the number of vertices.
-DeepWalk maps the graph's nodes to sentence's words and uses word embedding technique skip-gram to perform the node embedding. along with skip-gram word embedding later on been extended to Doc2Vec, DeepWalk node embedding is extended to Graph2Vec.
-
-
-code2vec \cite{Alon:2019:CLD:3302515.3290353}
+%code2vec \cite{Alon:2019:CLD:3302515.3290353}
 %Program synthesis:
 %
 %Logical reasoning: NEO, BLAZE, CEGIS.
