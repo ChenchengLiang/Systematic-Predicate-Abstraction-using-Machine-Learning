@@ -48,7 +48,7 @@ def separate_dataset_to_train_valid_test_files(source,train=120,valid=11,test=30
             copy(negative_hint, source + fold + "Data/")
 
 
-def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="analysis",path="../../", curssor=0):
+def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="analysis",path="../../", curssor=0,buckets=10):
     benchmark_name = benchmark.replace("/", "-")
     graphs_node_label_ids = []
     graphs_argument_indices = []
@@ -58,15 +58,14 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
     graph_info_list=[]
     for df in data_fold:
         print("write data_fold to pickle data:", df)
-
         file_type=".smt2"
-        for i in range(1,11):
-            p = subprocess.Popen(["../../venv/bin/python3", "split_read_graphs.py", path,df,str(i),file_type,label])
+        for i in range(1,buckets+1):
+            p = subprocess.Popen(["../../venv/bin/python3", "split_read_graphs.py", path,df,str(i),file_type,label,str(buckets),"anlysis"])
             p.wait()
             # os.kill(p.pid,signal.SIGKILL)
             print("curssor=",i)
 
-        for i in range(1,11):
+        for i in range(1,buckets+1):
             graphs_node_label_ids.extend(pickleRead(label+"-graphs_node_label_ids-"+str(i),path="../"))
             graphs_argument_indices.extend(pickleRead(label+"-graphs_argument_indices-"+str(i),path="../"))
             graphs_adjacency_lists.extend(pickleRead(label+"-graphs_adjacency_lists-" + str(i), path="../"))
@@ -76,7 +75,7 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
     return graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node,graph_info_list
 
 
-def get_statistic_data(path="",file_type=".smt2"):
+def get_statistic_data(path="",file_type=".smt2",buckets=10):
     try:
         rmtree(path + "statistic")
         os.mkdir(path + "statistic")
@@ -101,13 +100,14 @@ def get_statistic_data(path="",file_type=".smt2"):
 
 
             #todo:separated reading
-            if total_graph<11:
+            if total_graph<buckets+1:
                 graphInfoList = DotToGraphInfo(data_fold + "Data", path)
                 graphInfoList._file_type=file_type
-                graphs_node_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node,graph_info_list = graphInfoList.getHornGraphSample_no_offset()
+                graphInfoList._split_flag=0
+                graphs_node_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node,graph_info_list = graphInfoList.getHornGraphSample_analysis()
             else:
                 graphs_node_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node,graph_info_list= write_graph_to_pickle(path, data_fold=[data_fold], label="analysis", path=path,
-                                  curssor=0)
+                                  curssor=0,buckets=buckets)
 
             for g, a, i, p, n, graph_info,adjacency_list in zip(sorted(glob.glob(path + data_fold+"Data/" + '*' + '.gv')),
                                      sorted(glob.glob(path + data_fold+"Data/" + '*' + '.arguments')),
@@ -281,7 +281,7 @@ def main():
     #benchmark_list.append(["../../benchmarks/LIA-lin-trainData/", int(545 * 0.6), int(545 * 0.2), int(545 * 0.2), ".smt2"])
     for benchmark in benchmark_list:
         #separate_dataset_to_train_valid_test_files(benchmark[0], benchmark[1], benchmark[2], benchmark[3])
-        #get_statistic_data(benchmark[0],file_type=benchmark[4])
+        #get_statistic_data(benchmark[0],file_type=benchmark[4],buckets=10)
         separate_datafold_and_get_statistic_data(rootdir=benchmark[0],file_type=".smt2")
 
     #gather_all_train_data(rootdir="../../benchmarks/LIA-nonlin-extracted/")

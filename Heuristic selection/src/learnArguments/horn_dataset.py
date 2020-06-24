@@ -16,9 +16,9 @@ import random
 import scipy.stats as ss
 import subprocess
 
-def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../../",file_type=".smt2",split_flag=False):
+def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../../",file_type=".smt2",split_flag=False,buckets=10):
     if split_flag==True and not os.path.isfile("../../pickleData/"+label+"-"+benchmark_name+"-gnnInput_train_data.txt"):
-        write_graph_to_pickle(benchmark_name,  data_fold=["train", "valid", "test"], label=label,path=path)
+        write_graph_to_pickle(benchmark_name,  data_fold=["train", "valid", "test"], label=label,path=path,buckets=buckets)
 
 
     read_graph_from_pickle_file(benchmark_name,force_read=force_read,label=label,path=path,file_type=file_type)
@@ -200,7 +200,11 @@ def write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss,valid
             out_file.write("original rank:"+ str(ranks)+ "\n")
             out_file.write("predicted argument scores:"+ str(predicted_arguments)+ "\n")
             out_file.write("predicted rank:"+ str(ss.rankdata(predicted_arguments,method="dense"))+ "\n")
-            mse_list.append(tf.keras.losses.MSE(arguments,predicted_arguments))
+            mse=tf.keras.losses.MSE(arguments,predicted_arguments)
+            out_file.write("mse:" + str(mse) + "\n")
+            mse_list.append(mse)
+        out_file.write("-------"+ "\n")
+        out_file.write("mean(mse_list):" + str(np.mean(mse_list)) + "\n")
         plt.xlabel('graph number')
         plt.ylabel('mse of predicted argument score')
         plt.plot(mse_list,label="predicted_data_mse")
@@ -487,7 +491,7 @@ def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","
             pickleWrite(raw_data_graph, label+"-"+benchmark+"-gnnInput_"+df+"_data", "../")
 
 
-def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../../", curssor=0):
+def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../../", buckets=0):
     benchmark_name = benchmark.replace("/", "-")
     for df in data_fold:
         print("write data_fold to pickle data:", df)
@@ -498,13 +502,13 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
         graphs_argument_scores=[]
         total_number_of_node=0
         file_type=".smt2"
-        for i in range(1,11):
-            p = subprocess.Popen(["../../venv/bin/python3", "split_read_graphs.py", path,df,str(i),file_type,label])
+        for i in range(1,buckets+1):
+            p = subprocess.Popen(["../../venv/bin/python3", "split_read_graphs.py", path,df,str(i),file_type,label,str(buckets),"gnn_inputs"])
             p.wait()
             # os.kill(p.pid,signal.SIGKILL)
             print("curssor=",i)
 
-        for i in range(1,11):
+        for i in range(1,buckets+1):
             graphs_node_label_ids.extend(pickleRead(label+"-graphs_node_label_ids-"+str(i),path="../"))
             graphs_argument_indices.extend(pickleRead(label+"-graphs_argument_indices-"+str(i),path="../"))
             graphs_adjacency_lists.extend(pickleRead(label+"-graphs_adjacency_lists-" + str(i), path="../"))

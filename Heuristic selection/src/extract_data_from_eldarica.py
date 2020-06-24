@@ -34,7 +34,7 @@ def check_solvability(timeOut,abstractionOption,benchmark_solvability_folders,fi
             shutil.copy2(file, benchmark_solvability_folders["unsolvable"])
 
 def check_solvability_pool(rootdir="../benchmarks/LIA-lin/"):
-    timeOut, abstractionOption = 60,"-abstract"
+    timeOut, abstractionOption = 60,"-noIntervals"
     for root, subdirs, files in os.walk(rootdir):
         if os.path.exists(root + "/solvability"):
             shutil.rmtree(root + "/solvability")
@@ -66,7 +66,7 @@ def extract_one_file(parameterList):
     absTimeOut = parameterList[2]
     timeOut=parameterList[3]
     command = "../eldarica-graph-generation/./eld " \
-              + abstractionOption  + " -absTimeout:"+str(absTimeOut)+" -extractPredicates " +" -t:"+str(timeOut) +" "
+              + abstractionOption  + " -absTimeout:"+str(absTimeOut)+" -extractPredicates " +" -t:"+str(timeOut) + " -solvabilityTimeout:" + str(absTimeOut) +" -solvabilityTimeout:" + str(absTimeOut)
     run_p = command + filePath
 
     print("Command:", run_p)
@@ -77,6 +77,7 @@ def extract_one_file(parameterList):
         eld = subprocess.Popen(["../eldarica-graph-generation/eld", \
                                 filePath, abstractionOption, \
                                 "-absTimeout:" + str(absTimeOut), \
+                                "-solvabilityTimeout:" + str(absTimeOut), \
                                 "-extractPredicates","-t:"+str(timeOut)], stdout=subprocess.DEVNULL, shell=False)
         # eld = subprocess.Popen(["../eldarica-graph-generation/eld", \
         #                         filePath, abstractionOption, \
@@ -105,8 +106,8 @@ def extract_one_file(parameterList):
 
 def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
 
-    absTimeout=60
-    timeout=60*20
+    absTimeout=30
+    timeout=60*10
 
     for root, subdirs, files in os.walk(rootdir):
         if os.path.exists(root + "/trainData"):
@@ -125,8 +126,8 @@ def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
 
             parameterList=[]
             for file in files:
-                parameterList.append([root+"/"+file,"-abstract",absTimeout,timeout])
-            pool = Pool(processes=8)
+                parameterList.append([root+"/"+file,"-noIntervals",absTimeout,timeout])
+            pool = Pool(processes=4)
 
             pool.map(extract_one_file, parameterList)
             pool.close()
@@ -138,7 +139,7 @@ def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
 
 
 def main():
-    benchmark_list = ["../benchmarks/LIA-lin/"]
+    benchmark_list = ["../benchmarks/LIA-lin-trainData-temp/"]
     for benchmark in benchmark_list:
         # check_solvability_pool()
         extract_data_pool(benchmark)
