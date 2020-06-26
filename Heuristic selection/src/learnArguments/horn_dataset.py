@@ -288,13 +288,14 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         raw_inputs=pickleRead(self.label_type+"-"+self._benchmark+"-gnnInput_"+data_name+"_data","../")
         final_graphs=raw_inputs.final_graphs
 
+
+
         self._num_edge_types=raw_inputs._num_edge_types
         self._total_number_of_nodes=raw_inputs._total_number_of_nodes
         self._node_number_per_edge_type=raw_inputs._node_number_per_edge_type
 
         self._argument_scores[data_name]=raw_inputs.argument_scores
         self._ranked_argument_scores[data_name] = raw_inputs.ranked_argument_scores
-
 
         return final_graphs
 

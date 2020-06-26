@@ -127,7 +127,7 @@ def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
             parameterList=[]
             for file in files:
                 parameterList.append([root+"/"+file,"-noIntervals",absTimeout,timeout])
-            pool = Pool(processes=4)
+            pool = Pool(processes=8)
 
             pool.map(extract_one_file, parameterList)
             pool.close()

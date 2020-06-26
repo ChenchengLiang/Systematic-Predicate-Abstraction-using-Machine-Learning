@@ -147,6 +147,10 @@ class DotToGraphInfo:
         totalGraphNodeIDList = []
         totalGraphArgumentIDList = []
         argumentScoreList = []
+
+
+
+
         for graphInfo, args in zip(self.finalGraphInfoList, self.parsedArgumentList):
             totalGraphNodeIDList.append(graphInfo.nodeUniqueIDList)
             tempArgList = []
@@ -568,8 +572,6 @@ class DotToGraphInfo:
 
 
 
-
-
     def normalizeNodeLabel(self):
         vocabList=[]
         for G in self.graphList:
@@ -944,7 +946,7 @@ class DotToGraphInfo:
 
     def getGraphInfoList_for_GNN(self):
         self.getArgumentHead()
-        for G in self.graphList:
+        for G ,args in zip(self.graphList,self.parsedArgumentList):
             nodeUniqueIDList=[]
             nodeLabelList = []
             hyperedgeLabelList = []
@@ -959,17 +961,15 @@ class DotToGraphInfo:
             literal_node_list = []
             true_node_list = []
             boolvalue_node_list = []
-            data_flow_hyperedge_list=[]
-            control_flow_hyperedge_list=[]
+            data_flow_hyperedge_list = []
+            control_flow_hyperedge_list = []
             for node in G.nodes:
-                #get argument head
-                nodeDir = G.nodes[node]
-                if (nodeDir['class'] == "argument"):
-                    tempString = nodeDir['label']
-                    head = tempString[1:tempString.find('argument') - 1]
-                    nodeDir['head'] = head
-                    argument = "argument" + tempString[tempString.find('argument_') + 9:-1]
-                    nodeDir['argument'] = argument
+                for arg in args:
+                    nodeDir = G.nodes[node]
+                    if (nodeDir['class'] == "argument"):
+                        if (nodeDir['argument'] == arg.arg and nodeDir['head'] == arg.head[:arg.head.find("/")]):
+                            arg.nodeUniqueIDInGraph = nodeDir['nodeUniqueID']
+
 
                 if G.nodes[node]['class'] == "cfn":
                     control_flow_node_list.append(G.nodes[node]['nodeUniqueID'])
@@ -989,24 +989,17 @@ class DotToGraphInfo:
                     control_flow_hyperedge_list.append(G.nodes[node]['hyperedgeUniqueID'])
 
 
-
                 if (G.nodes[node]['class'] == "DataFlowHyperedge" or G.nodes[node]['class'] == "controlFlowHyperEdge"):#hyperedge
-                    hyperedgeLabelList.append(G.nodes[node]['hyperedgeLabelUniqueID'])
+
                     hyperedgeSenderList.append(G.nodes[node]['from'])
                     hyperedgeReceiverList.append(G.nodes[node]['to'])
-                    # senderLabelList=[]
-                    # receiverLabelList=[]
-                    # for pre in G.predecessors(node):
-                    #     senderLabelList.append(G.nodes[pre]['nodeLabelUniqueID'])
-                    # for suc in G.successors(node):
-                    #     receiverLabelList.append(G.nodes[suc]['nodeLabelUniqueID'])
 
-                    hyperedgeEmbeddingInputs.append({'hyperedgeLabelUniqueID':G.nodes[node]['hyperedgeLabelUniqueID'],
+
+                    hyperedgeEmbeddingInputs.append({#'hyperedgeLabelUniqueID':G.nodes[node]['hyperedgeLabelUniqueID'],
                                                      'senderIDList':G.nodes[node]['from'],'receiverIDList':G.nodes[node]['to'],
                                                      #'senderLabelList':senderLabelList,'receiverLabelList':receiverLabelList,
                                                      'hyperedgeEmbedding':'dummy'})
                 else:
-                    nodeLabelList.append(G.nodes[node]['nodeLabelUniqueID'])
                     nodeUniqueIDList.append(G.nodes[node]['nodeUniqueID'])
                     #todo:node embedding inputs
                     # if node connect to normal edges
@@ -1035,7 +1028,6 @@ class DotToGraphInfo:
                                                 'incomingHyperedgeEmbedding':'dummy',
                                                 'nodeEmbedding':'dummy'})
 
-
             edgeLabelList = []
             edgeSenderList = []
             edgeReceiverList = []
@@ -1049,7 +1041,7 @@ class DotToGraphInfo:
                     #edgeLabelList.append(G.edges[edge]['edgeLabelUniqueID'])
                     edgeSenderList.append(G.edges[edge]['from'])
                     edgeReceiverList.append(G.edges[edge]['to'])
-                    edgeEmbeddingInputs.append({'edgeLabelUniqueID':G.edges[edge]['edgeLabelUniqueID'],
+                    edgeEmbeddingInputs.append({#'edgeLabelUniqueID':G.edges[edge]['edgeLabelUniqueID'],
                                                 'sender':G.edges[edge]['from'],'receiver':G.edges[edge]['to'],
                                                 #'senderLabel':G.nodes[edge[0]]['nodeLabelUniqueID'],
                                                 #'receiverLabel':G.nodes[edge[1]]['nodeLabelUniqueID'],

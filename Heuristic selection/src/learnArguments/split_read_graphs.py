@@ -16,6 +16,7 @@ def main():
     graphInfoList._buckets=int(buckets)
     start=time.time()
     if reading_type == "gnn_inputs":
+        print("reading_type",reading_type)
         graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node,graph_info_list = graphInfoList.getHornGraphSample_no_offset()
     else:
         graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node, graph_info_list = graphInfoList.getHornGraphSample_analysis()
