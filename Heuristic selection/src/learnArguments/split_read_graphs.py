@@ -17,12 +17,13 @@ def main():
     start=time.time()
     if reading_type == "gnn_inputs":
         print("reading_type",reading_type)
-        graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node,graph_info_list = graphInfoList.getHornGraphSample_no_offset()
+        graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node,total_control_flow_node_list,graph_info_list = graphInfoList.getHornGraphSample_no_offset()
         pickleWrite(graphs_node_label_ids, df + "-graphs_node_label_ids-" + str(curssor), "../")
         pickleWrite(graphs_argument_indices, df + "-graphs_argument_indices-" + str(curssor), "../")
         pickleWrite(graphs_adjacency_lists, df + "-graphs_adjacency_lists-" + str(curssor), "../")
         pickleWrite(graphs_argument_scores, df + "-graphs_argument_scores-" + str(curssor), "../")
         pickleWrite(total_number_of_node, df + "-total_number_of_node-" + str(curssor), "../")
+        pickleWrite(total_control_flow_node_list, df + "-total_control_flow_node_list-" + str(curssor), "../")
         pickleWrite(graph_info_list, df + "-graphs_graph_info_list-" + str(curssor), "../")
     else:
         graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node, graph_info_list = graphInfoList.getHornGraphSample_analysis()

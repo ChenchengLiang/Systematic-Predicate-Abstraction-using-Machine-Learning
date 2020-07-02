@@ -2,7 +2,7 @@ from typing import Any, Dict,Optional
 import tensorflow as tf
 from learnArguments.dotToGraphInfo import GraphInfo,ArgumentInfo,DotToGraphInfo
 import tf2_gnn
-from learnArguments.horn_graph_argument_selection_task import InvariantArgumentSelectionTask,InvariantArgumentIdentifyTask
+from learnArguments.horn_graph_argument_selection_task import InvariantArgumentSelectionTask,InvariantNodeIdentifyTask
 from tf2_gnn.data import GraphDataset,GraphSample,DataFold,GraphBatchTFDataDescription
 import numpy as np
 from typing import List,Set,Iterator,Tuple
@@ -32,7 +32,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters['hidden_dim'] = 64
     parameters['num_layers'] = 1
     parameters['node_label_embedding_size'] = nodeFeatureDim
-    parameters['max_nodes_per_batch']=100000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
+    parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
     parameters['regression_hidden_layer_size'] = [64,64]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
@@ -62,11 +62,16 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     valid_loss_average = []
     test_loss_average = []
     best_valid_epoch_average = []
+    accuracy_average=[]
     model=None
     for n in range(train_n_times):
         # get model
         if label == "argument_identify":
-            model = InvariantArgumentIdentifyTask(parameters, dataset)
+            model = InvariantNodeIdentifyTask(parameters, dataset)
+        elif label == "argument_identify_no_batchs":
+            model = InvariantNodeIdentifyTask(parameters, dataset)
+        elif label == "control_location_identify":
+            model = InvariantNodeIdentifyTask(parameters, dataset)
         else:
             model = InvariantArgumentSelectionTask(parameters, dataset)
 
@@ -78,13 +83,13 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         save_dir=os.path.abspath("trained_model")
         log_file = os.path.join(save_dir, f"{run_id}.log")
 
-        trained_model_path,train_loss_list,valid_loss_list,best_valid_epoch = train(
+        trained_model_path,train_loss_list,valid_loss_list,best_valid_epoch,train_metric_list,valid_metric_list = train(
             model,
             dataset,
             log_fun=log,
             run_id=run_id,
-            max_epochs=1000,
-            patience=50,
+            max_epochs=100,
+            patience=10,
             save_dir=save_dir,
             quiet=quiet,
             aml_run=None,
@@ -98,6 +103,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         true_Y=None
 
         mean_loss_list=0
+        accuracy=0
         for data in test_data:
             #print(data[0]) #input
             true_Y=data[1]["node_labels"]
@@ -110,10 +116,11 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
                 [np.mean(data[1]["node_labels"])]*len(data[1]["node_labels"]), data[1]["node_labels"])
             print("\n mse_mean_Y_and_True_Y", mse_mean)
             mean_loss_list=mse_mean
-            num_correct = tf.reduce_sum(tf.math.equal(data[1]["node_labels"], tf.math.round(predicted_Y_loaded_model)))
+            num_correct = tf.reduce_sum(tf.cast(tf.math.equal(data[1]["node_labels"], tf.math.round(predicted_Y_loaded_model)),tf.int32))
             accuracy = num_correct / len(predicted_Y_loaded_model)
-            print("accuracy",accuracy)
 
+            print("accuracy",accuracy)
+        accuracy_average.append(accuracy)
         train_loss_list_average.append(train_loss_list)
         valid_loss_list_average.append(valid_loss_list)
         test_loss_list_average.append(predicted_Y_loaded_model)
@@ -124,25 +131,38 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         test_loss_average.append(predicted_Y_loaded_model[-1])
         best_valid_epoch_average.append(best_valid_epoch)
 
-    train_loss_list_average=np.mean(train_loss_list_average,axis=0)
-    valid_loss_list_average=np.mean(valid_loss_list_average,axis=0)
-    test_loss_list_average=np.mean(test_loss_list_average,axis=0)
+
+
+    # train_loss_list_average=np.mean(train_loss_list_average,axis=0)
+    # valid_loss_list_average=np.mean(valid_loss_list_average,axis=0)
+    # test_loss_list_average=np.mean(test_loss_list_average,axis=0)
     mean_loss_list_average=np.mean(mean_loss_list)
     mse_loaded_model_average=np.mean(mse_loaded_model)
     train_loss_average=np.mean(train_loss_average)
+    valid_loss_average=np.mean(valid_loss_average)
     best_valid_epoch_average=np.mean(best_valid_epoch_average)
+    mean_accuracy=np.mean(accuracy_average)
 
-    #visualize results
-    draw_training_results(train_loss_list_average, valid_loss_list_average,test_loss_list_average, mean_loss_list_average,
-                          mse_loaded_model_average, valid_loss_list, true_Y, predicted_Y_loaded_model, label,
-                          benchmark_name)
-    write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss_average,
-                               valid_loss_average, mse_loaded_model_average, mean_loss_list_average,best_valid_epoch_average,
-                               benchmark=benchmark_name,label=label)
+    write_accuracy_to_log(label, benchmark_name, accuracy_average,best_valid_epoch_average)
+
+    # #visualize results
+    # draw_training_results(train_loss_list_average, valid_loss_list_average,test_loss_list_average, mean_loss_list_average,
+    #                       mse_loaded_model_average, valid_loss_list, true_Y, predicted_Y_loaded_model, label,
+    #                       benchmark_name)
+    # write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss_average,
+    #                            valid_loss_average, mse_loaded_model, mean_loss_list,accuracy_average,best_valid_epoch_average,
+    #                            benchmark=benchmark_name,label=label)
 
 
 
-
+def write_accuracy_to_log(label,benchmark,accuracy_list,best_valid_epoch_list):
+    mean_accuracy = np.mean(accuracy_list)
+    best_valid_epoch_average = np.mean(best_valid_epoch_list)
+    with open("trained_model/" + label + "-" + benchmark + ".log", 'w') as out_file:
+        out_file.write("accuracy_list:" + str(accuracy_list) + "\n")
+        out_file.write("accuracy mean:" + str(mean_accuracy) + "\n")
+        out_file.write("best_valid_epoch_list:" + str(best_valid_epoch_list) + "\n")
+        out_file.write("best_valid_epoch_average:" + str(best_valid_epoch_average) + "\n")
 
 
 def draw_training_results(train_loss_list_average,valid_loss_list_average,test_loss_list_average,mean_loss_list_average,
@@ -183,15 +203,23 @@ def draw_training_results(train_loss_list_average,valid_loss_list_average,test_l
     plt.savefig("trained_model/" + label + "-" + benchmark_name + "-error-distribution.png")
     plt.clf()
 
-def write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss,valid_loss,test_loss,mean_loss,
+def write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss,valid_loss,mse_loaded_model_list,mean_loss_list,accuracy_list,
                                best_valid_epoch,benchmark="unknown",label="rank"):
+    mean_loss_list_average = np.mean(mean_loss_list)
+    mse_loaded_model_average = np.mean(mse_loaded_model_list)
+    mean_accuracy = np.mean(accuracy_list)
     with open("trained_model/"+label+"-"+benchmark+".log", 'w') as out_file:
         out_file.write("best_valid_epoch:" + str(best_valid_epoch) + "\n")
         out_file.write("train loss:"+ str(train_loss)+"\n")
         out_file.write("valid loss:"+ str(valid_loss)+"\n")
-        out_file.write("test loss:"+ str(test_loss)+"\n")
-        out_file.write("mean loss:"+ str(mean_loss)+"\n")
+        out_file.write("test loss list:" + str(mse_loaded_model_list) + "\n")
+        out_file.write("mean test loss:"+ str(mse_loaded_model_average)+"\n")
 
+        out_file.write("mean loss list:" + str(mean_loss_list) + "\n")
+        out_file.write("mean mean loss:"+ str(mean_loss_list_average)+"\n")
+
+        out_file.write("accuracy list:" + str(accuracy_list) + "\n")
+        out_file.write("mean accuracy:" + str(mean_accuracy) + "\n")
         # transform results to ranks
         argument_number_lists = []
         for arguments in dataset._argument_scores["test"]:
@@ -216,7 +244,7 @@ def write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss,valid
         plt.xlabel('graph number')
         plt.ylabel('mse of predicted argument score')
         plt.plot(mse_list,label="predicted_data_mse")
-        plt.plot([mean_loss]*len(mse_list),label="mean_mse")
+        plt.plot([mean_loss_list_average]*len(mse_list),label="mean_mse")
         plt.legend()
         plt.savefig("trained_model/" + label + "-" + benchmark + "-test-mse.png")
         plt.clf()
@@ -231,10 +259,14 @@ class HornGraphSample(GraphSample):
         node_features: np.ndarray,
         node_label: np.ndarray,
         node_argument: np.ndarray,
+        current_node_index:np.ndarray,
+        node_control_location:np.ndarray
     ):
         super().__init__(adjacency_lists, node_features)
+        self._current_node_index=current_node_index
         self._node_label = node_label
         self._node_argument=node_argument
+        self._node_control_location=node_control_location
 
     @property
     def node_label(self) -> np.ndarray:
@@ -249,6 +281,7 @@ class raw_graph_inputs():
         self.argument_scores=[]
         self.ranked_argument_scores=[]
         self.argument_identify=[]
+        self.control_location_identify=[]
 
 class HornGraphDataset(GraphDataset[HornGraphSample]):
     def __init__(self, params: Dict[str, Any], metadata: Optional[Dict[str, Any]] = None):
@@ -333,7 +366,8 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
             "node_features": tf.int32,
             "node_to_graph_map": tf.int32,
             "num_graphs_in_batch": tf.int32,
-            "node_argument": tf.int32
+            "node_argument": tf.int32,
+            "current_node_index":tf.int32
         }
         #print("self.node_feature_shape",self.node_feature_shape)
         batch_features_shapes = {
@@ -341,6 +375,7 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
             "node_to_graph_map": (None,),
             "num_graphs_in_batch": (),
             "node_argument": (None, ),
+            "current_node_index":(None,)
         }
         for edge_type_idx, edge_number in enumerate(self._node_number_per_edge_type):
             batch_features_types[f"adjacency_list_{edge_type_idx}"] = tf.int32
@@ -372,6 +407,7 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
             "num_nodes_in_batch": 0,
             "node_argument":[],
             "node_labels":[],
+            "current_node_index":[]
         }
         return new_batch
 
@@ -401,9 +437,10 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
             #print("graph_sample.adjacency_lists",graph_sample.adjacency_lists[edge_type_idx] + offset)
         raw_batch["node_argument"].extend(graph_sample._node_argument + offset)
         raw_batch["node_labels"].extend(graph_sample._node_label)
+        raw_batch["current_node_index"].extend(graph_sample._current_node_index)
 
-        #print("graph_sample.node_features+offset",graph_sample.node_features+offset)
-        #print("graph_sample._node_argument+offset", graph_sample._node_argument + offset)
+        # print("graph_sample.node_features+offset",graph_sample.node_features+offset)
+        # print("graph_sample._node_argument+offset", graph_sample._node_argument + offset)
         # print("raw_batch.node_features", raw_batch["node_features"])
         # print("raw_batch._node_argument",raw_batch["node_argument"])
         # print("raw_batch.adjacency_lists", raw_batch["adjacency_lists"])
@@ -434,7 +471,7 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
 
         #batch_features, batch_labels = super()._finalise_batch(raw_batch)
         batch_features["node_argument"] = raw_batch["node_argument"]
-
+        batch_features["current_node_index"] = raw_batch["current_node_index"]
         return batch_features, batch_labels
 
 
@@ -449,84 +486,37 @@ def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","
     else:
         for df in data_fold:
             print("write data_fold to pickle data:",df)
-            final_graphs_v1 = []
             graphInfoList = DotToGraphInfo(df+"Data",path)
             graphInfoList._file_type=file_type
             # get raw gnn inputs
-            graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node,graph_info_list = graphInfoList.getHornGraphSample_no_offset()
+            graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists,\
+            graphs_argument_scores, total_number_of_node,graphs_control_location_indices,graph_info_list = graphInfoList.getHornGraphSample_no_offset()
 
-            raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists[0]), total_number_of_node)
-            for edge_type in graphs_adjacency_lists[0]:
-                raw_data_graph._node_number_per_edge_type.append(len(edge_type[0]))
+            form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists,
+                                    graphs_argument_scores, total_number_of_node, graphs_control_location_indices,
+                                    label, benchmark, df)
 
-            # loop per graph
-            for node_label_ids, argument_indices, adjacency_lists, argument_scores in zip(graphs_node_label_ids,
-                                                                                          graphs_argument_indices,
-                                                                                          graphs_adjacency_lists,
-                                                                                          graphs_argument_scores):
-                #convert to rank
-                ranked_argument_scores=ss.rankdata(argument_scores,method="dense")
-                raw_data_graph.ranked_argument_scores.append(ranked_argument_scores)
-                raw_data_graph.argument_scores.append(argument_scores)
-                argument_identify = np.array([0] * len(node_label_ids))
-                argument_identify[argument_indices] = 1
-                raw_data_graph.argument_identify.append(argument_identify)
 
-                if label == "rank":
-                    final_graphs_v1.append(
-                        HornGraphSample(
-                            adjacency_lists=tuple(adjacency_lists),
-                            node_features=tf.constant(node_label_ids),
-                            node_label=tf.constant(ranked_argument_scores),
-                            # node_label=tf.constant(argument_scores),
-                            node_argument=tf.constant(argument_indices),
-                        )
-                    )
-                elif label == "occurrence":
-                    final_graphs_v1.append(
-                        HornGraphSample(
-                            adjacency_lists=tuple(adjacency_lists),
-                            node_features=tf.constant(node_label_ids),
-                            # node_label=tf.constant(ranked_argument_scores),
-                            node_label=tf.constant(argument_scores),#argument_scores
-                            node_argument=tf.constant(argument_indices),
-                        )
-                    )
-                elif label == "argument_identify":
-                    final_graphs_v1.append(
-                        HornGraphSample(
-                            adjacency_lists=tuple(adjacency_lists),
-                            node_features=tf.constant(node_label_ids),
-                            # node_label=tf.constant(ranked_argument_scores),
-                            node_label=tf.constant(argument_identify),
-                            node_argument=tf.constant(argument_indices),
-                        )
-                    )
-
-                # print("node_label_ids",node_label_ids)
-                # print("adjacency_lists",adjacency_lists)
-                # print("argument_scores",argument_scores)
-                # print("argument_indices", argument_indices)
-            raw_data_graph.final_graphs = final_graphs_v1.copy()
-            pickleWrite(raw_data_graph, label+"-"+benchmark+"-gnnInput_"+df+"_data", "../")
 
 class parsed_dot_format:
-    def __init__(self,graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,graphs_argument_scores,total_number_of_node):
+    def __init__(self,graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
+                 graphs_argument_scores,total_number_of_node,graph_control_location_indices):
         self.graphs_node_label_ids=graphs_node_label_ids
         self.graphs_argument_indices=graphs_argument_indices
         self.graphs_adjacency_lists=graphs_adjacency_lists
         self.graphs_argument_scores=graphs_argument_scores
         self.total_number_of_node=total_number_of_node
+        self.graph_control_location_indices=graph_control_location_indices
 
 def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../../", buckets=0):
     benchmark_name = benchmark.replace("/", "-")
     for df in data_fold:
         print("write data_fold to pickle data:", df)
-        # final_graphs_v1 = []
         graphs_node_label_ids=[]
         graphs_argument_indices=[]
         graphs_adjacency_lists=[]
         graphs_argument_scores=[]
+        graphs_control_location_indices=[]
         total_number_of_node=0
         file_type=".smt2"
         for i in range(1,buckets+1):
@@ -539,72 +529,15 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
             graphs_argument_indices.extend(pickleRead(df+"-graphs_argument_indices-"+str(i),path="../"))
             graphs_adjacency_lists.extend(pickleRead(df+"-graphs_adjacency_lists-" + str(i), path="../"))
             graphs_argument_scores.extend(pickleRead(df+"-graphs_argument_scores-" + str(i), path="../"))
+            graphs_control_location_indices.extend(pickleRead(df + "-total_control_flow_node_list-" + str(i), path="../"))
             total_number_of_node+=pickleRead(df+"-total_number_of_node-" + str(i), path="../")
 
-        pickle_data=parsed_dot_format(graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,graphs_argument_scores,total_number_of_node)
+
+
+        pickle_data=parsed_dot_format(graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
+                                      graphs_argument_scores,total_number_of_node,graphs_control_location_indices)
         pickleWrite(pickle_data, "train-" + benchmark_name + "-gnnInput_" + df + "_data", "../")
 
-        # for i in range(1,buckets+1):
-        #     graphs_node_label_ids.extend(pickleRead(df+label+"-graphs_node_label_ids-"+str(i),path="../"))
-        #     graphs_argument_indices.extend(pickleRead(label+"-graphs_argument_indices-"+str(i),path="../"))
-        #     graphs_adjacency_lists.extend(pickleRead(label+"-graphs_adjacency_lists-" + str(i), path="../"))
-        #     graphs_argument_scores.extend(pickleRead(label+"-graphs_argument_scores-" + str(i), path="../"))
-        #     total_number_of_node+=pickleRead(label+"-total_number_of_node-" + str(i), path="../")
-        #
-        #
-        # raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists[0]), total_number_of_node)
-        # for edge_type in graphs_adjacency_lists[0]:
-        #     raw_data_graph._node_number_per_edge_type.append(len(edge_type[0]))
-        #
-        # # loop per graph
-        # for node_label_ids, argument_indices, adjacency_lists, argument_scores in zip(graphs_node_label_ids,
-        #                                                                               graphs_argument_indices,
-        #                                                                               graphs_adjacency_lists,
-        #                                                                               graphs_argument_scores):
-        #     # convert to rank
-        #     ranked_argument_scores = ss.rankdata(argument_scores, method="dense")
-        #     raw_data_graph.ranked_argument_scores.append(ranked_argument_scores)
-        #     raw_data_graph.argument_scores.append(argument_scores)
-        #
-        #     argument_identify=np.array([0]*len(node_label_ids))
-        #     argument_identify[argument_indices]=1
-        #     raw_data_graph.argument_identify.append(argument_identify)
-        #
-        #
-        #     if label == "rank":
-        #         final_graphs_v1.append(
-        #             HornGraphSample(
-        #                 adjacency_lists=tuple(adjacency_lists),
-        #                 node_features=tf.constant(node_label_ids),
-        #                 node_label=tf.constant(ranked_argument_scores),
-        #                 # node_label=tf.constant(argument_scores),
-        #                 node_argument=tf.constant(argument_indices),
-        #             )
-        #         )
-        #     elif label=="occurrence":
-        #         final_graphs_v1.append(
-        #             HornGraphSample(
-        #                 adjacency_lists=tuple(adjacency_lists),
-        #                 node_features=tf.constant(node_label_ids),
-        #                 # node_label=tf.constant(ranked_argument_scores),
-        #                 node_label=tf.constant(argument_scores),#argument_scores
-        #                 node_argument=tf.constant(argument_indices),
-        #             )
-        #         )
-        #     elif label=="argument_identify":
-        #         final_graphs_v1.append(
-        #             HornGraphSample(
-        #                 adjacency_lists=tuple(adjacency_lists),
-        #                 node_features=tf.constant(node_label_ids),
-        #                 # node_label=tf.constant(ranked_argument_scores),
-        #                 node_label=tf.constant(argument_identify),
-        #                 node_argument=tf.constant(argument_indices),
-        #             )
-        #         )
-        #
-        #
-        # raw_data_graph.final_graphs = final_graphs_v1.copy()
-        # pickleWrite(raw_data_graph, label + "-" + benchmark_name + "-gnnInput_" + df + "_data", "../")
 
 def form_GNN_inputs_and_labels(label="occurrence",datafold=["train", "valid", "test"],benchmark=""):
     print("form labels")
@@ -612,63 +545,117 @@ def form_GNN_inputs_and_labels(label="occurrence",datafold=["train", "valid", "t
     for df in datafold:
         parsed_dot_file=pickleRead("train-" + benchmark_name + "-gnnInput_" + df + "_data", path="../")
 
-        final_graphs_v1 = []
         graphs_node_label_ids = parsed_dot_file.graphs_node_label_ids
         graphs_argument_indices = parsed_dot_file.graphs_argument_indices
         graphs_adjacency_lists = parsed_dot_file.graphs_adjacency_lists
         graphs_argument_scores = parsed_dot_file.graphs_argument_scores
         total_number_of_node = parsed_dot_file.total_number_of_node
+        graphs_control_location_indices=parsed_dot_file.graph_control_location_indices
+
+        form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists,
+                                graphs_argument_scores, total_number_of_node,graphs_control_location_indices, label, benchmark, df)
 
 
+def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists,
+                            graphs_argument_scores, total_number_of_node,graphs_control_location_indices, label, benchmark, df):
+    final_graphs_v1 = []
 
-        raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists[0]), total_number_of_node)
-        for edge_type in graphs_adjacency_lists[0]:
-            raw_data_graph._node_number_per_edge_type.append(len(edge_type[0]))
+    raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists[0]), total_number_of_node)
+    for edge_type in graphs_adjacency_lists[0]:
+        raw_data_graph._node_number_per_edge_type.append(len(edge_type[0]))
 
-        # loop per graph
-        for node_label_ids, argument_indices, adjacency_lists, argument_scores in zip(graphs_node_label_ids,
-                                                                                      graphs_argument_indices,
-                                                                                      graphs_adjacency_lists,
-                                                                                      graphs_argument_scores):
-            # convert to rank
-            ranked_argument_scores = ss.rankdata(argument_scores, method="dense")
-            raw_data_graph.ranked_argument_scores.append(ranked_argument_scores)
-            raw_data_graph.argument_scores.append(argument_scores)
+    for node_label_ids, argument_indices, adjacency_lists, argument_scores,control_location_indices in zip(graphs_node_label_ids,
+                                                                                  graphs_argument_indices,
+                                                                                  graphs_adjacency_lists,
+                                                                                  graphs_argument_scores,
+                                                                                  graphs_control_location_indices):
+        # convert to rank
+        ranked_argument_scores = ss.rankdata(argument_scores, method="dense")
+        raw_data_graph.ranked_argument_scores.append(ranked_argument_scores)
+        raw_data_graph.argument_scores.append(argument_scores)
+        argument_identify = np.array([0] * len(node_label_ids))
+        argument_identify[argument_indices] = 1
+        control_location_identify = np.array([0] * len(node_label_ids))
+        control_location_identify[control_location_indices]=1
+        raw_data_graph.argument_identify.append(argument_identify)
+        raw_data_graph.control_location_identify.append(control_location_identify)
 
-            argument_identify = np.array([0] * len(node_label_ids))
-            argument_identify[argument_indices] = 1
-            raw_data_graph.argument_identify.append(argument_identify)
 
-            if label == "rank":
-                final_graphs_v1.append(
-                    HornGraphSample(
-                        adjacency_lists=tuple(adjacency_lists),
-                        node_features=tf.constant(node_label_ids),
-                        node_label=tf.constant(ranked_argument_scores),
-                        # node_label=tf.constant(argument_scores),
-                        node_argument=tf.constant(argument_indices),
-                    )
+        if label == "rank":
+            final_graphs_v1.append(
+                HornGraphSample(
+                    adjacency_lists=tuple(adjacency_lists),
+                    node_features=tf.constant(node_label_ids),
+                    node_label=tf.constant(ranked_argument_scores),
+                    # node_label=tf.constant(argument_scores),
+                    node_argument=tf.constant(argument_indices),
+                    current_node_index=tf.constant([]),
+                    node_control_location=tf.constant(control_location_indices)
                 )
-            elif label == "occurrence":
-                final_graphs_v1.append(
-                    HornGraphSample(
-                        adjacency_lists=tuple(adjacency_lists),
-                        node_features=tf.constant(node_label_ids),
-                        # node_label=tf.constant(ranked_argument_scores),
-                        node_label=tf.constant(argument_scores),  # argument_scores
-                        node_argument=tf.constant(argument_indices),
-                    )
+            )
+        elif label == "occurrence":
+            final_graphs_v1.append(
+                HornGraphSample(
+                    adjacency_lists=tuple(adjacency_lists),
+                    node_features=tf.constant(node_label_ids),
+                    # node_label=tf.constant(ranked_argument_scores),
+                    node_label=tf.constant(argument_scores),  # argument_scores
+                    node_argument=tf.constant(argument_indices),
+                    current_node_index=tf.constant([]),
+                    node_control_location=tf.constant(control_location_indices)
                 )
-            elif label == "argument_identify":
-                final_graphs_v1.append(
-                    HornGraphSample(
-                        adjacency_lists=tuple(adjacency_lists),
-                        node_features=tf.constant(node_label_ids),
-                        # node_label=tf.constant(ranked_argument_scores),
-                        node_label=tf.constant(argument_identify),
-                        node_argument=tf.constant(argument_indices),
-                    )
+            )
+        elif label == "argument_identify":
+            final_graphs_v1.append(
+                HornGraphSample(
+                    adjacency_lists=tuple(adjacency_lists),
+                    node_features=tf.constant(node_label_ids),
+                    # node_label=tf.constant(ranked_argument_scores),
+                    node_label=tf.constant(argument_identify),
+                    node_argument=tf.constant(argument_indices),
+                    current_node_index=tf.constant([]),
+                    node_control_location=tf.constant(control_location_indices)
                 )
+            )
+        elif label == "control_location_identify":
+            print(control_location_identify)
+            final_graphs_v1.append(
+                HornGraphSample(
+                    adjacency_lists=tuple(adjacency_lists),
+                    node_features=tf.constant(node_label_ids),
+                    # node_label=tf.constant(ranked_argument_scores),
+                    node_label=tf.constant(control_location_identify),
+                    node_argument=tf.constant(argument_indices),
+                    current_node_index=tf.constant([]),
+                    node_control_location=tf.constant(control_location_indices)
 
+                )
+            )
+        elif label == "argument_identify_no_batchs":
+            for i in node_label_ids:
+                if i in argument_indices:
+                    final_graphs_v1.append(
+                        HornGraphSample(
+                            adjacency_lists=tuple(adjacency_lists),
+                            node_features=tf.constant(node_label_ids),
+                            # node_label=tf.constant(ranked_argument_scores),
+                            node_label=tf.constant([1]),
+                            node_argument=tf.constant(argument_indices),
+                            current_node_index=tf.constant([i]),
+                            node_control_location=tf.constant(control_location_indices)
+                        )
+                    )
+                else:
+                    final_graphs_v1.append(
+                        HornGraphSample(
+                            adjacency_lists=tuple(adjacency_lists),
+                            node_features=tf.constant(node_label_ids),
+                            # node_label=tf.constant(ranked_argument_scores),
+                            node_label=tf.constant([0]),
+                            node_argument=tf.constant(argument_indices),
+                            current_node_index=tf.constant([i]),
+                            node_control_location=tf.constant(control_location_indices)
+                        )
+                    )
         raw_data_graph.final_graphs = final_graphs_v1.copy()
-        pickleWrite(raw_data_graph, label + "-" + benchmark_name + "-gnnInput_" + df + "_data", "../")
+        pickleWrite(raw_data_graph, label + "-" + benchmark + "-gnnInput_" + df + "_data", "../")

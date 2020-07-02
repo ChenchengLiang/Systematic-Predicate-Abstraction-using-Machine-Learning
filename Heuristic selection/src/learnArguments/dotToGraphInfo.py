@@ -51,6 +51,8 @@ class GraphInfo:
         self.boolValueNode=boolValueNode
         self.dataFlowHyperedges=dataFlowHyperedges
         self.controlFlowHyperedges=controlFlowHyperedges
+        self.argumentNodes=[]
+        self.argumentScores=[]
     def printInfo(self):
         print("nodeUniqueIDList", sorted(self.nodeUniqueIDList))
         print("nodesAttributes",sorted(self.nodesAttributes))
@@ -64,6 +66,8 @@ class GraphInfo:
         print("hyperedgeEmbeddingInputs", self.hyperedgeEmbeddingInputs)
         print("nodeEmbeddingInputs", self.nodeEmbeddingInputs)
         print("controlFlowNodes",self.controlFlowNodes)
+        print("ArgumentNodes",self.argumentNodes)
+        print("ArgumentScores", self.argumentScores)
         print("operatorNodes", self.operatorNodes)
         print("constantNodes", self.constantNodes)
         print("literalNodes", self.literalNodes)
@@ -145,21 +149,10 @@ class DotToGraphInfo:
         self.getGraphInfoList_for_GNN()
         #todo: optimize graph processing
         totalGraphNodeIDList = []
+        totalControlFlowNodeList = []
         totalGraphArgumentIDList = []
         argumentScoreList = []
 
-
-
-
-        for graphInfo, args in zip(self.finalGraphInfoList, self.parsedArgumentList):
-            totalGraphNodeIDList.append(graphInfo.nodeUniqueIDList)
-            tempArgList = []
-            tempArgScoreList=[]
-            for arg in args:
-                tempArgList.append(arg.nodeUniqueIDInGraph)
-                tempArgScoreList.append(int(arg.score))
-            totalGraphArgumentIDList.append(tempArgList)
-            argumentScoreList.append(tempArgScoreList)
 
         nodeNumberList = []
         argumentNumberList = []
@@ -174,12 +167,15 @@ class DotToGraphInfo:
         edgeTypeNumberDict = {}
         edgeTypeNumberList = {}
         all_graphs_adjacent_list = []
-        maxNodeForAHypedEdge = 10
+        maxNodeForAHypedEdge = 3
         for i in range(2, maxNodeForAHypedEdge):
             edgeTypeList[str(i)] = list()
             edgeTypeNumberDict[str(i)] = [0] * len(self.finalGraphInfoList)
         for j, graphInfo in enumerate(self.finalGraphInfoList):
-
+            totalGraphNodeIDList.append(graphInfo.nodeUniqueIDList)
+            totalControlFlowNodeList.append(graphInfo.controlFlowNodes)
+            totalGraphArgumentIDList.append(graphInfo.argumentNodes)
+            argumentScoreList.append(graphInfo.argumentScores)
             #offset = sum(nodeNumberList[:j])
             #local_node_ID_to_uniformed_node_ID = list(range(offset, offset + graphInfo.numberOfUniqueNodeID))
             # print(local_node_ID_to_uniformed_node_ID)
@@ -208,7 +204,7 @@ class DotToGraphInfo:
             all_graphs_adjacent_list.append(one_graph_adjacent_list)
 
         return totalGraphNodeIDList, totalGraphArgumentIDList, all_graphs_adjacent_list, argumentScoreList, sum(
-            nodeNumberList),self.finalGraphInfoList
+            nodeNumberList),totalControlFlowNodeList,self.finalGraphInfoList
 
 
 
@@ -963,6 +959,16 @@ class DotToGraphInfo:
             boolvalue_node_list = []
             data_flow_hyperedge_list = []
             control_flow_hyperedge_list = []
+
+            tempArgList = []
+            tempArgScoreList = []
+            for arg in args:
+                tempArgList.append(arg.nodeUniqueIDInGraph)
+                tempArgScoreList.append(int(arg.score))
+            G.argumentScores = tempArgScoreList
+            G.argumentNodes = tempArgList
+            # graphInfo.printInfo()
+
             for node in G.nodes:
                 for arg in args:
                     nodeDir = G.nodes[node]

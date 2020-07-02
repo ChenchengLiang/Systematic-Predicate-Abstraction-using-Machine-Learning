@@ -15,6 +15,7 @@ import itertools
 import scipy.stats as ss
 import signal
 import matplotlib.pyplot as plt
+import tensorflow as tf
 def sleep(seconds=1):
     time.sleep(seconds)
     print("wait for",seconds)
@@ -66,10 +67,13 @@ def main():
     # parameterList=[10,15,20]
     # pool = Pool(processes=8)
     # pool.map(pool_kill_popen_test, parameterList)
-    x=[]
-    np.min(x)
+    # x=[]
+    # np.min(x)
+    x=tf.math.equal([1,1], tf.math.round([0.3,0.7]))
+    x=np.array(x)
 
-
+    x = [int(val) for val in x]
+    print(x)
 
 
 

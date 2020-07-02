@@ -133,7 +133,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
         epoch_mae = total_absolute_error / total_num_graphs
         return epoch_mae.numpy(), f"Mean Absolute Error = {epoch_mae.numpy():.3f}"
 
-class InvariantArgumentIdentifyTask(GraphTaskModel):
+class InvariantNodeIdentifyTask(GraphTaskModel):
 
     def __init__(self, params: Dict[str, Any], dataset: GraphDataset, name: str = None):
         super().__init__(params, dataset=dataset, name=name)
@@ -196,13 +196,6 @@ class InvariantArgumentIdentifyTask(GraphTaskModel):
             inputs[f"adjacency_list_{edge_type_idx}"]
             for edge_type_idx in range(self._num_edge_types)
         )
-        #before feed into gnn
-        # print("node_features",inputs["node_features"])
-        # print("node_features len",len(set(np.array(inputs["node_features"]))))
-        # print("arguments",inputs["node_argument"])
-        # print("node_to_graph_map",inputs['node_to_graph_map'])
-        # print("num_graphs_in_batch",inputs['num_graphs_in_batch'])
-        # print("adjacency_lists",adjacency_lists)
 
         # call gnn and get graph representation
         gnn_input = GNNInput(
@@ -212,10 +205,14 @@ class InvariantArgumentIdentifyTask(GraphTaskModel):
             adjacency_lists=adjacency_lists
         )
         final_node_representations = self._gnn(gnn_input, training=training)
-        argument_representations=tf.gather(params=final_node_representations*1,indices=inputs["node_argument"])
-        #print("argument_representations",argument_representations)
-        return self.compute_task_output(inputs, final_node_representations, training)
-
+        if self._params["label_type"]=="argument_identify":
+            return self.compute_task_output(inputs, final_node_representations, training)
+        elif self._params["label_type"] == "control_location_identify":
+            return self.compute_task_output(inputs, final_node_representations, training)
+        elif self._params["label_type"]=="argument_identify_no_batchs":
+            current_node_representations = tf.gather(params=final_node_representations * 1,
+                                                     indices=inputs["current_node_index"])
+            return self.compute_task_output(inputs, current_node_representations, training)
 
 
     def compute_task_output(
@@ -257,16 +254,20 @@ class InvariantArgumentIdentifyTask(GraphTaskModel):
             "batch_acc": tf.cast(num_correct, tf.float32) / num_nodes,
             "num_correct": num_correct,
             "num_graphs": num_graphs,
+            "num_nodes":num_nodes
         }
 
     def compute_epoch_metrics(self, task_results: List[Any]) -> Tuple[float, str]:
         total_num_graphs = np.sum(
             batch_task_result["num_graphs"] for batch_task_result in task_results
         )
+        total_num_nodes = np.sum(
+            batch_task_result["num_nodes"] for batch_task_result in task_results
+        )
         total_num_correct = np.sum(
             batch_task_result["num_correct"] for batch_task_result in task_results
         )
-        epoch_acc = tf.cast(total_num_correct, tf.float32) / total_num_graphs
+        epoch_acc = tf.cast(total_num_correct, tf.float32) / total_num_nodes
         return -epoch_acc.numpy(), f"Accuracy = {epoch_acc.numpy():.3f}"
 
 

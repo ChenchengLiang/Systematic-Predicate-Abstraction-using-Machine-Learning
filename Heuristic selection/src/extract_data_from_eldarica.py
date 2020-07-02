@@ -106,8 +106,8 @@ def extract_one_file(parameterList):
 
 def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
 
-    absTimeout=30
-    timeout=60*10
+    absTimeout=60*3
+    timeout=60*3*20
 
     for root, subdirs, files in os.walk(rootdir):
         if os.path.exists(root + "/trainData"):
