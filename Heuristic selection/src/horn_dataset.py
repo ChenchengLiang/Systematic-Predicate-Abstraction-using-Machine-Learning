@@ -1,8 +1,8 @@
 from typing import Any, Dict,Optional
 import tensorflow as tf
-from learnArguments.dotToGraphInfo import GraphInfo,ArgumentInfo,DotToGraphInfo
+from dotToGraphInfo import GraphInfo,ArgumentInfo,DotToGraphInfo
 import tf2_gnn
-from learnArguments.horn_graph_argument_selection_task import InvariantArgumentSelectionTask,InvariantNodeIdentifyTask
+from horn_graph_argument_selection_task import InvariantArgumentSelectionTask,InvariantNodeIdentifyTask
 from tf2_gnn.data import GraphDataset,GraphSample,DataFold,GraphBatchTFDataDescription
 import numpy as np
 from typing import List,Set,Iterator,Tuple
@@ -16,11 +16,11 @@ import random
 import scipy.stats as ss
 import subprocess
 
-def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../../",file_type=".smt2",split_flag=False,buckets=10,form_label=True):
-    if split_flag==True and not os.path.isfile("../../pickleData/"+"train-"+benchmark_name+"-gnnInput_train_data.txt"):
+def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",split_flag=False,buckets=10,form_label=True):
+    if split_flag==True and not os.path.isfile("../pickleData/"+"train-"+benchmark_name+"-gnnInput_train_data.txt"):
         write_graph_to_pickle(benchmark_name,  data_fold=["train", "valid", "test"], label=label,path=path,buckets=buckets)
     if form_label == True and not os.path.isfile(
-            "../../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):
+            "../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):
         form_GNN_inputs_and_labels(label=label, datafold=["train", "valid", "test"], benchmark=benchmark_name)
 
 
@@ -49,7 +49,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     #get dataset
     dataset=HornGraphDataset(parameters)
     dataset.load_data([DataFold.TRAIN,DataFold.VALIDATION,DataFold.TEST])
-
+    parameters["node_vocab_size"]=dataset._node_vocab_size
     def log(msg):
         log_line(log_file, msg)
 
@@ -295,6 +295,7 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         self._ranked_argument_scores = {}
         self._benchmark=params["benchmark"]
         self.label_type=params["label_type"]
+        self._node_vocab_size=0
 
 
     def load_data(self, folds_to_load: Optional[Set[DataFold]] = None) -> None:
@@ -327,16 +328,27 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         #whatever the data_fold is, use the same dataset to debug
         print("data_fold",data_name)
         print(self.label_type+"-"+self._benchmark+"-gnnInput_"+data_name+"_data")
-        raw_inputs=pickleRead(self.label_type+"-"+self._benchmark+"-gnnInput_"+data_name+"_data","../")
+        raw_inputs=pickleRead(self.label_type+"-"+self._benchmark+"-gnnInput_"+data_name+"_data")
         final_graphs=raw_inputs.final_graphs
 
+        node_num_list=[]
+        for g in final_graphs:
+            node_num_list.append(len(g.node_features))
+        if self._node_vocab_size< max(node_num_list):
+            self._node_vocab_size = max(node_num_list)
+        #print("self._node_vocab_size",self._node_vocab_size)
 
 
+        print("raw_inputs._total_number_of_nodes", raw_inputs._total_number_of_nodes)
+        self._total_number_of_nodes = raw_inputs._total_number_of_nodes
+        print("raw_inputs._num_edge_types",raw_inputs._num_edge_types)
         self._num_edge_types=raw_inputs._num_edge_types
-        self._total_number_of_nodes=raw_inputs._total_number_of_nodes
-        self._node_number_per_edge_type=raw_inputs._node_number_per_edge_type
 
+        print("raw_inputs._node_number_per_edge_type",raw_inputs._node_number_per_edge_type)
+        self._node_number_per_edge_type=raw_inputs._node_number_per_edge_type
+        print("raw_inputs.argument_scores",raw_inputs.argument_scores)
         self._argument_scores[data_name]=raw_inputs.argument_scores
+        print("raw_inputs.ranked_argument_scores",raw_inputs.ranked_argument_scores)
         self._ranked_argument_scores[data_name] = raw_inputs.ranked_argument_scores
 
         return final_graphs
@@ -386,6 +398,7 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
             batch_features_shapes=batch_features_shapes,
             batch_labels_types={**data_description.batch_labels_types, "node_labels": tf.float32},
             batch_labels_shapes={**data_description.batch_labels_shapes, "node_labels": (None,)},
+
         )
 
 
@@ -478,9 +491,9 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
 
 
 
-def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","valid","test"],label="rank",path="../../",file_type=".smt2"):
+def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","valid","test"],label="rank",path="../",file_type=".smt2"):
     benchmark_name=benchmark.replace("/", "-")
-    if os.path.isfile("../../pickleData/"+label+"-"+benchmark_name+"-gnnInput_train_data.txt") and force_read==False:
+    if os.path.isfile("../pickleData/"+label+"-"+benchmark_name+"-gnnInput_train_data.txt") and force_read==False:
         print("read existed training data")
 
     else:
@@ -508,7 +521,7 @@ class parsed_dot_format:
         self.total_number_of_node=total_number_of_node
         self.graph_control_location_indices=graph_control_location_indices
 
-def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../../", buckets=0):
+def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../", buckets=0):
     benchmark_name = benchmark.replace("/", "-")
     for df in data_fold:
         print("write data_fold to pickle data:", df)
@@ -520,30 +533,30 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
         total_number_of_node=0
         file_type=".smt2"
         for i in range(1,buckets+1):
-            p = subprocess.Popen(["../../venv/bin/python3", "split_read_graphs.py", path,df,str(i),file_type,label,str(buckets),"gnn_inputs"])
+            p = subprocess.Popen(["../venv/bin/python3", "split_read_graphs.py", path,df,str(i),file_type,label,str(buckets),"gnn_inputs"])
             p.wait()
             # os.kill(p.pid,signal.SIGKILL)
             print("curssor=",i)
         for i in range(1,buckets+1):
-            graphs_node_label_ids.extend(pickleRead(df+"-graphs_node_label_ids-"+str(i),path="../"))
-            graphs_argument_indices.extend(pickleRead(df+"-graphs_argument_indices-"+str(i),path="../"))
-            graphs_adjacency_lists.extend(pickleRead(df+"-graphs_adjacency_lists-" + str(i), path="../"))
-            graphs_argument_scores.extend(pickleRead(df+"-graphs_argument_scores-" + str(i), path="../"))
-            graphs_control_location_indices.extend(pickleRead(df + "-total_control_flow_node_list-" + str(i), path="../"))
-            total_number_of_node+=pickleRead(df+"-total_number_of_node-" + str(i), path="../")
+            graphs_node_label_ids.extend(pickleRead(df+"-graphs_node_label_ids-"+str(i)))
+            graphs_argument_indices.extend(pickleRead(df+"-graphs_argument_indices-"+str(i)))
+            graphs_adjacency_lists.extend(pickleRead(df+"-graphs_adjacency_lists-" + str(i)))
+            graphs_argument_scores.extend(pickleRead(df+"-graphs_argument_scores-" + str(i)))
+            graphs_control_location_indices.extend(pickleRead(df + "-total_control_flow_node_list-" + str(i)))
+            total_number_of_node+=pickleRead(df+"-total_number_of_node-" + str(i))
 
 
 
         pickle_data=parsed_dot_format(graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
                                       graphs_argument_scores,total_number_of_node,graphs_control_location_indices)
-        pickleWrite(pickle_data, "train-" + benchmark_name + "-gnnInput_" + df + "_data", "../")
+        pickleWrite(pickle_data, "train-" + benchmark_name + "-gnnInput_" + df + "_data")
 
 
 def form_GNN_inputs_and_labels(label="occurrence",datafold=["train", "valid", "test"],benchmark=""):
     print("form labels")
     benchmark_name = benchmark.replace("/", "-")
     for df in datafold:
-        parsed_dot_file=pickleRead("train-" + benchmark_name + "-gnnInput_" + df + "_data", path="../")
+        parsed_dot_file=pickleRead("train-" + benchmark_name + "-gnnInput_" + df + "_data")
 
         graphs_node_label_ids = parsed_dot_file.graphs_node_label_ids
         graphs_argument_indices = parsed_dot_file.graphs_argument_indices
@@ -560,8 +573,9 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                             graphs_argument_scores, total_number_of_node,graphs_control_location_indices, label, benchmark, df):
     final_graphs_v1 = []
 
-    raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists[0]), total_number_of_node)
+    raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists), total_number_of_node)
     for edge_type in graphs_adjacency_lists[0]:
+
         raw_data_graph._node_number_per_edge_type.append(len(edge_type[0]))
 
     for node_label_ids, argument_indices, adjacency_lists, argument_scores,control_location_indices in zip(graphs_node_label_ids,
@@ -579,6 +593,7 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
         control_location_identify[control_location_indices]=1
         raw_data_graph.argument_identify.append(argument_identify)
         raw_data_graph.control_location_identify.append(control_location_identify)
+        raw_data_graph._total_number_of_nodes+=len(graphs_node_label_ids)
 
 
         if label == "rank":
@@ -628,7 +643,6 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                     node_argument=tf.constant(argument_indices),
                     current_node_index=tf.constant([]),
                     node_control_location=tf.constant(control_location_indices)
-
                 )
             )
         elif label == "argument_identify_no_batchs":
@@ -657,5 +671,7 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                             node_control_location=tf.constant(control_location_indices)
                         )
                     )
+        else:
+            pass
         raw_data_graph.final_graphs = final_graphs_v1.copy()
-        pickleWrite(raw_data_graph, label + "-" + benchmark + "-gnnInput_" + df + "_data", "../")
+        pickleWrite(raw_data_graph, label + "-" + benchmark + "-gnnInput_" + df + "_data")

@@ -15,7 +15,7 @@ class InvariantArgumentSelectionTask(GraphTaskModel):
         self._params = params
         self._num_edge_types = dataset.num_edge_types
         self._embedding_layer = tf.keras.layers.Embedding(
-            input_dim=params["max_nodes_per_batch"], #size of the vocabulary
+            input_dim=params["node_vocab_size"], #size of the vocabulary
             output_dim=params["node_label_embedding_size"]
         )
         self._gnn = GNN(params) #RGCN,RGIN,RGAT,GGNN
@@ -140,7 +140,7 @@ class InvariantNodeIdentifyTask(GraphTaskModel):
         self._params = params
         self._num_edge_types = dataset.num_edge_types
         self._embedding_layer = tf.keras.layers.Embedding(
-            input_dim=params["max_nodes_per_batch"], #size of the vocabulary
+            input_dim=params["node_vocab_size"], #size of the vocabulary
             output_dim=params["node_label_embedding_size"]
         )
         self._gnn = GNN(params) #RGCN,RGIN,RGAT,GGNN
@@ -149,7 +149,7 @@ class InvariantNodeIdentifyTask(GraphTaskModel):
         self._regression_layer_1 = tf.keras.layers.Dense(
             units=self._params["regression_hidden_layer_size"][1], activation=tf.nn.relu, use_bias=True)
         self._argument_output_layer = tf.keras.layers.Dense(activation=tf.nn.sigmoid,
-            units=1, use_bias=True)#we didn't normalize label so this should not be sigmoid
+            units=1, use_bias=True)
         self._node_to_graph_aggregation = None
 
 

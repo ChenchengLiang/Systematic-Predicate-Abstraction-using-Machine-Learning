@@ -2,7 +2,7 @@ import random
 import os
 from shutil import copyfile,copy,rmtree,copytree,copy2
 import glob
-from learnArguments.dotToGraphInfo import DotToGraphInfo
+from dotToGraphInfo import DotToGraphInfo
 import numpy as np
 import matplotlib.pyplot as plt
 import errno

@@ -1,7 +1,7 @@
 from typing import Dict,Any,Union,Tuple,List
 import tensorflow as tf
 import tf2_gnn
-from learnArguments.invariantArgumentSelectionModel import InvariantArgumentSelectionModel
+from invariantArgumentSelectionModel import InvariantArgumentSelectionModel
 def main():
     nodeFeatureDim=3
     # first graph has 8 nodes, second graph has 4 nodes, third graph has 3 nodes

@@ -154,11 +154,7 @@ class DotToGraphInfo:
         argumentScoreList = []
 
 
-        nodeNumberList = []
-        argumentNumberList = []
-        for graphNodeIDList, graphArgumentIDList in zip(totalGraphNodeIDList, totalGraphArgumentIDList):
-            nodeNumberList.append(len(graphNodeIDList))
-            argumentNumberList.append(len(graphArgumentIDList))
+
 
         #totalGraphNodeIDList = np.concatenate(totalGraphNodeIDList).ravel().tolist()  # flatten
 
@@ -167,7 +163,7 @@ class DotToGraphInfo:
         edgeTypeNumberDict = {}
         edgeTypeNumberList = {}
         all_graphs_adjacent_list = []
-        maxNodeForAHypedEdge = 3
+        maxNodeForAHypedEdge = 4
         for i in range(2, maxNodeForAHypedEdge):
             edgeTypeList[str(i)] = list()
             edgeTypeNumberDict[str(i)] = [0] * len(self.finalGraphInfoList)
@@ -175,6 +171,7 @@ class DotToGraphInfo:
             totalGraphNodeIDList.append(graphInfo.nodeUniqueIDList)
             totalControlFlowNodeList.append(graphInfo.controlFlowNodes)
             totalGraphArgumentIDList.append(graphInfo.argumentNodes)
+
             argumentScoreList.append(graphInfo.argumentScores)
             #offset = sum(nodeNumberList[:j])
             #local_node_ID_to_uniformed_node_ID = list(range(offset, offset + graphInfo.numberOfUniqueNodeID))
@@ -203,6 +200,11 @@ class DotToGraphInfo:
             # print("one_graph_adjacent_list",len(one_graph_adjacent_list[0]),len(one_graph_adjacent_list[1]))
             all_graphs_adjacent_list.append(one_graph_adjacent_list)
 
+        nodeNumberList = []
+        argumentNumberList = []
+        for graphNodeIDList, graphArgumentIDList in zip(totalGraphNodeIDList, totalGraphArgumentIDList):
+            nodeNumberList.append(len(graphNodeIDList))
+            argumentNumberList.append(len(graphArgumentIDList))
         return totalGraphNodeIDList, totalGraphArgumentIDList, all_graphs_adjacent_list, argumentScoreList, sum(
             nodeNumberList),totalControlFlowNodeList,self.finalGraphInfoList
 
@@ -1059,6 +1061,7 @@ class DotToGraphInfo:
                           hyperedgeSenderList, hyperedgeReceiverList,edgeEmbeddingInputs,hyperedgeEmbeddingInputs,nodeEmbeddingInputs,
                           control_flow_node_list,operator_node_list,constant_node_list,literal_node_list,true_node_list,boolvalue_node_list,
                           data_flow_hyperedge_list,control_flow_hyperedge_list))
+            self.finalGraphInfoList[-1].argumentScores=tempArgScoreList
 
     def parseArguments(self,arguments):
         ParsedArgumentList=[]

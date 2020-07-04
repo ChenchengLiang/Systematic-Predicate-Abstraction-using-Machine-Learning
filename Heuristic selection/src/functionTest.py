@@ -1,9 +1,4 @@
 import os
-import shutil,glob
-from distutils.dir_util import copy_tree
-from Miscellaneous import renameBenchmarkFiles
-from extractDataFromEldarica import checkSolvability
-from loadData import readHornClausesAndHints_resplitTrainAndVerifyData
 from datetime import datetime
 import numpy as np
 import random
