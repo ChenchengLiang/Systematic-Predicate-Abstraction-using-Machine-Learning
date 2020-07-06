@@ -232,7 +232,6 @@ class DotToGraphInfo:
                 tempArgScoreList.append(int(arg.score))
             totalGraphArgumentIDList.append(tempArgList)
             argumentScoreList.append(tempArgScoreList)
-
         nodeNumberList = []
         argumentNumberList = []
         for graphNodeIDList, graphArgumentIDList in zip(totalGraphNodeIDList, totalGraphArgumentIDList):
@@ -962,13 +961,8 @@ class DotToGraphInfo:
             data_flow_hyperedge_list = []
             control_flow_hyperedge_list = []
 
-            tempArgList = []
-            tempArgScoreList = []
-            for arg in args:
-                tempArgList.append(arg.nodeUniqueIDInGraph)
-                tempArgScoreList.append(int(arg.score))
-            G.argumentScores = tempArgScoreList
-            G.argumentNodes = tempArgList
+
+
             # graphInfo.printInfo()
 
             for node in G.nodes:
@@ -1055,6 +1049,13 @@ class DotToGraphInfo:
                                                 #'receiverLabel':G.nodes[edge[1]]['nodeLabelUniqueID'],
                                                 'edgeEmbedding':'dummy'})
 
+            tempArgList = []
+            tempArgScoreList = []
+            for arg in args:
+                tempArgList.append(arg.nodeUniqueIDInGraph)
+                tempArgScoreList.append(int(arg.score))
+            G.argumentScores = tempArgScoreList
+            G.argumentNodes = tempArgList
 
             self.finalGraphInfoList.append(
                 GraphInfo(nodeUniqueIDList,nodeLabelList, edgeLabelList, hyperedgeLabelList, edgeSenderList, edgeReceiverList,
@@ -1062,6 +1063,7 @@ class DotToGraphInfo:
                           control_flow_node_list,operator_node_list,constant_node_list,literal_node_list,true_node_list,boolvalue_node_list,
                           data_flow_hyperedge_list,control_flow_hyperedge_list))
             self.finalGraphInfoList[-1].argumentScores=tempArgScoreList
+            self.finalGraphInfoList[-1].argumentNodes=tempArgList
 
     def parseArguments(self,arguments):
         ParsedArgumentList=[]

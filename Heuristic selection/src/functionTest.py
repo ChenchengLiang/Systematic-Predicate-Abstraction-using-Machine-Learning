@@ -64,11 +64,13 @@ def main():
     # pool.map(pool_kill_popen_test, parameterList)
     # x=[]
     # np.min(x)
-    x=tf.math.equal([1,1], tf.math.round([0.3,0.7]))
-    x=np.array(x)
-
-    x = [int(val) for val in x]
-    print(x)
+    # x=tf.math.equal([1,1], tf.math.round([0.3,0.7]))
+    # x=np.array(x)
+    #
+    # x = [int(val) for val in x]
+    # print(x)
+    x=[0,1]
+    print(np.concatenate(x))
 
 
 

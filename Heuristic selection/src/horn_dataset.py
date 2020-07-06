@@ -15,6 +15,7 @@ import matplotlib.patches as mpatches
 import random
 import scipy.stats as ss
 import subprocess
+from tf2_gnn.cli import test as model_test
 
 def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",split_flag=False,buckets=10,form_label=True):
     if split_flag==True and not os.path.isfile("../pickleData/"+"train-"+benchmark_name+"-gnnInput_train_data.txt"):
@@ -98,28 +99,34 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         #predict
         loaded_model=tf2_gnn.cli_utils.model_utils.load_model_for_prediction(trained_model_path,dataset)
         test_data = dataset.get_tensorflow_dataset(DataFold.TEST)
+
+        _, _, test_results = loaded_model.run_one_epoch(test_data, training=False, quiet=quiet)
+        test_metric, test_metric_string = loaded_model.compute_epoch_metrics(test_results)
+        print("test_metric_string",test_metric_string)
+
+
         predicted_Y_loaded_model=loaded_model.predict(test_data)
         print("predicted_Y_loaded_model Y\n",predicted_Y_loaded_model)
-        true_Y=None
 
-        mean_loss_list=0
-        accuracy=0
-        for data in test_data:
+        true_Y=[]
+        for data in iter(test_data):
             #print(data[0]) #input
-            true_Y=data[1]["node_labels"]
-            print("True Y\n",data[1]["node_labels"]) #labels
-            mse_loaded_model = tf.keras.losses.MSE(
-                data[1]["node_labels"], predicted_Y_loaded_model)
-            print("\n mse_loaded_model_predicted_Y_and_True_Y", mse_loaded_model)
+            true_Y.extend(np.array(data[1]["node_labels"]))
 
-            mse_mean = tf.keras.losses.MSE(
-                [np.mean(data[1]["node_labels"])]*len(data[1]["node_labels"]), data[1]["node_labels"])
-            print("\n mse_mean_Y_and_True_Y", mse_mean)
-            mean_loss_list=mse_mean
-            num_correct = tf.reduce_sum(tf.cast(tf.math.equal(data[1]["node_labels"], tf.math.round(predicted_Y_loaded_model)),tf.int32))
-            accuracy = num_correct / len(predicted_Y_loaded_model)
+        print("len(True Y)", len(true_Y))  # labels
+        # print("True Y\n",true_Y) #labels
+        mse_loaded_model = tf.keras.losses.MSE(
+            true_Y, predicted_Y_loaded_model)
+        print("\n mse_loaded_model_predicted_Y_and_True_Y", mse_loaded_model)
 
-            print("accuracy",accuracy)
+        mse_mean = tf.keras.losses.MSE(
+            [np.mean(true_Y)]*len(true_Y), true_Y)
+        print("\n mse_mean_Y_and_True_Y", mse_mean)
+        mean_loss_list=mse_mean
+        num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, tf.math.round(predicted_Y_loaded_model)),tf.int32))
+        accuracy = num_correct / len(predicted_Y_loaded_model)
+
+        print("accuracy",accuracy)
         accuracy_average.append(accuracy)
         train_loss_list_average.append(train_loss_list)
         valid_loss_list_average.append(valid_loss_list)
@@ -133,9 +140,9 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
 
 
 
-    # train_loss_list_average=np.mean(train_loss_list_average,axis=0)
-    # valid_loss_list_average=np.mean(valid_loss_list_average,axis=0)
-    # test_loss_list_average=np.mean(test_loss_list_average,axis=0)
+    train_loss_list_average=np.mean(train_loss_list_average,axis=0)
+    valid_loss_list_average=np.mean(valid_loss_list_average,axis=0)
+    test_loss_list_average=np.mean(test_loss_list_average,axis=0)
     mean_loss_list_average=np.mean(mean_loss_list)
     mse_loaded_model_average=np.mean(mse_loaded_model)
     train_loss_average=np.mean(train_loss_average)
@@ -145,13 +152,13 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
 
     write_accuracy_to_log(label, benchmark_name, accuracy_average,best_valid_epoch_average)
 
-    # #visualize results
-    # draw_training_results(train_loss_list_average, valid_loss_list_average,test_loss_list_average, mean_loss_list_average,
-    #                       mse_loaded_model_average, valid_loss_list, true_Y, predicted_Y_loaded_model, label,
-    #                       benchmark_name)
-    # write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss_average,
-    #                            valid_loss_average, mse_loaded_model, mean_loss_list,accuracy_average,best_valid_epoch_average,
-    #                            benchmark=benchmark_name,label=label)
+    #visualize results
+    draw_training_results(train_loss_list_average, valid_loss_list_average,test_loss_list_average, mean_loss_list_average,
+                          mse_loaded_model_average, valid_loss_list, true_Y, predicted_Y_loaded_model, label,
+                          benchmark_name)
+    write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss_average,
+                               valid_loss_average, mse_loaded_model, mean_loss_list,accuracy_average,best_valid_epoch_average,
+                               benchmark=benchmark_name,label=label)
 
 
 
@@ -282,6 +289,7 @@ class raw_graph_inputs():
         self.ranked_argument_scores=[]
         self.argument_identify=[]
         self.control_location_identify=[]
+        self.label_size=0
 
 class HornGraphDataset(GraphDataset[HornGraphSample]):
     def __init__(self, params: Dict[str, Any], metadata: Optional[Dict[str, Any]] = None):
@@ -323,8 +331,6 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
             self._node_number_per_edge_type=[]
 
 
-
-
         #whatever the data_fold is, use the same dataset to debug
         print("data_fold",data_name)
         print(self.label_type+"-"+self._benchmark+"-gnnInput_"+data_name+"_data")
@@ -338,7 +344,7 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
             self._node_vocab_size = max(node_num_list)
         #print("self._node_vocab_size",self._node_vocab_size)
 
-
+        print("raw_inputs.label_size", raw_inputs.label_size)
         print("raw_inputs._total_number_of_nodes", raw_inputs._total_number_of_nodes)
         self._total_number_of_nodes = raw_inputs._total_number_of_nodes
         print("raw_inputs._num_edge_types",raw_inputs._num_edge_types)
@@ -346,9 +352,10 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
 
         print("raw_inputs._node_number_per_edge_type",raw_inputs._node_number_per_edge_type)
         self._node_number_per_edge_type=raw_inputs._node_number_per_edge_type
-        print("raw_inputs.argument_scores",raw_inputs.argument_scores)
+
+        # print("raw_inputs.argument_scores",raw_inputs.argument_scores)
         self._argument_scores[data_name]=raw_inputs.argument_scores
-        print("raw_inputs.ranked_argument_scores",raw_inputs.ranked_argument_scores)
+        # print("raw_inputs.ranked_argument_scores",raw_inputs.ranked_argument_scores)
         self._ranked_argument_scores[data_name] = raw_inputs.ranked_argument_scores
 
         return final_graphs
@@ -383,7 +390,7 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         }
         #print("self.node_feature_shape",self.node_feature_shape)
         batch_features_shapes = {
-            "node_features": (None, ),  #+ self.node_feature_shape,  #do offset in minibatch
+            "node_features": (None, ),  #+ self.node_feature_shape,  #no offset in minibatch
             "node_to_graph_map": (None,),
             "num_graphs_in_batch": (),
             "node_argument": (None, ),
@@ -473,7 +480,11 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         batch_features: Dict[str, Any] = {}
         batch_labels: Dict[str, Any] = {"node_labels": raw_batch["node_labels"]}
         batch_features["node_features"] = np.array(raw_batch["node_features"])
-        batch_features["node_to_graph_map"] = np.concatenate(raw_batch["node_to_graph_map"])
+        #print("raw_batch node_to_graph_map len",len(raw_batch["node_to_graph_map"]))
+        if len(raw_batch["node_to_graph_map"])==0:
+            batch_features["node_to_graph_map"]=raw_batch["node_to_graph_map"]
+        else:
+            batch_features["node_to_graph_map"] = np.concatenate(raw_batch["node_to_graph_map"])
         batch_features["num_graphs_in_batch"] = raw_batch["num_graphs_in_batch"]
         for i, adjacency_list in enumerate(raw_batch["adjacency_lists"]):
             if len(adjacency_list) > 0:
@@ -504,6 +515,7 @@ def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","
             # get raw gnn inputs
             graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists,\
             graphs_argument_scores, total_number_of_node,graphs_control_location_indices,graph_info_list = graphInfoList.getHornGraphSample_no_offset()
+
 
             form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists,
                                     graphs_argument_scores, total_number_of_node, graphs_control_location_indices,
@@ -573,11 +585,12 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                             graphs_argument_scores, total_number_of_node,graphs_control_location_indices, label, benchmark, df):
     final_graphs_v1 = []
 
-    raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists), total_number_of_node)
+    raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists[0]), total_number_of_node)
     for edge_type in graphs_adjacency_lists[0]:
-
         raw_data_graph._node_number_per_edge_type.append(len(edge_type[0]))
 
+    total_label=0
+    total_nodes=0
     for node_label_ids, argument_indices, adjacency_lists, argument_scores,control_location_indices in zip(graphs_node_label_ids,
                                                                                   graphs_argument_indices,
                                                                                   graphs_adjacency_lists,
@@ -589,8 +602,11 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
         raw_data_graph.argument_scores.append(argument_scores)
         argument_identify = np.array([0] * len(node_label_ids))
         argument_identify[argument_indices] = 1
+        total_nodes+=len(node_label_ids)
+        total_label += len(argument_identify)
         control_location_identify = np.array([0] * len(node_label_ids))
         control_location_identify[control_location_indices]=1
+
         raw_data_graph.argument_identify.append(argument_identify)
         raw_data_graph.control_location_identify.append(control_location_identify)
         raw_data_graph._total_number_of_nodes+=len(graphs_node_label_ids)
@@ -608,6 +624,7 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                     node_control_location=tf.constant(control_location_indices)
                 )
             )
+            raw_data_graph.label_size+=len(ranked_argument_scores)
         elif label == "occurrence":
             final_graphs_v1.append(
                 HornGraphSample(
@@ -620,6 +637,7 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                     node_control_location=tf.constant(control_location_indices)
                 )
             )
+            raw_data_graph.label_size += len(argument_scores)
         elif label == "argument_identify":
             final_graphs_v1.append(
                 HornGraphSample(
@@ -632,8 +650,8 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                     node_control_location=tf.constant(control_location_indices)
                 )
             )
+            raw_data_graph.label_size += len(argument_identify)
         elif label == "control_location_identify":
-            print(control_location_identify)
             final_graphs_v1.append(
                 HornGraphSample(
                     adjacency_lists=tuple(adjacency_lists),
@@ -645,7 +663,9 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                     node_control_location=tf.constant(control_location_indices)
                 )
             )
+            raw_data_graph.label_size += len(control_location_identify)
         elif label == "argument_identify_no_batchs":
+            raw_data_graph.label_size += len(node_label_ids)
             for i in node_label_ids:
                 if i in argument_indices:
                     final_graphs_v1.append(
@@ -659,6 +679,7 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                             node_control_location=tf.constant(control_location_indices)
                         )
                     )
+
                 else:
                     final_graphs_v1.append(
                         HornGraphSample(
@@ -673,5 +694,7 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                     )
         else:
             pass
-        raw_data_graph.final_graphs = final_graphs_v1.copy()
-        pickleWrite(raw_data_graph, label + "-" + benchmark + "-gnnInput_" + df + "_data")
+    raw_data_graph.final_graphs = final_graphs_v1.copy()
+    pickleWrite(raw_data_graph, label + "-" + benchmark + "-gnnInput_" + df + "_data")
+    print("total_label",total_label)
+    print("total_nodes",total_nodes)
