@@ -277,13 +277,13 @@ def main():
     # benchmark_list.append(["../benchmarks/trainData-sv-comp-smt-templates/", 25, 8, 5,".smt2"])
     ###benchmark_list.append(["../benchmarks/trainData-sv-comp-c-templates/", 25, 5, 8,".c"])
     #benchmark_list.append(["../benchmarks/trainData-chc-comp-templates/", 25, 5, 5,".smt2"])
-    benchmark_list.append(["../benchmarks/LIA-lin-trainData-temp/", int(545 * 0.6), int(545 * 0.2), int(545 * 0.2), ".smt2"])
+    benchmark_list.append(["../benchmarks/temp/", int(18 * 0.6), int(18 * 0.2), int(18 * 0.2), ".smt2"])
     #benchmark_list.append(["../benchmarks/LIA-lin-trainData/", int(545 * 0.6), int(545 * 0.2), int(545 * 0.2), ".smt2"])
     buckets = 10
     for benchmark in benchmark_list:
-        #separate_dataset_to_train_valid_test_files(benchmark[0], benchmark[1], benchmark[2], benchmark[3])
+        separate_dataset_to_train_valid_test_files(benchmark[0], benchmark[1], benchmark[2], benchmark[3])
         #get_statistic_data(benchmark[0],file_type=benchmark[4],buckets=10)
-        separate_datafold_and_get_statistic_data(rootdir=benchmark[0],file_type=".smt2",buckets=buckets)
+        #separate_datafold_and_get_statistic_data(rootdir=benchmark[0],file_type=".smt2",buckets=buckets)
 
     #gather_all_train_data(rootdir="../benchmarks/LIA-nonlin-extracted/")
 

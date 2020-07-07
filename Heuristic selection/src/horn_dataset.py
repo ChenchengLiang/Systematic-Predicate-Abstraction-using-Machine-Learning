@@ -17,7 +17,7 @@ import scipy.stats as ss
 import subprocess
 from tf2_gnn.cli import test as model_test
 
-def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",split_flag=False,buckets=10,form_label=True):
+def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",split_flag=False,buckets=10,form_label=False):
     if split_flag==True and not os.path.isfile("../pickleData/"+"train-"+benchmark_name+"-gnnInput_train_data.txt"):
         write_graph_to_pickle(benchmark_name,  data_fold=["train", "valid", "test"], label=label,path=path,buckets=buckets)
     if form_label == True and not os.path.isfile(
@@ -100,12 +100,14 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         loaded_model=tf2_gnn.cli_utils.model_utils.load_model_for_prediction(trained_model_path,dataset)
         test_data = dataset.get_tensorflow_dataset(DataFold.TEST)
 
-        _, _, test_results = loaded_model.run_one_epoch(test_data, training=False, quiet=quiet)
-        test_metric, test_metric_string = loaded_model.compute_epoch_metrics(test_results)
+        #_, _, test_results = loaded_model.run_one_epoch(test_data, training=False, quiet=quiet)
+        _, _, test_results = model.run_one_epoch(test_data, training=False, quiet=quiet)
+        test_metric, test_metric_string = model.compute_epoch_metrics(test_results)
+
         print("test_metric_string",test_metric_string)
 
 
-        predicted_Y_loaded_model=loaded_model.predict(test_data)
+        predicted_Y_loaded_model=model.predict(test_data)
         print("predicted_Y_loaded_model Y\n",predicted_Y_loaded_model)
 
         true_Y=[]
@@ -113,8 +115,6 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             #print(data[0]) #input
             true_Y.extend(np.array(data[1]["node_labels"]))
 
-        print("len(True Y)", len(true_Y))  # labels
-        # print("True Y\n",true_Y) #labels
         mse_loaded_model = tf.keras.losses.MSE(
             true_Y, predicted_Y_loaded_model)
         print("\n mse_loaded_model_predicted_Y_and_True_Y", mse_loaded_model)
@@ -237,6 +237,7 @@ def write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss,valid
                 predicted_Y_loaded_model[sum(argument_number_lists[:i]):sum(argument_number_lists[:i]) + n])
 
         mse_list=[]
+        #todo:write ranked arguments to corresponding files
         for predicted_arguments, arguments,ranks in zip(argument_lists,dataset._argument_scores["test"],dataset._ranked_argument_scores["test"]):
             out_file.write("-------"+ "\n")
             out_file.write("original argument scores:"+ str(arguments)+ "\n")
