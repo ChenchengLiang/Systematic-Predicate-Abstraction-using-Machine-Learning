@@ -1,5 +1,14 @@
 from horn_dataset import train_on_graphs
 
+"""
+This will read train, valid, and test data from trainData, validData, and testData files in ../benchmarks/debug-examples/
+
+In every data folder such as trainData, you can find two types of files i.e. file_name.gv and file_name.arguments.
+A pair of them is one graph input. You can manually copy other .gv and .arguments file pairs from other folder in benchmarks to form different dataset.
+
+For a simplest test, you can use one pair of files for three datafolds. 
+
+"""
 
 def main():
     benchmark_list = []
@@ -7,8 +16,8 @@ def main():
     force_read = True
     file_type = ".smt2"
     #label = "occurrence"
-    #label = "rank"
-    label = "argument_identify"
+    label = "rank"
+    #label = "argument_identify"
     #label = "argument_identify_no_batchs"
     #label = "control_location_identify"
 

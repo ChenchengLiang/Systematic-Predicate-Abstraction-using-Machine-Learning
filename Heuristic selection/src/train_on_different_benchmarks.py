@@ -23,8 +23,8 @@ def main():
     form_label = True
     file_type = ".smt2"
     buckets = 50
-    #label = "occurrence"
-    label = "rank"
+    label = "occurrence"
+    #label = "rank"
     #label = "argument_identify"
     #label = "argument_identify_no_batchs"
     #label = "control_location_identify"

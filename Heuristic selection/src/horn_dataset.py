@@ -108,7 +108,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
 
 
         predicted_Y_loaded_model=model.predict(test_data)
-        print("predicted_Y_loaded_model Y\n",predicted_Y_loaded_model)
+        #print("predicted_Y_loaded_model Y\n",predicted_Y_loaded_model)
 
         true_Y=[]
         for data in iter(test_data):
@@ -126,7 +126,6 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, tf.math.round(predicted_Y_loaded_model)),tf.int32))
         accuracy = num_correct / len(predicted_Y_loaded_model)
 
-        print("accuracy",accuracy)
         accuracy_average.append(accuracy)
         train_loss_list_average.append(train_loss_list)
         valid_loss_list_average.append(valid_loss_list)
