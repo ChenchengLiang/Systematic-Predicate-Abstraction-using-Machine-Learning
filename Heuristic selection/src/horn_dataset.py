@@ -89,8 +89,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             dataset,
             log_fun=log,
             run_id=run_id,
-            max_epochs=100,
-            patience=10,
+            max_epochs=1000,
+            patience=50,
             save_dir=save_dir,
             quiet=quiet,
             aml_run=None,
@@ -448,13 +448,19 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
                 dtype=np.int32,
             )
         )
+        # print("len(raw bach adjacent list)",len(raw_batch["adjacency_lists"]))
+        # print("sample adjacent list",len(graph_sample.adjacency_lists))
+
         for edge_type_idx, (batch_adjacency_list,sample_adjacency_list) in enumerate(zip(raw_batch["adjacency_lists"],graph_sample.adjacency_lists)):
             edge_number=sample_adjacency_list.shape[1]
+            # print("sample_adjacency_list.shape",sample_adjacency_list.shape)
+            # print("edge_number",edge_number)
             batch_adjacency_list.append(
                 graph_sample.adjacency_lists[edge_type_idx].reshape(-1, edge_number)
                  + offset #offset
             )
             #print("graph_sample.adjacency_lists",graph_sample.adjacency_lists[edge_type_idx] + offset)
+
         raw_batch["node_argument"].extend(graph_sample._node_argument + offset)
         raw_batch["node_labels"].extend(graph_sample._node_label)
         raw_batch["current_node_index"].extend(graph_sample._current_node_index)
@@ -490,7 +496,9 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
             if len(adjacency_list) > 0:
                 batch_features[f"adjacency_list_{i}"] = np.concatenate(adjacency_list)
             else:
-                batch_features[f"adjacency_list_{i}"] = np.zeros(shape=(0, 2),
+                batch_features[f"adjacency_list_{0}"] = np.zeros(shape=(0, 2),
+                                                                 dtype=np.int32)
+                batch_features[f"adjacency_list_{1}"] = np.zeros(shape=(0, 3),
                                                                  dtype=np.int32)
 
         #batch_features, batch_labels = super()._finalise_batch(raw_batch)

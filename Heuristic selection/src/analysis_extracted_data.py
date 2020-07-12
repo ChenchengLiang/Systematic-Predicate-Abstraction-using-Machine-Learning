@@ -9,7 +9,16 @@ import errno
 from distutils.dir_util import copy_tree
 from Miscellaneous import pickleRead,pickleWrite
 import subprocess
-def separate_dataset_to_train_valid_test_files(source,train=120,valid=11,test=30):
+def separate_dataset_to_train_valid_test_files(source,destination,train_rate=0.6,valid_rate=0.2,test_rate=0.2):
+    print("source file",source)
+    total_file_number=len(glob.glob(source+"*.arguments"))
+    train=round(total_file_number*train_rate)
+    valid=round(total_file_number*valid_rate)
+    test=round(total_file_number*test_rate)
+    print("total_file_number",total_file_number)
+    print("train number",train)
+    print("valid number", valid)
+    print("test number", test)
 
     temp_shuffle=[]
     for g,a,i,p,n in zip(sorted(glob.glob(source + '*' + '.gv')),sorted(glob.glob(source + '*' + '.arguments')),
@@ -36,16 +45,16 @@ def separate_dataset_to_train_valid_test_files(source,train=120,valid=11,test=30
     negative_fold = [negative_hints_files[:train], negative_hints_files[train:train + valid], negative_hints_files[train + valid:]]
     for gvs,arguments,initial_hints,positive_hints,negative_hints,fold in zip(gv_fold,argument_fold,initial_hints_fold,positive_fold,negative_fold,["train","valid","test"]):
         try:
-            rmtree(source+fold+"Data")
-            os.mkdir(source + fold + "Data")
+            rmtree(destination+fold+"Data")
+            os.mkdir(destination + fold + "Data")
         except:
-            os.mkdir(source+fold+"Data")
+            os.mkdir(destination+fold+"Data")
         for gv,argument,initial_hint,positive_hint,negative_hint in zip(gvs,arguments,initial_hints,positive_hints,negative_hints):
-            copy(gv, source+fold+"Data/")
-            copy(argument, source+fold+"Data/")
-            copy(initial_hint, source + fold + "Data/")
-            copy(positive_hint, source + fold + "Data/")
-            copy(negative_hint, source + fold + "Data/")
+            copy(gv, destination+fold+"Data/")
+            copy(argument, destination+fold+"Data/")
+            copy(initial_hint, destination + fold + "Data/")
+            copy(positive_hint, destination + fold + "Data/")
+            copy(negative_hint, destination + fold + "Data/")
 
 
 def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="analysis",path="../", curssor=0,buckets=10):
@@ -251,21 +260,30 @@ def separate_datafold_and_get_statistic_data(rootdir="../benchmarks/LIA-lin/",fi
                 rmtree(root+"/extracted_data")
 
 
-def gather_all_train_data(rootdir="../benchmarks/LIA-lin/"):
+def gather_all_train_data(rootdir="../../benchmarks/LIA-lin/",dst="../../benchmarks/LIA-nonlin-trainData-noIntevals/"):
 
-    for root, subdirs, files in os.walk(rootdir):
-        if os.path.isdir(root + "/extracted_data"):
-            rmtree(root + "/extracted_data")
     for root, subdirs, files in os.walk(rootdir):
         #print(root,subdirs,files)
-
         if len(subdirs)==1 and subdirs[0]=="trainData":
             srcname=root+"/trainData/"
-            dstname=rootdir[:-1]+"-traiData/"
+            dstname=dst
 
             copy_tree(srcname,dstname)
 
-
+def unique_names(rootdir):
+    count=0
+    for root, subdirs, files in os.walk(rootdir):
+        #print(root,subdirs,files)
+        if "trainData" in subdirs:
+            srcname = root + "/trainData/*"
+            #print(srcname)
+            file_list=glob.glob(srcname)
+            for file in file_list:
+                preffix=file[:file.rfind(".smt2")]
+                suffix=file[file.rfind(".smt2"):]
+                #print(preffix,count,suffix)
+                os.rename(file,preffix+"-"+str(count)+suffix)
+            count += 1
 def main():
     benchmark_list = []
     #benchmark_list.append(["../benchmarks/trainData-chc-comp-predicates/", 120, 11, 30,".smt2"])
@@ -277,15 +295,18 @@ def main():
     # benchmark_list.append(["../benchmarks/trainData-sv-comp-smt-templates/", 25, 8, 5,".smt2"])
     ###benchmark_list.append(["../benchmarks/trainData-sv-comp-c-templates/", 25, 5, 8,".c"])
     #benchmark_list.append(["../benchmarks/trainData-chc-comp-templates/", 25, 5, 5,".smt2"])
-    benchmark_list.append(["../benchmarks/temp/", int(18 * 0.6), int(18 * 0.2), int(18 * 0.2), ".smt2"])
+    #benchmark_list.append(["../benchmarks/temp/", int(18 * 0.6), int(18 * 0.2), int(18 * 0.2), ".smt2"])
     #benchmark_list.append(["../benchmarks/LIA-lin-trainData/", int(545 * 0.6), int(545 * 0.2), int(545 * 0.2), ".smt2"])
-    buckets = 10
-    for benchmark in benchmark_list:
-        separate_dataset_to_train_valid_test_files(benchmark[0], benchmark[1], benchmark[2], benchmark[3])
+    # buckets = 10
+    # for benchmark in benchmark_list:
+    #     separate_dataset_to_train_valid_test_files(benchmark[0],benchmark[0][:-1]+"-datafold/", benchmark[1], benchmark[2], benchmark[3])
         #get_statistic_data(benchmark[0],file_type=benchmark[4],buckets=10)
         #separate_datafold_and_get_statistic_data(rootdir=benchmark[0],file_type=".smt2",buckets=buckets)
 
-    #gather_all_train_data(rootdir="../benchmarks/LIA-nonlin-extracted/")
+
+    unique_names("../benchmarks/temp")
+    #gather_all_train_data(rootdir="../benchmarks/LIA-nonlin-extracted-noIntervals/",dst="../benchmarks/LIA-nonlin-trainData-noIntevals/")
+
 
     #separate_dataset_to_train_valid_test_files("../benchmarks/LIA-lin-traiData/", int(413*0.6), int(413*0.2), int(413*0.2))
     #get_statistic_data("../benchmarks/LIA-lin-traiData/")
