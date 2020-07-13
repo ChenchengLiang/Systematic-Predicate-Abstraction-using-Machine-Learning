@@ -23,9 +23,9 @@ def main():
     form_label = True
     file_type = ".smt2"
     buckets = 2
-    #label = "occurrence"
+    label = "occurrence"
     #label = "rank"
-    label = "argument_identify"
+    #label = "argument_identify"
     #label = "argument_identify_no_batchs"
     #label = "control_location_identify"
 
