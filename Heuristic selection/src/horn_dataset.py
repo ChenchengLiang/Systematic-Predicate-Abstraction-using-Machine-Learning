@@ -89,26 +89,30 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             dataset,
             log_fun=log,
             run_id=run_id,
-            max_epochs=1000,
-            patience=50,
+            max_epochs=100,
+            patience=10,
             save_dir=save_dir,
             quiet=quiet,
             aml_run=None,
         )
 
         #predict
+        print("trained_model_path",trained_model_path)
         loaded_model=tf2_gnn.cli_utils.model_utils.load_model_for_prediction(trained_model_path,dataset)
         test_data = dataset.get_tensorflow_dataset(DataFold.TEST)
 
-        #_, _, test_results = loaded_model.run_one_epoch(test_data, training=False, quiet=quiet)
-        _, _, test_results = model.run_one_epoch(test_data, training=False, quiet=quiet)
-        test_metric, test_metric_string = model.compute_epoch_metrics(test_results)
+        #load model from files
+        _, _, test_results = loaded_model.run_one_epoch(test_data, training=False, quiet=quiet)
+        test_metric, test_metric_string = loaded_model.compute_epoch_metrics(test_results)
+        predicted_Y_loaded_model = loaded_model.predict(test_data)
+
+        #use model in memory
+        #_, _, test_results = model.run_one_epoch(test_data, training=False, quiet=quiet)
+        #test_metric, test_metric_string = model.compute_epoch_metrics(test_results)
+        # predicted_Y_loaded_model=model.predict(test_data)
 
         print("test_metric_string",test_metric_string)
 
-
-        predicted_Y_loaded_model=model.predict(test_data)
-        #print("predicted_Y_loaded_model Y\n",predicted_Y_loaded_model)
 
         true_Y=[]
         for data in iter(test_data):
