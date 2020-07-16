@@ -11,6 +11,7 @@ import scipy.stats as ss
 import signal
 import matplotlib.pyplot as plt
 import tensorflow as tf
+import re
 def sleep(seconds=1):
     time.sleep(seconds)
     print("wait for",seconds)
@@ -46,7 +47,7 @@ def occurance_to_rank_examples(x=[0,1,1,1,1,0,5]):
 
 def pool_kill_popen_test(to):
     try:
-        x = subprocess.Popen(["../venv/bin/python3", "learnArguments/sleep.py"])
+        x = subprocess.Popen(["../venv/bin/python3", "archived/sleep.py"])
         x.wait(timeout=to)
         print(x.pid)
     except:
@@ -69,8 +70,10 @@ def main():
     #
     # x = [int(val) for val in x]
     # print(x)
-    x=[0,1]
-    print(np.concatenate(x))
+    # x=[0,1]
+    # print(np.concatenate(x))
+    first_layer_name= re.sub(r'(?<!^)(?=[A-Z])', '_', "InvariantNodeIdentifyTask").lower()
+    print(first_layer_name)
 
 
 

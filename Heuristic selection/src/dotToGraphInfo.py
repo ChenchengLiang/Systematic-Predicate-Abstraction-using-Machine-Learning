@@ -7,6 +7,7 @@ import tensorflow as tf
 import numpy as np
 from typing import Dict
 import time
+import math
 
 
 """
@@ -89,7 +90,27 @@ class ArgumentInfo:
         print("ID:"+self.ID,"head:"+self.head,"arg:"+
               self.arg,"score:"+self.score,"nodeIDInGraph:"+str(self.nodeUniqueIDInGraph),
               "nodeLabelUniqueIDInGraph:"+str(self.nodeLabelUniqueIDInGraph))
-
+def parseArguments(arguments):
+    ParsedArgumentList=[]
+    argumentLines=arguments.splitlines()
+    for line in argumentLines:
+        argument_content_list = line.split(":")
+        ID=argument_content_list[0]
+        head=transform_list_to_string(argument_content_list[1:-2])
+        hint=argument_content_list[-2]
+        score=argument_content_list[-1]
+        ParsedArgumentList.append(ArgumentInfo(ID,head,hint,score))
+        #print(ID,head,hint,score)
+    return ParsedArgumentList
+def transform_list_to_string(head_list):
+    head=""
+    if len(head_list)>1:
+        for s in head_list:
+            head=head+":"+s
+        head=head[1:]
+    else:
+        head=head_list[0]
+    return head
 
 class RawGNNInput:
     def __init__(self,nodeNumberList,nodeIDList):
@@ -784,7 +805,7 @@ class DotToGraphInfo:
             print("total argument file", len(glob.glob(path + '*' + suffix + '.arguments')))
             gv_list = sorted(glob.glob(path + '*' + suffix + '.gv'))
             argument_list = sorted(glob.glob(path + '*' + suffix + '.arguments'))
-            buket_size=int(len(gv_list)/self._buckets)
+            buket_size=math.ceil(len(gv_list)/self._buckets)
             if self._split_flag<self._buckets:
                 gv_list=gv_list[(self._split_flag-1)*buket_size:self._split_flag*buket_size]
                 argument_list=argument_list[(self._split_flag-1)*buket_size:self._split_flag*buket_size]
@@ -815,15 +836,6 @@ class DotToGraphInfo:
 
 
 
-    def transform_list_to_string(self,head_list):
-        head=""
-        if len(head_list)>1:
-            for s in head_list:
-                head=head+":"+s
-            head=head[1:]
-        else:
-            head=head_list[0]
-        return head
 
 
 
@@ -1065,18 +1077,7 @@ class DotToGraphInfo:
             self.finalGraphInfoList[-1].argumentScores=tempArgScoreList
             self.finalGraphInfoList[-1].argumentNodes=tempArgList
 
-    def parseArguments(self,arguments):
-        ParsedArgumentList=[]
-        argumentLines=arguments.splitlines()
-        for line in argumentLines:
-            argument_content_list = line.split(":")
-            ID=argument_content_list[0]
-            head=self.transform_list_to_string(argument_content_list[1:-2])
-            hint=argument_content_list[-2]
-            score=argument_content_list[-1]
-            ParsedArgumentList.append(ArgumentInfo(ID,head,hint,score))
-            #print(ID,head,hint,score)
-        return ParsedArgumentList
+
 
     def getArgumentHead(self):
         for G, args in zip(self.graphList, self.parsedArgumentList):
@@ -1108,7 +1109,7 @@ class DotToGraphInfo:
 
     def getParsedArgument(self):
         for args in self.argumentList:
-            self.parsedArgumentList.append(self.parseArguments(args))
+            self.parsedArgumentList.append(parseArguments(args))
 #
 # def main():
 #     graphInfoList=DotToGraphInfo()

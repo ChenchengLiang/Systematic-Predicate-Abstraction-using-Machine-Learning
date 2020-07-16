@@ -1,6 +1,6 @@
 from typing import Any, Dict,Optional
 import tensorflow as tf
-from dotToGraphInfo import GraphInfo,ArgumentInfo,DotToGraphInfo
+from dotToGraphInfo import GraphInfo,ArgumentInfo,DotToGraphInfo,parseArguments
 import tf2_gnn
 from horn_graph_argument_selection_task import InvariantArgumentSelectionTask,InvariantNodeIdentifyTask
 from tf2_gnn.data import GraphDataset,GraphSample,DataFold,GraphBatchTFDataDescription
@@ -15,11 +15,18 @@ import matplotlib.patches as mpatches
 import random
 import scipy.stats as ss
 import subprocess
+import json
+import glob
 from tf2_gnn.cli import test as model_test
 
-def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",split_flag=False,buckets=10,form_label=False):
-    if split_flag==True and not os.path.isfile("../pickleData/"+"train-"+benchmark_name+"-gnnInput_train_data.txt"):
-        write_graph_to_pickle(benchmark_name,  data_fold=["train", "valid", "test"], label=label,path=path,buckets=buckets)
+'''
+All graphs read from .gv files or JSON files will be stored to pickle a file (a parsed_dot_format object).
+parsed_dot_format object includes multiple all graphs info.
+'''
+
+def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",split_flag=False,buckets=10,from_json=False,form_label=False):
+    if not os.path.isfile("../pickleData/"+"train-"+benchmark_name+"-gnnInput_train_data.txt"):
+        write_graph_to_pickle(benchmark_name,  data_fold=["train", "valid", "test"], label=label,path=path,buckets=buckets,split_flag=split_flag,from_json=from_json,file_type=file_type)
     if form_label == True and not os.path.isfile(
             "../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):
         form_GNN_inputs_and_labels(label=label, datafold=["train", "valid", "test"], benchmark=benchmark_name)
@@ -89,8 +96,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             dataset,
             log_fun=log,
             run_id=run_id,
-            max_epochs=100,
-            patience=10,
+            max_epochs=1000,
+            patience=50,
             save_dir=save_dir,
             quiet=quiet,
             aml_run=None,
@@ -111,6 +118,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         # _, _, test_results = model.run_one_epoch(test_data, training=False, quiet=quiet)
         # test_metric, test_metric_string = model.compute_epoch_metrics(test_results)
         # predicted_Y_loaded_model=model.predict(test_data)
+
 
         print("test_metric_string",test_metric_string)
         print("test_metric",test_metric)
@@ -337,8 +345,9 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
             self._node_number_per_edge_type=[]
 
 
-        #whatever the data_fold is, use the same dataset to debug
+
         print("data_fold",data_name)
+        print("read GNNInputs from pickle file")
         print(self.label_type+"-"+self._benchmark+"-gnnInput_"+data_name+"_data")
         raw_inputs=pickleRead(self.label_type+"-"+self._benchmark+"-gnnInput_"+data_name+"_data")
         final_graphs=raw_inputs.final_graphs
@@ -547,7 +556,7 @@ class parsed_dot_format:
         self.total_number_of_node=total_number_of_node
         self.graph_control_location_indices=graph_control_location_indices
 
-def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../", buckets=0):
+def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../", buckets=0,split_flag=True,from_json=False,file_type=".smt2"):
     benchmark_name = benchmark.replace("/", "-")
     for df in data_fold:
         print("write data_fold to pickle data:", df)
@@ -558,19 +567,47 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
         graphs_control_location_indices=[]
         total_number_of_node=0
         file_type=".smt2"
-        for i in range(1,buckets+1):
-            p = subprocess.Popen(["../venv/bin/python3", "split_read_graphs.py", path,df,str(i),file_type,label,str(buckets),"gnn_inputs"])
-            p.wait()
-            # os.kill(p.pid,signal.SIGKILL)
-            print("curssor=",i)
-        for i in range(1,buckets+1):
-            graphs_node_label_ids.extend(pickleRead(df+"-graphs_node_label_ids-"+str(i)))
-            graphs_argument_indices.extend(pickleRead(df+"-graphs_argument_indices-"+str(i)))
-            graphs_adjacency_lists.extend(pickleRead(df+"-graphs_adjacency_lists-" + str(i)))
-            graphs_argument_scores.extend(pickleRead(df+"-graphs_argument_scores-" + str(i)))
-            graphs_control_location_indices.extend(pickleRead(df + "-total_control_flow_node_list-" + str(i)))
-            total_number_of_node+=pickleRead(df+"-total_number_of_node-" + str(i))
 
+        #read from .gv
+        if split_flag==True:
+            for i in range(1,buckets+1):
+                p = subprocess.Popen(["../venv/bin/python3", "split_read_graphs.py", path,df,str(i),file_type,label,str(buckets),"gnn_inputs"])
+                p.wait()
+                # os.kill(p.pid,signal.SIGKILL)
+                print("curssor=",i)
+            for i in range(1,buckets+1):
+                graphs_node_label_ids.extend(pickleRead(df+"-graphs_node_label_ids-"+str(i)))
+                graphs_argument_indices.extend(pickleRead(df+"-graphs_argument_indices-"+str(i)))
+                graphs_adjacency_lists.extend(pickleRead(df+"-graphs_adjacency_lists-" + str(i)))
+                graphs_argument_scores.extend(pickleRead(df+"-graphs_argument_scores-" + str(i)))
+                graphs_control_location_indices.extend(pickleRead(df + "-total_control_flow_node_list-" + str(i)))
+                total_number_of_node+=pickleRead(df+"-total_number_of_node-" + str(i))
+
+        # read from JSON
+        if from_json==True:
+            suffix=file_type
+            for fileGraph, fileArgument in zip(sorted(glob.glob(path +df+"Data/"+ '*' + suffix + '.JSON')),
+                                               sorted(glob.glob(path +df+"Data/"+ '*' + suffix + '.arguments'))):
+                fileName = fileGraph[:fileGraph.find(suffix + ".JSON") + len(suffix)]
+                fileName = fileName[fileName.rindex("/") + 1:]
+                print(fileName)
+
+                # read graph
+                print(fileGraph)
+                with open(fileGraph) as f:
+                    loaded_graph = json.load(f)
+                    graphs_node_label_ids.append(loaded_graph["nodeIds"])
+                    graphs_adjacency_lists.append(
+                        [np.array(loaded_graph["binaryAdjacentList"]), np.array(loaded_graph["tenaryAdjacencyList"])])
+                    graphs_argument_indices.append(loaded_graph["argumentIndices"])
+                    graphs_control_location_indices.append(loaded_graph["controlLocationIndices"])
+                    total_number_of_node += len(loaded_graph["nodeIds"])
+
+                # read argument
+                print(fileArgument)
+                with open(fileArgument) as f:
+                    parsed_arguments = parseArguments(f.read())
+                    graphs_argument_scores.append([int(argument.score) for argument in parsed_arguments])
 
 
         pickle_data=parsed_dot_format(graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
