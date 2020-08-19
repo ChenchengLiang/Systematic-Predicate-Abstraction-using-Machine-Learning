@@ -72,8 +72,13 @@ def main():
     # print(x)
     # x=[0,1]
     # print(np.concatenate(x))
-    first_layer_name= re.sub(r'(?<!^)(?=[A-Z])', '_', "InvariantNodeIdentifyTask").lower()
-    print(first_layer_name)
+    # first_layer_name= re.sub(r'(?<!^)(?=[A-Z])', '_', "InvariantNodeIdentifyTask").lower()
+    # print(first_layer_name)
+    #filePath="../benchmarks/LIA-lin/hopv/lia/termination/Ackermann00_000.smt2"
+    filePath="../benchmarks/sv-comp-c/05.c-1.smt2"
+    eld = subprocess.Popen(["../eldarica-graph-generation/eld", \
+                            filePath, "-getHornGraph"], stdout=subprocess.DEVNULL, shell=False)
+    eld.wait(timeout=60)
 
 
 

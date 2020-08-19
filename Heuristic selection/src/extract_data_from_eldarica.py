@@ -136,13 +136,40 @@ def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
 
     return True
 
+def add_GNN_inputs_and_auto_graphviz_to_extracted_data(rootdir):
+    for file in glob.glob("../trainData/*"):
+        os.remove(file)
+    for root, subdirs, files in os.walk(rootdir):
+        if len(subdirs)==1 and subdirs[0]=="trainData":
+            print(root,subdirs,files)
+            full_file_list=files
+            extracted_file_list=glob.glob(root+"/trainData/*.smt2")
+            print("full_file_list",len(full_file_list),full_file_list)
+            print("extracted_file_list",len(extracted_file_list),extracted_file_list)
+            for fileName in extracted_file_list:
+                print("processing file:",fileName)
+                eld = subprocess.run(["../eldarica-graph-generation/eld", \
+                                        fileName, "-getHornGraph"], stdout=subprocess.DEVNULL, shell=False)
+            copy_tree("../trainData",root+"/trainData")
+            for file in glob.glob("../trainData/*"):
+                os.remove(file)
+
+
+
+    # filePath = "../benchmarks/sv-comp-c/05.c-1.smt2"
+    # eld = subprocess.Popen(["../eldarica-graph-generation/eld", \
+    #                         filePath, "-getHornGraph"], stdout=subprocess.DEVNULL, shell=False)
+    # eld.wait(timeout=60)
+    #
 
 def main():
-    benchmark_list = ["../benchmarks/LIA-lin-trainData-temp/"]
-    for benchmark in benchmark_list:
-        # check_solvability_pool()
-        extract_data_pool(benchmark)
-    return True
+    # benchmark_list = ["../benchmarks/LIA-lin-trainData-temp/"]
+    # for benchmark in benchmark_list:
+    #     # check_solvability_pool()
+    #     extract_data_pool(benchmark)
+    # return True
+
+    add_GNN_inputs_and_auto_graphviz_to_extracted_data("../benchmarks/LIA-lin-extracted-temp/")
 
 
 main()
