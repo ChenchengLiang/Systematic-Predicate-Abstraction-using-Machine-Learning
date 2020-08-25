@@ -21,7 +21,7 @@ def separate_dataset_to_train_valid_test_files(source,destination,train_rate=0.6
     print("test number", test)
 
     temp_shuffle=[]
-    for g,a,i,p,n,j in zip(sorted(glob.glob(source + '*' + 'auto.gv')),sorted(glob.glob(source + '*' + '.arguments')),
+    for g,a,i,p,n,j,s in zip(sorted(glob.glob(source + '*' + 'auto.gv')),sorted(glob.glob(source + '*' + '.arguments')),
                    sorted(glob.glob(source + '*' + '.initialHints')),sorted(glob.glob(source + '*' + '.positiveHints')),
                    sorted(glob.glob(source + '*' + '.negativeHints')),sorted(glob.glob(source + '*' + '.JSON')),
                            sorted(glob.glob(source + '*' + '.smt2'))):
@@ -50,13 +50,13 @@ def separate_dataset_to_train_valid_test_files(source,destination,train_rate=0.6
     negative_fold = [negative_hints_files[:train], negative_hints_files[train:train + valid], negative_hints_files[train + valid:]]
     json_fold=[json_files[:train], json_files[train:train + valid], json_files[train + valid:]]
     smt2_fold = [smt2_files[:train], smt2_files[train:train + valid], smt2_files[train + valid:]]
-    for gvs,arguments,initial_hints,positive_hints,negative_hints,jsons,smt,fold in zip(gv_fold,argument_fold,initial_hints_fold,positive_fold,negative_fold,json_fold,smt2_fold,["train","valid","test"]):
+    for gvs,arguments,initial_hints,positive_hints,negative_hints,jsons,smts,fold in zip(gv_fold,argument_fold,initial_hints_fold,positive_fold,negative_fold,json_fold,smt2_fold,["train","valid","test"]):
         try:
             rmtree(destination+fold+"Data")
             os.mkdir(destination + fold + "Data")
         except:
             os.mkdir(destination+fold+"Data")
-        for gv,argument,initial_hint,positive_hint,negative_hint,json in zip(gvs,arguments,initial_hints,positive_hints,negative_hints,jsons):
+        for gv,argument,initial_hint,positive_hint,negative_hint,json,smt in zip(gvs,arguments,initial_hints,positive_hints,negative_hints,jsons,smts):
             copy(gv, destination+fold+"Data/")
             copy(argument, destination+fold+"Data/")
             copy(initial_hint, destination + fold + "Data/")
@@ -269,10 +269,11 @@ def separate_datafold_and_get_statistic_data(rootdir="../benchmarks/LIA-lin/",fi
                 rmtree(root+"/extracted_data")
 
 
-def gather_all_train_data(src="../../benchmarks/LIA-lin/",dst="../../benchmarks/LIA-nonlin-trainData-noIntevals/"):
+def gather_all_train_data(src="../../benchmarks/LIA-lin/",dst="../../benchmarks/LIA-nonlin-trainData-noIntevals/",unique_file=False):
     temp_file='../benchmarks/temp'
     copytree(src,temp_file)
-    unique_names(temp_file)
+    if unique_file==True:
+        unique_names(temp_file)
     for root, subdirs, files in os.walk(temp_file):
         #print(root,subdirs,files)
         if len(subdirs)==1 and subdirs[0]=="trainData":

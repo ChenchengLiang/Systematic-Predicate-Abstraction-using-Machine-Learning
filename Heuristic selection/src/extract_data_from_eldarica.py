@@ -162,8 +162,8 @@ def main():
     #     # check_solvability_pool()
     #     extract_data_pool(benchmark)
 
-    add_GNN_inputs_and_auto_graphviz_to_extracted_data("../benchmarks/LIA-lin-extracted-noIntervals")
-    gather_all_train_data(src="../benchmarks/LIA-lin-extracted-noIntervals/",dst="../benchmarks/LIA-lin-trainData-noIntervals/")
+    #add_GNN_inputs_and_auto_graphviz_to_extracted_data("../benchmarks/LIA-lin-extracted-noIntervals")
+    #gather_all_train_data(src="../benchmarks/LIA-lin-extracted-noIntervals/",dst="../benchmarks/LIA-lin-trainData-noIntervals/")
     separate_dataset_to_train_valid_test_files("../benchmarks/LIA-lin-trainData-noIntervals/",
                                                "../benchmarks/LIA-lin-trainData-noIntervals-datafold/")
 
