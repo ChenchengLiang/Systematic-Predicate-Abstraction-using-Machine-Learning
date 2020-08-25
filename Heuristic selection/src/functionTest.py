@@ -12,6 +12,7 @@ import signal
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import re
+import glob
 def sleep(seconds=1):
     time.sleep(seconds)
     print("wait for",seconds)
@@ -75,11 +76,14 @@ def main():
     # first_layer_name= re.sub(r'(?<!^)(?=[A-Z])', '_', "InvariantNodeIdentifyTask").lower()
     # print(first_layer_name)
     #filePath="../benchmarks/LIA-lin/hopv/lia/termination/Ackermann00_000.smt2"
-    filePath="../benchmarks/sv-comp-c/05.c-1.smt2"
-    eld = subprocess.Popen(["../eldarica-graph-generation/eld", \
-                            filePath, "-getHornGraph"], stdout=subprocess.DEVNULL, shell=False)
-    eld.wait(timeout=60)
+    # filePath="../benchmarks/sv-comp-c/05.c-1.smt2"
+    # eld = subprocess.Popen(["../eldarica-graph-generation/eld", \
+    #                         filePath, "-getHornGraph"], stdout=subprocess.DEVNULL, shell=False)
+    # eld.wait(timeout=60)
 
+
+    x=sorted(glob.glob("../benchmarks/LIA-lin-extracted-intervals/hopv/lia/mochi/trainData/" + '*' + '.smt2'))
+    print(x)
 
 
 if __name__ == '__main__':

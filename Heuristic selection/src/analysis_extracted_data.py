@@ -21,40 +21,49 @@ def separate_dataset_to_train_valid_test_files(source,destination,train_rate=0.6
     print("test number", test)
 
     temp_shuffle=[]
-    for g,a,i,p,n in zip(sorted(glob.glob(source + '*' + '.gv')),sorted(glob.glob(source + '*' + '.arguments')),
+    for g,a,i,p,n,j in zip(sorted(glob.glob(source + '*' + 'auto.gv')),sorted(glob.glob(source + '*' + '.arguments')),
                    sorted(glob.glob(source + '*' + '.initialHints')),sorted(glob.glob(source + '*' + '.positiveHints')),
-                   sorted(glob.glob(source + '*' + '.negativeHints'))):
-        temp_shuffle.append([g,a,i,p,n])
+                   sorted(glob.glob(source + '*' + '.negativeHints')),sorted(glob.glob(source + '*' + '.JSON')),
+                           sorted(glob.glob(source + '*' + '.smt2'))):
+        temp_shuffle.append([g,a,i,p,n,j,s])
     random.shuffle(temp_shuffle)
     gv_files=[]
     arguments_files=[]
     initial_hints_files=[]
     positive_hints_files=[]
     negative_hints_files=[]
+    json_files=[]
+    smt2_files=[]
     for t in temp_shuffle:
         gv_files.append(t[0])
         arguments_files.append(t[1])
         initial_hints_files.append(t[2])
         positive_hints_files.append(t[3])
         negative_hints_files.append(t[4])
+        json_files.append(t[5])
+        smt2_files.append(t[6])
 
     gv_fold = [gv_files[:train],gv_files[train:train+valid],gv_files[train+valid:]]
     argument_fold = [arguments_files[:train], arguments_files[train:train + valid], arguments_files[train + valid:]]
     initial_hints_fold = [initial_hints_files[:train], initial_hints_files[train:train + valid], initial_hints_files[train + valid:]]
     positive_fold = [positive_hints_files[:train], positive_hints_files[train:train + valid], positive_hints_files[train + valid:]]
     negative_fold = [negative_hints_files[:train], negative_hints_files[train:train + valid], negative_hints_files[train + valid:]]
-    for gvs,arguments,initial_hints,positive_hints,negative_hints,fold in zip(gv_fold,argument_fold,initial_hints_fold,positive_fold,negative_fold,["train","valid","test"]):
+    json_fold=[json_files[:train], json_files[train:train + valid], json_files[train + valid:]]
+    smt2_fold = [smt2_files[:train], smt2_files[train:train + valid], smt2_files[train + valid:]]
+    for gvs,arguments,initial_hints,positive_hints,negative_hints,jsons,smt,fold in zip(gv_fold,argument_fold,initial_hints_fold,positive_fold,negative_fold,json_fold,smt2_fold,["train","valid","test"]):
         try:
             rmtree(destination+fold+"Data")
             os.mkdir(destination + fold + "Data")
         except:
             os.mkdir(destination+fold+"Data")
-        for gv,argument,initial_hint,positive_hint,negative_hint in zip(gvs,arguments,initial_hints,positive_hints,negative_hints):
+        for gv,argument,initial_hint,positive_hint,negative_hint,json in zip(gvs,arguments,initial_hints,positive_hints,negative_hints,jsons):
             copy(gv, destination+fold+"Data/")
             copy(argument, destination+fold+"Data/")
             copy(initial_hint, destination + fold + "Data/")
             copy(positive_hint, destination + fold + "Data/")
             copy(negative_hint, destination + fold + "Data/")
+            copy(json, destination + fold + "Data/")
+            copy(smt,destination + fold + "Data/")
 
 
 def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="analysis",path="../", curssor=0,buckets=10):
@@ -260,15 +269,18 @@ def separate_datafold_and_get_statistic_data(rootdir="../benchmarks/LIA-lin/",fi
                 rmtree(root+"/extracted_data")
 
 
-def gather_all_train_data(rootdir="../../benchmarks/LIA-lin/",dst="../../benchmarks/LIA-nonlin-trainData-noIntevals/"):
-
-    for root, subdirs, files in os.walk(rootdir):
+def gather_all_train_data(src="../../benchmarks/LIA-lin/",dst="../../benchmarks/LIA-nonlin-trainData-noIntevals/"):
+    temp_file='../benchmarks/temp'
+    copytree(src,temp_file)
+    unique_names(temp_file)
+    for root, subdirs, files in os.walk(temp_file):
         #print(root,subdirs,files)
         if len(subdirs)==1 and subdirs[0]=="trainData":
             srcname=root+"/trainData/"
             dstname=dst
-
             copy_tree(srcname,dstname)
+
+    rmtree(temp_file)
 
 def unique_names(rootdir):
     count=0
@@ -284,6 +296,7 @@ def unique_names(rootdir):
                 #print(preffix,count,suffix)
                 os.rename(file,preffix+"-"+str(count)+suffix)
             count += 1
+
 def main():
     benchmark_list = []
     #benchmark_list.append(["../benchmarks/trainData-chc-comp-predicates/", 120, 11, 30,".smt2"])
@@ -304,11 +317,13 @@ def main():
         #separate_datafold_and_get_statistic_data(rootdir=benchmark[0],file_type=".smt2",buckets=buckets)
 
 
-    unique_names("../benchmarks/temp")
-    #gather_all_train_data(rootdir="../benchmarks/LIA-nonlin-extracted-noIntervals/",dst="../benchmarks/LIA-nonlin-trainData-noIntevals/")
+    #unique_names("../benchmarks/temp")
 
+    #gather_all_train_data(src="../benchmarks/LIA-lin-extracted-intervals/",dst="../benchmarks/LIA-lin-trainData-intervals/")
+    separate_dataset_to_train_valid_test_files("../benchmarks/LIA-lin-trainData-noIntervals/","../benchmarks/LIA-lin-trainData-noIntervals-datafold/")
 
-    #separate_dataset_to_train_valid_test_files("../benchmarks/LIA-lin-traiData/", int(413*0.6), int(413*0.2), int(413*0.2))
     #get_statistic_data("../benchmarks/LIA-lin-traiData/")
 
-main()
+
+if __name__ == '__main__':
+    main()

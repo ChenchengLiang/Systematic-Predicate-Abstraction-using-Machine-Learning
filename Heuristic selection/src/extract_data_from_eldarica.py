@@ -8,6 +8,7 @@ from distutils.dir_util import copy_tree
 import gc
 import signal
 import psutil
+from analysis_extracted_data import gather_all_train_data,separate_dataset_to_train_valid_test_files
 
 # def check_solvability(timeOut,abstractionOption,benchmark_solvability_folders,file):
 #
@@ -65,7 +66,8 @@ def extract_one_file(parameterList):
     absTimeOut = parameterList[2]
     timeOut=parameterList[3]
     command = "../eldarica-graph-generation/./eld " \
-              + abstractionOption  + " -absTimeout:"+str(absTimeOut)+" -extractPredicates " +" -t:"+str(timeOut) + " -solvabilityTimeout:" + str(absTimeOut) +" -solvabilityTimeout:" + str(absTimeOut)
+              + abstractionOption  + " -absTimeout:"+str(absTimeOut)+" -extractPredicates " +" -t:"+str(timeOut) +\
+              " -solvabilityTimeout:" + str(absTimeOut) +" -solvabilityTimeout:" + str(absTimeOut) +" "
     run_p = command + filePath
 
     print("Command:", run_p)
@@ -105,8 +107,8 @@ def extract_one_file(parameterList):
 
 def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
 
-    absTimeout=60*3
-    timeout=60*3*20
+    absTimeout=60
+    timeout=absTimeout*20
 
     for root, subdirs, files in os.walk(rootdir):
         if os.path.exists(root + "/trainData"):
@@ -126,7 +128,7 @@ def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
             parameterList=[]
             for file in files:
                 parameterList.append([root+"/"+file,"-noIntervals",absTimeout,timeout])
-            pool = Pool(processes=8)
+            pool = Pool(processes=4)
 
             pool.map(extract_one_file, parameterList)
             pool.close()
@@ -154,22 +156,15 @@ def add_GNN_inputs_and_auto_graphviz_to_extracted_data(rootdir):
             for file in glob.glob("../trainData/*"):
                 os.remove(file)
 
-
-
-    # filePath = "../benchmarks/sv-comp-c/05.c-1.smt2"
-    # eld = subprocess.Popen(["../eldarica-graph-generation/eld", \
-    #                         filePath, "-getHornGraph"], stdout=subprocess.DEVNULL, shell=False)
-    # eld.wait(timeout=60)
-    #
-
 def main():
-    # benchmark_list = ["../benchmarks/LIA-lin-trainData-temp/"]
+    # benchmark_list = ["../benchmarks/LIA-lin-temp/"]
     # for benchmark in benchmark_list:
     #     # check_solvability_pool()
     #     extract_data_pool(benchmark)
-    # return True
 
-    add_GNN_inputs_and_auto_graphviz_to_extracted_data("../benchmarks/LIA-lin-extracted-temp/")
-
+    add_GNN_inputs_and_auto_graphviz_to_extracted_data("../benchmarks/LIA-lin-extracted-noIntervals")
+    gather_all_train_data(src="../benchmarks/LIA-lin-extracted-noIntervals/",dst="../benchmarks/LIA-lin-trainData-noIntervals/")
+    separate_dataset_to_train_valid_test_files("../benchmarks/LIA-lin-trainData-noIntervals/",
+                                               "../benchmarks/LIA-lin-trainData-noIntervals-datafold/")
 
 main()

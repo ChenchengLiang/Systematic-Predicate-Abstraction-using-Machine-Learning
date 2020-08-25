@@ -25,23 +25,28 @@ parsed_dot_format object includes multiple all graphs info.
 '''
 
 def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",split_flag=False,buckets=10,from_json=False,form_label=False):
-    if not os.path.isfile("../pickleData/"+"train-"+benchmark_name+"-gnnInput_train_data.txt"):
+    #if not os.path.isfile("../pickleData/"+"train-"+benchmark_name+"-gnnInput_train_data.txt"):
+    if force_read==True:
         write_graph_to_pickle(benchmark_name,  data_fold=["train", "valid", "test"], label=label,path=path,buckets=buckets,split_flag=split_flag,from_json=from_json,file_type=file_type)
-    if form_label == True and not os.path.isfile(
-            "../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):
+    else:
+        print("Use pickle data for training")
+    #if form_label == True and not os.path.isfile("../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):
+    if form_label == True:
         form_GNN_inputs_and_labels(label=label, datafold=["train", "valid", "test"], benchmark=benchmark_name)
+    else:
+        print("Use label in pickle data for training")
 
 
-    read_graph_from_pickle_file(benchmark_name,force_read=force_read,label=label,path=path,file_type=file_type)
-    nodeFeatureDim = 64
+    #read_graph_from_pickle_file(benchmark_name,force_read=force_read,label=label,path=path,file_type=file_type)
+    nodeFeatureDim = 2 #64
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
     parameters["message_calculation_class"]="rgcn"#rgcn,ggnn,rgat
     #parameters['num_heads'] = 2
-    parameters['hidden_dim'] = 64
+    parameters['hidden_dim'] = 2 #64
     parameters['num_layers'] = 1
     parameters['node_label_embedding_size'] = nodeFeatureDim
     parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
-    parameters['regression_hidden_layer_size'] = [64,64]
+    parameters['regression_hidden_layer_size'] = [2,2] #[64,64]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
 
@@ -96,8 +101,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             dataset,
             log_fun=log,
             run_id=run_id,
-            max_epochs=1000,
-            patience=50,
+            max_epochs=3,
+            patience=3,
             save_dir=save_dir,
             quiet=quiet,
             aml_run=None,
@@ -654,7 +659,7 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
         argument_identify = np.array([0] * len(node_label_ids))
         argument_identify[argument_indices] = 1
         total_nodes+=len(node_label_ids)
-        total_label += len(argument_identify)
+        total_label += sum(argument_identify)
         control_location_identify = np.array([0] * len(node_label_ids))
         control_location_identify[control_location_indices]=1
 

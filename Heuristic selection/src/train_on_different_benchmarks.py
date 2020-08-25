@@ -18,7 +18,7 @@ def main():
     benchmark_list.append(["../benchmarks/temp/", 0.6, 0.2, 0.2])
     # benchmark_list.append(["../benchmarks/one_graph_debug/", int(1), int(1), int(1)])
 
-    force_read = False
+    force_read = True
     split_flag = False
     form_label = True
     from_json=True
