@@ -9,7 +9,7 @@ import gc
 import signal
 import psutil
 from analysis_extracted_data import gather_all_train_data,separate_dataset_to_train_valid_test_files
-
+from Miscellaneous import copy_train_data_from_src_to_dst,clear_directory
 # def check_solvability(timeOut,abstractionOption,benchmark_solvability_folders,file):
 #
 #     solvability, runtime, flag = checkSolvability(timeOut, file, abstractionOption)
@@ -105,9 +105,10 @@ def extract_one_file(parameterList):
         return True
 
 
+
 def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
 
-    absTimeout=60
+    absTimeout=60*3
     timeout=absTimeout*20
 
     for root, subdirs, files in os.walk(rootdir):
@@ -117,13 +118,9 @@ def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
         print(root,subdirs,files)
 
         if len(subdirs)==0:
+            clear_directory("../trainData")
             print("extract data in",root)
-            if (os.path.exists("../trainData")):
-                shutil.rmtree("../trainData/")
-                os.mkdir("../trainData")
-
-            if not os.path.exists(root + "/trainData"):
-                os.makedirs(root + "/trainData")
+            clear_directory(root + "/trainData")
 
             parameterList=[]
             for file in files:
@@ -132,9 +129,8 @@ def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
 
             pool.map(extract_one_file, parameterList)
             pool.close()
-
-
             copy_tree("../trainData/", root + "/trainData")
+
 
     return True
 
@@ -156,15 +152,18 @@ def add_GNN_inputs_and_auto_graphviz_to_extracted_data(rootdir):
             for file in glob.glob("../trainData/*"):
                 os.remove(file)
 
-def main():
-    # benchmark_list = ["../benchmarks/LIA-lin-temp/"]
-    # for benchmark in benchmark_list:
-    #     # check_solvability_pool()
-    #     extract_data_pool(benchmark)
 
-    #add_GNN_inputs_and_auto_graphviz_to_extracted_data("../benchmarks/LIA-lin-extracted-noIntervals")
-    #gather_all_train_data(src="../benchmarks/LIA-lin-extracted-noIntervals/",dst="../benchmarks/LIA-lin-trainData-noIntervals/")
-    separate_dataset_to_train_valid_test_files("../benchmarks/LIA-lin-trainData-noIntervals/",
-                                               "../benchmarks/LIA-lin-trainData-noIntervals-datafold/")
+def main():
+    benchmark_list = ["../benchmarks/temp-train"]
+    for benchmark in benchmark_list:
+        # check_solvability_pool()
+        extract_data_pool(benchmark)
+
+    #add_GNN_inputs_and_auto_graphviz_to_extracted_data("../benchmarks/LIA-nonlin-extracted-noIntervals")
+    #gather_all_train_data(src="../benchmarks/LIA-nonlin-extracted-noIntervals/",dst="../benchmarks/LIA-nonlin-trainData-noIntervals/")
+    # separate_dataset_to_train_valid_test_files("../benchmarks/LIA-nonlin-trainData-noIntervals/",
+    #                                            "../benchmarks/LIA-nonlin-trainData-noIntervals-datafold/")
+
+    #copy_train_data_from_src_to_dst("../benchmarks/temp-train/train_data/wrong_extracted_cases/trainData/", "../benchmarks/temp-train/train_data")
 
 main()

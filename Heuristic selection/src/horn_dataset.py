@@ -17,6 +17,7 @@ import scipy.stats as ss
 import subprocess
 import json
 import glob
+import shutil
 from tf2_gnn.cli import test as model_test
 
 '''
@@ -114,6 +115,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         test_data = dataset.get_tensorflow_dataset(DataFold.TEST)
 
         #load model from files
+        print("trained_model_path",trained_model_path)
         loaded_model = tf2_gnn.cli_utils.model_utils.load_model_for_prediction(trained_model_path, dataset)
         _, _, test_results = loaded_model.run_one_epoch(test_data, training=False, quiet=quiet)
         test_metric, test_metric_string = loaded_model.compute_epoch_metrics(test_results)
@@ -553,15 +555,16 @@ def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","
 
 class parsed_dot_format:
     def __init__(self,graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
-                 graphs_argument_scores,total_number_of_node,graph_control_location_indices):
+                 graphs_argument_scores,total_number_of_node,graph_control_location_indices,file_name_list):
         self.graphs_node_label_ids=graphs_node_label_ids
         self.graphs_argument_indices=graphs_argument_indices
         self.graphs_adjacency_lists=graphs_adjacency_lists
         self.graphs_argument_scores=graphs_argument_scores
         self.total_number_of_node=total_number_of_node
         self.graph_control_location_indices=graph_control_location_indices
+        self.file_name_list=file_name_list
 
-def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../", buckets=0,split_flag=True,from_json=False,file_type=".smt2"):
+def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../", buckets=0,split_flag=False,from_json=False,file_type=".smt2"):
     benchmark_name = benchmark.replace("/", "-")
     for df in data_fold:
         print("write data_fold to pickle data:", df)
@@ -572,6 +575,7 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
         graphs_control_location_indices=[]
         total_number_of_node=0
         file_type=".smt2"
+        file_name_list=[]
 
         #read from .gv
         if split_flag==True:
@@ -591,11 +595,12 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
         # read from JSON
         if from_json==True:
             suffix=file_type
-            for fileGraph, fileArgument in zip(sorted(glob.glob(path +df+"Data/"+ '*' + suffix + '.JSON')),
-                                               sorted(glob.glob(path +df+"Data/"+ '*' + suffix + '.arguments'))):
+            for fileGraph, fileArgument in zip(sorted(glob.glob(path +df+"_data/"+ '*' + suffix + '.JSON')),
+                                               sorted(glob.glob(path +df+"_data/"+ '*' + suffix + '.arguments'))):
                 fileName = fileGraph[:fileGraph.find(suffix + ".JSON") + len(suffix)]
                 fileName = fileName[fileName.rindex("/") + 1:]
                 print(fileName)
+                file_name_list.append(fileGraph[:fileGraph.find(".JSON")])
 
                 # read graph
                 print(fileGraph)
@@ -616,7 +621,7 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
 
 
         pickle_data=parsed_dot_format(graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
-                                      graphs_argument_scores,total_number_of_node,graphs_control_location_indices)
+                                      graphs_argument_scores,total_number_of_node,graphs_control_location_indices,file_name_list)
         pickleWrite(pickle_data, "train-" + benchmark_name + "-gnnInput_" + df + "_data")
 
 
@@ -632,13 +637,14 @@ def form_GNN_inputs_and_labels(label="occurrence",datafold=["train", "valid", "t
         graphs_argument_scores = parsed_dot_file.graphs_argument_scores
         total_number_of_node = parsed_dot_file.total_number_of_node
         graphs_control_location_indices=parsed_dot_file.graph_control_location_indices
+        file_name_list =  parsed_dot_file.file_name_list
 
         form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists,
-                                graphs_argument_scores, total_number_of_node,graphs_control_location_indices, label, benchmark, df)
+                                graphs_argument_scores, total_number_of_node,graphs_control_location_indices, file_name_list,label, benchmark, df)
 
 
 def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists,
-                            graphs_argument_scores, total_number_of_node,graphs_control_location_indices, label, benchmark, df):
+                            graphs_argument_scores, total_number_of_node,graphs_control_location_indices, file_name_list,label, benchmark, df):
     final_graphs_v1 = []
 
     raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists[0]), total_number_of_node)
@@ -647,11 +653,15 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
 
     total_label=0
     total_nodes=0
-    for node_label_ids, argument_indices, adjacency_lists, argument_scores,control_location_indices in zip(graphs_node_label_ids,
+
+    directory_wrong_extracted_cases=file_name_list[0][:file_name_list[0].rfind("/")+1]+"wrong_extracted_cases"
+    if not os.path.exists(directory_wrong_extracted_cases):
+        os.makedirs(directory_wrong_extracted_cases)
+    for node_label_ids, argument_indices, adjacency_lists, argument_scores,control_location_indices, file_name in zip(graphs_node_label_ids,
                                                                                   graphs_argument_indices,
                                                                                   graphs_adjacency_lists,
                                                                                   graphs_argument_scores,
-                                                                                  graphs_control_location_indices):
+                                                                                  graphs_control_location_indices,file_name_list):
         # convert to rank
         ranked_argument_scores = ss.rankdata(argument_scores, method="dense")
         raw_data_graph.ranked_argument_scores.append(ranked_argument_scores)
@@ -659,9 +669,19 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
         argument_identify = np.array([0] * len(node_label_ids))
         argument_identify[argument_indices] = 1
         total_nodes+=len(node_label_ids)
-        total_label += sum(argument_identify)
+        total_label += len(argument_indices)
         control_location_identify = np.array([0] * len(node_label_ids))
         control_location_identify[control_location_indices]=1
+
+        #If .argument file has different number of argument with JSON file. copy that file to wrong_extracted_cases
+        if len(argument_indices)!=len(argument_scores):
+            print("------------------argument_scores != argument_indices-------------------------")
+            print("argument_scores", len(argument_scores))
+            print("argument_indices", len(argument_indices))
+            print(file_name)
+            shutil.copy(file_name, directory_wrong_extracted_cases)
+
+
 
         raw_data_graph.argument_identify.append(argument_identify)
         raw_data_graph.control_location_identify.append(control_location_identify)

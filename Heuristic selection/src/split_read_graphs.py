@@ -10,7 +10,7 @@ def main():
     label=sys.argv[5]
     buckets = sys.argv[6]
     reading_type=sys.argv[7]
-    graphInfoList = DotToGraphInfo(df + "Data", path)
+    graphInfoList = DotToGraphInfo(df + "_data", path)
     graphInfoList._split_flag = curssor
     graphInfoList._file_type=file_type
     graphInfoList._buckets=int(buckets)

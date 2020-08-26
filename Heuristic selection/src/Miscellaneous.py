@@ -6,6 +6,31 @@ import pickle
 import os,glob,shutil,gc
 from pathlib import Path
 
+
+def clear_directory(name):
+    if os.path.exists(name):
+        shutil.rmtree(name)
+        os.makedirs(name)
+    else:
+        os.makedirs(name)
+
+def copy_train_data_from_src_to_dst(src,dst):
+    arguments_file_list=glob.glob(src+"*.arguments")
+    initial_hints_file_list=glob.glob(src+"*.initialHints")
+    negative_hints_file_list = glob.glob(src + "*.negativeHints")
+    positive_hints_file_list = glob.glob(src + "*.positiveHints")
+    json_file_list = glob.glob(src + "*.JSON")
+    original_file_list = glob.glob(src + "*.smt2")
+    auto_gv_file_list = glob.glob(src + "*auto.gv")
+    for arguments_file,initial_hints_file,negative_hints_file,positive_hints_file,json_file,original_file,auto_gv_file in zip(arguments_file_list,initial_hints_file_list,negative_hints_file_list,positive_hints_file_list,json_file_list,original_file_list,auto_gv_file_list):
+        shutil.copy(arguments_file, dst)
+        shutil.copy(initial_hints_file, dst)
+        shutil.copy(negative_hints_file, dst)
+        shutil.copy(positive_hints_file, dst)
+        shutil.copy(json_file, dst)
+        shutil.copy(original_file, dst)
+        shutil.copy(auto_gv_file, dst)
+
 def renameBenchmarkFiles():
 
     counter=0

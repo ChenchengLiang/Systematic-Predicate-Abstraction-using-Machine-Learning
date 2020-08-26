@@ -52,18 +52,18 @@ def separate_dataset_to_train_valid_test_files(source,destination,train_rate=0.6
     smt2_fold = [smt2_files[:train], smt2_files[train:train + valid], smt2_files[train + valid:]]
     for gvs,arguments,initial_hints,positive_hints,negative_hints,jsons,smts,fold in zip(gv_fold,argument_fold,initial_hints_fold,positive_fold,negative_fold,json_fold,smt2_fold,["train","valid","test"]):
         try:
-            rmtree(destination+fold+"Data")
-            os.mkdir(destination + fold + "Data")
+            rmtree(destination+fold+"_data")
+            os.mkdir(destination + fold + "_data")
         except:
-            os.mkdir(destination+fold+"Data")
+            os.mkdir(destination+fold+"_data")
         for gv,argument,initial_hint,positive_hint,negative_hint,json,smt in zip(gvs,arguments,initial_hints,positive_hints,negative_hints,jsons,smts):
-            copy(gv, destination+fold+"Data/")
-            copy(argument, destination+fold+"Data/")
-            copy(initial_hint, destination + fold + "Data/")
-            copy(positive_hint, destination + fold + "Data/")
-            copy(negative_hint, destination + fold + "Data/")
-            copy(json, destination + fold + "Data/")
-            copy(smt,destination + fold + "Data/")
+            copy(gv, destination+fold+"_data")
+            copy(argument, destination+fold+"_data")
+            copy(initial_hint, destination + fold + "_data")
+            copy(positive_hint, destination + fold + "_data")
+            copy(negative_hint, destination + fold + "_data")
+            copy(json, destination + fold + "_data")
+            copy(smt,destination + fold + "_data")
 
 
 def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="analysis",path="../", curssor=0,buckets=10):
