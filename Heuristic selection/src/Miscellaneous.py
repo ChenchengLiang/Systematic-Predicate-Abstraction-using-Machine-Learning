@@ -7,12 +7,44 @@ import os,glob,shutil,gc
 from pathlib import Path
 
 
+def remove_list_of_file(name):
+    if os.path.exists(name):
+        os.remove(name)
+    if os.path.exists(name+".initialHints"):
+        os.remove(name+".initialHints")
+    if os.path.exists(name+".negativeHints"):
+        os.remove(name+".negativeHints")
+    if os.path.exists(name+".positiveHints"):
+        os.remove(name+".positiveHints")
+    if os.path.exists(name+"-auto.gv"):
+        os.remove(name+"-auto.gv")
+    if os.path.exists(name+".JSON"):
+        os.remove(name+".JSON")
+    if os.path.exists(name+".HornGraph"):
+        os.remove(name+".HornGraph")
+    if os.path.exists(name+".horn"):
+        os.remove(name+".horn")
+    if os.path.exists(name+".arguments"):
+        os.remove(name+".arguments")
+    if os.path.exists(name+".gv"):
+        os.remove(name+".gv")
+
+
 def clear_directory(name):
     if os.path.exists(name):
         shutil.rmtree(name)
         os.makedirs(name)
     else:
         os.makedirs(name)
+def clear_file(name):
+    if os.path.exists(name):
+        os.remove(name)
+        with open(name, 'w') as fp:
+            pass
+    else:
+        with open(name, 'w') as fp:
+            pass
+
 
 def copy_train_data_from_src_to_dst(src,dst):
     arguments_file_list=glob.glob(src+"*.arguments")

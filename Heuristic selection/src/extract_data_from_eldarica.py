@@ -154,16 +154,20 @@ def add_GNN_inputs_and_auto_graphviz_to_extracted_data(rootdir):
 
 
 def main():
-    benchmark_list = ["../benchmarks/temp-train"]
-    for benchmark in benchmark_list:
-        # check_solvability_pool()
-        extract_data_pool(benchmark)
+    # benchmark_list = ["../benchmarks/temp-train-2"]
+    # for benchmark in benchmark_list:
+    #     # check_solvability_pool()
+    #     extract_data_pool(benchmark)
 
     #add_GNN_inputs_and_auto_graphviz_to_extracted_data("../benchmarks/LIA-nonlin-extracted-noIntervals")
     #gather_all_train_data(src="../benchmarks/LIA-nonlin-extracted-noIntervals/",dst="../benchmarks/LIA-nonlin-trainData-noIntervals/")
-    # separate_dataset_to_train_valid_test_files("../benchmarks/LIA-nonlin-trainData-noIntervals/",
-    #                                            "../benchmarks/LIA-nonlin-trainData-noIntervals-datafold/")
+    separate_dataset_to_train_valid_test_files("../benchmarks/temp-train-3/",
+                                               "../benchmarks/temp-train-4/")
 
-    #copy_train_data_from_src_to_dst("../benchmarks/temp-train/train_data/wrong_extracted_cases/trainData/", "../benchmarks/temp-train/train_data")
+    #copy_train_data_from_src_to_dst("../benchmarks/temp-train-2/train_data/wrong_extracted_cases/trainData/", "../benchmarks/temp-train-2/train_data")
+    # copy_train_data_from_src_to_dst("../benchmarks/temp-train-2/valid_data/wrong_extracted_cases/trainData/",
+    #                                 "../benchmarks/temp-train-2/valid_data")
+    # copy_train_data_from_src_to_dst("../benchmarks/temp-train-2/test_data/wrong_extracted_cases/trainData/",
+    #                                 "../benchmarks/temp-train-2/test_data")
 
 main()

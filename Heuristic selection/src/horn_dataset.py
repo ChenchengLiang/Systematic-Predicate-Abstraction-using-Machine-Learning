@@ -39,15 +39,15 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
 
 
     #read_graph_from_pickle_file(benchmark_name,force_read=force_read,label=label,path=path,file_type=file_type)
-    nodeFeatureDim = 2 #64
+    nodeFeatureDim = 64 #64
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
     parameters["message_calculation_class"]="rgcn"#rgcn,ggnn,rgat
     #parameters['num_heads'] = 2
-    parameters['hidden_dim'] = 2 #64
+    parameters['hidden_dim'] = 64 #64
     parameters['num_layers'] = 1
     parameters['node_label_embedding_size'] = nodeFeatureDim
     parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
-    parameters['regression_hidden_layer_size'] = [2,2] #[64,64]
+    parameters['regression_hidden_layer_size'] = [64,64] #[64,64]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
 
@@ -102,8 +102,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             dataset,
             log_fun=log,
             run_id=run_id,
-            max_epochs=3,
-            patience=3,
+            max_epochs=1000,
+            patience=100,
             save_dir=save_dir,
             quiet=quiet,
             aml_run=None,
@@ -247,18 +247,10 @@ def write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss,valid
 
         out_file.write("accuracy list:" + str(accuracy_list) + "\n")
         out_file.write("mean accuracy:" + str(mean_accuracy) + "\n")
-        # transform results to ranks
-        argument_number_lists = []
-        for arguments in dataset._argument_scores["test"]:
-            argument_number_lists.append(len(arguments))
-        argument_lists = []
-        for i, n in enumerate(argument_number_lists):
-            argument_lists.append(
-                predicted_Y_loaded_model[sum(argument_number_lists[:i]):sum(argument_number_lists[:i]) + n])
 
+        predicted_argument_lists=get_predicted_argument_list_divided_by_file(dataset, predicted_Y_loaded_model)
         mse_list=[]
-        #todo:write ranked arguments to corresponding files
-        for predicted_arguments, arguments,ranks in zip(argument_lists,dataset._argument_scores["test"],dataset._ranked_argument_scores["test"]):
+        for predicted_arguments, arguments,ranks in zip(predicted_argument_lists,dataset._argument_scores["test"],dataset._ranked_argument_scores["test"]):
             out_file.write("-------"+ "\n")
             out_file.write("original argument scores:"+ str(arguments)+ "\n")
             out_file.write("original rank:"+ str(ranks)+ "\n")
@@ -277,6 +269,16 @@ def write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss,valid
         plt.savefig("trained_model/" + label + "-" + benchmark + "-test-mse.png")
         plt.clf()
 
+
+def get_predicted_argument_list_divided_by_file(dataset,predicted_Y_loaded_model):
+    argument_number_lists = []
+    for arguments in dataset._argument_scores["test"]:
+        argument_number_lists.append(len(arguments))
+    predicted_argument_lists = []
+    for i, n in enumerate(argument_number_lists):
+        predicted_argument_lists.append(
+            predicted_Y_loaded_model[sum(argument_number_lists[:i]):sum(argument_number_lists[:i]) + n])
+    return predicted_argument_lists
 
 
 class HornGraphSample(GraphSample):
@@ -308,6 +310,7 @@ class raw_graph_inputs():
         self.final_graphs=None
         self.argument_scores=[]
         self.ranked_argument_scores=[]
+        self.file_names=[]
         self.argument_identify=[]
         self.control_location_identify=[]
         self.label_size=0
@@ -322,6 +325,7 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         self._loaded_data: Dict[DataFold, List[GraphSample]] = {}
         self._argument_scores={}
         self._ranked_argument_scores = {}
+        self._file_list={}
         self._benchmark=params["benchmark"]
         self.label_type=params["label_type"]
         self._node_vocab_size=0
@@ -379,6 +383,7 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         self._argument_scores[data_name]=raw_inputs.argument_scores
         # print("raw_inputs.ranked_argument_scores",raw_inputs.ranked_argument_scores)
         self._ranked_argument_scores[data_name] = raw_inputs.ranked_argument_scores
+        self._file_list[data_name] = raw_inputs.file_names
 
         return final_graphs
 
@@ -599,7 +604,7 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                                                sorted(glob.glob(path +df+"_data/"+ '*' + suffix + '.arguments'))):
                 fileName = fileGraph[:fileGraph.find(suffix + ".JSON") + len(suffix)]
                 fileName = fileName[fileName.rindex("/") + 1:]
-                print(fileName)
+                print("fileName",fileName)
                 file_name_list.append(fileGraph[:fileGraph.find(".JSON")])
 
                 # read graph
@@ -613,8 +618,8 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                     graphs_control_location_indices.append(loaded_graph["controlLocationIndices"])
                     total_number_of_node += len(loaded_graph["nodeIds"])
 
-                # read argument
-                print(fileArgument)
+                # read argument from .argument file
+                print("read argument from",fileArgument)
                 with open(fileArgument) as f:
                     parsed_arguments = parseArguments(f.read())
                     graphs_argument_scores.append([int(argument.score) for argument in parsed_arguments])
@@ -664,8 +669,6 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                                                                                   graphs_control_location_indices,file_name_list):
         # convert to rank
         ranked_argument_scores = ss.rankdata(argument_scores, method="dense")
-        raw_data_graph.ranked_argument_scores.append(ranked_argument_scores)
-        raw_data_graph.argument_scores.append(argument_scores)
         argument_identify = np.array([0] * len(node_label_ids))
         argument_identify[argument_indices] = 1
         total_nodes+=len(node_label_ids)
@@ -673,103 +676,106 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
         control_location_identify = np.array([0] * len(node_label_ids))
         control_location_identify[control_location_indices]=1
 
-        #If .argument file has different number of argument with JSON file. copy that file to wrong_extracted_cases
+        #If .argument file has different number of argument with JSON file. copy that file to wrong_extracted_cases. and do not append this file
         if len(argument_indices)!=len(argument_scores):
             print("------------------argument_scores != argument_indices-------------------------")
             print("argument_scores", len(argument_scores))
             print("argument_indices", len(argument_indices))
             print(file_name)
             shutil.copy(file_name, directory_wrong_extracted_cases)
-
-
-
-        raw_data_graph.argument_identify.append(argument_identify)
-        raw_data_graph.control_location_identify.append(control_location_identify)
-        raw_data_graph._total_number_of_nodes+=len(graphs_node_label_ids)
-
-
-        if label == "rank":
-            final_graphs_v1.append(
-                HornGraphSample(
-                    adjacency_lists=tuple(adjacency_lists),
-                    node_features=tf.constant(node_label_ids),
-                    node_label=tf.constant(ranked_argument_scores),
-                    # node_label=tf.constant(argument_scores),
-                    node_argument=tf.constant(argument_indices),
-                    current_node_index=tf.constant([]),
-                    node_control_location=tf.constant(control_location_indices)
-                )
-            )
-            raw_data_graph.label_size+=len(ranked_argument_scores)
-        elif label == "occurrence":
-            final_graphs_v1.append(
-                HornGraphSample(
-                    adjacency_lists=tuple(adjacency_lists),
-                    node_features=tf.constant(node_label_ids),
-                    # node_label=tf.constant(ranked_argument_scores),
-                    node_label=tf.constant(argument_scores),  # argument_scores
-                    node_argument=tf.constant(argument_indices),
-                    current_node_index=tf.constant([]),
-                    node_control_location=tf.constant(control_location_indices)
-                )
-            )
-            raw_data_graph.label_size += len(argument_scores)
-        elif label == "argument_identify":
-            final_graphs_v1.append(
-                HornGraphSample(
-                    adjacency_lists=tuple(adjacency_lists),
-                    node_features=tf.constant(node_label_ids),
-                    # node_label=tf.constant(ranked_argument_scores),
-                    node_label=tf.constant(argument_identify),
-                    node_argument=tf.constant(argument_indices),
-                    current_node_index=tf.constant([]),
-                    node_control_location=tf.constant(control_location_indices)
-                )
-            )
-            raw_data_graph.label_size += len(argument_identify)
-        elif label == "control_location_identify":
-            final_graphs_v1.append(
-                HornGraphSample(
-                    adjacency_lists=tuple(adjacency_lists),
-                    node_features=tf.constant(node_label_ids),
-                    # node_label=tf.constant(ranked_argument_scores),
-                    node_label=tf.constant(control_location_identify),
-                    node_argument=tf.constant(argument_indices),
-                    current_node_index=tf.constant([]),
-                    node_control_location=tf.constant(control_location_indices)
-                )
-            )
-            raw_data_graph.label_size += len(control_location_identify)
-        elif label == "argument_identify_no_batchs":
-            raw_data_graph.label_size += len(node_label_ids)
-            for i in node_label_ids:
-                if i in argument_indices:
-                    final_graphs_v1.append(
-                        HornGraphSample(
-                            adjacency_lists=tuple(adjacency_lists),
-                            node_features=tf.constant(node_label_ids),
-                            # node_label=tf.constant(ranked_argument_scores),
-                            node_label=tf.constant([1]),
-                            node_argument=tf.constant(argument_indices),
-                            current_node_index=tf.constant([i]),
-                            node_control_location=tf.constant(control_location_indices)
-                        )
-                    )
-
-                else:
-                    final_graphs_v1.append(
-                        HornGraphSample(
-                            adjacency_lists=tuple(adjacency_lists),
-                            node_features=tf.constant(node_label_ids),
-                            # node_label=tf.constant(ranked_argument_scores),
-                            node_label=tf.constant([0]),
-                            node_argument=tf.constant(argument_indices),
-                            current_node_index=tf.constant([i]),
-                            node_control_location=tf.constant(control_location_indices)
-                        )
-                    )
+            from Miscellaneous import remove_list_of_file
+            remove_list_of_file(file_name)
         else:
-            pass
+            raw_data_graph.argument_identify.append(argument_identify)
+            raw_data_graph.control_location_identify.append(control_location_identify)
+            raw_data_graph._total_number_of_nodes+=len(graphs_node_label_ids)
+            raw_data_graph.ranked_argument_scores.append(ranked_argument_scores)
+            raw_data_graph.argument_scores.append(argument_scores)
+            raw_data_graph.file_names.append(file_name)
+
+
+            if label == "rank":
+                final_graphs_v1.append(
+                    HornGraphSample(
+                        adjacency_lists=tuple(adjacency_lists),
+                        node_features=tf.constant(node_label_ids),
+                        node_label=tf.constant(ranked_argument_scores),
+                        # node_label=tf.constant(argument_scores),
+                        node_argument=tf.constant(argument_indices),
+                        current_node_index=tf.constant([]),
+                        node_control_location=tf.constant(control_location_indices)
+                    )
+                )
+                raw_data_graph.label_size+=len(ranked_argument_scores)
+            elif label == "occurrence":
+                final_graphs_v1.append(
+                    HornGraphSample(
+                        adjacency_lists=tuple(adjacency_lists),
+                        node_features=tf.constant(node_label_ids),
+                        # node_label=tf.constant(ranked_argument_scores),
+                        node_label=tf.constant(argument_scores),  # argument_scores
+                        node_argument=tf.constant(argument_indices),
+                        current_node_index=tf.constant([]),
+                        node_control_location=tf.constant(control_location_indices)
+                    )
+                )
+                raw_data_graph.label_size += len(argument_scores)
+            elif label == "argument_identify":
+                final_graphs_v1.append(
+                    HornGraphSample(
+                        adjacency_lists=tuple(adjacency_lists),
+                        node_features=tf.constant(node_label_ids),
+                        # node_label=tf.constant(ranked_argument_scores),
+                        node_label=tf.constant(argument_identify),
+                        node_argument=tf.constant(argument_indices),
+                        current_node_index=tf.constant([]),
+                        node_control_location=tf.constant(control_location_indices)
+                    )
+                )
+                raw_data_graph.label_size += len(argument_identify)
+            elif label == "control_location_identify":
+                final_graphs_v1.append(
+                    HornGraphSample(
+                        adjacency_lists=tuple(adjacency_lists),
+                        node_features=tf.constant(node_label_ids),
+                        # node_label=tf.constant(ranked_argument_scores),
+                        node_label=tf.constant(control_location_identify),
+                        node_argument=tf.constant(argument_indices),
+                        current_node_index=tf.constant([]),
+                        node_control_location=tf.constant(control_location_indices)
+                    )
+                )
+                raw_data_graph.label_size += len(control_location_identify)
+            elif label == "argument_identify_no_batchs":
+                raw_data_graph.label_size += len(node_label_ids)
+                for i in node_label_ids:
+                    if i in argument_indices:
+                        final_graphs_v1.append(
+                            HornGraphSample(
+                                adjacency_lists=tuple(adjacency_lists),
+                                node_features=tf.constant(node_label_ids),
+                                # node_label=tf.constant(ranked_argument_scores),
+                                node_label=tf.constant([1]),
+                                node_argument=tf.constant(argument_indices),
+                                current_node_index=tf.constant([i]),
+                                node_control_location=tf.constant(control_location_indices)
+                            )
+                        )
+
+                    else:
+                        final_graphs_v1.append(
+                            HornGraphSample(
+                                adjacency_lists=tuple(adjacency_lists),
+                                node_features=tf.constant(node_label_ids),
+                                # node_label=tf.constant(ranked_argument_scores),
+                                node_label=tf.constant([0]),
+                                node_argument=tf.constant(argument_indices),
+                                current_node_index=tf.constant([i]),
+                                node_control_location=tf.constant(control_location_indices)
+                            )
+                        )
+            else:
+                pass
     raw_data_graph.final_graphs = final_graphs_v1.copy()
     pickleWrite(raw_data_graph, label + "-" + benchmark + "-gnnInput_" + df + "_data")
     print("total_label",total_label)

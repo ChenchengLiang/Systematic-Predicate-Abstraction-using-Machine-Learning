@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import errno
 from distutils.dir_util import copy_tree
-from Miscellaneous import pickleRead,pickleWrite
+from Miscellaneous import pickleRead,pickleWrite,clear_directory
 import subprocess
 def separate_dataset_to_train_valid_test_files(source,destination,train_rate=0.6,valid_rate=0.2,test_rate=0.2):
     print("source file",source)
@@ -19,6 +19,8 @@ def separate_dataset_to_train_valid_test_files(source,destination,train_rate=0.6
     print("train number",train)
     print("valid number", valid)
     print("test number", test)
+
+    clear_directory(destination)
 
     temp_shuffle=[]
     for g,a,i,p,n,j,s in zip(sorted(glob.glob(source + '*' + 'auto.gv')),sorted(glob.glob(source + '*' + '.arguments')),
