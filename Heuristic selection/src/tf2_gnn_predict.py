@@ -18,7 +18,7 @@ def write_predicted_argument_score_to_file(dataset,predicted_Y_loaded_model):
             clear_file(file + ".predicted_argument")
             with open(file + ".predicted_argument", 'w') as out_file:
                 for argument,score in zip(parsed_arguments,predicted_argument_score):
-                    out_file.write(argument.ID+":"+argument.head+":"+argument.arg+":"+str(int(score))+"\n")
+                    out_file.write(argument.ID+":"+argument.head+":"+argument.arg+":"+str(float(score))+"\n")
 
 def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score_list):
     # write predicted_argument_score to JSON file
@@ -28,12 +28,13 @@ def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score
         # read JSON file and add predicted_argument_score to json object
         with open(json_file) as f:
             loaded_graph = json.load(f)
-            json_obj["nodeIds"] = (loaded_graph["nodeIds"])
-            json_obj["binaryAdjacentList"] = np.array(loaded_graph["binaryAdjacentList"])
-            json_obj["tenaryAdjacencyList"] = np.array(loaded_graph["tenaryAdjacencyList"])
+            json_obj["nodeIds"] = loaded_graph["nodeIds"]
+            json_obj["binaryAdjacentList"] = loaded_graph["binaryAdjacentList"]
+            json_obj["tenaryAdjacencyList"] = loaded_graph["tenaryAdjacencyList"]
             json_obj["argumentIndices"] = loaded_graph["argumentIndices"]
             json_obj["controlLocationIndices"] = loaded_graph["controlLocationIndices"]
-            json_obj["predictedArgumentScores"] = predicted_argument_score
+            json_obj["predictedArgumentScores"] = list(predicted_argument_score.numpy().astype(float))
+
         # write json object to JSON file
         clear_file(json_file)
         with open(json_file, 'w') as f:
@@ -41,7 +42,7 @@ def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score
 
 
 def main():
-    path="../benchmarks/temp-test/"
+    path="../benchmarks/temp-test-2/"
     benchmark_name = path[len("../benchmarks/"):-1]
     force_read=True
     form_label=True
@@ -62,7 +63,7 @@ def main():
 
     quiet=False
     #trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2020-08-27_02-14-44_best.pkl"
-    trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2020-08-27_20-37-14_best.pkl"
+    trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2020-08-27_21-51-45_best.pkl"
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
     parameters["benchmark"] = benchmark_name
     parameters["label_type"] = label
