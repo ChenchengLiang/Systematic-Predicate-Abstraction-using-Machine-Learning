@@ -23,6 +23,15 @@ def write_predicted_argument_score_to_file(dataset,predicted_Y_loaded_model):
 def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score_list):
     # write predicted_argument_score to JSON file
     for file, predicted_argument_score in zip(dataset._file_list["test"], predicted_argument_score_list):
+        argument_file = file + ".arguments"
+        argument_ID_list=[]
+        argument_name_list=[] #head:arg
+        with open(argument_file) as f:
+            parsed_arguments = parseArguments(f.read())
+            for argument in parsed_arguments:
+                argument_ID_list.append(int(argument.ID))
+                argument_name_list.append(argument.head+":"+argument.arg)
+
         json_file = file + ".JSON"
         json_obj = {}
         # read JSON file and add predicted_argument_score to json object
@@ -34,6 +43,8 @@ def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score
             json_obj["argumentIndices"] = loaded_graph["argumentIndices"]
             json_obj["controlLocationIndices"] = loaded_graph["controlLocationIndices"]
             json_obj["predictedArgumentScores"] = list(predicted_argument_score.numpy().astype(float))
+            json_obj["argumentIDList"] = argument_ID_list
+            json_obj["argumentNameList"]= argument_name_list
 
         # write json object to JSON file
         clear_file(json_file)
