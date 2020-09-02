@@ -81,9 +81,12 @@ def main():
     #                         filePath, "-getHornGraph"], stdout=subprocess.DEVNULL, shell=False)
     # eld.wait(timeout=60)
 
+    # x=sorted(glob.glob("../benchmarks/LIA-lin-extracted-intervals/hopv/lia/mochi/trainData/" + '*' + '.smt2'))
+    # print(x)
 
-    x=sorted(glob.glob("../benchmarks/LIA-lin-extracted-intervals/hopv/lia/mochi/trainData/" + '*' + '.smt2'))
-    print(x)
+    json_file="xadasd.smt2.JSON"
+    smt2_file=json_file[:json_file.find(".JSON")]
+    print(smt2_file)
 
 
 if __name__ == '__main__':

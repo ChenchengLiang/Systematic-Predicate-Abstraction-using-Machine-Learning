@@ -23,14 +23,16 @@ def write_predicted_argument_score_to_file(dataset,predicted_Y_loaded_model):
 def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score_list):
     # write predicted_argument_score to JSON file
     for file, predicted_argument_score in zip(dataset._file_list["test"], predicted_argument_score_list):
-        argument_file = file + ".arguments"
-        argument_ID_list=[]
-        argument_name_list=[] #head:arg
-        with open(argument_file) as f:
-            parsed_arguments = parseArguments(f.read())
-            for argument in parsed_arguments:
-                argument_ID_list.append(int(argument.ID))
-                argument_name_list.append(argument.head+":"+argument.arg)
+        # # read argument id and name from .argument file
+        # argument_file = file + ".arguments"
+        # argument_ID_list=[]
+        # argument_name_list=[] #head:arg
+        # with open(argument_file) as f:
+        #     parsed_arguments = parseArguments(f.read())
+        #     for argument in parsed_arguments:
+        #         argument_ID_list.append(int(argument.ID))
+        #         argument_name_list.append(argument.head+":"+argument.arg)
+
 
         json_file = file + ".JSON"
         json_obj = {}
@@ -43,8 +45,8 @@ def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score
             json_obj["argumentIndices"] = loaded_graph["argumentIndices"]
             json_obj["controlLocationIndices"] = loaded_graph["controlLocationIndices"]
             json_obj["predictedArgumentScores"] = list(predicted_argument_score.numpy().astype(float))
-            json_obj["argumentIDList"] = argument_ID_list
-            json_obj["argumentNameList"]= argument_name_list
+            json_obj["argumentIDList"] = loaded_graph["argumentIDList"]
+            json_obj["argumentNameList"]= loaded_graph["argumentNameList"]
 
         # write json object to JSON file
         clear_file(json_file)
@@ -53,7 +55,9 @@ def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score
 
 
 def main():
-    path="../benchmarks/temp-test-2/"
+    path="../benchmarks/temp-extract-trainData-datafold-test/"
+    trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2020-09-02_00-55-19_best.pkl"
+
     benchmark_name = path[len("../benchmarks/"):-1]
     force_read=True
     form_label=True
@@ -73,8 +77,8 @@ def main():
 
 
     quiet=False
-    #trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2020-08-27_02-14-44_best.pkl"
-    trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2020-08-27_21-51-45_best.pkl"
+
+
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
     parameters["benchmark"] = benchmark_name
     parameters["label_type"] = label

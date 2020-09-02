@@ -1,6 +1,6 @@
 from typing import Any, Dict,Optional
 import tensorflow as tf
-from dotToGraphInfo import GraphInfo,ArgumentInfo,DotToGraphInfo,parseArguments
+from dotToGraphInfo import GraphInfo,ArgumentInfo,DotToGraphInfo,parseArguments,parseArgumentsFromJson
 import tf2_gnn
 from horn_graph_argument_selection_task import InvariantArgumentSelectionTask,InvariantNodeIdentifyTask
 from tf2_gnn.data import GraphDataset,GraphSample,DataFold,GraphBatchTFDataDescription
@@ -103,7 +103,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             log_fun=log,
             run_id=run_id,
             max_epochs=1000,
-            patience=100,
+            patience=50,
             save_dir=save_dir,
             quiet=quiet,
             aml_run=None,
@@ -560,7 +560,7 @@ def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","
 
 class parsed_dot_format:
     def __init__(self,graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
-                 graphs_argument_scores,total_number_of_node,graph_control_location_indices,file_name_list):
+                 graphs_argument_scores,total_number_of_node,graph_control_location_indices,file_name_list,parsed_arguments):
         self.graphs_node_label_ids=graphs_node_label_ids
         self.graphs_argument_indices=graphs_argument_indices
         self.graphs_adjacency_lists=graphs_adjacency_lists
@@ -568,6 +568,7 @@ class parsed_dot_format:
         self.total_number_of_node=total_number_of_node
         self.graph_control_location_indices=graph_control_location_indices
         self.file_name_list=file_name_list
+        self.parsed_arguments=parsed_arguments
 
 def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../", buckets=0,split_flag=False,from_json=False,file_type=".smt2"):
     benchmark_name = benchmark.replace("/", "-")
@@ -608,7 +609,7 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                 file_name_list.append(fileGraph[:fileGraph.find(".JSON")])
 
                 # read graph
-                print(fileGraph)
+                print("read graph from",fileGraph)
                 with open(fileGraph) as f:
                     loaded_graph = json.load(f)
                     graphs_node_label_ids.append(loaded_graph["nodeIds"])
@@ -617,16 +618,19 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                     graphs_argument_indices.append(loaded_graph["argumentIndices"])
                     graphs_control_location_indices.append(loaded_graph["controlLocationIndices"])
                     total_number_of_node += len(loaded_graph["nodeIds"])
-
-                # read argument from .argument file
-                print("read argument from",fileArgument)
-                with open(fileArgument) as f:
-                    parsed_arguments = parseArguments(f.read())
+                    # read argument from JSON file
+                    parsed_arguments = parseArgumentsFromJson(loaded_graph["argumentIDList"],loaded_graph["argumentNameList"],loaded_graph["argumentOccurrence"])
                     graphs_argument_scores.append([int(argument.score) for argument in parsed_arguments])
+
+                # # read argument from .argument file
+                # print("read argument from",fileArgument)
+                # with open(fileArgument) as f:
+                #     parsed_arguments = parseArguments(f.read())
+                #     graphs_argument_scores.append([int(argument.score) for argument in parsed_arguments])
 
 
         pickle_data=parsed_dot_format(graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
-                                      graphs_argument_scores,total_number_of_node,graphs_control_location_indices,file_name_list)
+                                      graphs_argument_scores,total_number_of_node,graphs_control_location_indices,file_name_list,parsed_arguments)
         pickleWrite(pickle_data, "train-" + benchmark_name + "-gnnInput_" + df + "_data")
 
 

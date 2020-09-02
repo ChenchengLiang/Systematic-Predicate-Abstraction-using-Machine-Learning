@@ -9,7 +9,7 @@ import errno
 from distutils.dir_util import copy_tree
 from Miscellaneous import pickleRead,pickleWrite,clear_directory
 import subprocess
-def separate_dataset_to_train_valid_test_files(source,destination,train_rate=0.6,valid_rate=0.2,test_rate=0.2):
+def separate_dataset_to_train_valid_test_files(source,destination,train_rate=0.6,valid_rate=0.2,test_rate=0.2,remove_src=False):
     print("source file",source)
     total_file_number=len(glob.glob(source+"*.arguments"))
     train=round(total_file_number*train_rate)
@@ -66,6 +66,9 @@ def separate_dataset_to_train_valid_test_files(source,destination,train_rate=0.6
             copy(negative_hint, destination + fold + "_data")
             copy(json, destination + fold + "_data")
             copy(smt,destination + fold + "_data")
+
+    if remove_src == True:
+        rmtree(source)
 
 
 def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="analysis",path="../", curssor=0,buckets=10):
@@ -272,6 +275,8 @@ def separate_datafold_and_get_statistic_data(rootdir="../benchmarks/LIA-lin/",fi
 
 
 def gather_all_train_data(src="../../benchmarks/LIA-lin/",dst="../../benchmarks/LIA-nonlin-trainData-noIntevals/",unique_file=False):
+    if not os.path.isdir(dst):
+        os.mkdir(dst)
     temp_file='../benchmarks/temp'
     copytree(src,temp_file)
     if unique_file==True:

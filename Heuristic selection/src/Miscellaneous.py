@@ -5,7 +5,18 @@ import numpy as np
 import pickle
 import os,glob,shutil,gc
 from pathlib import Path
+from distutils.dir_util import copy_tree
 
+
+def copy_and_remove(src,dst):
+    if os.path.isdir(src):
+        hints_dir=dst+src[src.rfind("/"):]
+        os.mkdir(hints_dir)
+        copy_tree(src,hints_dir)
+        shutil.rmtree(src)
+    else:
+        shutil.copy(src, dst)
+        os.remove(src)
 
 def remove_list_of_file(name):
     if os.path.exists(name):

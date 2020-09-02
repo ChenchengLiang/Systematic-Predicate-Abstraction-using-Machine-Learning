@@ -15,7 +15,7 @@ def main():
     #benchmark_list.append(["../benchmarks/temp/", int(413*0.6), int(413*0.2), int(413*0.2)])
     #benchmark_list.append(["../benchmarks/LIA-lin-trainData-intervals-datafold/", int(413 * 0.6), int(413 * 0.2), int(413 * 0.2)])
     #benchmark_list.append(["../benchmarks/LIA-lin-trainData-noIntevals-datafold/", int(413 * 0.6), int(413 * 0.2), int(413 * 0.2)])
-    benchmark_list.append(["../benchmarks/temp-train-4/", 0.6, 0.2, 0.2])
+    benchmark_list.append(["../benchmarks/temp-test-1/", 0.6, 0.2, 0.2])
     #benchmark_list.append(["../benchmarks/LIA-nonlin-trainData-noIntervals-datafold/", 0.6, 0.2, 0.2])
     # benchmark_list.append(["../benchmarks/one_graph_debug/", int(1), int(1), int(1)])
 
@@ -25,8 +25,8 @@ def main():
     from_json=True
     file_type = ".smt2"
     buckets = 1
-    #label = "occurrence"
-    label = "rank"
+    label = "occurrence"
+    #label = "rank"
     #label = "argument_identify"
     #label = "argument_identify_no_batchs"
     #label = "control_location_identify"

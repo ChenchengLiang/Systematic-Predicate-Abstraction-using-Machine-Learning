@@ -102,6 +102,14 @@ def parseArguments(arguments):
         ParsedArgumentList.append(ArgumentInfo(ID,head,hint,score))
         #print(ID,head,hint,score)
     return ParsedArgumentList
+def parseArgumentsFromJson(id_list,name_list,occurrence_list):
+    parsed_argument_list=[]
+    for id, name,occurrence in zip(id_list,name_list,occurrence_list):
+        head=name[:name.rfind(":")]
+        hint=name[name.rfind(":")+1:]
+        parsed_argument_list.append(ArgumentInfo(id,head,hint,occurrence))
+    return parsed_argument_list
+
 def transform_list_to_string(head_list):
     head=""
     if len(head_list)>1:

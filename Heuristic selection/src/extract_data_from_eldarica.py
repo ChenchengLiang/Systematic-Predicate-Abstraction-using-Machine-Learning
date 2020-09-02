@@ -8,8 +8,10 @@ from distutils.dir_util import copy_tree
 import gc
 import signal
 import psutil
+import json
+from dotToGraphInfo import parseArguments
 from analysis_extracted_data import gather_all_train_data,separate_dataset_to_train_valid_test_files
-from Miscellaneous import copy_train_data_from_src_to_dst,clear_directory
+from Miscellaneous import copy_train_data_from_src_to_dst,clear_directory,copy_and_remove,clear_file
 # def check_solvability(timeOut,abstractionOption,benchmark_solvability_folders,file):
 #
 #     solvability, runtime, flag = checkSolvability(timeOut, file, abstractionOption)
@@ -118,7 +120,7 @@ def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
         print(root,subdirs,files)
 
         if len(subdirs)==0:
-            clear_directory("../trainData")
+            #clear_directory("../trainData")
             print("extract data in",root)
             clear_directory(root + "/trainData")
 
@@ -129,40 +131,84 @@ def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
 
             pool.map(extract_one_file, parameterList)
             pool.close()
-            copy_tree("../trainData/", root + "/trainData")
+        for json_file,argument_file,gv_file,hints_file,horn_file,horn_graph_file,initialHints_file,negativeHints_file,positiveHints_file,auto_gv_file in zip(glob.glob(root+"/*.JSON"),glob.glob(root+"/*.arguments"),glob.glob(root+"/*.smt2.gv"),
+                                           glob.glob(root+"/*.hints.graphs"),glob.glob(root+"/*.horn"),glob.glob(root+"/*.HornGraph"),
+                                           glob.glob(root+"/*.initialHints"),glob.glob(root+"/*.negativeHints"),glob.glob(root+"/*.positiveHints"),
+                                           glob.glob(root+"/*.smt2-auto.gv")): #identify files need hints
+            smt2_file=json_file[:json_file.find(".JSON")]
+            copy_and_remove(json_file,root + "/trainData")
+            copy_and_remove(argument_file, root + "/trainData")
+            copy_and_remove(gv_file, root + "/trainData")
+            copy_and_remove(hints_file, root + "/trainData")
+            copy_and_remove(horn_file, root + "/trainData")
+            copy_and_remove(horn_graph_file, root + "/trainData")
+            copy_and_remove(initialHints_file, root + "/trainData")
+            copy_and_remove(negativeHints_file, root + "/trainData")
+            copy_and_remove(positiveHints_file, root + "/trainData")
+            shutil.copy(smt2_file, root + "/trainData")
+            copy_and_remove(auto_gv_file, root + "/trainData")
+
+
+            #copy_tree("../trainData/", root + "/trainData")
 
 
     return True
 
-def add_GNN_inputs_and_auto_graphviz_to_extracted_data(rootdir):
-    for file in glob.glob("../trainData/*"):
-        os.remove(file)
-    for root, subdirs, files in os.walk(rootdir):
-        if len(subdirs)==1 and subdirs[0]=="trainData":
-            print(root,subdirs,files)
-            full_file_list=files
-            extracted_file_list=glob.glob(root+"/trainData/*.smt2")
-            print("full_file_list",len(full_file_list),full_file_list)
-            print("extracted_file_list",len(extracted_file_list),extracted_file_list)
-            for fileName in extracted_file_list:
-                print("processing file:",fileName)
-                eld = subprocess.run(["../eldarica-graph-generation/eld", \
-                                        fileName, "-getHornGraph"], stdout=subprocess.DEVNULL, shell=False)
-            copy_tree("../trainData",root+"/trainData")
-            for file in glob.glob("../trainData/*"):
-                os.remove(file)
-
+# Impossible to transfer .argument to JSON file because cannot match argument name
+# def add_GNN_inputs_and_auto_graphviz_to_extracted_data(rootdir):
+#     # for file in glob.glob("../trainData/*"):
+#     #     os.remove(file)
+#     for root, subdirs, files in os.walk(rootdir):
+#         if len(subdirs)==1 and subdirs[0]=="trainData":
+#             print(root,subdirs,files)
+#             full_file_list=files
+#             extracted_file_list=glob.glob(root+"/trainData/*.smt2")
+#             print("full_file_list",len(full_file_list),full_file_list)
+#             print("extracted_file_list",len(extracted_file_list),extracted_file_list)
+#             for fileName in extracted_file_list:
+#                 print("processing file:",fileName)
+#                 eld = subprocess.run(["../eldarica-graph-generation/eld", \
+#                                         fileName, "-getHornGraph"], stdout=subprocess.DEVNULL, shell=False)
+#                 #read .argument to Json
+#                 with open(fileName+".arguments") as f:
+#                     parsed_arguments = parseArguments(f.read())
+#                 predicted_argument_score=[int(argument.score) for argument in parsed_arguments]
+#                 argument_id_list=[int(argument.ID) for argument in parsed_arguments]
+#                 argument_name_list=[int(argument.head+":"+argument.arg) for argument in parsed_arguments]
+#                 json_file = fileName + ".JSON"
+#                 json_obj = {}
+#                 # read JSON file and add predicted_argument_score to json object
+#                 with open(json_file) as f:
+#                     loaded_graph = json.load(f)
+#                     json_obj["nodeIds"] = loaded_graph["nodeIds"]
+#                     json_obj["binaryAdjacentList"] = loaded_graph["binaryAdjacentList"]
+#                     json_obj["tenaryAdjacencyList"] = loaded_graph["tenaryAdjacencyList"]
+#                     json_obj["argumentIndices"] = loaded_graph["argumentIndices"]
+#                     json_obj["controlLocationIndices"] = loaded_graph["controlLocationIndices"]
+#                     json_obj["predictedArgumentScores"] = predicted_argument_score
+#                     json_obj["argumentIDList"] = argument_id_list
+#                     json_obj["argumentNameList"] = argument_name_list
+#
+#                 # write json object to JSON file
+#                 clear_file(json_file)
+#                 with open(json_file, 'w') as f:
+#                     json.dump(json_obj, f)
+#             # copy_tree("../trainData",root+"/trainData")
+#             # for file in glob.glob("../trainData/*"):
+#             #     os.remove(file)
+#
 
 def main():
-    # benchmark_list = ["../benchmarks/temp-train-2"]
-    # for benchmark in benchmark_list:
-    #     # check_solvability_pool()
-    #     extract_data_pool(benchmark)
+    benchmark_list = ["../benchmarks/temp-extract"]
+    for benchmark in benchmark_list:
+        # check_solvability_pool()
+        extract_data_pool(benchmark)
+        gather_all_train_data(src=benchmark,dst=benchmark+"-trainData")
+        separate_dataset_to_train_valid_test_files(benchmark+"-trainData/",benchmark+"-trainData-datafold/")
 
-    #add_GNN_inputs_and_auto_graphviz_to_extracted_data("../benchmarks/LIA-nonlin-extracted-noIntervals")
-    #gather_all_train_data(src="../benchmarks/LIA-nonlin-extracted-noIntervals/",dst="../benchmarks/LIA-nonlin-trainData-noIntervals/")
-    separate_dataset_to_train_valid_test_files("../benchmarks/temp-train-3/",
-                                               "../benchmarks/temp-train-4/")
+    # gather_all_train_data(src="../benchmarks/temp-train-6",dst="../benchmarks/temp-train-7")
+    # separate_dataset_to_train_valid_test_files("../benchmarks/temp-train-7/",
+    #                                            "../benchmarks/temp-train-8/")
 
     #copy_train_data_from_src_to_dst("../benchmarks/temp-train-2/train_data/wrong_extracted_cases/trainData/", "../benchmarks/temp-train-2/train_data")
     # copy_train_data_from_src_to_dst("../benchmarks/temp-train-2/valid_data/wrong_extracted_cases/trainData/",
@@ -170,4 +216,5 @@ def main():
     # copy_train_data_from_src_to_dst("../benchmarks/temp-train-2/test_data/wrong_extracted_cases/trainData/",
     #                                 "../benchmarks/temp-train-2/test_data")
 
+    pass
 main()
