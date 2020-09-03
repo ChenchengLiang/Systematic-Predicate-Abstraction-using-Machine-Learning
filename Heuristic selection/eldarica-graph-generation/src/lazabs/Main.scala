@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2019 Hossein Hojjat, Filip Konecny, Philipp Ruemmer,
+ * Copyright (c) 2011-2020 Hossein Hojjat, Filip Konecny, Philipp Ruemmer,
  * Pavle Subotic. All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,7 @@
 package lazabs
 
 import java.io.{File, FileInputStream, FileNotFoundException, InputStream, PrintWriter}
+import java.lang.System.currentTimeMillis
 
 import parser._
 import lazabs.art._
@@ -46,7 +47,6 @@ import lazabs.horn.parser.HornReader
 import lazabs.horn.bottomup.HornPredAbs.RelationSymbol
 import lazabs.horn.abstractions.AbsLattice
 import lazabs.horn.abstractions.StaticAbstractionBuilder.AbstractionType
-import lazabs.horn.abstractions.StaticAbstractionBuilderSmtHintsSelection
 import lazabs.horn.concurrency.CCReader
 import lazabs.horn.abstractions.VerificationHints
 import lazabs.horn.concurrency.{VerificationLoop}
@@ -73,12 +73,14 @@ class GlobalParameters extends Cloneable {
   //var printHints=VerificationHints(Map())
   var totalHints=0 //DEBUG
   var threadTimeout = 2000 //debug
+  var solvabilityTimeout=2000
   var extractTemplates=false
   var extractPredicates=false
   var readHints=false
   var rank=0.0
   var getSMT2=false
   var getHornGraph=false
+  var hornGraphWithHints=false
   var in: InputStream = null
   var fileName = ""
   var funcName = "main"
@@ -91,6 +93,7 @@ class GlobalParameters extends Cloneable {
   var absInFile = false
   var lbe = false
   var slicing = true
+  var intervals = true
   var prettyPrint = false
   var smtPrettyPrint = false  
 //  var interpolation = false
@@ -112,6 +115,8 @@ class GlobalParameters extends Cloneable {
   var templateBasedInterpolationPortfolio = false
   var templateBasedInterpolationPrint = false
   var cegarHintsFile : String = ""
+  var cegarPostHintsFile : String = ""
+  var predicateOutputFile : String = ""
   var arithmeticMode : CCReader.ArithmeticMode.Value =
     CCReader.ArithmeticMode.Mathematical
   var arrayRemoval = false
@@ -174,6 +179,7 @@ class GlobalParameters extends Cloneable {
     that.absInFile = this.absInFile
     that.lbe = this.lbe
     that.slicing = this.slicing
+    that.intervals = this.intervals
     that.prettyPrint = this.prettyPrint
     that.smtPrettyPrint = this.smtPrettyPrint
     that.ntsPrint = this.ntsPrint
@@ -193,6 +199,8 @@ class GlobalParameters extends Cloneable {
     that.templateBasedInterpolationPortfolio = this.templateBasedInterpolationPortfolio
     that.templateBasedInterpolationPrint = this.templateBasedInterpolationPrint
     that.cegarHintsFile = this.cegarHintsFile
+    that.cegarPostHintsFile = this.cegarPostHintsFile
+    that.predicateOutputFile = this.predicateOutputFile
     that.arithmeticMode = this.arithmeticMode
     that.arrayRemoval = this.arrayRemoval
     that.princess = this.princess
@@ -216,6 +224,7 @@ class GlobalParameters extends Cloneable {
     that.timeoutChecker = this.timeoutChecker
     //DEBUG
     that.threadTimeout = this.threadTimeout //debug
+    that.solvabilityTimeout=this.solvabilityTimeout
     that.rank = this.rank //debug
     //that.printHints = this.printHints //DEBUG
     that.extractTemplates=this.extractTemplates//debug
@@ -223,6 +232,7 @@ class GlobalParameters extends Cloneable {
     that.readHints=this.readHints
     that.getSMT2=this.getSMT2
     that.getHornGraph=this.getHornGraph
+    that.hornGraphWithHints=this.hornGraphWithHints
   }
 
   override def clone : GlobalParameters = {
@@ -293,7 +303,8 @@ object Main {
   
 
   val greeting =
-    "Eldarica v2.0.2.\n(C) Copyright 2012-2019 Hossein Hojjat and Philipp Ruemmer"
+
+    "Eldarica v2.0.4.\n(C) Copyright 2012-2020 Hossein Hojjat and Philipp Ruemmer"
 
   def doMain(args: Array[String],
              stoppingCond : => Boolean) : Unit = try {
@@ -317,6 +328,7 @@ object Main {
       case "-readHints" :: rest => readHints = true; arguments(rest)
       case "-getSMT2" :: rest => getSMT2 = true; arguments(rest)
       case "-getHornGraph" :: rest => getHornGraph = true; arguments(rest)
+      case "-hornGraphWithHints" :: rest => hornGraphWithHints = true; arguments(rest)
       case "-pIntermediate" :: rest => printIntermediateClauseSets = true; arguments(rest)
       case "-sp" :: rest => smtPrettyPrint = true; arguments(rest)
 //      case "-pnts" :: rest => ntsPrint = true; arguments(rest)
@@ -362,6 +374,11 @@ object Main {
         templateBasedInterpolationType = AbstractionType.RelationalIneqs
         arguments(rest)
       }
+      case "-abstract:learnedTerm" :: rest => {
+        templateBasedInterpolation = true
+        templateBasedInterpolationType = AbstractionType.LearnedTerm
+        arguments(rest)
+      }
       case "-abstract:off" :: rest => {
         templateBasedInterpolation = false
         arguments(rest)
@@ -374,6 +391,10 @@ object Main {
         threadTimeout =
           (java.lang.Float.parseFloat(tTimeout.drop(12)) ).toInt;
         arguments(rest)
+      case tTimeout :: rest if (tTimeout.startsWith("-solvabilityTimeout:")) =>  //debug
+        solvabilityTimeout =
+          (java.lang.Float.parseFloat(tTimeout.drop("-solvabilityTimeout:".length)) ).toInt;
+        arguments(rest)
       case tTimeout :: rest if (tTimeout.startsWith("-rank:")) =>  //debug
         rank =
           (java.lang.Float.parseFloat(tTimeout.drop(6))); //parse input string
@@ -381,6 +402,15 @@ object Main {
 
       case tFile :: rest if (tFile.startsWith("-hints:")) => {
         cegarHintsFile = tFile drop 7
+        arguments(rest)
+      }
+      case tFile :: rest if (tFile.startsWith("-postHints:")) => {
+        cegarPostHintsFile = tFile drop 11
+        arguments(rest)
+      }
+
+      case tFile :: rest if (tFile.startsWith("-pPredicates:")) => {
+        predicateOutputFile = tFile drop 13
         arguments(rest)
       }
 
@@ -412,6 +442,7 @@ object Main {
         arguments(rest)
 
       case "-noSlicing" :: rest => slicing = false; arguments(rest)
+      case "-noIntervals" :: rest => intervals = false; arguments(rest)
       //case "-array" :: rest => arrayRemoval = true; arguments(rest)
       case "-princess" :: rest => princess = true; arguments(rest)
       case "-stac" :: rest => staticAccelerate = true; arguments(rest)
@@ -465,8 +496,11 @@ object Main {
           " -lbe\t\tDisable preprocessor (e.g., clause inlining)\n" +
           " -arrayQuans:n\tIntroduce n quantifiers for each array argument (default: 1)\n" +
           " -noSlicing\tDisable slicing of clauses\n" +
-          " -hints:f\tRead initial predicates and abstraction templates from a file\n" +
+          " -noIntervals\tDisable interval analysis\n" +
+          " -hints:f\tRead hints (initial predicates and abstraction templates) from a file\n" +
+          " -postHints:f\tRead hints for processed clauses from a file\n" +
           " -pHints\tPrint initial predicates and abstraction templates\n" +
+          " -pPredicates:f\tOutput predicates computed by CEGAR to a file\n" +
 //          " -glb\t\tUse the global approach to solve Horn clauses (outdated)\n" +
 	  "\n" +
 //          " -abstract\tUse interpolation abstraction for better interpolants (default)\n" +
@@ -492,9 +526,12 @@ object Main {
           " -extractTemplates\textract templates training data\n"+
           " -extractPredicates\textract predicates training data\n"+
           " -absTimeout:time\tset timeout for labeling hints\n"+
+          " -solvabilityTimeout:time\tset timeout for solvability\n"+
           " -rank:n\tuse top n or score above n ranked hints read from file\n"+
           " -getSMT2\tget SMT2 file\n"+
-          " -getHornGraph\tget horn graph file\n"
+          " -getHornGraph\tget horn graph file and GNN input\n"+
+          " -hornGraphWithHints\tget horn graph file with hints\n"
+
 
           )
           false
@@ -626,7 +663,6 @@ object Main {
         //do selection
         lazabs.horn.TrainDataGeneratorPredicatesSmt2(clauseSet, absMap, global, disjunctive,
           drawRTree, lbe) //generate train data.  clauseSet error may caused by import package
-
         return
       }
 
@@ -672,13 +708,14 @@ object Main {
         return
       }
 
-
       if(extractTemplates){
         val systemGraphs=new lazabs.horn.concurrency.TrainDataGenerator(smallSystem,system) //generate train data by templates
         return
       }
       if(extractPredicates){
+
         val predicateGenerator=new lazabs.horn.concurrency.TrainDataGeneratorPredicate(smallSystem,system) //generate train data by predicates
+
         return
       }
 

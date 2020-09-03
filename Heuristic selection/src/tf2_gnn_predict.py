@@ -55,8 +55,8 @@ def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score
 
 
 def main():
-    path="../benchmarks/temp-extract-trainData-datafold-test/"
-    trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2020-09-02_00-55-19_best.pkl"
+    path="../benchmarks/temp-test-1/"
+    trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2020-09-03_13-11-28_best.pkl"
 
     benchmark_name = path[len("../benchmarks/"):-1]
     force_read=True

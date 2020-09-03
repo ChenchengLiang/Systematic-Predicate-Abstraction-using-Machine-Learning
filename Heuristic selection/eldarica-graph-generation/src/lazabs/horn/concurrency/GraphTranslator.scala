@@ -4,19 +4,15 @@ import java.io.{File, FileWriter, PrintWriter}
 import ap.parser._
 import lazabs.horn.abstractions.VerificationHints._
 import lazabs.horn.bottomup.HornClauses
+import lazabs.horn.concurrency.DrawHornGraph.GNNInput
 import lazabs.horn.preprocessor.HornPreprocessor.VerificationHints
 
 import scala.collection.mutable.ListBuffer
 
 class GraphTranslator(hornClauses : Seq[HornClauses.Clause],file:String) {
-
   import HornClauses.Clause
 
-  //println(file.substring(file.lastIndexOf("/")+1))
-  val fileName=file.substring(file.lastIndexOf("/")+1)
-  //println(fileName)
-  //val writer = new PrintWriter(new File("graphs/"+fileName+".gv"))
-  val writer = new PrintWriter(new File("../graphs/"+fileName+".gv")) //python path
+  val writer = new PrintWriter(new File(file+".gv")) //python path
 
   // println(hornClauses)
 
@@ -53,11 +49,9 @@ class GraphTranslator_hint(hornClauses : Seq[HornClauses.Clause],
   var logString:String="" //store node information
 
   //create fileName.hints.graphs directory
-  val fileName=file.substring(file.lastIndexOf("/")+1)
-  //val pathName= "graphs/"+fileName+".hints.graphs"+"/"
-  val pathName= "../trainData/"+fileName+".hints.graphs"+"/" //python path
+  val pathName= file + ".hints.graphs"+"/" //python path
   //val hintFileName=head.name.toString()+":"+oneHint.toString()+".gv"
-  val hintFile = new File(pathName)
+  val hintFile = new File(file + ".hints.graphs"+"/")
   hintFile.mkdir() //create fileName.hints.graphs directory
 
   println("---graph translator (hints)---")
@@ -126,6 +120,7 @@ class GraphTranslator_hint(hornClauses : Seq[HornClauses.Clause],
     case VerifHintTplEqTerm(t,_) => translateExpr(t,root)
     case VerifHintTplInEqTerm(t,_) => translateExpr(t,root)
     case VerifHintTplInEqTermPosNeg(t,_) => translateExpr(t,root)
+    case _=>{}
 
   }
 
@@ -362,12 +357,6 @@ class GraphTranslator_hint(hornClauses : Seq[HornClauses.Clause],
 
       case _=>println("?")
     }
-//    for (subExpr <- e.subExpressions) {
-//
-//      translateExpr(subExpr)
-//
-//    }
-
 
 
   }
@@ -387,7 +376,7 @@ class TreeNode{
 }
 
 object BinarySearchTree {
-
+  var ASTtype=""
   var relationString:String="" //store node relation information
   def preOrder(root: TreeNode): Unit = {
     if (root != null) {
@@ -400,14 +389,14 @@ object BinarySearchTree {
         val (l_key,l_value)=root.lchild.data.head
         //println(k+"->"+l_key)
         if(k!=l_key){
-          relationString=relationString+(k+"->"+l_key+"\n")
+          relationString=relationString+("\""+k+"\""+" -> "+"\""+l_key+"\""+"[label=\"" + ASTtype + "\"]"+"\n")
         }
 
       }
       if(root.rchild!=null){
         val (r_key,r_value)=root.rchild.data.head
         //println(k+"->"+r_key)
-        relationString=relationString+(k+" -> "+r_key+"\n")
+        relationString=relationString+("\""+k+"\""+" -> "+"\""+r_key+"\""+"[label=\"" + ASTtype + "\"]"+"\n")
       }
       preOrder(root.lchild)
       //print(root.data.keys + "\n")
@@ -440,76 +429,102 @@ class TreeNodeForGraph{
   }
 }
 
-  object BinarySearchTreeForGraph {
-    var ASTtype=""
-    var relationString:String="" //store node relation information
-    var nodeString:String="" //store node information
-    def preOrder(root: TreeNodeForGraph): Unit = {
-      if (root != null) {
-        //println(root.data)
-        val (k,v) = root.data.head
 
-        if(root.lchild!=null){
-          val (l_key,l_value)=root.lchild.data.head
-          if(k!=l_key && v!="root"){
-            relationString=relationString+(l_key+"->"+k+"\n")
-          }
+class BinarySearchTreeForGraphClass (connectionType:String,ASTtype:String = ""){
+
+  var relationString: String = "" //store node relation information
+  var nodeString: String = "" //store node information
+  def preOrder(root: TreeNodeForGraph): Unit = {
+    if (root != null) {
+      //println(root.data)
+      val (k, v) = root.data.head
+
+      if (root.lchild != null) {
+        val (l_key, l_value) = root.lchild.data.head
+        if (k != l_key && v != "root") {
+          //relationString=relationString+(l_key+"->"+k+"[label=\"" + edgeNameMap("dataFlowOut") + "\"]"+"\n")
+          relationString = relationString + ("\"" + l_key + "\"" + " -> " + "\"" + k + "\"" + "[label=\"" + connectionType + "\"]" + "\n")
+        }
+      }
+
+      if (root.rchild != null) {
+        val (r_key, r_value) = root.rchild.data.head
+        if (k != r_key && v != "root") {
+          relationString = relationString + ("\"" + r_key + "\"" + " -> " + "\"" + k + "\"" + "[label=\"" + connectionType + "\"]" + "\n")
         }
 
-        if(root.rchild!=null){
-          val (r_key,r_value)=root.rchild.data.head
-          if(k!=r_key && v!="root"){
-            relationString=relationString+(r_key+"->"+k+"\n")
-          }
+      }
+      preOrder(root.lchild)
+      //print(root.data.keys + "\n")
+      preOrder(root.rchild)
+      //print(root.data.keys + "\n")
+    }
+  }
+  def preOrder(root: TreeNodeForGraph,gnn_inputs:GNNInput,dot:Digraph): Unit = {
+    import scala.collection.mutable.{Map => MuMap}
+    import lazabs.horn.concurrency.DrawHornGraph.addQuotes
+    if (root != null) {
+      val (k, v) = root.data.head
+      if (root.lchild != null) {
+        val (l_key, l_value) = root.lchild.data.head
+        if (k != l_key && v != "root") {
+          //relationString=relationString+(l_key+"->"+k+"[label=\"" + edgeNameMap("dataFlowOut") + "\"]"+"\n")
+          relationString = relationString + (addQuotes(l_key)+ " -> " + addQuotes(k) + "[label=\"" + connectionType + "\"]" + "\n")
+          dot.edge(addQuotes(l_key),addQuotes(k),attrs = MuMap("label"->addQuotes(connectionType)))
+          gnn_inputs.binaryAdjacentcy+=ListBuffer(gnn_inputs.nodeNameToIDMap(l_key),gnn_inputs.nodeNameToIDMap(k))
+        }
+      }
 
+      if (root.rchild != null) {
+        val (r_key, r_value) = root.rchild.data.head
+        if (k != r_key && v != "root") {
+          relationString = relationString + (addQuotes(r_key) + " -> " + addQuotes(k)+ "[label=\"" + connectionType + "\"]" + "\n")
+          dot.edge(addQuotes(r_key),addQuotes(k),attrs = MuMap("label"->addQuotes(connectionType)))
+          gnn_inputs.binaryAdjacentcy+=ListBuffer(gnn_inputs.nodeNameToIDMap(r_key),gnn_inputs.nodeNameToIDMap(k))
         }
 
-        preOrder(root.lchild)
-        //print(root.data.keys + "\n")
-        preOrder(root.rchild)
-        //print(root.data.keys + "\n")
-
       }
-
+      preOrder(root.lchild,gnn_inputs,dot)
+      //print(root.data.keys + "\n")
+      preOrder(root.rchild,gnn_inputs,dot)
+      //print(root.data.keys + "\n")
     }
-
-
-    def deleteANode(node:String): Unit ={
-      var tempRelation=""
-      var sList:Array[String]=nodeString.split("\n")
-      var deleteList=ListBuffer[String]()
-      for(line<-sList if line.contains(node)){
-        deleteList+=line
-      }
-      var nodeList=ListBuffer[String]()
-      for(line<-sList){
-        nodeList+=line
-      }
-      for(line<-deleteList){
-        nodeList-=line
-      }
-      //sList.filter(! _.contains(line))
-      for(line<-nodeList){
-        tempRelation=tempRelation+line
-      }
-      nodeString=tempRelation
+  }
+  def deleteANode(node: String): Unit = {
+    var tempRelation = ""
+    var sList: Array[String] = nodeString.split("\n")
+    var deleteList = ListBuffer[String]()
+    for (line <- sList if line.contains(node)) {
+      deleteList += line
     }
-
+    var nodeList = ListBuffer[String]()
+    for (line <- sList) {
+      nodeList += line
+    }
+    for (line <- deleteList) {
+      nodeList -= line
+    }
+    //sList.filter(! _.contains(line))
+    for (line <- nodeList) {
+      tempRelation = tempRelation + line
+    }
+    nodeString = tempRelation
+  }
 }
-
 
 
 
 class ArgumentNode(headName:String,bodyName:String,location:String,clauseID:Int,arg:ITerm,argIndex:Int) {
   val InList=ListBuffer
   val OutList=ListBuffer
-  val index=argIndex
-  val name=location+"_argument_"+index.toString
+  val index=argIndex.toString
+  val name=location+"_argument_"+index
   var argumentEdgeFlag=false
   val originalContent=arg.toString
   var constantFlowInNode:String=""
   val dataFLowHyperEdge=new DataFlowHyperEdge(bodyName,headName,name,clauseID)
   val originalContentInITerm=arg
+  val hintIndex=index
 }
 
 class ControlFowHyperEdge(body:String,head:String,ind:Int) {
@@ -520,15 +535,45 @@ class ControlFowHyperEdge(body:String,head:String,ind:Int) {
 
 }
 class DataFlowHyperEdge(body:String,head:String,guardedArgument:String,ind:Int) {
-  val from=body
-  val to=head
+  var fromData=""
+  var fromASTRoot=""
+  val from =head
+  val to=guardedArgument
   val name="DataFowHyperEdge_"+ind.toString+"_"+guardedArgument
 
 }
 
+class predicateGraph(astR:String,predName:String,graph:String,t:String,i:String,h: IExpression){
+  val ASTRoot=astR
+  val predicateName=predName
+  val graphText=graph
+  val predicateType=t
+  val index=i
+  val hintText=h
+}
+
+
 class ControlFlowNode(nodeName:String,argumentNodeList:ListBuffer[ArgumentNode]){
+  var arity=0
   val name=nodeName
   var argumentList:ListBuffer[ArgumentNode]=argumentNodeList
+  var predicateList:ListBuffer[VerifHintElement]=ListBuffer[VerifHintElement]()
+  var predicateGraphList:ListBuffer[predicateGraph]=ListBuffer[predicateGraph]()
+  var nodeList=ListBuffer[Pair[String,String]]()
+  var hintList=ListBuffer[Triple[String,String,IExpression]]()
+
+
+  def getHintsList(): Unit ={
+    for(p <- predicateList) p match{
+      case VerifHintInitPred(p) => {hintList+=Triple(name,"VerifHintInitPred",p)}
+      case VerifHintTplPred(p,_) => {hintList+=Triple(name,"VerifHintTplPred",p)}
+      case VerifHintTplPredPosNeg(p,_) => {hintList+=Triple(name,"VerifHintTplPredPosNeg",p)}
+      case VerifHintTplEqTerm(t,_) => {hintList+=Triple(name,"VerifHintTplEqTerm",t)}
+      case VerifHintTplInEqTerm(t,_) => {hintList+=Triple(name,"VerifHintTplInEqTerm",t)}
+      case VerifHintTplInEqTermPosNeg(t,_) => {hintList+=Triple(name,"VerifHintTplInEqTermPosNeg",t)}
+      case _=>{}
+    }
+  }
 
   def getArgNameByContent(c:String): String ={
     var name=""
@@ -539,6 +584,17 @@ class ControlFlowNode(nodeName:String,argumentNodeList:ListBuffer[ArgumentNode])
     }
     name
   }
+
+  def getArgNameByIndex(i:String): String ={
+    var name=""
+    for(arg<-argumentList){
+      if(arg.index==i){
+        name=arg.name
+      }
+    }
+    name
+  }
+
 
 }
 
@@ -555,7 +611,7 @@ class ClauseTransitionInformation(controlFlowHead:ControlFlowNode,controlFLowBod
   var dataFlowNumber=0
   var guardASTGraph=Map[String,String]()//rootName->graph
   var dataFlowASTGraph=ListBuffer[DataFlowASTGraphInfo]()
-  var simpleDataFlowConnection=Map[String,String]()//map:hyperedge->connectiongraph
+  var simpleDataFlowConnection=Map[ArgumentNode,ArgumentNode]()//map:hyperedge->connectiongraph
   val name:String=head.name+"___"+body.name
   var guardASTRootName=""
   var nodeList=ListBuffer[Pair[String,String]]()

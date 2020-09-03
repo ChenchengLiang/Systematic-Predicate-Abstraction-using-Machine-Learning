@@ -131,6 +131,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         print("test_metric",test_metric)
 
 
+
         true_Y=[]
         for data in iter(test_data):
             #print(data[0]) #input
@@ -139,6 +140,9 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         mse_loaded_model = tf.keras.losses.MSE(
             true_Y, predicted_Y_loaded_model)
         print("\n mse_loaded_model_predicted_Y_and_True_Y", mse_loaded_model)
+
+        print("true_Y", true_Y)
+        print("predicted_Y_loaded_model", predicted_Y_loaded_model)
 
         mse_mean = tf.keras.losses.MSE(
             [np.mean(true_Y)]*len(true_Y), true_Y)
@@ -578,6 +582,7 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
         graphs_argument_indices=[]
         graphs_adjacency_lists=[]
         graphs_argument_scores=[]
+        parsed_arguments = []
         graphs_control_location_indices=[]
         total_number_of_node=0
         file_type=".smt2"
@@ -607,7 +612,6 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                 fileName = fileName[fileName.rindex("/") + 1:]
                 print("fileName",fileName)
                 file_name_list.append(fileGraph[:fileGraph.find(".JSON")])
-
                 # read graph
                 print("read graph from",fileGraph)
                 with open(fileGraph) as f:

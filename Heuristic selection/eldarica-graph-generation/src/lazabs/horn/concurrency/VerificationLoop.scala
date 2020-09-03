@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2019 Philipp Ruemmer. All rights reserved.
+ * Copyright (c) 2011-2020 Philipp Ruemmer. All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,7 +39,7 @@ import lazabs.{GlobalParameters, ParallelComputation}
 import lazabs.horn.bottomup.{DagInterpolator, HornClauses, HornPredAbs, HornWrapper, Util}
 import lazabs.horn.abstractions.{AbsLattice, AbstractionRecord, LoopDetector, StaticAbstractionBuilder, VerificationHints}
 import lazabs.horn.bottomup.DisjInterpolator.AndOrNode
-import lazabs.horn.concurrency.HintsSelection.initialIDForHints
+import lazabs.horn.concurrency.HintsSelection.{initialIDForHints, writeHintsWithIDToFile}
 import lazabs.horn.bottomup.TemplateInterpolator
 import lazabs.horn.preprocessor.DefaultPreprocessor
 
@@ -152,11 +152,16 @@ object VerificationLoop {
     println("-" * totalWidth)
   }
 
+  private def diagonalInvariants(n : Int) : Seq[Seq[Int]] =
+    for (i <- 0 until n)
+    yield ((List tabulate n) { j => if (i == j) 1 else 0 })
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class VerificationLoop(system : ParametricEncoder.System) {
+class VerificationLoop(system : ParametricEncoder.System,
+                       initialInvariants : Seq[Seq[Int]] = null) {
 
   import VerificationLoop._
   import ParametricEncoder._
@@ -166,9 +171,21 @@ class VerificationLoop(system : ParametricEncoder.System) {
 
   val result = {
     val processNum = system.processes.size
+
     var invariants : Seq[Seq[Int]] =
-      for (i <- 0 until processNum)
-      yield ((List tabulate processNum) { j => if (i == j) 1 else 0 })
+      initialInvariants match {
+        case null =>
+          diagonalInvariants(processNum)
+        case invs => {
+          assert(invs forall { v => v.size == processNum &&
+                                    (v forall (_ >= 0)) &&
+                                    ((v zip system.processes) forall {
+                                      case (s, (_, Singleton)) => s <= 1
+                                      case _                   => true
+                                    }) })
+          invs
+        }
+      }
 
     var res : Either[Unit, Counterexample] = null
 
@@ -225,10 +242,6 @@ class VerificationLoop(system : ParametricEncoder.System) {
         GlobalParameters.get.withAndWOTemplates
       else
         List()
-      ////debug///
-
-      //No hints selection
-      //val optimizedHints=simpHints
 
       //Select hints by Edarica
       import lazabs.horn.concurrency.HintsSelection
@@ -240,8 +253,9 @@ class VerificationLoop(system : ParametricEncoder.System) {
       //val InitialHintsWithID=initialIDForHints(encoder.globalHints) //ID:head->hint
       //Call python to select hints
 
+      //No hints selection
+      var optimizedHints=HintsSelection.sortHints(simpHints) //if there is no readHints flag, use simpHints
 
-      var optimizedHints=simpHints //if there is no readHints flag, use simpHints
       if(GlobalParameters.get.readHints==true){
         //Read selected hints from file (NNs)
         println("simpHints:")
@@ -257,9 +271,15 @@ class VerificationLoop(system : ParametricEncoder.System) {
       }
       //get horn clauses
       if(GlobalParameters.get.getHornGraph==true){
-        HintsSelection.writeHornClausesGraphToFile(GlobalParameters.get.fileName,simpClauses) //write horn format to file
-        println(simpClauses)
-        //val hornGraph = new GraphTranslator(simpClauses, GlobalParameters.get.fileName)
+        //val InitialHintsWithID=initialIDForHints(optimizedHints) //ID:head->hint
+        //val fileName = GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/") + 1)
+        //writeHintsWithIDToFile(InitialHintsWithID, fileName, "initial")//write hints and their ID to file
+
+        val argumentList=(for (p <- HornClauses.allPredicates(simpClauses)) yield (p, p.arity)).toList
+        val argumentInfo = HintsSelection.writeArgumentScoreToFile(GlobalParameters.get.fileName,argumentList,optimizedHints,countOccurrence = false)
+        DrawHornGraph.writeHornClausesGraphToFile(GlobalParameters.get.fileName,simpClauses,optimizedHints,argumentInfo) //write horn graph and gn input to file
+
+        sys.exit()
       }
 
 

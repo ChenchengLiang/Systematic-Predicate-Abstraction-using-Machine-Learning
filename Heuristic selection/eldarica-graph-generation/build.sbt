@@ -2,9 +2,13 @@
 lazy val commonSettings = Seq(
     name := "Eldarica",
     organization := "uuverifiers",
-    version := "2.0-alpha1",
-    scalaVersion := "2.11.8",
-    crossScalaVersions := Seq("2.11.8", "2.12.6"),
+    version := "2.0.4",
+    homepage := Some(url("https://github.com/uuverifiers/eldarica")),
+    licenses := Seq("BSD License 2.0" -> url("https://github.com/uuverifiers/eldarica/blob/master/LICENSE")),
+    scalaVersion := "2.11.12",
+    crossScalaVersions := Seq("2.11.12", "2.12.10"),
+    fork in run := true,
+    cancelable in Global := true,
     publishTo := Some(Resolver.file("file",  new File( "/home/wv/public_html/maven/" )) )
 )
 
@@ -121,8 +125,8 @@ lazy val root = (project in file(".")).
       List("-feature",
            "-language:implicitConversions,postfixOps,reflectiveCalls"),
     scalacOptions += (scalaVersion map { sv => sv match {
-      case "2.11.8" => "-optimise"
-      case "2.12.6" => "-opt:_"
+      case "2.11.12" => "-optimise"
+      case "2.12.10" => "-opt:_"
     }}).value,	
 //
     libraryDependencies +=
@@ -136,9 +140,21 @@ lazy val root = (project in file(".")).
 //
     libraryDependencies +=
       "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.5",
+    
+    //resolvers += "Typesafe Public Repo" at "http://repo.typesafe.com/typesafe/releases",
+    //libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5",
+    libraryDependencies +=  "org.apache.commons" % "commons-lang3" % "3.5",
+    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.4.6",
+
+    assemblyMergeStrategy in assembly := {
+	 case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+	 case x => MergeStrategy.last
+    },
+      
 //
     resolvers += "uuverifiers" at "http://logicrunch.research.it.uu.se/maven/",
-//    libraryDependencies += "uuverifiers" %% "princess" % "2018-12-06"
+//    libraryDependencies += "uuverifiers" %% "princess" % "2020-07-13"
     libraryDependencies += "uuverifiers" %% "princess" % "nightly-SNAPSHOT"
 )
 //
+    

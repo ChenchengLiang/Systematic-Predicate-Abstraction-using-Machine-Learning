@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2019 Philipp Ruemmer. All rights reserved.
+ * Copyright (c) 2011-2020 Philipp Ruemmer, Chencheng Liang All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -36,11 +36,12 @@ import ap.parser._
 import ap.terfor.conjunctions.Conjunction
 import ap.terfor.preds.Predicate
 import lazabs.GlobalParameters
+import lazabs.Main.TimeoutException
 import lazabs.horn.abstractions.VerificationHints.VerifHintElement
 import lazabs.horn.abstractions.{AbstractionRecord, StaticAbstractionBuilder, VerificationHints}
 import lazabs.horn.bottomup.DisjInterpolator.AndOrNode
 import lazabs.horn.bottomup.Util.Dag
-import lazabs.horn.bottomup.{DagInterpolator, HornPredAbs, TemplateInterpolator}
+import lazabs.horn.bottomup.{DagInterpolator, HornClauses, HornPredAbs, TemplateInterpolator}
 import lazabs.horn.preprocessor.DefaultPreprocessor
 
 import scala.collection.immutable.ListMap
@@ -137,6 +138,7 @@ class TrainDataGeneratorPredicate(smallSystem : ParametricEncoder.System, system
   val file = GlobalParameters.get.fileName
   val fileName=file.substring(file.lastIndexOf("/")+1)
   val timeOut = GlobalParameters.get.threadTimeout //timeout
+  val solvabilityTimeout=GlobalParameters.get.solvabilityTimeout
 
   val exceptionalPredGen: Dag[AndOrNode[HornPredAbs.NormClause, Unit]] =>
     Either[Seq[(Predicate, Seq[Conjunction])],
@@ -146,6 +148,23 @@ class TrainDataGeneratorPredicate(smallSystem : ParametricEncoder.System, system
       throw lazabs.Main.TimeoutException
 
   println("extract original predicates")
+  val startTimeCEGAR = currentTimeMillis
+  val toParamsCEGAR = GlobalParameters.get.clone
+  toParamsCEGAR.timeoutChecker = () => {
+    if ((currentTimeMillis - startTimeCEGAR) > solvabilityTimeout * 1000) //timeout milliseconds
+      throw lazabs.Main.TimeoutException //Main.TimeoutException
+  }
+  try{
+    GlobalParameters.parameters.withValue(toParamsCEGAR) {
+      new HornPredAbs(simpClauses, simpHints.toInitialPredicates, interpolator)
+    }
+  }
+  catch {
+    case lazabs.Main.TimeoutException => {
+      throw TimeoutException
+    }
+  }
+
   val cegar = new HornPredAbs(simpClauses,
     simpHints.toInitialPredicates,
     interpolator)
@@ -329,7 +348,7 @@ class TrainDataGeneratorPredicate(smallSystem : ParametricEncoder.System, system
     println("-----------------test finished-----------------------")
 
     if(selectedTemplates.isEmpty){
-
+      writeHintsWithIDToFile(InitialHintsWithID,fileName,"initial")//write hints and their ID to file
     }else{//only write to file when optimized hint is not empty
       writeHintsWithIDToFile(InitialHintsWithID,fileName,"initial")//write hints and their ID to file
       writeHintsWithIDToFile(PositiveHintsWithID,fileName,"positive")
@@ -347,15 +366,18 @@ class TrainDataGeneratorPredicate(smallSystem : ParametricEncoder.System, system
       HintsSelection.writeHornClausesToFile(GlobalParameters.get.fileName,simpClauses)
       //write smt2 format to file
       if(GlobalParameters.get.fileName.endsWith(".c")){ //if it is a c file
-        HintsSelection.writeSMTFormatToFile(simpClauses,"../trainData/")  //write smt2 format to file
+        val filePath=GlobalParameters.get.fileName.substring(0,GlobalParameters.get.fileName.lastIndexOf("/")+1)
+        HintsSelection.writeSMTFormatToFile(simpClauses,filePath)  //write smt2 format to file
+        //HintsSelection.writeSMTFormatToFile(simpClauses,"../trainData/")  //write smt2 format to file
       }
       if(GlobalParameters.get.fileName.endsWith(".smt2")){ //if it is a smt2 file
         //copy smt2 file
       }
-
+      val argumentList=(for (p <- HornClauses.allPredicates(simpClauses)) yield (p, p.arity)).toList
+      val argumentInfo = HintsSelection.writeArgumentScoreToFile(GlobalParameters.get.fileName,argumentList,selectedTemplates)
       //Output graphs
       //val hornGraph = new GraphTranslator(simpClauses, GlobalParameters.get.fileName)
-      HintsSelection.writeHornClausesGraphToFile(GlobalParameters.get.fileName,simpClauses)
+      DrawHornGraph.writeHornClausesGraphToFile(GlobalParameters.get.fileName,simpClauses,sortedHints,argumentInfo)
       val hintGraph= new GraphTranslator_hint(simpClauses, GlobalParameters.get.fileName, sortedHints,InitialHintsWithID)
     }
 
@@ -378,9 +400,10 @@ class TrainDataGeneratorPredicate(smallSystem : ParametricEncoder.System, system
 
   def writeHintsWithIDToFile(wrappedHintList:Seq[wrappedHintWithID],fileName:String,hintType:String){
     val distinctWrappedHintList=wrappedHintList.distinct
+    val filePath=GlobalParameters.get.fileName.substring(0,GlobalParameters.get.fileName.lastIndexOf("/")+1)
     if(hintType=="initial"){
-      //val writer = new PrintWriter(new File("trainData/"+fileName+".initialHints"))
-      val writer = new PrintWriter(new File("../trainData/"+fileName+".initialHints")) //python path
+      //val writer = new PrintWriter(new File("../trainData/"+fileName+".initialHints")) //python path
+      val writer = new PrintWriter(new File(filePath + fileName + ".initialHints")) //python path
       for(wrappedHint<-wrappedHintList){
         writer.write(wrappedHint.ID.toString+":"+wrappedHint.head+":"+wrappedHint.hint+"\n")
       }
@@ -388,7 +411,7 @@ class TrainDataGeneratorPredicate(smallSystem : ParametricEncoder.System, system
     }
     if(hintType=="positive"){
       //val writer = new PrintWriter(new File("trainData/"+fileName+".positiveHints"))
-      val writer = new PrintWriter(new File("../trainData/"+fileName+".positiveHints")) //python path
+      val writer = new PrintWriter(new File(filePath + fileName+".positiveHints")) //python path
       for(wrappedHint<-wrappedHintList){
         writer.write(wrappedHint.ID.toString+":"+wrappedHint.head+":"+wrappedHint.hint+"\n")
       }
@@ -396,7 +419,7 @@ class TrainDataGeneratorPredicate(smallSystem : ParametricEncoder.System, system
     }
     if(hintType=="negative"){
       //val writer = new PrintWriter(new File("trainData/"+fileName+".negativeHints"))
-      val writer = new PrintWriter(new File("../trainData/"+fileName+".negativeHints")) //python path
+      val writer = new PrintWriter(new File(filePath + fileName+".negativeHints")) //python path
       for(wrappedHint<-wrappedHintList){
         writer.write(wrappedHint.ID.toString+":"+wrappedHint.head+":"+wrappedHint.hint+"\n")
       }
