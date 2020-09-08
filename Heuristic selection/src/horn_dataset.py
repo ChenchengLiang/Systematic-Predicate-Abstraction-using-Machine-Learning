@@ -284,6 +284,20 @@ def get_predicted_argument_list_divided_by_file(dataset,predicted_Y_loaded_model
             predicted_Y_loaded_model[sum(argument_number_lists[:i]):sum(argument_number_lists[:i]) + n])
     return predicted_argument_lists
 
+def build_vocabulary(datafold=["train", "valid", "test"], path=""):
+    vocabulary_set=set(["unknown"])
+    for fold in datafold:
+        for json_file in glob.glob(path+fold+"_data/*.JSON"):
+            with open(json_file) as f:
+                loaded_graph = json.load(f)
+                vocabulary_set.update(loaded_graph["nodeSymbolList"])
+    token_map={}
+    token_id=0
+    for word in vocabulary_set:
+        token_map[word]=token_id
+        token_id=token_id+1
+    return vocabulary_set,token_map
+
 
 class HornGraphSample(GraphSample):
     """Data structure holding a single horn graph."""
@@ -318,6 +332,8 @@ class raw_graph_inputs():
         self.argument_identify=[]
         self.control_location_identify=[]
         self.label_size=0
+        self.vocabulary_set=set()
+        self.token_map={}
 
 class HornGraphDataset(GraphDataset[HornGraphSample]):
     def __init__(self, params: Dict[str, Any], metadata: Optional[Dict[str, Any]] = None):
@@ -333,7 +349,6 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         self._benchmark=params["benchmark"]
         self.label_type=params["label_type"]
         self._node_vocab_size=0
-        self._current_node_offset=0
 
 
     def load_data(self, folds_to_load: Optional[Set[DataFold]] = None) -> None:
@@ -371,11 +386,9 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         node_num_list=[]
         for g in final_graphs:
             node_num_list.append(len(g.node_features))
-        #todo: tokenization. Build vocabulary
+
         #Vocabulary size should be total vocabulary size of train, valid, test data
-        # if self._node_vocab_size< max(node_num_list):
-        #     self._node_vocab_size = max(node_num_list)
-        self._node_vocab_size=self._node_vocab_size+max(node_num_list)
+        self._node_vocab_size=len(raw_inputs.vocabulary_set)
 
 
         print("raw_inputs.label_size", raw_inputs.label_size)
@@ -563,13 +576,13 @@ def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","
             form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists,
                                     graphs_argument_scores, total_number_of_node, graphs_control_location_indices,
                                     label, benchmark, df)
-            current_node_offset=current_node_offset+total_number_of_node
 
 
 
 class parsed_dot_format:
     def __init__(self,graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
-                 graphs_argument_scores,total_number_of_node,graph_control_location_indices,file_name_list,parsed_arguments):
+                 graphs_argument_scores,total_number_of_node,graph_control_location_indices,file_name_list,parsed_arguments,
+                 graphs_node_symbols,vocabulary_set, token_map):
         self.graphs_node_label_ids=graphs_node_label_ids
         self.graphs_argument_indices=graphs_argument_indices
         self.graphs_adjacency_lists=graphs_adjacency_lists
@@ -578,12 +591,17 @@ class parsed_dot_format:
         self.graph_control_location_indices=graph_control_location_indices
         self.file_name_list=file_name_list
         self.parsed_arguments=parsed_arguments
+        self.graphs_node_symbols=graphs_node_symbols
+        self.vocabulary_set=vocabulary_set
+        self.token_map=token_map
 
 def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../", buckets=0,split_flag=False,from_json=False,file_type=".smt2"):
+    vocabulary_set, token_map = build_vocabulary(datafold=["train", "valid", "test"], path=path)
     benchmark_name = benchmark.replace("/", "-")
     for df in data_fold:
         print("write data_fold to pickle data:", df)
         graphs_node_label_ids=[]
+        graphs_node_symbols=[]
         graphs_argument_indices=[]
         graphs_adjacency_lists=[]
         graphs_argument_scores=[]
@@ -615,13 +633,14 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                                                sorted(glob.glob(path +df+"_data/"+ '*' + suffix + '.arguments'))):
                 fileName = fileGraph[:fileGraph.find(suffix + ".JSON") + len(suffix)]
                 fileName = fileName[fileName.rindex("/") + 1:]
-                print("fileName",fileName)
+                #print("fileName",fileName)
                 file_name_list.append(fileGraph[:fileGraph.find(".JSON")])
                 # read graph
-                print("read graph from",fileGraph)
+                #print("read graph from",fileGraph)
                 with open(fileGraph) as f:
                     loaded_graph = json.load(f)
                     graphs_node_label_ids.append(loaded_graph["nodeIds"])
+                    graphs_node_symbols.append(loaded_graph["nodeSymbolList"])
                     graphs_adjacency_lists.append(
                         [np.array(loaded_graph["binaryAdjacentList"]), np.array(loaded_graph["tenaryAdjacencyList"])])
                     graphs_argument_indices.append(loaded_graph["argumentIndices"])
@@ -639,7 +658,8 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
 
 
         pickle_data=parsed_dot_format(graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
-                                      graphs_argument_scores,total_number_of_node,graphs_control_location_indices,file_name_list,parsed_arguments)
+                                      graphs_argument_scores,total_number_of_node,graphs_control_location_indices,file_name_list,
+                                      parsed_arguments,graphs_node_symbols,vocabulary_set, token_map)
         pickleWrite(pickle_data, "train-" + benchmark_name + "-gnnInput_" + df + "_data")
 
 
@@ -650,35 +670,40 @@ def form_GNN_inputs_and_labels(label="occurrence",datafold=["train", "valid", "t
         parsed_dot_file=pickleRead("train-" + benchmark_name + "-gnnInput_" + df + "_data")
 
         graphs_node_label_ids = parsed_dot_file.graphs_node_label_ids
+        graphs_node_symbols = parsed_dot_file.graphs_node_symbols
         graphs_argument_indices = parsed_dot_file.graphs_argument_indices
         graphs_adjacency_lists = parsed_dot_file.graphs_adjacency_lists
         graphs_argument_scores = parsed_dot_file.graphs_argument_scores
         total_number_of_node = parsed_dot_file.total_number_of_node
         graphs_control_location_indices=parsed_dot_file.graph_control_location_indices
         file_name_list =  parsed_dot_file.file_name_list
+        vocabulary_set = parsed_dot_file.vocabulary_set
+        token_map = parsed_dot_file.token_map
 
-        form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists,
-                                graphs_argument_scores, total_number_of_node,graphs_control_location_indices, file_name_list,label, benchmark, df)
-        current_node_offset=current_node_offset+total_number_of_node
+        form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_argument_indices, graphs_adjacency_lists,
+                                graphs_argument_scores, total_number_of_node,graphs_control_location_indices, file_name_list,label,
+                                vocabulary_set,token_map, benchmark, df)
 
 
-def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists,
-                            graphs_argument_scores, total_number_of_node,graphs_control_location_indices, file_name_list,label, benchmark, df):
+def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_argument_indices, graphs_adjacency_lists,
+                            graphs_argument_scores, total_number_of_node,graphs_control_location_indices, file_name_list,label,
+                            vocabulary_set,token_map,benchmark, df):
     final_graphs_v1 = []
 
     raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists[0]), total_number_of_node)
     for edge_type in graphs_adjacency_lists[0]:
         raw_data_graph._node_number_per_edge_type.append(len(edge_type[0]))
 
+    raw_data_graph.vocabulary_set=vocabulary_set
+    raw_data_graph.token_map=token_map
     total_label=0
     total_nodes=0
-    node_name_offset=0
 
     directory_wrong_extracted_cases=file_name_list[0][:file_name_list[0].rfind("/")+1]+"wrong_extracted_cases"
     if not os.path.exists(directory_wrong_extracted_cases):
         os.makedirs(directory_wrong_extracted_cases)
-    for node_label_ids, argument_indices, adjacency_lists, argument_scores,control_location_indices, file_name in zip(graphs_node_label_ids,
-                                                                                  graphs_argument_indices,
+    for node_label_ids, node_symbols, argument_indices, adjacency_lists, argument_scores,control_location_indices, file_name in zip(graphs_node_label_ids,
+                                                                                  graphs_node_symbols,graphs_argument_indices,
                                                                                   graphs_adjacency_lists,
                                                                                   graphs_argument_scores,
                                                                                   graphs_control_location_indices,file_name_list):
@@ -707,19 +732,18 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
             raw_data_graph.argument_scores.append(argument_scores)
             raw_data_graph.file_names.append(file_name)
 
-            #todo: node tokenization
-            encoded_node_label_ids = [x + node_name_offset for x in node_label_ids]
-            node_name_offset=node_name_offset+len(node_label_ids)
-
-
+            #node tokenization
+            tokenized_node_label_ids = []
+            for symbol in node_symbols:
+                tokenized_node_label_ids.append(token_map[symbol])
 
             if label == "rank":
                 total_label += len(ranked_argument_scores)
                 final_graphs_v1.append(
                     HornGraphSample(
                         adjacency_lists=tuple(adjacency_lists),
-                        #node_features=tf.constant(tokenized_node_label_ids),
-                        node_features=tf.constant(node_label_ids),
+                        node_features=tf.constant(tokenized_node_label_ids),
+                        #node_features=tf.constant(node_label_ids),
                         node_label=tf.constant(ranked_argument_scores),
                         # node_label=tf.constant(argument_scores),
                         node_argument=tf.constant(argument_indices),
@@ -733,8 +757,8 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                 final_graphs_v1.append(
                     HornGraphSample(
                         adjacency_lists=tuple(adjacency_lists),
-                        #node_features=tf.constant(tokenized_node_label_ids),
-                        node_features=tf.constant(node_label_ids),
+                        node_features=tf.constant(tokenized_node_label_ids),
+                        #node_features=tf.constant(node_label_ids),
                         # node_label=tf.constant(ranked_argument_scores),
                         node_label=tf.constant(argument_scores),  # argument_scores
                         node_argument=tf.constant(argument_indices),
@@ -748,8 +772,8 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                 final_graphs_v1.append(
                     HornGraphSample(
                         adjacency_lists=tuple(adjacency_lists),
-                        #node_features=tf.constant(tokenized_node_label_ids),
-                        node_features=tf.constant(node_label_ids),
+                        node_features=tf.constant(tokenized_node_label_ids),
+                        #node_features=tf.constant(node_label_ids),
                         # node_label=tf.constant(ranked_argument_scores),
                         node_label=tf.constant(argument_identify),
                         node_argument=tf.constant(argument_indices),
@@ -763,8 +787,8 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                 final_graphs_v1.append(
                     HornGraphSample(
                         adjacency_lists=tuple(adjacency_lists),
-                        #node_features=tf.constant(tokenized_node_label_ids),
-                        node_features=tf.constant(node_label_ids),
+                        node_features=tf.constant(tokenized_node_label_ids),
+                        #node_features=tf.constant(node_label_ids),
                         # node_label=tf.constant(ranked_argument_scores),
                         node_label=tf.constant(control_location_identify),
                         node_argument=tf.constant(argument_indices),
@@ -781,8 +805,8 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                         final_graphs_v1.append(
                             HornGraphSample(
                                 adjacency_lists=tuple(adjacency_lists),
-                                #node_features=tf.constant(tokenized_node_label_ids),
-                                node_features=tf.constant(node_label_ids),
+                                node_features=tf.constant(tokenized_node_label_ids),
+                                #node_features=tf.constant(node_label_ids),
                                 # node_label=tf.constant(ranked_argument_scores),
                                 node_label=tf.constant([1]),
                                 node_argument=tf.constant(argument_indices),
@@ -796,8 +820,8 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                         final_graphs_v1.append(
                             HornGraphSample(
                                 adjacency_lists=tuple(adjacency_lists),
-                                #node_features=tf.constant(tokenized_node_label_ids),
-                                node_features=tf.constant(node_label_ids),
+                                node_features=tf.constant(tokenized_node_label_ids),
+                                #node_features=tf.constant(node_label_ids),
                                 # node_label=tf.constant(ranked_argument_scores),
                                 node_label=tf.constant([0]),
                                 node_argument=tf.constant(argument_indices),

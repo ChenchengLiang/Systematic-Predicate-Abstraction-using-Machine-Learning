@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import re
 import glob
+import json
+import tensorflow_datasets as tfds
 def sleep(seconds=1):
     time.sleep(seconds)
     print("wait for",seconds)
@@ -87,13 +89,7 @@ def main():
     # json_file="xadasd.smt2.JSON"
     # smt2_file=json_file[:json_file.find(".JSON")]
     # print(smt2_file)
-    node_name_offset=0
-    node_label_ids_list=[[1,2,3],[1,2,3,4,5],[1,2,3,4,5,6]]
-    for node_label_ids in node_label_ids_list:
-        encoded_node_label_ids = [x + node_name_offset for x in node_label_ids]
-        node_name_offset = node_name_offset + len(node_label_ids)
-        print(encoded_node_label_ids)
-
+    pass
 
 if __name__ == '__main__':
     main()
