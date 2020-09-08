@@ -154,52 +154,8 @@ def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
 
     return True
 
-# Impossible to transfer .argument to JSON file because cannot match argument name
-# def add_GNN_inputs_and_auto_graphviz_to_extracted_data(rootdir):
-#     # for file in glob.glob("../trainData/*"):
-#     #     os.remove(file)
-#     for root, subdirs, files in os.walk(rootdir):
-#         if len(subdirs)==1 and subdirs[0]=="trainData":
-#             print(root,subdirs,files)
-#             full_file_list=files
-#             extracted_file_list=glob.glob(root+"/trainData/*.smt2")
-#             print("full_file_list",len(full_file_list),full_file_list)
-#             print("extracted_file_list",len(extracted_file_list),extracted_file_list)
-#             for fileName in extracted_file_list:
-#                 print("processing file:",fileName)
-#                 eld = subprocess.run(["../eldarica-graph-generation/eld", \
-#                                         fileName, "-getHornGraph"], stdout=subprocess.DEVNULL, shell=False)
-#                 #read .argument to Json
-#                 with open(fileName+".arguments") as f:
-#                     parsed_arguments = parseArguments(f.read())
-#                 predicted_argument_score=[int(argument.score) for argument in parsed_arguments]
-#                 argument_id_list=[int(argument.ID) for argument in parsed_arguments]
-#                 argument_name_list=[int(argument.head+":"+argument.arg) for argument in parsed_arguments]
-#                 json_file = fileName + ".JSON"
-#                 json_obj = {}
-#                 # read JSON file and add predicted_argument_score to json object
-#                 with open(json_file) as f:
-#                     loaded_graph = json.load(f)
-#                     json_obj["nodeIds"] = loaded_graph["nodeIds"]
-#                     json_obj["binaryAdjacentList"] = loaded_graph["binaryAdjacentList"]
-#                     json_obj["tenaryAdjacencyList"] = loaded_graph["tenaryAdjacencyList"]
-#                     json_obj["argumentIndices"] = loaded_graph["argumentIndices"]
-#                     json_obj["controlLocationIndices"] = loaded_graph["controlLocationIndices"]
-#                     json_obj["predictedArgumentScores"] = predicted_argument_score
-#                     json_obj["argumentIDList"] = argument_id_list
-#                     json_obj["argumentNameList"] = argument_name_list
-#
-#                 # write json object to JSON file
-#                 clear_file(json_file)
-#                 with open(json_file, 'w') as f:
-#                     json.dump(json_obj, f)
-#             # copy_tree("../trainData",root+"/trainData")
-#             # for file in glob.glob("../trainData/*"):
-#             #     os.remove(file)
-#
-
 def main():
-    benchmark_list = ["../benchmarks/temp-extract"]
+    benchmark_list = ["../benchmarks/temp-LIA-lin-noInterval-extract"]
     for benchmark in benchmark_list:
         # check_solvability_pool()
         extract_data_pool(benchmark)

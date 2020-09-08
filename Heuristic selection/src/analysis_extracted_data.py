@@ -7,8 +7,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import errno
 from distutils.dir_util import copy_tree
-from Miscellaneous import pickleRead,pickleWrite,clear_directory
+from Miscellaneous import pickleRead,pickleWrite,clear_directory,clear_file
 import subprocess
+import json
 def separate_dataset_to_train_valid_test_files(source,destination,train_rate=0.6,valid_rate=0.2,test_rate=0.2,remove_src=False):
     print("source file",source)
     total_file_number=len(glob.glob(source+"*.arguments"))
@@ -70,7 +71,6 @@ def separate_dataset_to_train_valid_test_files(source,destination,train_rate=0.6
     if remove_src == True:
         rmtree(source)
 
-
 def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="analysis",path="../", curssor=0,buckets=10):
     benchmark_name = benchmark.replace("/", "-")
     graphs_node_label_ids = []
@@ -96,7 +96,6 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
             total_number_of_node+=pickleRead(label+"-total_number_of_node-" + str(i), path="../")
             graph_info_list.extend(pickleRead(label + "-graphs_graph_info_list-" + str(i), path="../"))
     return graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists, graphs_argument_scores, total_number_of_node,graph_info_list
-
 
 def get_statistic_data(path="",file_type=".smt2",buckets=10):
     try:
@@ -240,7 +239,6 @@ def get_statistic_data(path="",file_type=".smt2",buckets=10):
                 plt.savefig(path + "statistic/"+ label + ".png")
                 plt.clf()
 
-
 def separate_datafold_and_get_statistic_data(rootdir="../benchmarks/LIA-lin/",file_type=".smt2",buckets=10):
 
     for root, subdirs, files in os.walk(rootdir):
@@ -273,7 +271,6 @@ def separate_datafold_and_get_statistic_data(rootdir="../benchmarks/LIA-lin/",fi
                 copytree(root + "/extracted_data/statistic", root + "/statistic")
                 rmtree(root+"/extracted_data")
 
-
 def gather_all_train_data(src="../../benchmarks/LIA-lin/",dst="../../benchmarks/LIA-nonlin-trainData-noIntevals/",unique_file=False):
     if not os.path.isdir(dst):
         os.mkdir(dst)
@@ -305,6 +302,37 @@ def unique_names(rootdir):
                 os.rename(file,preffix+"-"+str(count)+suffix)
             count += 1
 
+def replace_JSON_file_with_node_name(rootdir):
+    for root, subdirs, files in os.walk(rootdir):
+        if len(subdirs)==0:
+            for file in glob.glob(root+"/*.smt2"):
+                #read JSON' label
+                json_file=file+".JSON"
+                json_obj = {}
+                with open(json_file) as f:
+                    loaded_graph = json.load(f)
+                    json_obj["nodeIds"] = loaded_graph["nodeIds"]
+                    json_obj["binaryAdjacentList"] = loaded_graph["binaryAdjacentList"]
+                    json_obj["tenaryAdjacencyList"] = loaded_graph["tenaryAdjacencyList"]
+                    json_obj["argumentIndices"] = loaded_graph["argumentIndices"]
+                    json_obj["controlLocationIndices"] = loaded_graph["controlLocationIndices"]
+                    json_obj["argumentIDList"] = loaded_graph["argumentIDList"]
+                    json_obj["argumentNameList"] = loaded_graph["argumentNameList"]
+                    json_obj["argumentOccurrence"] = loaded_graph["argumentOccurrence"]
+                eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-getHornGraph"], stdout=subprocess.DEVNULL,
+                                       shell=False)
+                eld.wait()
+                #add JSON' label back
+                with open(json_file) as f:
+                    loaded_graph = json.load(f)
+                    json_obj["nodeSymbolList"] = loaded_graph["nodeSymbolList"]
+                # write json object to JSON file
+                clear_file(json_file)
+                with open(json_file, 'w') as f:
+                    json.dump(json_obj, f)
+
+
+
 def main():
     benchmark_list = []
     #benchmark_list.append(["../benchmarks/trainData-chc-comp-predicates/", 120, 11, 30,".smt2"])
@@ -328,10 +356,11 @@ def main():
     #unique_names("../benchmarks/temp")
 
     #gather_all_train_data(src="../benchmarks/LIA-lin-extracted-intervals/",dst="../benchmarks/LIA-lin-trainData-intervals/")
-    separate_dataset_to_train_valid_test_files("../benchmarks/LIA-lin-trainData-noIntervals/","../benchmarks/LIA-lin-trainData-noIntervals-datafold/")
+    #separate_dataset_to_train_valid_test_files("../benchmarks/LIA-lin-trainData-noIntervals/","../benchmarks/LIA-lin-trainData-noIntervals-datafold/")
 
     #get_statistic_data("../benchmarks/LIA-lin-traiData/")
 
+    replace_JSON_file_with_node_name("../benchmarks/temp-extract-trainData-datafold")
 
 if __name__ == '__main__':
     main()

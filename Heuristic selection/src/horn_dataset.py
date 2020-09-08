@@ -44,7 +44,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters["message_calculation_class"]="rgcn"#rgcn,ggnn,rgat
     #parameters['num_heads'] = 2
     parameters['hidden_dim'] = 64 #64
-    parameters['num_layers'] = 1
+    parameters['num_layers'] = 2
     parameters['node_label_embedding_size'] = nodeFeatureDim
     parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
     parameters['regression_hidden_layer_size'] = [64,64] #[64,64]
@@ -333,6 +333,7 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         self._benchmark=params["benchmark"]
         self.label_type=params["label_type"]
         self._node_vocab_size=0
+        self._current_node_offset=0
 
 
     def load_data(self, folds_to_load: Optional[Set[DataFold]] = None) -> None:
@@ -370,9 +371,12 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         node_num_list=[]
         for g in final_graphs:
             node_num_list.append(len(g.node_features))
-        if self._node_vocab_size< max(node_num_list):
-            self._node_vocab_size = max(node_num_list)
-        #print("self._node_vocab_size",self._node_vocab_size)
+        #todo: tokenization. Build vocabulary
+        #Vocabulary size should be total vocabulary size of train, valid, test data
+        # if self._node_vocab_size< max(node_num_list):
+        #     self._node_vocab_size = max(node_num_list)
+        self._node_vocab_size=self._node_vocab_size+max(node_num_list)
+
 
         print("raw_inputs.label_size", raw_inputs.label_size)
         print("raw_inputs._total_number_of_nodes", raw_inputs._total_number_of_nodes)
@@ -559,6 +563,7 @@ def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","
             form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists,
                                     graphs_argument_scores, total_number_of_node, graphs_control_location_indices,
                                     label, benchmark, df)
+            current_node_offset=current_node_offset+total_number_of_node
 
 
 
@@ -654,6 +659,7 @@ def form_GNN_inputs_and_labels(label="occurrence",datafold=["train", "valid", "t
 
         form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists,
                                 graphs_argument_scores, total_number_of_node,graphs_control_location_indices, file_name_list,label, benchmark, df)
+        current_node_offset=current_node_offset+total_number_of_node
 
 
 def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists,
@@ -666,6 +672,7 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
 
     total_label=0
     total_nodes=0
+    node_name_offset=0
 
     directory_wrong_extracted_cases=file_name_list[0][:file_name_list[0].rfind("/")+1]+"wrong_extracted_cases"
     if not os.path.exists(directory_wrong_extracted_cases):
@@ -680,7 +687,7 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
         argument_identify = np.array([0] * len(node_label_ids))
         argument_identify[argument_indices] = 1
         total_nodes+=len(node_label_ids)
-        total_label += len(argument_indices)
+        #total_label += len(argument_indices)
         control_location_identify = np.array([0] * len(node_label_ids))
         control_location_identify[control_location_indices]=1
 
@@ -696,16 +703,22 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
         else:
             raw_data_graph.argument_identify.append(argument_identify)
             raw_data_graph.control_location_identify.append(control_location_identify)
-            raw_data_graph._total_number_of_nodes+=len(graphs_node_label_ids)
             raw_data_graph.ranked_argument_scores.append(ranked_argument_scores)
             raw_data_graph.argument_scores.append(argument_scores)
             raw_data_graph.file_names.append(file_name)
 
+            #todo: node tokenization
+            encoded_node_label_ids = [x + node_name_offset for x in node_label_ids]
+            node_name_offset=node_name_offset+len(node_label_ids)
+
+
 
             if label == "rank":
+                total_label += len(ranked_argument_scores)
                 final_graphs_v1.append(
                     HornGraphSample(
                         adjacency_lists=tuple(adjacency_lists),
+                        #node_features=tf.constant(tokenized_node_label_ids),
                         node_features=tf.constant(node_label_ids),
                         node_label=tf.constant(ranked_argument_scores),
                         # node_label=tf.constant(argument_scores),
@@ -716,9 +729,11 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                 )
                 raw_data_graph.label_size+=len(ranked_argument_scores)
             elif label == "occurrence":
+                total_label += len(argument_scores)
                 final_graphs_v1.append(
                     HornGraphSample(
                         adjacency_lists=tuple(adjacency_lists),
+                        #node_features=tf.constant(tokenized_node_label_ids),
                         node_features=tf.constant(node_label_ids),
                         # node_label=tf.constant(ranked_argument_scores),
                         node_label=tf.constant(argument_scores),  # argument_scores
@@ -729,9 +744,11 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                 )
                 raw_data_graph.label_size += len(argument_scores)
             elif label == "argument_identify":
+                total_label += len(argument_identify)
                 final_graphs_v1.append(
                     HornGraphSample(
                         adjacency_lists=tuple(adjacency_lists),
+                        #node_features=tf.constant(tokenized_node_label_ids),
                         node_features=tf.constant(node_label_ids),
                         # node_label=tf.constant(ranked_argument_scores),
                         node_label=tf.constant(argument_identify),
@@ -742,9 +759,11 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                 )
                 raw_data_graph.label_size += len(argument_identify)
             elif label == "control_location_identify":
+                total_label += len(control_location_identify)
                 final_graphs_v1.append(
                     HornGraphSample(
                         adjacency_lists=tuple(adjacency_lists),
+                        #node_features=tf.constant(tokenized_node_label_ids),
                         node_features=tf.constant(node_label_ids),
                         # node_label=tf.constant(ranked_argument_scores),
                         node_label=tf.constant(control_location_identify),
@@ -755,12 +774,14 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                 )
                 raw_data_graph.label_size += len(control_location_identify)
             elif label == "argument_identify_no_batchs":
+                total_label += len([1])
                 raw_data_graph.label_size += len(node_label_ids)
                 for i in node_label_ids:
                     if i in argument_indices:
                         final_graphs_v1.append(
                             HornGraphSample(
                                 adjacency_lists=tuple(adjacency_lists),
+                                #node_features=tf.constant(tokenized_node_label_ids),
                                 node_features=tf.constant(node_label_ids),
                                 # node_label=tf.constant(ranked_argument_scores),
                                 node_label=tf.constant([1]),
@@ -771,9 +792,11 @@ def form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, grap
                         )
 
                     else:
+                        total_label += len([0])
                         final_graphs_v1.append(
                             HornGraphSample(
                                 adjacency_lists=tuple(adjacency_lists),
+                                #node_features=tf.constant(tokenized_node_label_ids),
                                 node_features=tf.constant(node_label_ids),
                                 # node_label=tf.constant(ranked_argument_scores),
                                 node_label=tf.constant([0]),
