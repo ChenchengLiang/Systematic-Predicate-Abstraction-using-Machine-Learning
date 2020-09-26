@@ -144,7 +144,6 @@ object HintsSelection {
     val LastPredicate = cegar.predicates //Map[relationSymbols.values,ArrayBuffer[RelationSymbolPred]]
 
     var originalPredicates: Map[Predicate, Seq[IFormula]] = Map()
-
     //show original predicates
     var numberOfpredicates = 0
     println("Original predicates:")
@@ -154,7 +153,7 @@ object HintsSelection {
       val subst = (for ((c, n) <- head.arguments.head.iterator.zipWithIndex) yield (c, IVariable(n))).toMap
       //val headPredicate=new Predicate(head.name,head.arity) //class Predicate(val name : String, val arity : Int)
       val predicateSequence = for (p <- preds) yield {
-        val simplifiedPredicate = (new Simplifier) (Internal2InputAbsy(p.rawPred, p.rs.sf.functionEnc.predTranslation))
+        val simplifiedPredicate = (new Simplifier) (Internal2InputAbsy(p.rawPred, p.rs.sf.getFunctionEnc().predTranslation))
         //println("value:"+simplifiedPredicate)
         val varPred = ConstantSubstVisitor(simplifiedPredicate, subst) //transform variables to _1,_2,_3...
         println("value:" + varPred)
@@ -241,8 +240,8 @@ object HintsSelection {
     if (LastPredicate.isEmpty) {
       return VerificationHints(Map())
     } else {
-      var originalPredicates: Map[Predicate, Seq[IFormula]] = Map()
 
+      var originalPredicates: Map[Predicate, Seq[IFormula]] = Map()
       //show LastPredicate
       println("Original predicates:")
       for ((head, preds) <- LastPredicate) {
@@ -250,7 +249,7 @@ object HintsSelection {
         val subst = (for ((c, n) <- head.arguments.head.iterator.zipWithIndex) yield (c, IVariable(n))).toMap
         //val headPredicate=new Predicate(head.name,head.arity) //class Predicate(val name : String, val arity : Int)
         val predicateSequence = for (p <- preds) yield {
-          val simplifiedPredicate = (new Simplifier) (Internal2InputAbsy(p.rawPred, p.rs.sf.functionEnc.predTranslation))
+          val simplifiedPredicate = (new Simplifier) (Internal2InputAbsy(p.rawPred, p.rs.sf.getFunctionEnc().predTranslation))
           //println("value:"+simplifiedPredicate)
           val varPred = ConstantSubstVisitor(simplifiedPredicate, subst) //transform variables to _1,_2,_3...
           println("value:" + varPred)
@@ -1091,18 +1090,13 @@ object HintsSelection {
   }
 
 
-  def writeSMTFormatToFile(simpClauses: Clauses, path: String): Unit = {
+  def writeSMTFormatToFile(simpClauses: Clauses, fileName: String): Unit = {
 
-    val basename = GlobalParameters.get.fileName
-    //      val suffix =
-    //        (for (inv <- invariants) yield (inv mkString "_")) mkString "--"
-    //      val filename = basename + "-" + suffix + ".smt2"
-    //println(basename.substring(basename.lastIndexOf("/")+1))
-    val fileName = basename.substring(basename.lastIndexOf("/") + 1)
+
     //val filename = basename + ".smt2"
     println("write " + fileName + " to smt format file")
     //val out = new java.io.FileOutputStream("trainData/"+fileName+".smt2")
-    val out = new java.io.FileOutputStream(path + fileName + ".smt2") //python path
+    val out = new java.io.FileOutputStream(fileName + ".smt2") //python path
     Console.withOut(out) {
       val clauseFors =
         for (c <- simpClauses) yield {
@@ -1131,16 +1125,7 @@ object HintsSelection {
     // could return `path`
   }
 
-
-  def writeArgumentScoreToFile(file:String,
-                               argumentList:List[(IExpression.Predicate,Int)],
-                               positiveHints:VerificationHints,
-                               countOccurrence:Boolean=true): ListBuffer[argumentInfo] ={
-    println("Write arguments to file")
-    val fileName = file.substring(file.lastIndexOf("/") + 1)
-    val writer = new PrintWriter(new File(file + ".arguments")) //python path
-
-    //get argument list
+  def getArgumentInfo(argumentList:List[(IExpression.Predicate,Int)]):ListBuffer[argumentInfo]= {
     var argID=0
     var arguments:ListBuffer[argumentInfo]=ListBuffer[argumentInfo]()
     for((arg,i)<-argumentList.zipWithIndex){
@@ -1149,6 +1134,26 @@ object HintsSelection {
         argID=argID+1
       }
     }
+    val argumentFileName=GlobalParameters.get.fileName+".arguments"
+    if(scala.reflect.io.File(argumentFileName).exists){
+      //read score from .argument file
+      for (arg<-arguments;line <- Source.fromFile(argumentFileName).getLines){
+        val parsedLine=line.split(":")
+        if(arg.head==parsedLine(1) && ("argument"+arg.index.toString)==parsedLine(2))
+          arg.score=parsedLine(3).toInt
+      }
+    }
+
+    (arguments)
+  }
+  def writeArgumentScoreToFile(file:String,
+                               argumentList:List[(IExpression.Predicate,Int)],
+                               positiveHints:VerificationHints,
+                               countOccurrence:Boolean=true): ListBuffer[argumentInfo] ={
+    println("Write arguments to file")
+    val fileName = file.substring(file.lastIndexOf("/") + 1)
+    val arguments=getArgumentInfo(argumentList)
+    val writer = new PrintWriter(new File(file + ".arguments")) //python path
 
     if (countOccurrence==true){
       //get hint info list
@@ -1169,7 +1174,7 @@ object HintsSelection {
       for(arg<-arguments){
         for(hint<-positiveHintInfoList){
           if(arg.location.equals(hint.head))
-            if(ContainsSymbol(hint.expression, new IVariable(arg.index)))
+            if(ContainsSymbol(hint.expression, IVariable(arg.index)))
               arg.score=arg.score+1
         }
       }
@@ -1199,4 +1204,5 @@ class argumentInfo(id:Int,loc: IExpression.Predicate,ind:Int)
   val index=ind
   var score=0
   val head=location.toString()
+  val headName=location.name
 }

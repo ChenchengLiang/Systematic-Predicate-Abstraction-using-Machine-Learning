@@ -266,7 +266,7 @@ class VerificationLoop(system : ParametricEncoder.System,
 
       //get smt
       if(GlobalParameters.get.getSMT2==true){
-        HintsSelection.writeSMTFormatToFile(encoder.allClauses,"regression-tests/smt-graph/")  //write smt2 format to file
+        HintsSelection.writeSMTFormatToFile(encoder.allClauses,GlobalParameters.get.fileName)  //write smt2 format to file
         println(encoder.allClauses)
       }
       //get horn clauses
@@ -274,11 +274,12 @@ class VerificationLoop(system : ParametricEncoder.System,
         //val InitialHintsWithID=initialIDForHints(optimizedHints) //ID:head->hint
         //val fileName = GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/") + 1)
         //writeHintsWithIDToFile(InitialHintsWithID, fileName, "initial")//write hints and their ID to file
+        HintsSelection.writeSMTFormatToFile(simpClauses,GlobalParameters.get.fileName)  //write smt2 format to file
 
         val argumentList=(for (p <- HornClauses.allPredicates(simpClauses)) yield (p, p.arity)).toList
         val argumentInfo = HintsSelection.writeArgumentScoreToFile(GlobalParameters.get.fileName,argumentList,optimizedHints,countOccurrence = false)
         DrawHornGraph.writeHornClausesGraphToFile(GlobalParameters.get.fileName,simpClauses,optimizedHints,argumentInfo) //write horn graph and gn input to file
-
+        val layerHornGraph= new DrawLayerHornGraph(GlobalParameters.get.fileName, simpClauses, optimizedHints,argumentInfo)
         sys.exit()
       }
 
@@ -318,7 +319,6 @@ class VerificationLoop(system : ParametricEncoder.System,
       } else {
         DagInterpolator.interpolatingPredicateGenCEXAndOr _
       }
-
       println("-------------------Test optimized hints---------------------------------")
       println
       println(

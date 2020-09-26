@@ -24,28 +24,34 @@ def separate_dataset_to_train_valid_test_files(source,destination,train_rate=0.6
     clear_directory(destination)
 
     temp_shuffle=[]
-    for g,a,i,p,n,j,s in zip(sorted(glob.glob(source + '*' + 'auto.gv')),sorted(glob.glob(source + '*' + '.arguments')),
-                   sorted(glob.glob(source + '*' + '.initialHints')),sorted(glob.glob(source + '*' + '.positiveHints')),
-                   sorted(glob.glob(source + '*' + '.negativeHints')),sorted(glob.glob(source + '*' + '.JSON')),
+    for lg,g,a,i,p,n,j,lj,s in zip(sorted(glob.glob(source + '*' + '.layerHornGraph.gv')),sorted(glob.glob(source + '*' + 'auto.gv')),
+                                sorted(glob.glob(source + '*' + '.arguments')),sorted(glob.glob(source + '*' + '.initialHints')),
+                                   sorted(glob.glob(source + '*' + '.positiveHints')),sorted(glob.glob(source + '*' + '.negativeHints')),
+                                   sorted(glob.glob(source + '*' + 'smt2.JSON')),sorted(glob.glob(source + '*' + '.layerHornGraph.JSON')),
                            sorted(glob.glob(source + '*' + '.smt2'))):
-        temp_shuffle.append([g,a,i,p,n,j,s])
+        temp_shuffle.append([lg,g,a,i,p,n,j,lj,s])
     random.shuffle(temp_shuffle)
+    lgv_files=[]
     gv_files=[]
     arguments_files=[]
     initial_hints_files=[]
     positive_hints_files=[]
     negative_hints_files=[]
     json_files=[]
+    ljson_files=[]
     smt2_files=[]
     for t in temp_shuffle:
-        gv_files.append(t[0])
-        arguments_files.append(t[1])
-        initial_hints_files.append(t[2])
-        positive_hints_files.append(t[3])
-        negative_hints_files.append(t[4])
-        json_files.append(t[5])
-        smt2_files.append(t[6])
+        lgv_files.append(t[0])
+        gv_files.append(t[1])
+        arguments_files.append(t[2])
+        initial_hints_files.append(t[3])
+        positive_hints_files.append(t[4])
+        negative_hints_files.append(t[5])
+        json_files.append(t[6])
+        ljson_files.append(t[7])
+        smt2_files.append(t[8])
 
+    lgv_fold=[lgv_files[:train],lgv_files[train:train+valid],lgv_files[train+valid:]]
     gv_fold = [gv_files[:train],gv_files[train:train+valid],gv_files[train+valid:]]
     argument_fold = [arguments_files[:train], arguments_files[train:train + valid], arguments_files[train + valid:]]
     initial_hints_fold = [initial_hints_files[:train], initial_hints_files[train:train + valid], initial_hints_files[train + valid:]]
@@ -53,19 +59,22 @@ def separate_dataset_to_train_valid_test_files(source,destination,train_rate=0.6
     negative_fold = [negative_hints_files[:train], negative_hints_files[train:train + valid], negative_hints_files[train + valid:]]
     json_fold=[json_files[:train], json_files[train:train + valid], json_files[train + valid:]]
     smt2_fold = [smt2_files[:train], smt2_files[train:train + valid], smt2_files[train + valid:]]
-    for gvs,arguments,initial_hints,positive_hints,negative_hints,jsons,smts,fold in zip(gv_fold,argument_fold,initial_hints_fold,positive_fold,negative_fold,json_fold,smt2_fold,["train","valid","test"]):
+    ljson_fold=[ljson_files[:train],ljson_files[train:train+valid],ljson_files[train+valid:]]
+    for lgvs,gvs,arguments,initial_hints,positive_hints,negative_hints,jsons,ljsons,smts,fold in zip(lgv_fold,gv_fold,argument_fold,initial_hints_fold,positive_fold,negative_fold,json_fold,ljson_fold,smt2_fold,["train","valid","test"]):
         try:
             rmtree(destination+fold+"_data")
             os.mkdir(destination + fold + "_data")
         except:
             os.mkdir(destination+fold+"_data")
-        for gv,argument,initial_hint,positive_hint,negative_hint,json,smt in zip(gvs,arguments,initial_hints,positive_hints,negative_hints,jsons,smts):
+        for lgv,gv,argument,initial_hint,positive_hint,negative_hint,json,ljson,smt in zip(lgvs,gvs,arguments,initial_hints,positive_hints,negative_hints,jsons,ljsons,smts):
+            copy(lgv, destination + fold + "_data")
             copy(gv, destination+fold+"_data")
             copy(argument, destination+fold+"_data")
             copy(initial_hint, destination + fold + "_data")
             copy(positive_hint, destination + fold + "_data")
             copy(negative_hint, destination + fold + "_data")
             copy(json, destination + fold + "_data")
+            copy(ljson, destination + fold + "_data")
             copy(smt,destination + fold + "_data")
 
     if remove_src == True:
@@ -302,35 +311,72 @@ def unique_names(rootdir):
                 os.rename(file,preffix+"-"+str(count)+suffix)
             count += 1
 
-def replace_JSON_file_with_node_name(rootdir):
+def add_JSON_field(rootdir,file_type=".layerHornGraph.JSON"):
+    for root, subdirs, files in os.walk(rootdir):
+        if len(subdirs)==1 and subdirs[0]=="wrong_extracted_cases":
+            os.rmdir(root+"/wrong_extracted_cases")
+    old_field=["nodeIds","nodeSymbolList","argumentIndices","argumentIDList","argumentNameList","argumentOccurrence","binaryAdjacentList","predicateArgumentEdges",
+               "predicateInstanceEdges","controlHeadEdges","controlBodyEdges","controlArgumentEdges","guardEdges","dataEdges","unknownEdges"]
+    new_field=["argumentInstanceEdges"]
     for root, subdirs, files in os.walk(rootdir):
         if len(subdirs)==0:
             for file in glob.glob(root+"/*.smt2"):
+                print(file)
                 #read JSON' label
-                json_file=file+".JSON"
+                json_file=file+file_type
                 json_obj = {}
                 with open(json_file) as f:
                     loaded_graph = json.load(f)
-                    json_obj["nodeIds"] = loaded_graph["nodeIds"]
-                    json_obj["binaryAdjacentList"] = loaded_graph["binaryAdjacentList"]
-                    json_obj["tenaryAdjacencyList"] = loaded_graph["tenaryAdjacencyList"]
-                    json_obj["argumentIndices"] = loaded_graph["argumentIndices"]
-                    json_obj["controlLocationIndices"] = loaded_graph["controlLocationIndices"]
-                    json_obj["argumentIDList"] = loaded_graph["argumentIDList"]
-                    json_obj["argumentNameList"] = loaded_graph["argumentNameList"]
-                    json_obj["argumentOccurrence"] = loaded_graph["argumentOccurrence"]
+                    for field in old_field:
+                        json_obj[field] = loaded_graph[field]
                 eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-getHornGraph"], stdout=subprocess.DEVNULL,
                                        shell=False)
                 eld.wait()
-                #add JSON' label back
+                #add more field
                 with open(json_file) as f:
                     loaded_graph = json.load(f)
-                    json_obj["nodeSymbolList"] = loaded_graph["nodeSymbolList"]
+                    for field in new_field:
+                        json_obj[field] = loaded_graph[field]
                 # write json object to JSON file
                 clear_file(json_file)
                 with open(json_file, 'w') as f:
                     json.dump(json_obj, f)
 
+
+def add_layer_version_horn_graph_json_file(rootdir):
+    old_field = ["argumentOccurrence"]
+    new_field = ["nodeIds", "nodeSymbolList", "argumentIndices", "argumentIDList", "argumentNameList",
+                 "argumentOccurrence", "binaryAdjacentList", "ternaryAdjacencyList", "predicateArgumentEdges",
+                 "predicateInstanceEdges","argumentInstanceEdges", "controlHeadEdges", "controlBodyEdges", "controlArgumentEdges", "guardEdges",
+                 "dataEdges", "unknownEdges"]
+    for root, subdirs, files in os.walk(rootdir):
+        if len(subdirs)==1 and subdirs[0]=="wrong_extracted_cases":
+            os.rmdir(root+"/wrong_extracted_cases")
+    for root, subdirs, files in os.walk(rootdir):
+        if len(subdirs)==0:
+            for file in glob.glob(root+"/*.smt2"):
+                json_file = file + ".JSON"
+                layer_version_json_file = file + ".layerHornGraph.JSON"
+                if not os.path.isfile(layer_version_json_file):
+                    #read JSON' label
+                    json_obj = {}
+                    with open(json_file) as f:
+                        loaded_graph = json.load(f)
+                        for field in old_field:
+                            json_obj[field] = loaded_graph[field]
+                    eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-getHornGraph"], stdout=subprocess.DEVNULL,
+                                           shell=False)
+                    eld.wait()
+                    print("../eldarica-graph-generation-temp/eld",file,"-getHornGraph")
+                    #add more field
+                    with open(layer_version_json_file) as layer_f:
+                        loaded_graph = json.load(layer_f)
+                        for field in new_field:
+                            json_obj[field] = loaded_graph[field]
+                    # write json object to JSON file
+                    clear_file(layer_version_json_file)
+                    with open(layer_version_json_file, 'w') as f:
+                        json.dump(json_obj, f)
 
 
 def main():
@@ -345,22 +391,24 @@ def main():
     ###benchmark_list.append(["../benchmarks/trainData-sv-comp-c-templates/", 25, 5, 8,".c"])
     #benchmark_list.append(["../benchmarks/trainData-chc-comp-templates/", 25, 5, 5,".smt2"])
     #benchmark_list.append(["../benchmarks/temp/", int(18 * 0.6), int(18 * 0.2), int(18 * 0.2), ".smt2"])
-    #benchmark_list.append(["../benchmarks/LIA-lin-trainData/", int(545 * 0.6), int(545 * 0.2), int(545 * 0.2), ".smt2"])
+    #benchmark_list.append(["../benchmarks/temp-extract/", int(545 * 0.6), int(545 * 0.2), int(545 * 0.2), ".smt2"])
     # buckets = 10
     # for benchmark in benchmark_list:
     #     separate_dataset_to_train_valid_test_files(benchmark[0],benchmark[0][:-1]+"-datafold/", benchmark[1], benchmark[2], benchmark[3])
-        #get_statistic_data(benchmark[0],file_type=benchmark[4],buckets=10)
-        #separate_datafold_and_get_statistic_data(rootdir=benchmark[0],file_type=".smt2",buckets=buckets)
+    #     get_statistic_data(benchmark[0],file_type=benchmark[4],buckets=10)
+    #     separate_datafold_and_get_statistic_data(rootdir=benchmark[0],file_type=".smt2",buckets=buckets)
 
 
     #unique_names("../benchmarks/temp")
 
-    #gather_all_train_data(src="../benchmarks/LIA-lin-extracted-intervals/",dst="../benchmarks/LIA-lin-trainData-intervals/")
-    #separate_dataset_to_train_valid_test_files("../benchmarks/LIA-lin-trainData-noIntervals/","../benchmarks/LIA-lin-trainData-noIntervals-datafold/")
+    #gather_all_train_data(src="../benchmarks/LIA-lin-noInterval-extract/",dst="../benchmarks/LIA-lin-noInterval-trainData/")
+    #separate_dataset_to_train_valid_test_files("../benchmarks/LIA-lin-noInterval-trainData/","../benchmarks/LIA-lin-noInterval-trainData-datafold/")
 
     #get_statistic_data("../benchmarks/LIA-lin-traiData/")
 
-    replace_JSON_file_with_node_name("../benchmarks/temp-extract-trainData-datafold")
+    #add_JSON_field("../benchmarks/temp-extract-trainData-datafold")
+
+    add_layer_version_horn_graph_json_file("../benchmarks/LIA-lin-noInterval-trainData-datafold--temp")
 
 if __name__ == '__main__':
     main()

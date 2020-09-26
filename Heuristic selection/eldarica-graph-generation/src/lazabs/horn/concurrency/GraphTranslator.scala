@@ -430,10 +430,13 @@ class TreeNodeForGraph{
 }
 
 
-class BinarySearchTreeForGraphClass (connectionType:String,ASTtype:String = ""){
+class BinarySearchTreeForGraphClass (ASTtype:String = ""){
 
   var relationString: String = "" //store node relation information
   var nodeString: String = "" //store node information
+  var treeType:String = ""
+  if (ASTtype=="guard") treeType="guardAST"
+  else treeType="dataFlow"
   def preOrder(root: TreeNodeForGraph): Unit = {
     if (root != null) {
       //println(root.data)
@@ -443,14 +446,14 @@ class BinarySearchTreeForGraphClass (connectionType:String,ASTtype:String = ""){
         val (l_key, l_value) = root.lchild.data.head
         if (k != l_key && v != "root") {
           //relationString=relationString+(l_key+"->"+k+"[label=\"" + edgeNameMap("dataFlowOut") + "\"]"+"\n")
-          relationString = relationString + ("\"" + l_key + "\"" + " -> " + "\"" + k + "\"" + "[label=\"" + connectionType + "\"]" + "\n")
+          relationString = relationString + ("\"" + l_key + "\"" + " -> " + "\"" + k + "\"" + "[label=\"" + treeType + "\"]" + "\n")
         }
       }
 
       if (root.rchild != null) {
         val (r_key, r_value) = root.rchild.data.head
         if (k != r_key && v != "root") {
-          relationString = relationString + ("\"" + r_key + "\"" + " -> " + "\"" + k + "\"" + "[label=\"" + connectionType + "\"]" + "\n")
+          relationString = relationString + ("\"" + r_key + "\"" + " -> " + "\"" + k + "\"" + "[label=\"" + treeType + "\"]" + "\n")
         }
 
       }
@@ -469,20 +472,29 @@ class BinarySearchTreeForGraphClass (connectionType:String,ASTtype:String = ""){
         val (l_key, l_value) = root.lchild.data.head
         if (k != l_key && v != "root") {
           //relationString=relationString+(l_key+"->"+k+"[label=\"" + edgeNameMap("dataFlowOut") + "\"]"+"\n")
-          relationString = relationString + (addQuotes(l_key)+ " -> " + addQuotes(k) + "[label=\"" + connectionType + "\"]" + "\n")
-          dot.edge(addQuotes(l_key),addQuotes(k),attrs = MuMap("label"->addQuotes(connectionType)))
-          gnn_inputs.binaryAdjacentcy+=ListBuffer(gnn_inputs.nodeNameToIDMap(l_key),gnn_inputs.nodeNameToIDMap(k))
+          relationString = relationString + (addQuotes(l_key)+ " -> " + addQuotes(k) + "[label=\"" + treeType + "\"]" + "\n")
+          dot.edge(addQuotes(l_key),addQuotes(k),attrs = MuMap("label"->addQuotes(treeType)))
+          val ASTEdges = ListBuffer(gnn_inputs.nodeNameToIDMap(l_key),gnn_inputs.nodeNameToIDMap(k))
+          gnn_inputs.binaryAdjacency += ASTEdges
+          if (treeType=="dataFlow"){
+            gnn_inputs.dataFlowASTEdges.edgeList += ASTEdges
+            gnn_inputs.dataFlowEdges.edgeList += ASTEdges
+          }else{gnn_inputs.guardASTEdges.edgeList += ASTEdges}
         }
       }
 
       if (root.rchild != null) {
         val (r_key, r_value) = root.rchild.data.head
         if (k != r_key && v != "root") {
-          relationString = relationString + (addQuotes(r_key) + " -> " + addQuotes(k)+ "[label=\"" + connectionType + "\"]" + "\n")
-          dot.edge(addQuotes(r_key),addQuotes(k),attrs = MuMap("label"->addQuotes(connectionType)))
-          gnn_inputs.binaryAdjacentcy+=ListBuffer(gnn_inputs.nodeNameToIDMap(r_key),gnn_inputs.nodeNameToIDMap(k))
+          relationString = relationString + (addQuotes(r_key) + " -> " + addQuotes(k)+ "[label=\"" + treeType + "\"]" + "\n")
+          dot.edge(addQuotes(r_key),addQuotes(k),attrs = MuMap("label"->addQuotes(treeType)))
+          val ASTEdges = ListBuffer(gnn_inputs.nodeNameToIDMap(r_key),gnn_inputs.nodeNameToIDMap(k))
+          gnn_inputs.binaryAdjacency += ASTEdges
+          if (treeType=="dataFlow"){
+            gnn_inputs.dataFlowASTEdges.edgeList += ASTEdges
+            gnn_inputs.dataFlowEdges.edgeList += ASTEdges
+          }else{gnn_inputs.guardASTEdges.edgeList += ASTEdges}
         }
-
       }
       preOrder(root.lchild,gnn_inputs,dot)
       //print(root.data.keys + "\n")
@@ -535,7 +547,7 @@ class ControlFowHyperEdge(body:String,head:String,ind:Int) {
 
 }
 class DataFlowHyperEdge(body:String,head:String,guardedArgument:String,ind:Int) {
-  var fromData=""
+  var fromData=("",true)
   var fromASTRoot=""
   val from =head
   val to=guardedArgument
@@ -611,6 +623,7 @@ class ClauseTransitionInformation(controlFlowHead:ControlFlowNode,controlFLowBod
   var dataFlowNumber=0
   var guardASTGraph=Map[String,String]()//rootName->graph
   var dataFlowASTGraph=ListBuffer[DataFlowASTGraphInfo]()
+  var argumentDataFlowASTGraph=ListBuffer[DataFlowASTGraphInfo]()
   var simpleDataFlowConnection=Map[ArgumentNode,ArgumentNode]()//map:hyperedge->connectiongraph
   val name:String=head.name+"___"+body.name
   var guardASTRootName=""

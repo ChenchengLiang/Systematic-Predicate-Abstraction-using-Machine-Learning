@@ -27,9 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package lazabs.horn.concurrency
-
 import java.io.{File, PrintWriter}
-
 import ap.basetypes.IdealInt
 import ap.parser.IExpression._
 import ap.parser.{IExpression, _}
@@ -39,7 +37,6 @@ import lazabs.horn.preprocessor.HornPreprocessor.{Clauses, VerificationHints}
 import lazabs.horn.concurrency.Digraph
 import play.api.libs.json._
 import lazabs.horn.concurrency.BinarySearchTreeForGraphClass
-
 import scala.collection.mutable.{ListBuffer, HashMap => MHashMap, Map => MuMap}
 
 
@@ -49,15 +46,19 @@ object DrawHornGraph {
   def writeHornClausesGraphWithHintsToFile(file: String, simpClauses: Clauses,hints:VerificationHints): Unit = {
 
   }
+  def isNumeric(input: String): Boolean = {
+    if(input!="" && input.forall(_.isDigit)) true
+    else false
+  }
 
-  def genereateGNNInputs(file: String, simpClauses: Clauses): Unit ={
+  def genereateSampleGNNInputs(file: String, simpClauses: Clauses): Unit ={
     val nodeIds=List(0,1,2,3,4,5)
-    val binaryAdjacentcy=List(List(1,2),List(2,3))
-    val tenaryAdjacency=List(List(1,2,3),List(2,3,1))
+    val binaryAdjacency=List(List(1,2),List(2,3))
+    val ternaryAdjacency=List(List(1,2,3),List(2,3,1))
     val controlLocationIndices=List(1,2)
     val argumentIndices=List(4,5)
     val oneGraphGNNInput=Json.obj("nodeIds" -> nodeIds,
-      "binaryAdjacentList" -> binaryAdjacentcy,"tenaryAdjacencyList" -> tenaryAdjacency,
+      "binaryAdjacentList" -> binaryAdjacency,"ternaryAdjacencyList" -> ternaryAdjacency,
       "controlLocationIndices"->controlLocationIndices,"argumentIndices"->argumentIndices)
     println(oneGraphGNNInput)
 
@@ -71,28 +72,7 @@ object DrawHornGraph {
     writer.close()
 
   }
-
-  def writeGNNInputsToJSON(file: String,nodeIds:ListBuffer[Int],binaryAdjacentcy:ListBuffer[ListBuffer[Int]],
-                           tenaryAdjacency:ListBuffer[ListBuffer[Int]],
-                           controlLocationIndices:ListBuffer[Int],argumentIndices:ListBuffer[Int],
-                           argumentIDList:ListBuffer[Int],argumentNameList:ListBuffer[String],argumentOccurrence:ListBuffer[Int]): Unit ={
-
-
-    val oneGraphGNNInput=Json.obj("nodeIds" -> nodeIds,
-      "binaryAdjacentList" -> binaryAdjacentcy,"tenaryAdjacencyList" -> tenaryAdjacency,
-      "controlLocationIndices"->controlLocationIndices,"argumentIndices"->argumentIndices,
-    "argumentIDList"->argumentIDList,"argumentNameList"->argumentNameList,"argumentOccurrence"->argumentOccurrence)
-    //println(oneGraphGNNInput)
-
-    println("Write GNNInput to file")
-    val writer = new PrintWriter(new File(GlobalParameters.get.fileName + ".JSON")) //python path
-    //val writer = new PrintWriter(new File("../trainData/" + file + ".JSON")) //python path
-    writer.write(oneGraphGNNInput.toString())
-    writer.close()
-
-  }
-
-  def buildHornGraphInMemory(file: String, simpClauses: Clauses,hints:VerificationHints): Unit ={
+  def buildSampleHornGraphInMemory(file: String, simpClauses: Clauses,hints:VerificationHints): Unit ={
     import scala.collection.mutable.Map
     val fileName = file.substring(file.lastIndexOf("/") + 1)
     val dot = new Digraph(comment = "Horn Graph")
@@ -109,6 +89,31 @@ object DrawHornGraph {
 
 
   }
+
+  def writeGNNInputsToJSON(file: String,nodeIds:ListBuffer[Int],binaryAdjacency:ListBuffer[ListBuffer[Int]],
+                           ternaryAdjacency:ListBuffer[ListBuffer[Int]],
+                           controlLocationIndices:ListBuffer[Int],argumentIndices:ListBuffer[Int],nodeSymbolList:ListBuffer[String],
+                           argumentIDList:ListBuffer[Int],argumentNameList:ListBuffer[String],argumentOccurrence:ListBuffer[Int],
+                           controlFlowHyperEdges:Adjacency,dataFlowHyperEdges:Adjacency,dataFlowASTEdges:Adjacency,
+                           dataFlowEdges:Adjacency,guardASTEdges:Adjacency,argumentEdges:Adjacency): Unit ={
+
+    val oneGraphGNNInput=Json.obj("nodeIds" -> nodeIds,"nodeSymbolList"->nodeSymbolList,
+      "binaryAdjacentList" -> binaryAdjacency,"ternaryAdjacencyList" -> ternaryAdjacency,
+      "controlLocationIndices"->controlLocationIndices,"argumentIndices"->argumentIndices,
+      "argumentIDList"->argumentIDList,"argumentNameList"->argumentNameList,"argumentOccurrence"->argumentOccurrence,
+      "controlFlowHyperEdges"->controlFlowHyperEdges.edgeList,"dataFlowHyperEdges"->dataFlowHyperEdges.edgeList,
+      "dataFlowASTEdges"->dataFlowASTEdges.edgeList,"dataFlowEdges"->dataFlowEdges.edgeList,
+      "guardASTEdges"->guardASTEdges.edgeList,
+      "argumentEdges"->argumentEdges.edgeList)
+    //println(oneGraphGNNInput)
+    println("Write GNNInput to file")
+    val writer = new PrintWriter(new File(GlobalParameters.get.fileName + ".JSON")) //python path
+    //val writer = new PrintWriter(new File("../trainData/" + file + ".JSON")) //python path
+    writer.write(oneGraphGNNInput.toString())
+    writer.close()
+  }
+
+
   class argumentInfoHronGraph(headName:String,ind:Int)
   {
     var ID=0
@@ -118,35 +123,161 @@ object DrawHornGraph {
     var score=0
   }
 
+  class Adjacency(edge_name:String,edge_number:Int){
+    val edgeName=edge_name
+    val edgeNumber=edge_number
+    var edgeList=new ListBuffer[ListBuffer[Int]]()
+  }
+
   class GNNInput(){
     var GNNNodeID=0
     var hyperEdgeNodeID=0
     var TotalNodeID=0
+    //canonical node category for hyperedge horn graph
+    var CONTROLCanonicalID,argumentCanonicalID,predicateCanonicalID,iEpsilonCanonicalID,iFormulaITECanonicalID,iFunAppCanonicalID,
+    iNamePartCanonicalID,iTermITECanonicalID,iTriggerCanonicalID,variableCanonicalID,symbolicConstantCanonicalID=0
+
+    //canonical node category for layer horn graph
+    var clauseHeadCanonicalID,clauseBodyCanonicalID,clauseArgCanonicalID,clauseCanonicalID,predicateNameCanonicalID,
+    predicateArgumentCanonicalID,operatorUniqueID,constantUniqueID=0
 
     var nodeIds=new ListBuffer[Int]()
-    var binaryAdjacentcy=new ListBuffer[ListBuffer[Int]]()
-    var tenaryAdjacency=new ListBuffer[ListBuffer[Int]]()
+    var nodeSymbols = new ListBuffer[String]()
+
+    //edge category for hyperedge horn graph
+    var binaryAdjacency=new ListBuffer[ListBuffer[Int]]()
+    val dataFlowASTEdges = new Adjacency("dataFlowASTEdge",2)
+    val dataFlowEdges = new Adjacency("dataFlowEdge",2)
+    val argumentEdges = new Adjacency("argumentEdge",2)
+    val guardASTEdges = new Adjacency("guardASTEdge",2)
+
+    var ternaryAdjacency=new ListBuffer[ListBuffer[Int]]()
+    val controlFlowHyperEdges=new Adjacency("controlFlowHyperEdge",3)
+    val dataFlowHyperEdges=new Adjacency("dataFlowHyperEdge",3)
+
+    //edge category for layer version horn graph
+    val predicateArgumentEdges = new Adjacency("predicateArgument",2)
+    val predicateInstanceEdges = new Adjacency("predicateInstance",2)
+    val argumentInstanceEdges = new Adjacency("argumentInstance",2)
+    val controlHeadEdges = new Adjacency("controlHead",2)
+    val controlBodyEdges= new Adjacency("controlBody",2)
+    val controlArgumentEdges = new Adjacency("controlArgument",2)
+    val guardEdges = new Adjacency("guard",2)
+    val dataEdges = new Adjacency("data",2)
+    val subTermEdges = new Adjacency("subTerm",2)
+    val unknownEdges = new Adjacency("unknownEdges",2)
+
     var controlLocationIndices=new ListBuffer[Int]()
     var argumentIndices=new ListBuffer[Int]()
     var argumentInfoHornGraphList=new ListBuffer[argumentInfoHronGraph]
-
-
-
     var nodeNameToIDMap =   MuMap[String, Int]()
-    var controlFLowTenaryAdjacency=new ListBuffer[ListBuffer[Int]]()
 
-    def incrementNodeIds(nodeName:String): Unit ={
+    def incrementBinaryEdge(from:String,to:String,label:String): Unit ={
+      val fromID=nodeNameToIDMap(from)
+      val toID=nodeNameToIDMap(to)
+      label match {
+        case "predicateArgument" => predicateArgumentEdges.edgeList += ListBuffer(fromID,toID)
+        case "predicateInstance" => predicateInstanceEdges.edgeList += ListBuffer(fromID,toID)
+        case "argumentInstance" => argumentInstanceEdges.edgeList += ListBuffer(fromID,toID)
+        case "controlHead" => controlHeadEdges.edgeList += ListBuffer(fromID,toID)
+        case "controlBody" => controlBodyEdges.edgeList += ListBuffer(fromID,toID)
+        case "controlArgument" => controlArgumentEdges.edgeList += ListBuffer(fromID,toID)
+        case "guard" => guardEdges.edgeList += ListBuffer(fromID,toID)
+        case "data" => dataEdges.edgeList += ListBuffer(fromID,toID)
+        case "subTerm" => subTermEdges.edgeList += ListBuffer(fromID,toID)
+        case _ => unknownEdges.edgeList += ListBuffer(fromID,toID)
+      }
+      binaryAdjacency+=ListBuffer(fromID,toID)
+    }
+
+    def incrementNodeIds(nodeUniqueName:String,nodeClass:String,nodeName:String): Unit ={
       nodeIds+=GNNNodeID
-      nodeNameToIDMap(nodeName)=GNNNodeID
+      nodeNameToIDMap(nodeUniqueName)=GNNNodeID
       GNNNodeID+=1
+      nodeClass match{
+        case "CONTROL" =>{
+          nodeSymbols+=nodeClass +"_"+ CONTROLCanonicalID.toString
+          CONTROLCanonicalID+=1
+        }
+        case "argument" =>{
+          nodeSymbols+=nodeClass +"_"+ argumentCanonicalID.toString
+          argumentCanonicalID+=1
+        }
+        case "predicate" =>{
+          nodeSymbols+=nodeClass +"_"+ predicateCanonicalID.toString
+          predicateCanonicalID+=1
+        }
+        case "IEpsilon" =>{
+          nodeSymbols+=nodeClass +"_"+ iEpsilonCanonicalID.toString
+          iEpsilonCanonicalID+=1
+        }
+        case "IFormulaITE" =>{
+          nodeSymbols+=nodeClass +"_"+ iFormulaITECanonicalID.toString
+          iFormulaITECanonicalID+=1
+        }
+        case "IFunApp" =>{
+          nodeSymbols+=nodeClass +"_"+ iFunAppCanonicalID.toString
+          iFunAppCanonicalID+=1
+        }
+        case "INamePart" =>{
+          nodeSymbols+=nodeClass +"_"+ iNamePartCanonicalID.toString
+          iNamePartCanonicalID+=1
+        }
+        case "ITermITE"=>{
+          nodeSymbols+=nodeClass +"_"+ iTermITECanonicalID.toString
+          iTermITECanonicalID+=1
+        }
+        case "ITrigger"=>{
+          nodeSymbols+=nodeClass +"_"+ iTriggerCanonicalID.toString
+          iTriggerCanonicalID+=1
+        }
+        case "variable"=>{
+          nodeSymbols+=nodeClass +"_"+ variableCanonicalID.toString
+          variableCanonicalID+=1
+        }
+        case "symbolicConstant"=>{
+          nodeSymbols+=nodeClass +"_"+ symbolicConstantCanonicalID.toString
+          symbolicConstantCanonicalID+=1
+        }
+        case "clauseHead"=>{
+          nodeSymbols+=nodeClass +"_"+ clauseHeadCanonicalID.toString
+          clauseHeadCanonicalID+=1
+        }
+        case "clauseBody" =>{
+          nodeSymbols+=nodeClass +"_"+ clauseBodyCanonicalID.toString
+          clauseBodyCanonicalID+=1
+        }
+        case "clauseArg" =>{
+          nodeSymbols+=nodeClass +"_"+ clauseArgCanonicalID.toString
+          clauseArgCanonicalID+=1
+        }
+        case "clause" =>{
+          nodeSymbols+=nodeClass +"_"+ clauseCanonicalID.toString
+          clauseCanonicalID+=1
+        }
+        case "predicateName"=>{
+          nodeSymbols+=nodeClass +"_"+ predicateNameCanonicalID.toString
+          predicateNameCanonicalID+=1
+        }
+        case "predicateArgument" =>{
+          nodeSymbols+=nodeClass +"_"+ predicateArgumentCanonicalID.toString
+          predicateArgumentCanonicalID+=1
+        }
+        case "FALSE" => nodeSymbols+=nodeName
+        case "operator" => nodeSymbols+=nodeName
+        case "constant" => nodeSymbols+=nodeName
+        case _ => nodeSymbols+=nodeName
+
+      }
+
     }
-    def incrementArgumentIndicesAndNodeIds(nodeName:String): Unit ={
+    def incrementArgumentIndicesAndNodeIds(nodeUniqueName:String,nodeClass:String,nodeName:String): Unit ={
       argumentIndices+=GNNNodeID
-      incrementNodeIds(nodeName)
+      incrementNodeIds(nodeUniqueName,nodeClass,nodeName)
     }
-    def incrementControlLocationIndicesAndNodeIds(nodeName:String): Unit ={
+    def incrementControlLocationIndicesAndNodeIds(nodeUniqueName:String,nodeClass:String,nodeName:String): Unit ={
       controlLocationIndices+=GNNNodeID
-      incrementNodeIds(nodeName)
+      incrementNodeIds(nodeUniqueName,nodeClass,nodeName)
     }
   }
 
@@ -156,21 +287,25 @@ object DrawHornGraph {
 
     println("Write horn to file")
     var edgeNameMap: Map[String, String] = Map()
-    edgeNameMap += ("controlFlowIn" -> "control flow in")
-    edgeNameMap += ("controlFlowOut" -> "control flow out")
-    edgeNameMap += ("dataFlowIn" -> "data flow in")
-    edgeNameMap += ("dataFlowOut" -> "data flow out")
-    edgeNameMap += ("argument" -> "argument")
-    edgeNameMap += ("dataFlowIn" -> "data flow in")
-    edgeNameMap += ("dataFlowOut" -> "data flow out")
-    edgeNameMap += ("astAnd" -> "AST &")
-    edgeNameMap += ("condition" -> "condition")
-    edgeNameMap += ("constantDataFlow" -> "constant data flow")
-    edgeNameMap += ("dataFlow" -> "data flow")
-    edgeNameMap += ("predicateAST" -> "predicateAST")
-    edgeNameMap += ("dataFlowAST" -> "dataFlowAST")
-    edgeNameMap += ("predicate" -> "prdicate")
+    //edgeNameMap += ("controlFlowIn" -> "control flow in")//replaced by controlFlowHyperEdge
+    //edgeNameMap += ("controlFlowOut" -> "control flow out")//replaced by controlFlowHyperEdge
+    edgeNameMap += ("controlFlowHyperEdge" -> "CFHE")
 
+    //edgeNameMap += ("dataFlowIn" -> "data flow in")//replaced by dataFlowHyperEdge
+    //edgeNameMap += ("dataFlowOut" -> "data flow out")//replaced by dataFlowHyperEdge
+    edgeNameMap += ("dataFlowHyperEdge" -> "DFHE")
+
+    //edgeNameMap += ("condition" -> "condition") //replaced by controlFlowHyperEdge and dataFlowHyperEdge
+    //edgeNameMap += ("constantDataFlow" -> "constant data flow") //replaced by dataFlow
+    //edgeNameMap += ("astAnd" -> "AST &") //replaced by dataFlowAST
+
+    edgeNameMap += ("argument" -> "argument")
+    edgeNameMap += ("dataFlow" -> "dataFlow")
+    edgeNameMap += ("dataFlowAST" -> "dataFlowAST")
+    edgeNameMap += ("guardAST" -> "guardAST")
+
+    edgeNameMap += ("predicateAST" -> "predicateAST")
+    edgeNameMap += ("predicate" -> "prdicate")
 
 
     //turn on/off edge's label
@@ -181,7 +316,6 @@ object DrawHornGraph {
         //edgeNameMap updated (key, " ")
       }
     }
-    //println(file.substring(file.lastIndexOf("/")+1))
     val fileName = file.substring(file.lastIndexOf("/") + 1)
     //val writer = new PrintWriter(new File("../trainData/" + fileName + ".HornGraph")) //python path
     val writer = new PrintWriter(new File(file + ".HornGraph")) //python path
@@ -214,7 +348,6 @@ object DrawHornGraph {
           argsInBody += Pair(arg.toString,arg)
         }
       }
-
 
       //store head and body to controlFLowNodeList data structure
       var bodyName = "Initial"
@@ -249,23 +382,13 @@ object DrawHornGraph {
       val currentClause = new ClauseTransitionInformation(currentControlFlowNodeHead, currentControlFlowNodeBody, clauseID)
       clauseID = clauseID + 1
 
-      //todo:check if this argument sequence equal to .argument's argument sequence
       //add head argument to node list
       for(arg<-currentClause.head.argumentList if !currentClause.head.argumentList.isEmpty){
         if(!currentClause.nodeList.exists(x=>x._1==arg.name)){
           currentClause.nodeList+=Pair(arg.name,arg.originalContent)
           if (!gnn_input.nodeNameToIDMap.contains(arg.name)) {
-            gnn_input.incrementArgumentIndicesAndNodeIds(arg.name)
+            gnn_input.incrementArgumentIndicesAndNodeIds(arg.name,"argument",arg.originalContent)
             gnn_input.argumentInfoHornGraphList+=new argumentInfoHronGraph(arg.name.substring(0,arg.name.indexOf("_argument"))+"/"+currentClause.head.arity,(arg.name.substring(arg.name.indexOf("argument_")+"argument_".size,arg.name.size)).toInt)
-//            val argumentHead=arg.name.substring(0,arg.name.indexOf("_argument"))
-//            val argumentIndex=(arg.name.substring(arg.name.indexOf("argument_")+"argument_".size,arg.name.size)).toInt
-//            var tempCounter=false
-//            for (argInfo <- gnn_input.argumentInfoHornGraphList){
-//              if (argInfo.head==argumentHead && argumentIndex==argInfo.index) tempCounter=true
-//            }
-//            if (tempCounter==false)
-//              gnn_input.argumentInfoHornGraphList+=new argumentInfoHronGraph(argumentHead,argumentIndex)
-
           }
         }
       }
@@ -274,14 +397,12 @@ object DrawHornGraph {
         if(!currentClause.nodeList.exists(x=>x._1==arg.name)){
           currentClause.nodeList+=Pair(arg.name,arg.originalContent)
           if (!gnn_input.nodeNameToIDMap.contains(arg.name)) {
-            gnn_input.incrementArgumentIndicesAndNodeIds(arg.name)
+            gnn_input.incrementArgumentIndicesAndNodeIds(arg.name,"argument",arg.originalContent)
             gnn_input.argumentInfoHornGraphList+=new argumentInfoHronGraph(arg.name.substring(0,arg.name.indexOf("_argument"))+"/"+currentClause.head.arity,(arg.name.substring(arg.name.indexOf("argument_")+"argument_".size,arg.name.size)).toInt)
           }
 
         }
       }
-
-
 
       writer.write("Head arguments: " + argsInHead.toString() + "\n")
       writer.write("Body arguments: " + argsInBody.toString() + "\n")
@@ -290,16 +411,49 @@ object DrawHornGraph {
       //val x =argsInHead.toList.filterNot(arg=>argsInBody.toString().contains(arg.toString))
       writer.write("Common Arguments:" + commonArg.toString() + "\n")
 
-
       //head argument -common argument
       val relativeComplimentOfHeadArg = argsInHead.filterNot(arg => commonArg.contains(arg))
+      //body argument -common argument
+      val relativeComplimentOfBodyArg = argsInBody.filterNot(arg => commonArg.contains(arg))
       // store relativeComplimentOfHeadArg to clause
       currentClause.relativeComplimentOfHeadArg=relativeComplimentOfHeadArg
       writer.write("relativeComplimentOfHeadArg:" + relativeComplimentOfHeadArg.toString() + "\n")
+      writer.write("relativeComplimentOfBodyArg:" + relativeComplimentOfBodyArg.toString() + "\n")
+
+      writer.write(clause.head.args+ "\n")
+      writer.write(clause.body+ "\n")
+      writer.write(clause.constraint+ "\n")
+      /*
+      inv_main6(P5, T6, T7, T8, T9) :- inv_main6(0, T6 + -1, T7 + -1, P4, P0), P3 != 0 & T9 = P0 + 1 + T6 + -1 & T8 = P4 + 1 + T7 + -1 & P5 = 0.
+      dataflow:
+      P5 <- 0
+      T6 <- T6 + -1
+      T7 <- T7 + -1
+      T8 <- P4
+      T9 <- P0
+      Guards:
+      P3 != 0
+      T9 = P0 + 1 + T6 + -1
+      T8 = P4 + 1 + T7 + -1
+      P5 = 0
 
 
+      clause format: head(arg1,arg2,...,argn):-body(bodyArg1,bodyArg2,...bodyArgn), [E_1 & E_2 & ... & E_M]
+      bodyArg and E
+      parsing constrains:
+      E is expression in constrains
+      if E is not a equation
+        E is a guard
+      else if E includes head's argument:
+        E is a data flow
+      else if E does not include head's argument:
+        E is a guard
+      parsing things in body(E1,E2)
+
+      */
       //separate guard and data flow conjunct
-      //if the expression is not a equation, then it is a guard
+      //if the expression is not a equation, it is a guard
+      //if the expression is a equation and includes head's argument, then it is a data flow.
       //if the expression is a equation and head's argument -common argument not in the formula,then it is a guard
       //if the expression is a equation and there are element in the head's argument - common argument set, then it is a data flow
       var guardConjunct=ListBuffer[IFormula]()
@@ -401,11 +555,9 @@ object DrawHornGraph {
       }
       elementsInGuard=elementsInGuard.distinct //delete reapeatative element
       for(e<-elementsInGuard){ //delete integers
-        try {
+        if(isNumeric(e)){
           e.toInt
           elementsInGuard-=e
-        } catch {
-          case e: Exception => {}
         }
       }
       writer.write("variables in guard: " + elementsInGuard.toString() + "\n")
@@ -469,6 +621,28 @@ object DrawHornGraph {
         dataFlowConjunct=dataFlowConjunctTemp
       }
 
+      /*
+      todo: not use this mechanism, use argument to involve in guard directly. check 05.c-1.smt2' main6:argument_0 dataflow hyperedge_2
+      inv_main6(P5, T6, T7, T8, T9) :- inv_main6(0, T6 + -1, T7 + -1, P4, P0), P3 != 0 & T9 = P0 + 1 + T6 + -1 & T8 = P4 + 1 + T7 + -1 & P5 = 0.
+      Data flow:
+      P5 <- 0
+      T6 <- _T6
+      T7 <- _T7
+      T8 <- _T8
+      T9 <- _T9
+      P5<-0
+      T6<-(T6 + -1)
+      T7<-(T7 + -1)
+      T8<-P4
+      T9<-P0
+      inv_main6_argument_0<-0
+      Guard:
+      !(P3 = 0)
+      ((_T9 + (-1 * P0 + -1 * _T6)) = 0)
+      ((_T8 + (-1 * P4 + -1 * _T7)) = 0)
+      dataflow number:5
+      guard number:3
+      */
       //preprocessing:if data flow has more than one head elements, replace element in conjunct to be a guard, add data flow
       writer.write("Data flow:\n")
       var dataFlowMap = Map[String, IExpression]() //argument->dataflow
@@ -487,6 +661,7 @@ object DrawHornGraph {
         }
         case _=>{}
       }
+
 //      //After preprocessing, the left dataflow conjuncts only has one head argument
 //      for(conjunct<-dataFlowConjunct){
 //        //val Eq(a,b)=conjunct
@@ -521,6 +696,7 @@ object DrawHornGraph {
               //val sp=new ap.parser.Simplifier
               //sp.apply(lhs)
               dataFlowMap = dataFlowMap ++ Map(currentClause.head.getArgNameByContent(headArg._1) -> df)
+
             }
             //writer.write(headArg+"="+lhs+"-"+otherTerms+"\n")// data flow: lhs - otherTerms -> c
           }
@@ -531,6 +707,19 @@ object DrawHornGraph {
         }
 
       }
+
+      //preprocessing: if relativeComplimentOfBodyArg is not empty and headName = bodyName, there is a data flow between arguments
+      if (!relativeComplimentOfBodyArg.isEmpty && currentClause.body.name==currentClause.head.name){
+        for ((argHead, argBody) <- (relativeComplimentOfHeadArg zip relativeComplimentOfBodyArg)){
+          for(arg <-currentClause.head.argumentList){
+            if (arg.originalContent==argHead._1) {
+              dataFlowMap=dataFlowMap ++ Map(arg.name -> argBody._2)
+              writer.write(argHead._1+ "<-" + argBody._2.toString+"\n")// this is for printing nicely, in the map, arg.name is used.
+            }
+          }
+        }
+      }
+
 
       var dataFlowList = ListBuffer[IExpression]()
       for ((arg, df) <- dataFlowMap) {
@@ -545,68 +734,53 @@ object DrawHornGraph {
       val (dataFLowAST,dataFlowNodeHashMap) = drawAST(currentClause, "dataFlow", dataFlowMap,
         MHashMap.empty[String,ITerm],edgeNameMap,gnn_input,dot)
       currentClause.dataFlowASTGraph=dataFLowAST
-      //draw simple data flow
+
+
+      //draw simple data flow: body argument to head argument if there is no data flow in constrains.
       for (comArg <- commonArg) {
         if (!dataFlowElementList.contains(comArg._1)) {
+          //writer.write("simple data flow:"+ "\n")
           writer.write(comArg._1 + "<-" + comArg._1 + "\n")
-
           for (bodyArg <- currentClause.body.argumentList; headArg <- currentClause.head.argumentList
                if headArg.originalContent == comArg._1 && bodyArg.originalContent == comArg._1) {
                 currentClause.simpleDataFlowConnection = currentClause.simpleDataFlowConnection ++
                   Map(bodyArg ->headArg)
-//                    ("\"" + bodyArg.name + "\"" + " -> " + "\"" + headArg.dataFLowHyperEdge.name+ "\"" +
-//                      "[label=\"" + edgeNameMap("dataFlowIn") + "\"]" + "\n"))
-                //                  + //data flow hyper edge already been drew when create this hyperedge
-                //                  headArg.dataFLowHyperEdge.name + " -> " + headArg.name +
-                //                  "[label=\""+edgeNameMap("dataFlowOut")+"\"]"+"\n"))
           }
         }
       }
 
+
       //draw constant data flow
       //if arguments in head are constant, add data flow constant ->arguments
-      //head constan dataflow
+      //head constant dataflow
       if (!argsInHead.isEmpty) {
         for ((arg, i) <- argsInHead.zipWithIndex) {
-          try {
-            arg._1.toInt
-            //determine if argument is a constant number
+          if(isNumeric(arg._1)){ //if argument is a constant number
             for (argument <- currentControlFlowNodeHead.argumentList)
               if (argument.originalContent == arg._1) {
                 writer.write(argument.name + " <- " + arg._1 + "\n")
                 //add constant data flow in to clause data structure
                 argument.constantFlowInNode = "xxx"+currentClause.name + "_" + currentClause.clauseID +  "xxx" +
                   argument.name + "_constant_" + "\""+arg._1
-                //println(argument.constantFlowInNode)
               }
-          }
-          catch {
-            case ex: Exception => {}
           }
         }
       }
-
       //if arguments in body are constant, add guard constant == arguments
       //body constant dataflow
       if (!argsInBody.isEmpty) {
         for ((arg, i) <- argsInBody.zipWithIndex) {
-          try {
-            arg._1.toInt
-            //determine if argument is a constant number
+          if (isNumeric(arg._1)){//if argument is a constant number
             for (argument <- currentControlFlowNodeBody.argumentList)
               if (argument.originalContent == arg._1) {
                 writer.write(argument.name + "<-" + arg._1 + "\n")
                 //add constant data flow in to clause data structure
                 argument.constantFlowInNode = "xxx"+currentClause.name + "_" + currentClause.clauseID  + "xxx" +
                   argument.name + "_constant_" +arg._1
-                //println(argument.constantFlowInNode)
               }
-          }catch {
-            case ex: Exception => {}
           }
         }
       }
-
 
       //guard
       writer.write("Guard:\n")
@@ -668,20 +842,20 @@ object DrawHornGraph {
     //control flow node
     for (p <- predicates) {
       //println("" + predIndex(p) + " [label=\"" + p.name + "\"];")
-      writerGraph.write("" + addQuotes(p.name)+ " [label=" + addQuotes(p.name) +" nodeName="+ addQuotes(p.name) +" class=cfn "+ " shape=\"rect\"" + "];" + "\n")
+      writerGraph.write("" + addQuotes(p.name)+ " [label=" + addQuotes(p.name) +" nodeName="+ addQuotes(p.name) +" class=CONTROL "+ " shape=\"rect\"" + "];" + "\n")
       dot.node(addQuotes(p.name), addQuotes(p.name),attrs = MuMap("nodeName"->addQuotes(p.name),
-        "shape"->addQuotes("rect"),"class"->"cfn","GNNNodeID"->gnn_input.GNNNodeID.toString))
-      gnn_input.incrementControlLocationIndicesAndNodeIds(p.name)
+        "shape"->addQuotes("rect"),"class"->"CONTROL","GNNNodeID"->gnn_input.GNNNodeID.toString))
+      gnn_input.incrementControlLocationIndicesAndNodeIds(p.name,"CONTROL",p.name)
     }
-    writerGraph.write("FALSE" + " [label=\"" + "FALSE" + "\""+" nodeName=FALSE"+" class=cfn " + " shape=\"rect\"" + "];" + "\n") //false node
+    writerGraph.write("FALSE" + " [label=\"" + "FALSE" + "\""+" nodeName=FALSE"+" class=CONTROL " + " shape=\"rect\"" + "];" + "\n") //false node
     dot.node("FALSE","False",
-      attrs = MuMap("nodeName"->"False","shape"->addQuotes("rect"),"class"->"cfn","GNNNodeID"->gnn_input.GNNNodeID.toString))
-    gnn_input.incrementControlLocationIndicesAndNodeIds("FALSE")
+      attrs = MuMap("nodeName"->"False","shape"->addQuotes("rect"),"class"->"CONTROL","GNNNodeID"->gnn_input.GNNNodeID.toString))
+    gnn_input.incrementControlLocationIndicesAndNodeIds("FALSE","FALSE","FALSE")
 
-    writerGraph.write("Initial" + " [label=\"" + "Initial" + "\"" +" nodeName=Initial"+" class=cfn "+ " shape=\"rect\"" + "];" + "\n") //initial node
+    writerGraph.write("Initial" + " [label=\"" + "Initial" + "\"" +" nodeName=Initial"+" class=CONTROL "+ " shape=\"rect\"" + "];" + "\n") //initial node
     dot.node("Initial","Initial",
-      attrs = MuMap("nodeName"->"Initial","shape"->addQuotes("rect"),"class"->"cfn","GNNNodeID"->gnn_input.GNNNodeID.toString))
-    gnn_input.incrementControlLocationIndicesAndNodeIds("Initial")
+      attrs = MuMap("nodeName"->"Initial","shape"->addQuotes("rect"),"class"->"CONTROL","GNNNodeID"->gnn_input.GNNNodeID.toString))
+    gnn_input.incrementControlLocationIndicesAndNodeIds("Initial","CONTROL","Initial")
 
 
 
@@ -699,10 +873,10 @@ object DrawHornGraph {
         "shape"->addQuotes("diamond"),"class"->"controlFlowHyperEdge","hyperEdgeNodeID"->gnn_input.hyperEdgeNodeID.toString))
       gnn_input.hyperEdgeNodeID+=1
       //create edges of control flow hyper edge
-      writerGraph.write(addQuotes(clauseInfo.body.name)+ " -> " + cfheName + " [label=\"" + edgeNameMap("controlFlowIn") + "\"]" + "\n")
-      writerGraph.write(cfheName + " -> " + addQuotes(clauseInfo.head.name) + " [label=\"" + edgeNameMap("controlFlowOut") + "\"]" + "\n")
-      dot.edge(addQuotes(clauseInfo.body.name),cfheName,attrs=MuMap("label"->addQuotes(edgeNameMap("controlFlowIn"))))
-      dot.edge(addQuotes(cfheName),addQuotes(clauseInfo.head.name),attrs=MuMap("label"->addQuotes(edgeNameMap("controlFlowOut"))))
+      writerGraph.write(addQuotes(clauseInfo.body.name)+ " -> " + cfheName + " [label=\"" + edgeNameMap("controlFlowHyperEdge") + "\"]" + "\n")//controlFlowIn
+      writerGraph.write(cfheName + " -> " + addQuotes(clauseInfo.head.name) + " [label=\"" + edgeNameMap("controlFlowHyperEdge") + "\"]" + "\n")//controlFlowOut
+      dot.edge(addQuotes(clauseInfo.body.name),cfheName,attrs=MuMap("label"->addQuotes(edgeNameMap("controlFlowHyperEdge"))))//controlFlowIn
+      dot.edge(addQuotes(cfheName),addQuotes(clauseInfo.head.name),attrs=MuMap("label"->addQuotes(edgeNameMap("controlFlowHyperEdge"))))//controlFlowOut
       //get unique control flow nodes
       if (!uniqueControlFLowNodeList.exists(_.name == clauseInfo.head.name)) {
         uniqueControlFLowNodeList += clauseInfo.head
@@ -726,7 +900,9 @@ object DrawHornGraph {
         " style=\"dashed\"" + "]" + "\n")
       dot.edge(addQuotes(arg.name),addQuotes(controlFLowNode.name),attrs = MuMap("label"->addQuotes(edgeNameMap("argument")),
       "style"->"dashed"))
-      gnn_input.binaryAdjacentcy+=ListBuffer(gnn_input.nodeNameToIDMap(arg.name),gnn_input.nodeNameToIDMap(controlFLowNode.name))
+      val argumentEdge=ListBuffer(gnn_input.nodeNameToIDMap(arg.name),gnn_input.nodeNameToIDMap(controlFLowNode.name))
+      gnn_input.binaryAdjacency += argumentEdge
+      gnn_input.argumentEdges.edgeList += argumentEdge
     }
 
 
@@ -745,18 +921,22 @@ object DrawHornGraph {
         andName = "xxx" + clauseInfo.name + "_" + clauseInfo.clauseID + "xxx" + "_and"
         writerGraph.write(addQuotes(andName) + " [label=\"" + "&" + "\"" +" nodeName="+ "\"" +andName+ "\"" +" class=Operator"+ " shape=\"rect\"" + "];" + "\n")
         dot.node(andName,addQuotes("&"),attrs = MuMap("andName"->addQuotes(andName),"class"->"Operator","shape"->"rect"))
-        gnn_input.incrementNodeIds(andName)
+        gnn_input.incrementNodeIds(andName,"operator","&")
         clauseInfo.guardASTRootName = andName //store this node to clauses's guardASTRootName
       }
-      //draw guard ast
+      //draw guard ast and connect root AST to and
       for ((rootName, ast) <- clauseInfo.guardASTGraph) { //create & node to connect constraints
         writerGraph.write(ast + "\n")
         if (clauseInfo.guardNumber > 1) { //connect constraints by &
           //writerGraph.write(clauseInfo.name + "_and"+"->"+rootName//ast.substring(0,ast.indexOf("[label")-1)
           writerGraph.write(addQuotes(rootName) + " -> " + addQuotes(andName)//ast.substring(0,ast.indexOf("[label")-1)
-            + " [label=\"" + edgeNameMap("astAnd") + "\"" + "];" + "\n")
-          dot.edge(addQuotes(rootName),addQuotes(andName),attrs = MuMap("label"->addQuotes( edgeNameMap("astAnd"))))
-          gnn_input.binaryAdjacentcy+=ListBuffer(gnn_input.nodeNameToIDMap(rootName),gnn_input.nodeNameToIDMap(andName))
+            + " [label=\"" + edgeNameMap("guardAST") + "\"" + "];" + "\n")//astAnd,dataFlowAST,dataFlow
+          dot.edge(addQuotes(rootName),addQuotes(andName),attrs = MuMap("label"->addQuotes( edgeNameMap("guardAST"))))//astAnd,dataFlowAST,dataFlow
+          val dataFlowASTEdge = ListBuffer(gnn_input.nodeNameToIDMap(rootName),gnn_input.nodeNameToIDMap(andName))
+          gnn_input.binaryAdjacency += dataFlowASTEdge
+          //gnn_input.dataFlowASTEdges.edgeList += dataFlowASTEdge
+          //gnn_input.dataFlowEdges.edgeList += dataFlowASTEdge
+          gnn_input.guardASTEdges.edgeList += dataFlowASTEdge
         } else {
           clauseInfo.guardASTRootName = rootName
         }
@@ -765,125 +945,139 @@ object DrawHornGraph {
       //guard AST root point to control flow hyperedge
       if (!clauseInfo.guardASTRootName.isEmpty) {
         writerGraph.write(addQuotes(clauseInfo.guardASTRootName) + " -> " + addQuotes(clauseInfo.controlFlowHyperEdge.name)
-          + " [label=\"" + edgeNameMap("condition") + "\"" + "];" + "\n")
+          + " [label=\"" + edgeNameMap("controlFlowHyperEdge") + "\"" + "];" + "\n")//condition
         dot.edge(addQuotes(clauseInfo.guardASTRootName),addQuotes(clauseInfo.controlFlowHyperEdge.name),
-          attrs = MuMap("label"->addQuotes(edgeNameMap("condition"))))
-        gnn_input.tenaryAdjacency+=ListBuffer(gnn_input.nodeNameToIDMap(clauseInfo.controlFlowHyperEdge.from),
+          attrs = MuMap("label"->addQuotes(edgeNameMap("controlFlowHyperEdge"))))//condition
+        val tenaryListBuffer= ListBuffer(gnn_input.nodeNameToIDMap(clauseInfo.controlFlowHyperEdge.from),
           gnn_input.nodeNameToIDMap(clauseInfo.guardASTRootName),
           gnn_input.nodeNameToIDMap(clauseInfo.controlFlowHyperEdge.to))
+        gnn_input.ternaryAdjacency+=tenaryListBuffer
+        gnn_input.controlFlowHyperEdges.edgeList += tenaryListBuffer
       }
       //if there is no guard add true condition
       if (clauseInfo.guardASTGraph.isEmpty) {
         writerGraph.write(addQuotes(clauseInfo.trueCondition) + " [label=\"" + "true" + "\"" +" nodeName="+addQuotes(clauseInfo.trueCondition)+" class=true"+ " shape=\"rect\"" + "];" + "\n") //add true node
         dot.node(addQuotes(clauseInfo.trueCondition),addQuotes("true"),attrs = MuMap("nodeName"->addQuotes(clauseInfo.trueCondition),"class"->"true","shape"->"rect"))
-        gnn_input.incrementNodeIds(clauseInfo.trueCondition)
+        gnn_input.incrementNodeIds(clauseInfo.trueCondition,"constant","true")
         writerGraph.write(addQuotes(clauseInfo.trueCondition) + " -> " + addQuotes(clauseInfo.controlFlowHyperEdge.name)//add edge to control flow hyper edges
-          + " [label=\"" + edgeNameMap("condition") + "\"" + "];" + "\n")
-        dot.edge(addQuotes(clauseInfo.trueCondition),addQuotes(clauseInfo.controlFlowHyperEdge.name),attrs = MuMap("label"->addQuotes(edgeNameMap("condition"))))
-        gnn_input.tenaryAdjacency+=ListBuffer(gnn_input.nodeNameToIDMap(clauseInfo.controlFlowHyperEdge.from),
+          + " [label=\"" + edgeNameMap("controlFlowHyperEdge") + "\"" + "];" + "\n")//condition
+        dot.edge(addQuotes(clauseInfo.trueCondition),addQuotes(clauseInfo.controlFlowHyperEdge.name),attrs = MuMap("label"->addQuotes(edgeNameMap("controlFlowHyperEdge"))))//condition
+        val tenaryListBuffer=ListBuffer(gnn_input.nodeNameToIDMap(clauseInfo.controlFlowHyperEdge.from),
           gnn_input.nodeNameToIDMap(clauseInfo.trueCondition),
           gnn_input.nodeNameToIDMap(clauseInfo.controlFlowHyperEdge.to))
+        gnn_input.ternaryAdjacency += tenaryListBuffer
+        gnn_input.controlFlowHyperEdges.edgeList += tenaryListBuffer
       }
 
-      //draw data flow ast
+      //draw data flow ast and get data flow AST node
       for (graphInfo <- clauseInfo.dataFlowASTGraph; argNode <- clauseInfo.head.argumentList if (graphInfo.argumentName == argNode.name)) {
+        argNode.dataFLowHyperEdge.fromData=(graphInfo.astRootName,true)
         writerGraph.write(graphInfo.graphText + "\n") //draw AST
-        writerGraph.write(addQuotes(graphInfo.astRootName) + " -> " + addQuotes(argNode.dataFLowHyperEdge.name) //connect to data flow hyper edge
-          + " [label=\"" + edgeNameMap("dataFlow") + "\"" + "];" + "\n")
-        argNode.dataFLowHyperEdge.fromData=graphInfo.astRootName
-        dot.edge(addQuotes(graphInfo.astRootName),addQuotes(argNode.dataFLowHyperEdge.name),attrs = MuMap("label"->addQuotes(edgeNameMap("dataFlow"))))
+//        writerGraph.write(addQuotes(graphInfo.astRootName) + " -> " + addQuotes(argNode.dataFLowHyperEdge.name) //connect to data flow hyper edge
+//          + " [label=\"" + edgeNameMap("dataFlowHyperEdge") + "\"" + "];" + "\n")//dataFlow
+//        dot.edge(addQuotes(graphInfo.astRootName),addQuotes(argNode.dataFLowHyperEdge.name),attrs = MuMap("label"->addQuotes(edgeNameMap("dataFlowHyperEdge"))))//dataFlow
       }
     }
 
 
 
     //draw data flow
-    //draw guarded data flow hyperedge for head
-    for (clauseInfo <- clauseList; headArg <- clauseInfo.head.argumentList; if !clauseInfo.head.argumentList.isEmpty) {
-      //create data flow hyperedge node
-      if(headArg.dataFLowHyperEdge.fromData!=""){
-        drawDataFlowHyperEdge(clauseInfo,headArg)
-      }
-    }
-
-    //draw constant data flow for head
+    //draw constant data flow for head. example: main4(a,0):-main5(x,y)
     for (clauseInfo <- clauseList) {
       for (headArg <- clauseInfo.head.argumentList; if !clauseInfo.head.argumentList.isEmpty) {
-        if (headArg.constantFlowInNode != "") {
+        if (headArg.constantFlowInNode!="") {
           writerGraph.write(addQuotes(headArg.constantFlowInNode)
             + " [label=\"" + headArg.originalContent + "\"" +" nodeName="+ "\"" +headArg.constantFlowInNode+ "\"" + " class=Constant"+ "];" + "\n") //create constant node
           dot.node(addQuotes(headArg.constantFlowInNode),addQuotes(headArg.originalContent),
             attrs = MuMap("nodeName"->addQuotes(headArg.constantFlowInNode),"class"->"Constant"))
-          gnn_input.incrementNodeIds(headArg.constantFlowInNode)
-//          writerGraph.write("\"" + headArg.constantFlowInNode+ "\"" + " -> " + "\"" + headArg.dataFLowHyperEdge.name+"\"" //add edge to argument
-//            + " [label=\"" + edgeNameMap("constantDataFlow") + "\"" + "];" + "\n")
-          headArg.dataFLowHyperEdge.fromData=headArg.constantFlowInNode
-          ///////
+          gnn_input.incrementNodeIds(headArg.constantFlowInNode,"constant",headArg.originalContent)
+          //draw edge
+          headArg.dataFLowHyperEdge.fromData=(headArg.constantFlowInNode,false)
           drawDataFlowHyperEdge(clauseInfo,headArg)
+          writerGraph.write(addQuotes(headArg.dataFLowHyperEdge.fromData._1) + " -> " + addQuotes(headArg.dataFLowHyperEdge.name) //connect to data flow hyperedge
+            + " [label=\"" + edgeNameMap("dataFlowHyperEdge") + "\"" + "];" + "\n")//dataFlow
+          dot.edge(addQuotes(headArg.dataFLowHyperEdge.fromData._1),addQuotes(headArg.dataFLowHyperEdge.name),attrs = MuMap("label"->addQuotes(edgeNameMap("dataFlowHyperEdge"))))//dataFlow
+
         }
       }
-      //draw constant data flow for body
+      //draw constant data flow for body. example: main4(a,b):-main5(x,0)
       for (bodyArg <- clauseInfo.body.argumentList; if !clauseInfo.body.argumentList.isEmpty) {
-        if (!bodyArg.constantFlowInNode.isEmpty) {
+        if (bodyArg.constantFlowInNode!="") {
           writerGraph.write(addQuotes(bodyArg.constantFlowInNode)
             + " [label=\"" + bodyArg.originalContent + "\"" +" nodeName=" + addQuotes(bodyArg.constantFlowInNode) +" class=Constant"+ "];" + "\n") //create constant node
           dot.node(addQuotes(bodyArg.constantFlowInNode),addQuotes(bodyArg.originalContent),
             attrs = MuMap("nodeName"->addQuotes(bodyArg.constantFlowInNode),"class"->"Constant"))
-          gnn_input.incrementNodeIds(bodyArg.constantFlowInNode)
-          writerGraph.write(addQuotes(bodyArg.constantFlowInNode) + " -> " + addQuotes(bodyArg.name)//add edge to argument
-            + " [label=\"" + edgeNameMap("constantDataFlow") + "\"" + "];" + "\n")
-          dot.edge(addQuotes(bodyArg.constantFlowInNode) ,addQuotes(bodyArg.name),
-            attrs = MuMap("label"->addQuotes(edgeNameMap("constantDataFlow"))))
-          gnn_input.binaryAdjacentcy+=ListBuffer(gnn_input.nodeNameToIDMap(bodyArg.constantFlowInNode),
-            gnn_input.nodeNameToIDMap(bodyArg.name))
-          //bodyArg.dataFLowHyperEdge.fromData=bodyArg.constantFlowInNode
+          gnn_input.incrementNodeIds(bodyArg.constantFlowInNode,"constant",bodyArg.originalContent)
+          //draw edge
+          bodyArg.dataFLowHyperEdge.fromData=(bodyArg.constantFlowInNode,false)
+          drawDataFlowHyperEdge(clauseInfo,bodyArg)
+          writerGraph.write(addQuotes(bodyArg.dataFLowHyperEdge.fromData._1) + " -> " + addQuotes(bodyArg.dataFLowHyperEdge.name) //connect to data flow hyperedge
+            + " [label=\"" + edgeNameMap("dataFlowHyperEdge") + "\"" + "];" + "\n")//dataFlow
+          dot.edge(addQuotes(bodyArg.dataFLowHyperEdge.fromData._1),addQuotes(bodyArg.dataFLowHyperEdge.name),attrs = MuMap("label"->addQuotes(edgeNameMap("dataFlowHyperEdge"))))//dataFlow
         }
       }
     }
 
+    //draw simple data flow connection. for example: main4(a,b):-main5(x,0)[empty], a<-x
+    for (clauseInfo <- clauseList) {
+      if (!clauseInfo.simpleDataFlowConnection.isEmpty) {
+        for ((bodyArg, headArg) <- clauseInfo.simpleDataFlowConnection) {
+          if (headArg.dataFLowHyperEdge.fromData._2==true) {
+            headArg.dataFLowHyperEdge.fromData=(bodyArg.name,false)
+            writerGraph.write(addQuotes(bodyArg.name) + " -> " + addQuotes(headArg.dataFLowHyperEdge.name) + "[label=\"" + edgeNameMap("dataFlowHyperEdge") + "\"]" + "\n")//dataFlowIn
+            dot.edge(addQuotes(bodyArg.name) ,addQuotes(headArg.dataFLowHyperEdge.name), attrs = MuMap("label"->addQuotes(edgeNameMap("dataFlowHyperEdge"))))
+            drawDataFlowHyperEdge(clauseInfo,headArg)
+          }
+        }
+      }
+    }
+
+    //draw left guarded data flow hyperedge for head.
+    for (clauseInfo <- clauseList; headArg <- clauseInfo.head.argumentList; if !clauseInfo.head.argumentList.isEmpty) {
+      //create data flow hyperedge node
+      if(headArg.dataFLowHyperEdge.fromData._1!="" && headArg.dataFLowHyperEdge.fromData._2==true){
+        drawDataFlowHyperEdge(clauseInfo,headArg)
+        //writerGraph.write(graphInfo.graphText + "\n") //draw AST
+        writerGraph.write(addQuotes(headArg.dataFLowHyperEdge.fromData._1) + " -> " + addQuotes(headArg.dataFLowHyperEdge.name) //connect to data flow hyper edge
+          + " [label=\"" + edgeNameMap("dataFlowHyperEdge") + "\"" + "];" + "\n")//dataFlow
+        dot.edge(addQuotes(headArg.dataFLowHyperEdge.fromData._1),addQuotes(headArg.dataFLowHyperEdge.name),attrs = MuMap("label"->addQuotes(edgeNameMap("dataFlowHyperEdge"))))//dataFlow
+      }
+    }
+
     def drawDataFlowHyperEdge(clauseInfo:ClauseTransitionInformation,headArg:ArgumentNode): Unit ={
+      //create hyperedge
       writerGraph.write(addQuotes(headArg.dataFLowHyperEdge.name) +
         " [label=\""+headArg.dataFLowHyperEdge.name+"\""+" nodeName="+ "\""+ headArg.dataFLowHyperEdge.name+ "\"" +" class=DataFlowHyperedge" +" shape=\"diamond\"" + "];" + "\n")
       dot.node(addQuotes(headArg.dataFLowHyperEdge.name),addQuotes(headArg.dataFLowHyperEdge.name),
         attrs = MuMap("nodeName"->addQuotes(headArg.dataFLowHyperEdge.name),
           "class"->"DataFlowHyperedge","shape"->"diamond"))
 
-      //create data flow hyperedge node coonections
+      //create data flow hyperedge node coonection to argument
       writerGraph.write(addQuotes(headArg.dataFLowHyperEdge.name) + " -> " + addQuotes(headArg.name) +
-        "[label=\"" + edgeNameMap("dataFlowOut") + "\"]" + "\n")
-      dot.edge(addQuotes(headArg.dataFLowHyperEdge.name),addQuotes(headArg.name),attrs = MuMap("label"->addQuotes(edgeNameMap("dataFlowOut"))))
+        "[label=\"" + edgeNameMap("dataFlowHyperEdge") + "\"]" + "\n")//dataFlowOut
+      dot.edge(addQuotes(headArg.dataFLowHyperEdge.name),addQuotes(headArg.name),attrs = MuMap("label"->addQuotes(edgeNameMap("dataFlowHyperEdge"))))//dataFlowOut
 
       //guard AST root point to data flow hyperedge
       if (!clauseInfo.guardASTRootName.isEmpty) {
         writerGraph.write(addQuotes(clauseInfo.guardASTRootName) + " -> " + addQuotes(headArg.dataFLowHyperEdge.name) +
-          "[label=\"" + edgeNameMap("dataFlowIn") + "\"]" + "\n")
-        dot.edge(addQuotes(clauseInfo.guardASTRootName),addQuotes(headArg.dataFLowHyperEdge.name),attrs = MuMap("label"->addQuotes(edgeNameMap("dataFlowIn"))))
+          "[label=\"" + edgeNameMap("dataFlowHyperEdge") + "\"]" + "\n")//dataFlowIn
+        dot.edge(addQuotes(clauseInfo.guardASTRootName),addQuotes(headArg.dataFLowHyperEdge.name),attrs = MuMap("label"->addQuotes(edgeNameMap("dataFlowHyperEdge"))))//dataFlowIn
         headArg.dataFLowHyperEdge.fromASTRoot=clauseInfo.guardASTRootName
       }
       //if there is no guard add true condition to data flow hyperedge
       if (clauseInfo.guardASTGraph.isEmpty) {
         writerGraph.write(addQuotes(clauseInfo.trueCondition) + " -> " + addQuotes(headArg.dataFLowHyperEdge.name) //add edge to data flow hyper edges
-          + " [label=\"" + edgeNameMap("condition") + "\"" + "];" + "\n")
-        dot.edge(addQuotes(clauseInfo.trueCondition),addQuotes(headArg.dataFLowHyperEdge.name),attrs = MuMap("label"-> addQuotes(edgeNameMap("condition"))))
+          + " [label=\"" + edgeNameMap("dataFlowHyperEdge") + "\"" + "];" + "\n")//condition
+        dot.edge(addQuotes(clauseInfo.trueCondition),addQuotes(headArg.dataFLowHyperEdge.name),attrs = MuMap("label"-> addQuotes(edgeNameMap("dataFlowHyperEdge"))))//condition
         headArg.dataFLowHyperEdge.fromASTRoot=clauseInfo.trueCondition
       }
-      gnn_input.tenaryAdjacency+=ListBuffer(gnn_input.nodeNameToIDMap(headArg.dataFLowHyperEdge.fromData),
+      val tenaryListBuffer = ListBuffer(gnn_input.nodeNameToIDMap(headArg.dataFLowHyperEdge.fromData._1),
         gnn_input.nodeNameToIDMap(headArg.dataFLowHyperEdge.fromASTRoot),
         gnn_input.nodeNameToIDMap(headArg.dataFLowHyperEdge.to))
+      gnn_input.ternaryAdjacency+=tenaryListBuffer
+      gnn_input.dataFlowHyperEdges.edgeList += tenaryListBuffer
     }
 
-
-    //draw simple data flow connection
-    for (clauseInfo <- clauseList) {
-      if (!clauseInfo.simpleDataFlowConnection.isEmpty) {
-        for ((bodyArg, headArg) <- clauseInfo.simpleDataFlowConnection) {
-          writerGraph.write(addQuotes(bodyArg.name) + " -> " + addQuotes(headArg.dataFLowHyperEdge.name) + "[label=\"" + edgeNameMap("dataFlowIn") + "\"]" + "\n")
-          headArg.dataFLowHyperEdge.fromData=bodyArg.name
-          drawDataFlowHyperEdge(clauseInfo,headArg)
-          //writerGraph.write(connection)
-        }
-      }
-    }
 
     writerGraph.write("\n\n\n\n")
     //draw hints
@@ -914,12 +1108,14 @@ object DrawHornGraph {
     val argumentIDList = for (argHornGraph<-gnn_input.argumentInfoHornGraphList) yield argHornGraph.ID
     val argumentNameList = for (argHornGraph<-gnn_input.argumentInfoHornGraphList) yield argHornGraph.head+":"+argHornGraph.name
     val argumentOccurrenceList = for (argHornGraph<-gnn_input.argumentInfoHornGraphList) yield argHornGraph.score
-    writeGNNInputsToJSON(fileName,gnn_input.nodeIds,gnn_input.binaryAdjacentcy,gnn_input.tenaryAdjacency,
-      gnn_input.controlLocationIndices,gnn_input.argumentIndices,argumentIDList,argumentNameList,argumentOccurrenceList)
+    writeGNNInputsToJSON(fileName,gnn_input.nodeIds,gnn_input.binaryAdjacency,gnn_input.ternaryAdjacency,
+      gnn_input.controlLocationIndices,gnn_input.argumentIndices,gnn_input.nodeSymbols,argumentIDList,argumentNameList,argumentOccurrenceList,
+    gnn_input.controlFlowHyperEdges,gnn_input.dataFlowHyperEdges,gnn_input.dataFlowASTEdges,gnn_input.dataFlowEdges,gnn_input.guardASTEdges,gnn_input.argumentEdges)
 
     writerGraph.write("}" + "\n")
     writerGraph.close()
   }
+
 
   def drawAST(cfn:ControlFlowNode,argumentList:ListBuffer[ArgumentNode],hints:ListBuffer[Triple[String,String,IExpression]],
               freeVariableMap:MHashMap[String,ITerm],
@@ -1299,7 +1495,7 @@ object DrawHornGraph {
               nodeHashMap=nodeHashMapOut
               val nodeName:String=nodeNameOut
               root.lchild.lchild = new TreeNodeForGraph(Map(nodeName -> (v)))
-              logString = logString + ( "\"" +nodeName + "\"" + " [label=\"" + v + "\""+" nodeName="+ "\"" +nodeName+ "\"" +" class=Literal "+"];" + "\n")
+              logString = logString + ( "\"" +nodeName + "\"" + " [label=\"" + v + "\""+" nodeName="+ "\"" +nodeName+ "\"" +" class=IdealInt "+"];" + "\n")
               rootName = checkASTRoot(nodeCount,nodeName,rootName)
             }
             nodeCount = nodeCount + 1
@@ -1322,7 +1518,7 @@ object DrawHornGraph {
               nodeHashMap=nodeHashMapOut
               val nodeName:String=nodeNameOut
               root.rchild.rchild = new TreeNodeForGraph(Map(nodeName -> (v)))
-              logString = logString + ( "\"" +nodeName + "\"" + " [label=\"" + v + "\""+" nodeName="+ "\"" +nodeName+ "\"" +" class=Literal "+"];" + "\n")
+              logString = logString + ( "\"" +nodeName + "\"" + " [label=\"" + v + "\""+" nodeName="+ "\"" +nodeName+ "\"" +" class=IdealInt "+"];" + "\n")
               rootName = checkASTRoot(nodeCount,nodeName,rootName)
             }
             nodeCount = nodeCount + 1
@@ -1391,7 +1587,7 @@ object DrawHornGraph {
               val nodeName:String=nodeNameOut
               root.lchild = new TreeNodeForGraph(Map(nodeName -> (v)))
               if(!cfn.nodeList.exists(x=>x._1==nodeName)){
-                logString = logString + ( "\"" +nodeName + "\"" + " [label=\"" + v + "\""+" nodeName="+ "\"" +nodeName+ "\"" +" class=Literal "+"];" + "\n")
+                logString = logString + ( "\"" +nodeName + "\"" + " [label=\"" + v + "\""+" nodeName="+ "\"" +nodeName+ "\"" +" class=IdealInt "+"];" + "\n")
                 cfn.nodeList+=Pair(nodeName,v)
               }
               rootName = checkASTRoot(nodeCount,nodeName,rootName)
@@ -1413,7 +1609,7 @@ object DrawHornGraph {
               val nodeName:String=nodeNameOut
               root.rchild = new TreeNodeForGraph(Map(nodeName -> (v)))
               if(!cfn.nodeList.exists(x=>x._1==nodeName)){
-                logString = logString + ( "\"" +nodeName +  "\"" +" [label=\"" + v + "\""+" nodeName="+ "\"" +nodeName+ "\"" +" class=Literal "+"];" + "\n")
+                logString = logString + ( "\"" +nodeName +  "\"" +" [label=\"" + v + "\""+" nodeName="+ "\"" +nodeName+ "\"" +" class=IdealInt "+"];" + "\n")
                 cfn.nodeList+=Pair(nodeName,v)
               }
               rootName = checkASTRoot(nodeCount,nodeName,rootName)
@@ -1761,7 +1957,7 @@ object DrawHornGraph {
       astNodeNamePrefix =hintName + "predicate_"+ hintCount + "_node_"
       translateConstraint(hint, root) //define nodes in graph, information is stored in logString
 
-      val binary_search_tree_for_graph = new BinarySearchTreeForGraphClass(edgeNameMap("predicateAST"))
+      val binary_search_tree_for_graph = new BinarySearchTreeForGraphClass("predicateAST")
       binary_search_tree_for_graph.nodeString = logString
       binary_search_tree_for_graph.preOrder(rootMark) //connect nodes in graph, information is stored in relationString
       logString = binary_search_tree_for_graph.nodeString + binary_search_tree_for_graph.relationString
@@ -1802,7 +1998,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + "!" + "\"" +" nodeName="+ addQuotes(nodeName) + " class=Operator"+ " shape=\"rect\"" + "];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes("!"),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Operator","shape"->"rect","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"operator","!")
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -1814,7 +2010,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + "!" + "\"" +" nodeName="+ "\"" + nodeName+ "\"" + " class=Operator"+ " shape=\"rect\"" + "];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes("!"),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Operator","shape"->"rect","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"operator","!")
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -1842,7 +2038,7 @@ object DrawHornGraph {
               logString = logString + ( addQuotes(nodeName) +  " [label=\"" + p + "\""+" nodeName="+ "\"" + nodeName+ "\"" + " class=Pred "+"];" + "\n")
               dot.node(addQuotes(nodeName),addQuotes(p),MuMap("nodeName"->addQuotes(nodeName),
                 "class"->"Pred","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-              gnn_inputs.incrementNodeIds(nodeName)
+              gnn_inputs.incrementNodeIds(nodeName,"predicate",p)
               if (nodeCount == 0) {
                 rootName = nodeName
               }
@@ -1869,7 +2065,7 @@ object DrawHornGraph {
               logString = logString + ( addQuotes(nodeName) +  " [label=\"" + p + "\""+" nodeName="+ "\"" + nodeName+ "\"" + " class=Pred "+"];" + "\n")
               dot.node(addQuotes(nodeName),addQuotes(p),MuMap("nodeName"->addQuotes(nodeName),
                 "class"->"Pred","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-              gnn_inputs.incrementNodeIds(nodeName)
+              gnn_inputs.incrementNodeIds(nodeName,"predicate",p)
               if (nodeCount == 0) {
                 rootName = astNodeNamePrefix + nodeCount
               }
@@ -1902,7 +2098,7 @@ object DrawHornGraph {
               logString = logString + ( addQuotes(nodeName) +  " [label=\"" + j + "\""+" nodeName="+ "\"" + nodeName+ "\"" + " class=Operator "+"];" + "\n")
               dot.node(addQuotes(nodeName),addQuotes(j),MuMap("nodeName"->addQuotes(nodeName),
                 "class"->"Operator","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-              gnn_inputs.incrementNodeIds(nodeName)
+              gnn_inputs.incrementNodeIds(nodeName,"operator",j)
               if (nodeCount == 0) {
                 rootName = astNodeNamePrefix + nodeCount
               }
@@ -1928,7 +2124,7 @@ object DrawHornGraph {
               logString = logString + ( addQuotes(nodeName) +  " [label=\"" + j + "\""+" nodeName="+ "\"" + nodeName+ "\"" + " class=Operator "+"];" + "\n")
               dot.node(addQuotes(nodeName),addQuotes(j),MuMap("nodeName"->addQuotes(nodeName),
                 "class"->"Operator","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-              gnn_inputs.incrementNodeIds(nodeName)
+              gnn_inputs.incrementNodeIds(nodeName,"operator",j)
               if (nodeCount == 0) {
                 rootName = astNodeNamePrefix + nodeCount
               }
@@ -1958,10 +2154,10 @@ object DrawHornGraph {
             } else {
               val nodeName=astNodeNamePrefix + nodeCount
               root.rchild = new TreeNodeForGraph(Map(nodeName-> (v)))
-              logString = logString + ( addQuotes(nodeName) +  " [label=\"" + v + "\""+" nodeName="+ "\"" + nodeName+ "\"" + " class=BoolValue "+"];" + "\n")
+              logString = logString + ( addQuotes(nodeName) +  " [label=\"" + v + "\""+" nodeName="+ "\"" + nodeName+ "\"" + " class=Constant "+"];" + "\n")
               dot.node(addQuotes(nodeName),addQuotes(v),MuMap("nodeName"->addQuotes(nodeName),
-                "class"->"BoolValue","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-              gnn_inputs.incrementNodeIds(nodeName)
+                "class"->"Constant","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
+              gnn_inputs.incrementNodeIds(nodeName,"constant",v)
               if (nodeCount == 0) {
                 rootName = astNodeNamePrefix + nodeCount
               }
@@ -1980,10 +2176,10 @@ object DrawHornGraph {
             } else {
               val nodeName=astNodeNamePrefix + nodeCount
               root.lchild = new TreeNodeForGraph(Map(nodeName -> (v)))
-              logString = logString + ( addQuotes(nodeName) +  " [label=\"" + v + "\""+" nodeName="+ "\"" + nodeName+ "\"" + " class=BoolValue "+"];" + "\n")
+              logString = logString + ( addQuotes(nodeName) +  " [label=\"" + v + "\""+" nodeName="+ "\"" + nodeName+ "\"" + " class=Constant "+"];" + "\n")
               dot.node(addQuotes(nodeName),addQuotes(v),MuMap("nodeName"->addQuotes(nodeName),
-                "class"->"BoolValue","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-              gnn_inputs.incrementNodeIds(nodeName)
+                "class"->"Constant","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
+              gnn_inputs.incrementNodeIds(nodeName,"constant",v)
               if (nodeCount == 0) {
                 rootName = astNodeNamePrefix + nodeCount
               }
@@ -2018,11 +2214,11 @@ object DrawHornGraph {
               val nodeName:String=nodeNameOut
               root.lchild = new TreeNodeForGraph(Map(nodeName -> (c)))
               if(!clause.nodeList.exists(x=>x._1==nodeName)){
-                logString = logString + ( addQuotes(nodeName) +  " [label=\"" + c + "\""+" nodeName="+ "\"" + nodeName+ "\"" + " class=Constant "+"];" + "\n")
+                logString = logString + ( addQuotes(nodeName) +  " [label=\"" + c + "\""+" nodeName="+ "\"" + nodeName+ "\"" + " class=symbolicConstant "+"];" + "\n")
                 clause.nodeList+=Pair(nodeName,c)
                 dot.node(addQuotes(nodeName),addQuotes(c),MuMap("nodeName"->addQuotes(nodeName),
-                  "class"->"Constant","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-                gnn_inputs.incrementNodeIds(nodeName)
+                  "class"->"symbolicConstant","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
+                gnn_inputs.incrementNodeIds(nodeName,"symbolicConstant",c)
               }
               //logString = logString + ( "\"" + nodeName + "\"" +  " [label=\"" + c + "\"];" + "\n")
               rootName = checkASTRoot(nodeCount,nodeName,rootName)
@@ -2050,11 +2246,11 @@ object DrawHornGraph {
               val nodeName:String=nodeNameOut
               root.rchild = new TreeNodeForGraph(Map(nodeName -> (c)))
               if(!clause.nodeList.exists(x=>x._1==nodeName)){
-                logString = logString + ( addQuotes(nodeName) +  " [label=\"" + c + "\""+" nodeName="+ "\"" + nodeName+ "\"" + " class=Constant "+"];" + "\n")
+                logString = logString + ( addQuotes(nodeName) +  " [label=\"" + c + "\""+" nodeName="+ "\"" + nodeName+ "\"" + " class=symbolicConstant "+"];" + "\n")
                 clause.nodeList+=Pair(nodeName,c)
                 dot.node(addQuotes(nodeName),addQuotes(c),MuMap("nodeName"->addQuotes(nodeName),
-                  "class"->"Constant","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-                gnn_inputs.incrementNodeIds(nodeName)
+                  "class"->"symbolicConstant","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
+                gnn_inputs.incrementNodeIds(nodeName,"symbolicConstant",c)
               }
               rootName = checkASTRoot(nodeCount,nodeName,rootName)
             }
@@ -2069,7 +2265,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + "IEpsilon" +" nodeName="+ addQuotes(nodeName) +  "\""+" class=Operator "+"];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes("IEpsilon"),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Operator","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"IEpsilon",cond.toString)
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2082,7 +2278,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + "IEpsilon" +" nodeName="+ addQuotes(nodeName) +  "\""+" class=Operator "+"];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes("IEpsilon"),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Operator","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"IEpsilon",cond.toString)
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2099,7 +2295,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + "IFormulaITE" + "\""+" nodeName="+ addQuotes(nodeName) + " class=Formula "+"];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes("IFormulaITE"),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Formula","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"IFormulaITE",cond.toString+":"+left.toString+":"+right.toString)
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2114,7 +2310,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + "IFormulaITE" + "\""+" nodeName="+ addQuotes(nodeName) + " class=Formula "+"];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes("IFormulaITE"),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Formula","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"IFormulaITE",cond.toString+":"+left.toString+":"+right.toString)
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2133,7 +2329,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + "IFunApp" + "\""+" nodeName="+ addQuotes(nodeName) + " class=IFunApp "+"];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes("IFunApp"),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"IFunApp","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"IFunApp",fun.toString+":"+args.toString)
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2148,7 +2344,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + "IFunApp" + "\""+" nodeName="+ addQuotes(nodeName) + " class=IFunApp "+"];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes("IFunApp"),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"IFunApp","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"IFunApp",fun.toString+":"+args.toString)
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2166,7 +2362,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + eq + "\"" +" nodeName="+ addQuotes(nodeName) + " class=Operator "+ " shape=\"rect\"" + "];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes(eq),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Operator","shape"->"rect","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"operator","=")
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2180,7 +2376,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + eq + "\"" +" nodeName="+ addQuotes(nodeName) + " class=Operator "+ " shape=\"rect\"" + "];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes(eq),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Operator","shape"->"rect","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"operator","=")
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2198,7 +2394,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + geq + "\"" +" nodeName="+ addQuotes(nodeName) + " class=Operator "+ " shape=\"rect\"" + "];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes(geq),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Operator","shape"->"rect","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"operator",">=")
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2212,7 +2408,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + geq + "\"" +" nodeName="+ addQuotes(nodeName) + " class=Operator "+ " shape=\"rect\"" + "];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes(geq),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Operator","shape"->"rect","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"operator",">=")
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2231,7 +2427,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + eq + "\"" +" nodeName="+ addQuotes(nodeName) + " class=Operator "+ " shape=\"rect\"" + "];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes(eq),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Operator","shape"->"rect","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"operator","=")
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2248,11 +2444,11 @@ object DrawHornGraph {
               nodeHashMap=nodeHashMapOut
               val nodeName:String=nodeNameOut
               root.lchild.lchild = new TreeNodeForGraph(Map(nodeName -> (v)))
-              logString = logString + ( addQuotes(nodeName) +  " [label=\"" + v + "\""+" nodeName="+ addQuotes(nodeName) + " class=Literal "+"];" + "\n")
+              logString = logString + ( addQuotes(nodeName) +  " [label=\"" + v + "\""+" nodeName="+ addQuotes(nodeName) + " class=IdealInt "+"];" + "\n")
               rootName = checkASTRoot(nodeCount,nodeName,rootName)
               dot.node(addQuotes(nodeName),addQuotes(v),MuMap("nodeName"->addQuotes(nodeName),
-                "class"->"Literal","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-              gnn_inputs.incrementNodeIds(nodeName)
+                "class"->"IdealInt","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
+              gnn_inputs.incrementNodeIds(nodeName,"constant",v)
             }
             nodeCount = nodeCount + 1
             translateConstraint(term, root.lchild)
@@ -2262,7 +2458,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + eq + "\"" + " shape=\"rect\"" +" class=Operator "+ "];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes(eq),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Operator","shape"->"rect","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"operator","=")
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2280,11 +2476,11 @@ object DrawHornGraph {
               nodeHashMap=nodeHashMapOut
               val nodeName:String=nodeNameOut
               root.rchild.rchild = new TreeNodeForGraph(Map(nodeName -> (v)))
-              logString = logString + ( addQuotes(nodeName) +  " [label=\"" + v + "\""+" nodeName="+ addQuotes(nodeName) + " class=Literal "+"];" + "\n")
+              logString = logString + ( addQuotes(nodeName) +  " [label=\"" + v + "\""+" nodeName="+ addQuotes(nodeName) + " class=IdealInt "+"];" + "\n")
               rootName = checkASTRoot(nodeCount,nodeName,rootName)
               dot.node(addQuotes(nodeName),addQuotes(v),MuMap("nodeName"->addQuotes(nodeName),
-                "class"->"Literal","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-              gnn_inputs.incrementNodeIds(nodeName)
+                "class"->"IdealInt","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
+              gnn_inputs.incrementNodeIds(nodeName,"constant",v)
             }
             nodeCount = nodeCount + 1
             translateConstraint(term, root.rchild)
@@ -2298,7 +2494,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nn) +  " [label=\"" + geq + "\"" +" nodeName="+ addQuotes(nn) + " class=Operator "+ " shape=\"rect\"" + "];" + "\n")
             dot.node(addQuotes(nn),addQuotes(geq),MuMap("nodeName"->addQuotes(nn),
               "class"->"Operator","shape"->"rect","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nn)
+            gnn_inputs.incrementNodeIds(nn,"operator",">=")
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2312,7 +2508,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + "0" + "\""+" nodeName="+ addQuotes(nodeName) + " class=Constant "+"];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes("0"),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Constant","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"constant","0")
             rootName = checkASTRoot(nodeCount,nodeName,rootName)
             nodeCount = nodeCount + 1
             translateConstraint(t, root.lchild)
@@ -2323,7 +2519,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nn) +  " [label=\"" + geq + "\"" +" nodeName="+ addQuotes(nn) + " class=Operator "+ " shape=\"rect\"" + "];" + "\n")
             dot.node(addQuotes(nn),addQuotes(geq),MuMap("nodeName"->addQuotes(nn),
               "class"->"Operator","shape"->"rect","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nn)
+            gnn_inputs.incrementNodeIds(nn,"operator",">=")
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2336,7 +2532,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + "0" + "\""+" nodeName="+ addQuotes(nodeName) + " class=Constant "+"];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes("0"),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Constant","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"constant","0")
             rootName = checkASTRoot(nodeCount,nodeName,rootName)
             nodeCount = nodeCount + 1
             translateConstraint(t, root.rchild)
@@ -2369,10 +2565,10 @@ object DrawHornGraph {
               val nodeName:String=nodeNameOut
               root.lchild = new TreeNodeForGraph(Map(nodeName -> (v)))
               if(!clause.nodeList.exists(x=>x._1==nodeName)){
-                logString = logString + ( addQuotes(nodeName) +  " [label=\"" + v + "\""+" nodeName="+ addQuotes(nodeName) + " class=Literal "+"];" + "\n")
+                logString = logString + ( addQuotes(nodeName) +  " [label=\"" + v + "\""+" nodeName="+ addQuotes(nodeName) + " class=IdealInt "+"];" + "\n")
                 dot.node(addQuotes(nodeName),addQuotes(v),MuMap("nodeName"->addQuotes(nodeName),
-                  "class"->"Literal","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-                gnn_inputs.incrementNodeIds(nodeName)
+                  "class"->"IdealInt","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
+                gnn_inputs.incrementNodeIds(nodeName,"constant",v)
                 clause.nodeList+=Pair(nodeName,v)
               }
               rootName = checkASTRoot(nodeCount,nodeName,rootName)
@@ -2401,10 +2597,10 @@ object DrawHornGraph {
               val nodeName:String=nodeNameOut
               root.rchild = new TreeNodeForGraph(Map(nodeName -> (v)))
               if(!clause.nodeList.exists(x=>x._1==nodeName)){
-                logString = logString + ( addQuotes(nodeName) +  " [label=\"" + v + "\""+" nodeName="+ addQuotes(nodeName) + " class=Literal "+"];" + "\n")
+                logString = logString + ( addQuotes(nodeName) +  " [label=\"" + v + "\""+" nodeName="+ addQuotes(nodeName) + " class=IdealInt "+"];" + "\n")
                 dot.node(addQuotes(nodeName),addQuotes(v),MuMap("nodeName"->addQuotes(nodeName),
-                  "class"->"Literal","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-                gnn_inputs.incrementNodeIds(nodeName)
+                  "class"->"IdealInt","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
+                gnn_inputs.incrementNodeIds(nodeName,"constant",v)
                 clause.nodeList+=Pair(nodeName,v)
               }
               rootName = checkASTRoot(nodeCount,nodeName,rootName)
@@ -2432,7 +2628,7 @@ object DrawHornGraph {
               logString = logString + ( addQuotes(nodeName) +  " [label=\"" + n + "\""+" nodeName="+ addQuotes(nodeName) + " class=INamePart "+"];" + "\n")
               dot.node(addQuotes(nodeName),addQuotes(n),MuMap("nodeName"->addQuotes(nodeName),
                 "class"->"INamePart","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-              gnn_inputs.incrementNodeIds(nodeName)
+              gnn_inputs.incrementNodeIds(nodeName,"INamePart",n+":"+subformula.toString)
               if (nodeCount == 0) {
                 rootName = astNodeNamePrefix + nodeCount
               }
@@ -2461,7 +2657,7 @@ object DrawHornGraph {
               logString = logString + ( addQuotes(nodeName) +  " [label=\"" + n + "\""+" nodeName="+ addQuotes(nodeName) + " class=INamePart "+"];" + "\n")
               dot.node(addQuotes(nodeName),addQuotes(n),MuMap("nodeName"->addQuotes(nodeName),
                 "class"->"INamePart","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-              gnn_inputs.incrementNodeIds(nodeName)
+              gnn_inputs.incrementNodeIds(nodeName,"INamePart",n+":"+subformula.toString)
               if (nodeCount == 0) {
                 rootName = astNodeNamePrefix + nodeCount
               }
@@ -2481,7 +2677,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + d + "\"" +" nodeName="+ addQuotes(nodeName) + " class= Operator"+ " shape=\"rect\"" + "];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes(d),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Operator","shape"->"rect","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"operator","-")
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2495,7 +2691,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + d + "\"" +" nodeName="+ addQuotes(nodeName) + " class= Operator"+ " shape=\"rect\"" + "];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes(d),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Operator","shape"->"rect","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"operator","-")
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2514,7 +2710,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + p + "\"" +" nodeName="+ addQuotes(nodeName) + " class= Operator"+ " shape=\"rect\"" + "];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes(p),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Operator","shape"->"rect","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"operator","+")
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2528,7 +2724,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + p + "\"" +" nodeName="+ addQuotes(nodeName) + " class= Operator"+ " shape=\"rect\"" + "];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes(p),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Operator","shape"->"rect","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"operator","+")
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2546,7 +2742,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + q + "\"" +" nodeName="+ addQuotes(nodeName) + " class= Operator"+ " shape=\"rect\"" + "];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes(q),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Operator","shape"->"rect","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"operator",q)
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2559,7 +2755,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + q + "\"" +" nodeName="+ addQuotes(nodeName) + " class= Operator"+ " shape=\"rect\"" + "];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes(q),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Operator","shape"->"rect","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"operator",q)
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2576,7 +2772,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + "ITermITE" + "\""+" nodeName="+ addQuotes(nodeName) + " class=ITermITE "+"];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes("ITermITE"),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"ITermITE","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"ITermITE",cond.toString+":"+left.toString+":"+right.toString)
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2591,7 +2787,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + "ITermITE" + "\""+" nodeName="+ addQuotes(nodeName) + " class=ITermITE "+"];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes("ITermITE"),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"ITermITE","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"ITermITE",cond.toString+":"+left.toString+":"+right.toString)
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2611,7 +2807,7 @@ object DrawHornGraph {
             logString = logString + ( "\"" + nodeName + "\"" +  " [label=\"*\"" +" nodeName="+ addQuotes(nodeName) + " class=Operator "+ " shape=\"rect\"" + "];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes("*"),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Operator","shape"->"rect","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"operator","*")
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2632,10 +2828,10 @@ object DrawHornGraph {
               nodeHashMap=nodeHashMapOut
               val nodeName:String=nodeNameOut
               root.lchild.lchild = new TreeNodeForGraph(Map(nodeName -> (v)))
-              logString = logString + ( addQuotes(nodeName) +  " [label=\"" + v + "\""+" nodeName="+ addQuotes(nodeName) + " class=Coeff "+"];" + "\n")
+              logString = logString + ( addQuotes(nodeName) +  " [label=\"" + v + "\""+" nodeName="+ addQuotes(nodeName) + " class=constant "+"];" + "\n")
               dot.node(addQuotes(nodeName),addQuotes(v),MuMap("nodeName"->addQuotes(nodeName),
-                "class"->"Coeff","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-              gnn_inputs.incrementNodeIds(nodeName)
+                "class"->"constant","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
+              gnn_inputs.incrementNodeIds(nodeName,"constant",v)
               if (nodeCount == 0) {
                 rootName = astNodeNamePrefix + nodeCount
               }
@@ -2648,7 +2844,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"*\"" +" nodeName="+ addQuotes(nodeName) + " class=Operator "+ " shape=\"rect\"" + "];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes("*"),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"Operator","shape"->"rect","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"operator","*")
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2669,10 +2865,10 @@ object DrawHornGraph {
               nodeHashMap=nodeHashMapOut
               val nodeName:String=nodeNameOut
               root.rchild.rchild = new TreeNodeForGraph(Map(nodeName -> (v)))
-              logString = logString + ( addQuotes(nodeName)  + " [label=\"" + v + "\""+" nodeName="+ addQuotes(nodeName) + " class=Coeff "+"];" + "\n")
+              logString = logString + ( addQuotes(nodeName)  + " [label=\"" + v + "\""+" nodeName="+ addQuotes(nodeName) + " class=constant "+"];" + "\n")
               dot.node(addQuotes(nodeName),addQuotes(v),MuMap("nodeName"->addQuotes(nodeName),
-                "class"->"Coeff","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-              gnn_inputs.incrementNodeIds(nodeName)
+                "class"->"constant","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
+              gnn_inputs.incrementNodeIds(nodeName,"constant",v)
               if (nodeCount == 0) {
                 rootName = astNodeNamePrefix + nodeCount
               }
@@ -2690,7 +2886,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + "ITrigger" + "\""+" nodeName="+ addQuotes(nodeName) + " class=ITrigger "+"];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes("ITrigger"),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"ITrigger","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"ITrigger",patterns.toString()+":"+subformula.toString)
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2706,7 +2902,7 @@ object DrawHornGraph {
             logString = logString + ( addQuotes(nodeName) +  " [label=\"" + "ITrigger" + "\""+" nodeName="+ addQuotes(nodeName) + " class=ITrigger "+"];" + "\n")
             dot.node(addQuotes(nodeName),addQuotes("ITrigger"),MuMap("nodeName"->addQuotes(nodeName),
               "class"->"ITrigger","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-            gnn_inputs.incrementNodeIds(nodeName)
+            gnn_inputs.incrementNodeIds(nodeName,"ITrigger",patterns.toString()+":"+subformula.toString)
             if (nodeCount == 0) {
               rootName = astNodeNamePrefix + nodeCount
             }
@@ -2739,7 +2935,7 @@ object DrawHornGraph {
               logString = logString + ( addQuotes(nodeName) +  " [label=\"" + i + "\""+" nodeName="+ addQuotes(nodeName) + " class=Variable"+"];" + "\n")
               dot.node(addQuotes(nodeName),addQuotes(i),MuMap("nodeName"->addQuotes(nodeName),
                 "class"->"Variable","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-              gnn_inputs.incrementNodeIds(nodeName)
+              gnn_inputs.incrementNodeIds(nodeName,"variable",i)
               if (nodeCount == 0) {
                 rootName = astNodeNamePrefix + nodeCount
               }
@@ -2762,7 +2958,7 @@ object DrawHornGraph {
               logString = logString + ( addQuotes(nodeName) +  " [label=\"" + i + "\""+" nodeName="+ addQuotes(nodeName) + " class=Variable"+"];" + "\n")
               dot.node(addQuotes(nodeName),addQuotes(i),MuMap("nodeName"->addQuotes(nodeName),
                 "class"->"Variable","GNNNodeID"->gnn_inputs.GNNNodeID.toString))
-              gnn_inputs.incrementNodeIds(nodeName)
+              gnn_inputs.incrementNodeIds(nodeName,"variable",i)
               if (nodeCount == 0) {
                 rootName = astNodeNamePrefix + nodeCount
               }
@@ -2785,7 +2981,7 @@ object DrawHornGraph {
       }
       val root = new TreeNodeForGraph(Map(astNodeNamePrefix + nodeCount -> "root"))
       translateConstraint(conatraint, root) //define nodes in graph, information is stored in logString
-      val binary_search_tree_for_graph=new BinarySearchTreeForGraphClass(edgeNameMap("dataFlowAST"),ASTType)
+      val binary_search_tree_for_graph=new BinarySearchTreeForGraphClass(ASTType)//dataFlowAST,dataFlow
       binary_search_tree_for_graph.nodeString = logString
       binary_search_tree_for_graph.preOrder(root,gnn_inputs,dot) //connect nodes in graph, information is stored in relationString
       logString = binary_search_tree_for_graph.nodeString + binary_search_tree_for_graph.relationString

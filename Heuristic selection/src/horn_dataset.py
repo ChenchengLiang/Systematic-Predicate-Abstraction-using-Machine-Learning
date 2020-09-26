@@ -25,10 +25,13 @@ All graphs read from .gv files or JSON files will be stored to pickle a file (a 
 parsed_dot_format object includes multiple all graphs info.
 '''
 
-def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",split_flag=False,buckets=10,from_json=False,form_label=False):
+def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",
+                    split_flag=False,buckets=10,from_json=False,json_type=".JSON",form_label=False):
     #if not os.path.isfile("../pickleData/"+"train-"+benchmark_name+"-gnnInput_train_data.txt"):
     if force_read==True:
-        write_graph_to_pickle(benchmark_name,  data_fold=["train", "valid", "test"], label=label,path=path,buckets=buckets,split_flag=split_flag,from_json=from_json,file_type=file_type)
+        write_graph_to_pickle(benchmark_name,  data_fold=["train", "valid", "test"],
+                              label=label,path=path,buckets=buckets,split_flag=split_flag,from_json=from_json,
+                              file_type=file_type,json_type=json_type)
     else:
         print("Use pickle data for training")
     #if form_label == True and not os.path.isfile("../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):
@@ -389,7 +392,8 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
 
         #Vocabulary size should be total vocabulary size of train, valid, test data
         self._node_vocab_size=len(raw_inputs.vocabulary_set)
-
+        # if self._node_vocab_size<max(node_num_list):
+        #     self._node_vocab_size=max(node_num_list)
 
         print("raw_inputs.label_size", raw_inputs.label_size)
         print("raw_inputs._total_number_of_nodes", raw_inputs._total_number_of_nodes)
@@ -595,7 +599,8 @@ class parsed_dot_format:
         self.vocabulary_set=vocabulary_set
         self.token_map=token_map
 
-def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../", buckets=0,split_flag=False,from_json=False,file_type=".smt2"):
+def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../",
+                          buckets=0,split_flag=False,from_json=False,file_type=".smt2",json_type=".JSON"):
     vocabulary_set, token_map = build_vocabulary(datafold=["train", "valid", "test"], path=path)
     benchmark_name = benchmark.replace("/", "-")
     for df in data_fold:
@@ -629,22 +634,43 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
         # read from JSON
         if from_json==True:
             suffix=file_type
-            for fileGraph, fileArgument in zip(sorted(glob.glob(path +df+"_data/"+ '*' + suffix + '.JSON')),
+            for fileGraph, fileArgument in zip(sorted(glob.glob(path +df+"_data/"+ '*' + suffix + json_type)),
                                                sorted(glob.glob(path +df+"_data/"+ '*' + suffix + '.arguments'))):
-                fileName = fileGraph[:fileGraph.find(suffix + ".JSON") + len(suffix)]
+                fileName = fileGraph[:fileGraph.find(suffix + json_type) + len(suffix)]
                 fileName = fileName[fileName.rindex("/") + 1:]
                 #print("fileName",fileName)
-                file_name_list.append(fileGraph[:fileGraph.find(".JSON")])
+                file_name_list.append(fileGraph[:fileGraph.find(json_type)])
                 # read graph
                 #print("read graph from",fileGraph)
                 with open(fileGraph) as f:
                     loaded_graph = json.load(f)
                     graphs_node_label_ids.append(loaded_graph["nodeIds"])
                     graphs_node_symbols.append(loaded_graph["nodeSymbolList"])
-                    graphs_adjacency_lists.append(
-                        [np.array(loaded_graph["binaryAdjacentList"]), np.array(loaded_graph["tenaryAdjacencyList"])])
                     graphs_argument_indices.append(loaded_graph["argumentIndices"])
-                    graphs_control_location_indices.append(loaded_graph["controlLocationIndices"])
+                    #for hyperedge horn graph
+                    # graphs_adjacency_lists.append([
+                    #     #np.array(loaded_graph["argumentDataFlowEdges"]),
+                    #     #np.array(loaded_graph["dataFlowASTEdges"]),
+                    #     np.array(loaded_graph["guardASTEdges"]),
+                    #     np.array(loaded_graph["dataFlowEdges"]),
+                    #     np.array(loaded_graph["argumentEdges"]),
+                    #     np.array(loaded_graph["controlFlowHyperEdges"]),
+                    #     np.array(loaded_graph["dataFlowHyperEdges"])])
+                    #for layer horn graph
+                    graphs_adjacency_lists.append([
+                        np.array(loaded_graph["binaryAdjacentList"]),
+                        np.array(loaded_graph["predicateArgumentEdges"]),
+                        np.array(loaded_graph["predicateInstanceEdges"]),
+                        np.array(loaded_graph["argumentInstanceEdges"]),
+                        np.array(loaded_graph["controlHeadEdges"]),
+                        np.array(loaded_graph["controlBodyEdges"]),
+                        np.array(loaded_graph["controlArgumentEdges"]),
+                    np.array(loaded_graph["guardEdges"]),
+                    np.array(loaded_graph["dataEdges"]),
+                    #np.array(loaded_graph["unknownEdges"])
+                    ])
+
+                    #graphs_control_location_indices.append(loaded_graph["controlLocationIndices"])
                     total_number_of_node += len(loaded_graph["nodeIds"])
                     # read argument from JSON file
                     parsed_arguments = parseArgumentsFromJson(loaded_graph["argumentIDList"],loaded_graph["argumentNameList"],loaded_graph["argumentOccurrence"])
@@ -690,8 +716,17 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
                             vocabulary_set,token_map,benchmark, df):
     final_graphs_v1 = []
 
-    raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists[0]), total_number_of_node)
-    for edge_type in graphs_adjacency_lists[0]:
+    raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists[0]), total_number_of_node)#graphs_adjacency_lists[0] means the first graph's adjacency_list
+    temp_graph_index=0
+    for i,graphs_adjacency in enumerate(graphs_adjacency_lists):
+        temp_count=0
+        for edge_type in graphs_adjacency:
+            if len(edge_type) != 0:
+                temp_count=temp_count+1
+        if temp_count == len(graphs_adjacency):
+            temp_graph_index=i
+    for edge_type in graphs_adjacency_lists[temp_graph_index]:
+        #if len(edge_type)!=0:
         raw_data_graph._node_number_per_edge_type.append(len(edge_type[0]))
 
     raw_data_graph.vocabulary_set=vocabulary_set
@@ -699,14 +734,14 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
     total_label=0
     total_nodes=0
 
+    if len(graphs_control_location_indices)==0:
+        graphs_control_location_indices=graphs_argument_indices
     directory_wrong_extracted_cases=file_name_list[0][:file_name_list[0].rfind("/")+1]+"wrong_extracted_cases"
     if not os.path.exists(directory_wrong_extracted_cases):
         os.makedirs(directory_wrong_extracted_cases)
-    for node_label_ids, node_symbols, argument_indices, adjacency_lists, argument_scores,control_location_indices, file_name in zip(graphs_node_label_ids,
-                                                                                  graphs_node_symbols,graphs_argument_indices,
-                                                                                  graphs_adjacency_lists,
-                                                                                  graphs_argument_scores,
-                                                                                  graphs_control_location_indices,file_name_list):
+    for node_label_ids, node_symbols, argument_indices, adjacency_lists, argument_scores,control_location_indices,\
+        file_name in zip(graphs_node_label_ids,graphs_node_symbols,graphs_argument_indices,graphs_adjacency_lists,
+                         graphs_argument_scores,graphs_control_location_indices,file_name_list):
         # convert to rank
         ranked_argument_scores = ss.rankdata(argument_scores, method="dense")
         argument_identify = np.array([0] * len(node_label_ids))

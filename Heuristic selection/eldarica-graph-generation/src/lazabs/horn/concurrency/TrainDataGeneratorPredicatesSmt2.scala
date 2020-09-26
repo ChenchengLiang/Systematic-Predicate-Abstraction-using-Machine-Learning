@@ -338,7 +338,6 @@ object TrainDataGeneratorPredicatesSmt2 {
       }
       else {
         var originalPredicates: Map[Predicate, Seq[IFormula]] = Map()
-
         //show original predicates
         var numberOfpredicates = 0
         println("Original predicates:")
@@ -348,7 +347,7 @@ object TrainDataGeneratorPredicatesSmt2 {
           val subst = (for ((c, n) <- head.arguments.head.iterator.zipWithIndex) yield (c, IVariable(n))).toMap
           //val headPredicate=new Predicate(head.name,head.arity) //class Predicate(val name : String, val arity : Int)
           val predicateSequence = for (p <- preds) yield {
-            val simplifiedPredicate = (new Simplifier) (Internal2InputAbsy(p.rawPred, p.rs.sf.functionEnc.predTranslation))
+            val simplifiedPredicate = (new Simplifier) (Internal2InputAbsy(p.rawPred, p.rs.sf.getFunctionEnc().predTranslation))
             //println("value:"+simplifiedPredicate)
             val varPred = ConstantSubstVisitor(simplifiedPredicate, subst) //transform variables to _1,_2,_3...
             println("value:" + varPred)
@@ -516,7 +515,7 @@ object TrainDataGeneratorPredicatesSmt2 {
             //val hornGraph = new GraphTranslator(simplifiedClauses, GlobalParameters.get.fileName)
             DrawHornGraph.writeHornClausesGraphToFile(GlobalParameters.get.fileName,simplifiedClauses,sortedHints,argumentInfo)
             val hintGraph= new GraphTranslator_hint(simplifiedClauses, GlobalParameters.get.fileName, sortedHints,InitialHintsWithID)
-
+            val layerHornGraph= new DrawLayerHornGraph(GlobalParameters.get.fileName, simplifiedClauses, sortedHints,argumentInfo)
 
             //write horn clauses to file
 

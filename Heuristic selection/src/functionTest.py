@@ -89,6 +89,11 @@ def main():
     # json_file="xadasd.smt2.JSON"
     # smt2_file=json_file[:json_file.find(".JSON")]
     # print(smt2_file)
+
+    eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld", "../benchmarks/LIA-lin-noInterval-trainData-datafold-temp/valid_data/gulwani_cegar2.c_000.smt2", "-getHornGraph"],
+                           stdout=subprocess.DEVNULL,
+                           shell=True)
+    eld.wait()
     pass
 
 if __name__ == '__main__':

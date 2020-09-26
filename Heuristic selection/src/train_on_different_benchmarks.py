@@ -34,7 +34,7 @@ def main():
     for benchmark in benchmark_list:
         train_on_graphs(benchmark_name=benchmark[0][len("../benchmarks/"):-1], label=label, force_read=force_read, train_n_times=1,
                         path=benchmark[0], file_type=file_type, split_flag=split_flag, buckets=buckets,
-                        form_label=form_label,from_json=from_json)
+                        form_label=form_label,from_json=from_json,json_type=".layerHornGraph.JSON")
     # train_on_graphs()
 
 

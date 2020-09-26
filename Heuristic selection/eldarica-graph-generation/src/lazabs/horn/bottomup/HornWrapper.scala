@@ -53,7 +53,7 @@ import lazabs.horn.abstractions.{AbsLattice, AbsReader, AbstractionRecord, Empty
 import AbstractionRecord.AbstractionMap
 import StaticAbstractionBuilder.AbstractionType
 import lazabs.horn.abstractions.VerificationHints.VerifHintTplEqTerm
-import lazabs.horn.concurrency.{DrawHornGraph, HintsSelection, ReaderMain}
+import lazabs.horn.concurrency.{DrawHornGraph, HintsSelection, ReaderMain,DrawLayerHornGraph}
 
 import scala.collection.mutable.{LinkedHashMap, HashMap => MHashMap, HashSet => MHashSet}
 
@@ -78,7 +78,7 @@ object HornWrapper {
                     // since we are making use of the equivalence
                     // x == False <=> x != True, we need to add bounds on Boolean
                     // variables (corresponding to the law of the excluded middle)
-                    !! (Sort.Bool.membershipConstraint(c))
+                    !! (c >= 0 & c <= 1)
                   case _ =>
                     // nothing
                 }
@@ -237,10 +237,12 @@ class HornWrapper(constraints: Seq[HornClause],
   val sortedHints = HintsSelection.sortHints(simpPreHints)
   if (GlobalParameters.get.getHornGraph == true) {
     val argumentList = (for (p <- HornClauses.allPredicates(simplifiedClauses)) yield (p, p.arity)).toList
-    val argumentInfo = HintsSelection.writeArgumentScoreToFile(GlobalParameters.get.fileName, argumentList, sortedHints)
+    val argumentInfo = HintsSelection.writeArgumentScoreToFile(GlobalParameters.get.fileName, argumentList, sortedHints,countOccurrence=false)
     DrawHornGraph.writeHornClausesGraphToFile(GlobalParameters.get.fileName, simplifiedClauses, sortedHints,argumentInfo) //write horn graph and gnn to file
     //println(simplifiedClauses)
     //val hornGraph = new GraphTranslator(simpClauses, GlobalParameters.get.fileName)
+
+    val layerHornGraph= new DrawLayerHornGraph(GlobalParameters.get.fileName, simplifiedClauses, sortedHints,argumentInfo)
     sys.exit()
   }
 
@@ -508,8 +510,12 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
           // only keep relation symbols that were also part of the orginal problem
           Left(res filterKeys allPredicates(unsimplifiedClauses))
         }
-
-      case Right(cex) =>
+        
+      case Right(cex) => {
+        if (lazabs.GlobalParameters.get.simplifiedCEX) {
+          println
+          cex.map(_._1).prettyPrint
+        }
         if (lazabs.GlobalParameters.get.needFullCEX) {
           val fullCEX = preprocBackTranslator translate cex
           HornWrapper.verifyCEX(fullCEX, unsimplifiedClauses)
@@ -517,6 +523,7 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
         } else {
           Right(for (p <- cex) yield p._1)
         }
+      }
     }
   }
 }

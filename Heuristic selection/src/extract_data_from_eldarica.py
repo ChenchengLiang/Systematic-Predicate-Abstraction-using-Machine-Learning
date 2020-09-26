@@ -131,14 +131,12 @@ def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
 
             pool.map(extract_one_file, parameterList)
             pool.close()
-        for json_file,argument_file,gv_file,hints_file,horn_file,horn_graph_file,initialHints_file,negativeHints_file,positiveHints_file,auto_gv_file in zip(glob.glob(root+"/*.JSON"),glob.glob(root+"/*.arguments"),glob.glob(root+"/*.smt2.gv"),
+        for argument_file,hints_file,horn_file,horn_graph_file,initialHints_file,negativeHints_file,positiveHints_file\
+                in zip(glob.glob(root+"/*.arguments"),
                                            glob.glob(root+"/*.hints.graphs"),glob.glob(root+"/*.horn"),glob.glob(root+"/*.HornGraph"),
-                                           glob.glob(root+"/*.initialHints"),glob.glob(root+"/*.negativeHints"),glob.glob(root+"/*.positiveHints"),
-                                           glob.glob(root+"/*.smt2-auto.gv")): #identify files need hints
-            smt2_file=json_file[:json_file.find(".JSON")]
-            copy_and_remove(json_file,root + "/trainData")
+                                           glob.glob(root+"/*.initialHints"),glob.glob(root+"/*.negativeHints"),glob.glob(root+"/*.positiveHints"),): #identify files need hints
+            smt2_file=argument_file[:argument_file.find(".arguments")]
             copy_and_remove(argument_file, root + "/trainData")
-            copy_and_remove(gv_file, root + "/trainData")
             copy_and_remove(hints_file, root + "/trainData")
             copy_and_remove(horn_file, root + "/trainData")
             copy_and_remove(horn_graph_file, root + "/trainData")
@@ -146,7 +144,12 @@ def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
             copy_and_remove(negativeHints_file, root + "/trainData")
             copy_and_remove(positiveHints_file, root + "/trainData")
             shutil.copy(smt2_file, root + "/trainData")
-            copy_and_remove(auto_gv_file, root + "/trainData")
+        for json_file in glob.glob(root+"/*.JSON"):
+            copy_and_remove(json_file, root + "/trainData")
+        for gv_file in glob.glob(root+"/*.gv"):
+            copy_and_remove(gv_file, root + "/trainData")
+
+
 
 
             #copy_tree("../trainData/", root + "/trainData")
@@ -155,11 +158,11 @@ def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
     return True
 
 def main():
-    benchmark_list = ["../benchmarks/temp-LIA-lin-noInterval-extract"]
+    benchmark_list = ["../benchmarks/temp-extract"]
     for benchmark in benchmark_list:
         # check_solvability_pool()
-        extract_data_pool(benchmark)
-        gather_all_train_data(src=benchmark,dst=benchmark+"-trainData")
+        #extract_data_pool(benchmark)
+        #gather_all_train_data(src=benchmark,dst=benchmark+"-trainData")
         separate_dataset_to_train_valid_test_files(benchmark+"-trainData/",benchmark+"-trainData-datafold/")
 
     # gather_all_train_data(src="../benchmarks/temp-train-6",dst="../benchmarks/temp-train-7")
