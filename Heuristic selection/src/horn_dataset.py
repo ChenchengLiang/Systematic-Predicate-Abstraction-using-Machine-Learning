@@ -3,7 +3,7 @@ import tensorflow as tf
 from dotToGraphInfo import GraphInfo,ArgumentInfo,DotToGraphInfo,parseArguments,parseArgumentsFromJson
 import tf2_gnn
 from horn_graph_argument_selection_task import InvariantArgumentSelectionTask,InvariantNodeIdentifyTask
-from tf2_gnn.data import GraphDataset,GraphSample,DataFold,GraphBatchTFDataDescription
+from tf2_gnn.data import GraphDataset,GraphSample,DataFold,GraphBatchTFDataDescription,HornGraphSample,HornGraphDataset
 import numpy as np
 from typing import List,Set,Iterator,Tuple
 from sklearn.preprocessing import MinMaxScaler,Normalizer
@@ -49,7 +49,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters['hidden_dim'] = 64 #64
     parameters['num_layers'] = 1
     parameters['node_label_embedding_size'] = nodeFeatureDim
-    parameters['max_nodes_per_batch']=1000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
+    parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
     parameters['regression_hidden_layer_size'] = [64,64] #[64,64]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
@@ -302,27 +302,6 @@ def build_vocabulary(datafold=["train", "valid", "test"], path="",json_type=".la
     return vocabulary_set,token_map
 
 
-class HornGraphSample(GraphSample):
-    """Data structure holding a single horn graph."""
-    def __init__(
-        self,
-        adjacency_lists: List[np.ndarray],
-        node_features: np.ndarray,
-        node_label: np.ndarray,
-        node_argument: np.ndarray,
-        current_node_index:np.ndarray,
-        node_control_location:np.ndarray
-    ):
-        super().__init__(adjacency_lists, node_features)
-        self._current_node_index=current_node_index
-        self._node_label = node_label
-        self._node_argument=node_argument
-        self._node_control_location=node_control_location
-
-    @property
-    def node_label(self) -> np.ndarray:
-        """Node labels to predict as ndarray of shape [V, C]"""
-        return self._node_label
 class raw_graph_inputs():
     def __init__(self,num_edge_types,total_number_of_nodes):
         self._num_edge_types=num_edge_types
@@ -337,209 +316,6 @@ class raw_graph_inputs():
         self.label_size=0
         self.vocabulary_set=set()
         self.token_map={}
-
-class HornGraphDataset(GraphDataset[HornGraphSample]):
-    def __init__(self, params: Dict[str, Any], metadata: Optional[Dict[str, Any]] = None):
-        super().__init__(params, metadata=metadata)
-        self._num_edge_types = None
-        self._total_number_of_nodes=None
-        #self._node_number_per_edge_type = list()
-        self._node_feature_shape: Optional[Tuple[int]] = None
-        self._loaded_data: Dict[DataFold, List[GraphSample]] = {}
-        self._argument_scores={}
-        self._ranked_argument_scores = {}
-        self._file_list={}
-        self._benchmark=params["benchmark"]
-        self.label_type=params["label_type"]
-        self._node_vocab_size=0
-
-
-    def load_data(self, folds_to_load: Optional[Set[DataFold]] = None) -> None:
-        '''been run automatically when create the object of this class'''
-        if folds_to_load is None:
-            folds_to_load = {DataFold.TRAIN, DataFold.VALIDATION, DataFold.TEST}
-            #folds_to_load = {DataFold.TRAIN}
-
-        if DataFold.TRAIN in folds_to_load:
-            self._loaded_data[DataFold.TRAIN] = self.__load_data(DataFold.TRAIN)
-        if DataFold.VALIDATION in folds_to_load:
-            self._loaded_data[DataFold.VALIDATION] = self.__load_data(DataFold.VALIDATION)
-        if DataFold.TEST in folds_to_load:
-            self._loaded_data[DataFold.TEST] = self.__load_data(DataFold.TEST)
-
-    def __load_data(self, data_fold: DataFold) -> List[HornGraphSample]:
-        if data_fold == DataFold.TRAIN:
-            data_name = "train"
-            self._node_number_per_edge_type=[] #reset to empty list
-        elif data_fold == DataFold.VALIDATION:
-            data_name = "valid"
-            self._node_number_per_edge_type=[]
-        elif data_fold == DataFold.TEST:
-            data_name = "test"
-            self._node_number_per_edge_type=[]
-
-
-
-        print("data_fold",data_name)
-        print("read GNNInputs from pickle file")
-        print(self.label_type+"-"+self._benchmark+"-gnnInput_"+data_name+"_data")
-        raw_inputs=pickleRead(self.label_type+"-"+self._benchmark+"-gnnInput_"+data_name+"_data")
-        final_graphs=raw_inputs.final_graphs
-
-        node_num_list=[]
-        for g in final_graphs:
-            node_num_list.append(len(g.node_features))
-
-        #Vocabulary size should be total vocabulary size of train, valid, test data
-        self._node_vocab_size=len(raw_inputs.vocabulary_set)
-        # if self._node_vocab_size<max(node_num_list):
-        #     self._node_vocab_size=max(node_num_list)
-
-        print("raw_inputs.label_size", raw_inputs.label_size)
-        print("raw_inputs._total_number_of_nodes", raw_inputs._total_number_of_nodes)
-        self._total_number_of_nodes = raw_inputs._total_number_of_nodes
-        print("raw_inputs._num_edge_types",raw_inputs._num_edge_types)
-        self._num_edge_types=raw_inputs._num_edge_types
-
-        print("raw_inputs._node_number_per_edge_type",raw_inputs._node_number_per_edge_type)
-        self._node_number_per_edge_type=raw_inputs._node_number_per_edge_type
-
-        # print("raw_inputs.argument_scores",raw_inputs.argument_scores)
-        self._argument_scores[data_name]=raw_inputs.argument_scores
-        # print("raw_inputs.ranked_argument_scores",raw_inputs.ranked_argument_scores)
-        self._ranked_argument_scores[data_name] = raw_inputs.ranked_argument_scores
-        self._file_list[data_name] = raw_inputs.file_names
-
-        return final_graphs
-
-    def load_data_from_list(self):
-        raise NotImplementedError()
-        pass
-
-    @property
-    def node_feature_shape(self) -> Tuple:
-        """Return the shape of the node features."""
-        some_data_fold = next(iter(self._loaded_data.values()))
-        return (some_data_fold[0].node_features.shape[-1],)
-
-    @property
-    def num_edge_types(self) -> int:
-        return self._num_edge_types
-
-    @property
-    def total_number_of_nodes(self) -> int:
-        return self._total_number_of_nodes
-
-    # -------------------- Minibatching --------------------
-    def get_batch_tf_data_description(self) -> GraphBatchTFDataDescription:
-        data_description = super().get_batch_tf_data_description()
-        batch_features_types = {
-            "node_features": tf.int32,
-            "node_to_graph_map": tf.int32,
-            "num_graphs_in_batch": tf.int32,
-            "node_argument": tf.int32,
-            "current_node_index":tf.int32
-        }
-        #print("self.node_feature_shape",self.node_feature_shape)
-        batch_features_shapes = {
-            "node_features": (None, ),  #+ self.node_feature_shape,  #no offset in minibatch
-            "node_to_graph_map": (None,),
-            "num_graphs_in_batch": (),
-            "node_argument": (None, ),
-            "current_node_index":(None,)
-        }
-        for edge_type_idx, edge_number in enumerate(self._node_number_per_edge_type):
-            batch_features_types[f"adjacency_list_{edge_type_idx}"] = tf.int32
-            batch_features_shapes[f"adjacency_list_{edge_type_idx}"] = (None, edge_number)
-
-        return GraphBatchTFDataDescription(
-            batch_features_types=batch_features_types,
-            batch_features_shapes=batch_features_shapes,
-            batch_labels_types={**data_description.batch_labels_types, "node_labels": tf.float32},
-            batch_labels_shapes={**data_description.batch_labels_shapes, "node_labels": (None,)},
-
-        )
-
-
-    def _graph_iterator(self, data_fold: DataFold) -> Iterator[HornGraphSample]:
-        loaded_data = self._loaded_data[data_fold]
-        if data_fold == DataFold.TRAIN:
-            random.shuffle(loaded_data)
-        return iter(loaded_data)
-
-    def _new_batch(self) -> Dict[str, Any]:
-        #new_batch = super()._new_batch()
-        # new_batch["node_argument"]=[]
-        # new_batch["node_labels"] = []
-        return {
-            "node_features": [],
-            "adjacency_lists": [[] for _ in range(self.num_edge_types)],
-            "node_to_graph_map": [],
-            "num_graphs_in_batch": 0,
-            "num_nodes_in_batch": 0,
-            "node_argument":[],
-            "node_labels":[],
-            "current_node_index":[]
-        }
-        return new_batch
-
-    def _add_graph_to_batch(self, raw_batch, graph_sample: HornGraphSample) -> None:
-        #super()._add_graph_to_batch(raw_batch, graph_sample)
-        num_nodes_in_graph = len(graph_sample.node_features)
-        #print("----add new batch---")
-        offset = raw_batch["num_nodes_in_batch"]
-        #print("num_nodes_in_graph",num_nodes_in_graph)
-        #print("offset",offset)
-        #raw_batch["node_features"].extend(graph_sample.node_features+offset)
-        raw_batch["node_features"].extend(graph_sample.node_features)
-
-        raw_batch["node_to_graph_map"].append(
-            np.full(
-                shape=[num_nodes_in_graph],
-                fill_value=raw_batch["num_graphs_in_batch"],
-                dtype=np.int32,
-            )
-        )
-        # print("len(raw bach adjacent list)",len(raw_batch["adjacency_lists"]))
-        # print("sample adjacent list",len(graph_sample.adjacency_lists))
-
-        for edge_type_idx, (batch_adjacency_list,sample_adjacency_list) in enumerate(zip(raw_batch["adjacency_lists"],graph_sample.adjacency_lists)):
-            edge_number=sample_adjacency_list.shape[1]
-            # print("sample_adjacency_list.shape",sample_adjacency_list.shape)
-            # print("edge_number",edge_number)
-            batch_adjacency_list.append(
-                graph_sample.adjacency_lists[edge_type_idx].reshape(-1, edge_number)
-                 + offset #offset
-            )
-            #print("graph_sample.adjacency_lists",graph_sample.adjacency_lists[edge_type_idx] + offset)
-
-        raw_batch["node_argument"].extend(graph_sample._node_argument + offset)
-        raw_batch["node_labels"].extend(graph_sample._node_label)
-        raw_batch["current_node_index"].extend(graph_sample._current_node_index)
-
-    def _finalise_batch(self, raw_batch) -> Tuple[Dict[str, Any], Dict[str, Any]]:
-        batch_features: Dict[str, Any] = {}
-        batch_labels: Dict[str, Any] = {"node_labels": raw_batch["node_labels"]}
-        batch_features["node_features"] = np.array(raw_batch["node_features"])
-        #print("raw_batch node_to_graph_map len",len(raw_batch["node_to_graph_map"]))
-        if len(raw_batch["node_to_graph_map"])==0:
-            batch_features["node_to_graph_map"]=raw_batch["node_to_graph_map"]
-        else:
-            batch_features["node_to_graph_map"] = np.concatenate(raw_batch["node_to_graph_map"])
-        batch_features["num_graphs_in_batch"] = raw_batch["num_graphs_in_batch"]
-        for i, adjacency_list in enumerate(raw_batch["adjacency_lists"]):
-            if len(adjacency_list) > 0:
-                batch_features[f"adjacency_list_{i}"] = np.concatenate(adjacency_list)
-            else:
-                batch_features[f"adjacency_list_{0}"] = np.zeros(shape=(0, 2),
-                                                                 dtype=np.int32)
-                batch_features[f"adjacency_list_{1}"] = np.zeros(shape=(0, 3),
-                                                                 dtype=np.int32)
-
-        #batch_features, batch_labels = super()._finalise_batch(raw_batch)
-        batch_features["node_argument"] = raw_batch["node_argument"]
-        batch_features["current_node_index"] = raw_batch["current_node_index"]
-        return batch_features, batch_labels
 
 def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","valid","test"],label="rank",path="../",file_type=".smt2"):
     benchmark_name=benchmark.replace("/", "-")
@@ -623,43 +399,43 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                 #print("read graph from",fileGraph)
                 with open(fileGraph) as f:
                     loaded_graph = json.load(f)
-                    graphs_node_label_ids.append(loaded_graph["nodeIds"])
-                    graphs_node_symbols.append(loaded_graph["nodeSymbolList"])
-                    graphs_argument_indices.append(loaded_graph["argumentIndices"])
-                    #for hyperedge horn graph
-                    # graphs_adjacency_lists.append([
-                    #     #np.array(loaded_graph["argumentDataFlowEdges"]),
-                    #     #np.array(loaded_graph["dataFlowASTEdges"]),
-                    #     np.array(loaded_graph["guardASTEdges"]),
-                    #     np.array(loaded_graph["dataFlowEdges"]),
-                    #     np.array(loaded_graph["argumentEdges"]),
-                    #     np.array(loaded_graph["controlFlowHyperEdges"]),
-                    #     np.array(loaded_graph["dataFlowHyperEdges"])])
-                    #for layer horn graph
-                    graphs_adjacency_lists.append([
-                        np.array(loaded_graph["binaryAdjacentList"]),
-                        np.array(loaded_graph["predicateArgumentEdges"]),
-                        np.array(loaded_graph["predicateInstanceEdges"]),
-                        np.array(loaded_graph["argumentInstanceEdges"]),
-                        np.array(loaded_graph["controlHeadEdges"]),
-                        np.array(loaded_graph["controlBodyEdges"]),
-                        np.array(loaded_graph["controlArgumentEdges"]),
-                    np.array(loaded_graph["guardEdges"]),
-                    np.array(loaded_graph["dataEdges"]),
-                    #np.array(loaded_graph["unknownEdges"])
-                    ])
+                    if len(loaded_graph["nodeIds"])!=0:
+                        graphs_node_label_ids.append(loaded_graph["nodeIds"])
+                        graphs_node_symbols.append(loaded_graph["nodeSymbolList"])
+                        graphs_argument_indices.append(loaded_graph["argumentIndices"])
+                        #for hyperedge horn graph
+                        # graphs_adjacency_lists.append([
+                        #     #np.array(loaded_graph["argumentDataFlowEdges"]),
+                        #     #np.array(loaded_graph["dataFlowASTEdges"]),
+                        #     np.array(loaded_graph["guardASTEdges"]),
+                        #     np.array(loaded_graph["dataFlowEdges"]),
+                        #     np.array(loaded_graph["argumentEdges"]),
+                        #     np.array(loaded_graph["controlFlowHyperEdges"]),
+                        #     np.array(loaded_graph["dataFlowHyperEdges"])])
+                        #for layer horn graph
+                        graphs_adjacency_lists.append([
+                            np.array(loaded_graph["binaryAdjacentList"]),
+                            np.array(loaded_graph["predicateArgumentEdges"]),
+                            np.array(loaded_graph["predicateInstanceEdges"]),
+                            np.array(loaded_graph["argumentInstanceEdges"]),
+                            np.array(loaded_graph["controlHeadEdges"]),
+                            np.array(loaded_graph["controlBodyEdges"]),
+                            np.array(loaded_graph["controlArgumentEdges"]),
+                        np.array(loaded_graph["guardEdges"]),
+                        np.array(loaded_graph["dataEdges"]),
+                        #np.array(loaded_graph["unknownEdges"])
+                        ])
 
-                    #graphs_control_location_indices.append(loaded_graph["controlLocationIndices"])
-                    total_number_of_node += len(loaded_graph["nodeIds"])
-                    # read argument from JSON file
-                    parsed_arguments = parseArgumentsFromJson(loaded_graph["argumentIDList"],loaded_graph["argumentNameList"],loaded_graph["argumentOccurrence"])
-                    graphs_argument_scores.append([int(argument.score) for argument in parsed_arguments])
-
-                # # read argument from .argument file
-                # print("read argument from",fileArgument)
-                # with open(fileArgument) as f:
-                #     parsed_arguments = parseArguments(f.read())
-                #     graphs_argument_scores.append([int(argument.score) for argument in parsed_arguments])
+                        #graphs_control_location_indices.append(loaded_graph["controlLocationIndices"])
+                        total_number_of_node += len(loaded_graph["nodeIds"])
+                        # read argument from JSON file
+                        parsed_arguments = parseArgumentsFromJson(loaded_graph["argumentIDList"],loaded_graph["argumentNameList"],loaded_graph["argumentOccurrence"])
+                        graphs_argument_scores.append([int(argument.score) for argument in parsed_arguments])
+                    # # read argument from .argument file
+                    # print("read argument from",fileArgument)
+                    # with open(fileArgument) as f:
+                    #     parsed_arguments = parseArguments(f.read())
+                    #     graphs_argument_scores.append([int(argument.score) for argument in parsed_arguments])
 
 
         pickle_data=parsed_dot_format(graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
