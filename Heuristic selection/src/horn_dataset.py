@@ -255,9 +255,9 @@ def write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss,valid
         out_file.write("accuracy list:" + str(accuracy_list) + "\n")
         out_file.write("mean accuracy:" + str(mean_accuracy) + "\n")
 
-        predicted_argument_lists=get_predicted_argument_list_divided_by_file(dataset, predicted_Y_loaded_model)
+        predicted_argument_lists=get_predicted_label_list_divided_by_file(dataset, predicted_Y_loaded_model)
         mse_list=[]
-        for predicted_arguments, arguments,ranks in zip(predicted_argument_lists,dataset._argument_scores["test"],dataset._ranked_argument_scores["test"]):
+        for predicted_arguments, arguments,ranks in zip(predicted_argument_lists,dataset._label_list["test"],dataset._ranked_argument_scores["test"]):
             out_file.write("-------"+ "\n")
             out_file.write("original argument scores:"+ str(arguments)+ "\n")
             out_file.write("original rank:"+ str(ranks)+ "\n")
@@ -277,15 +277,15 @@ def write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss,valid
         plt.clf()
 
 
-def get_predicted_argument_list_divided_by_file(dataset,predicted_Y_loaded_model):
-    argument_number_lists = []
-    for arguments in dataset._argument_scores["test"]:
-        argument_number_lists.append(len(arguments))
-    predicted_argument_lists = []
-    for i, n in enumerate(argument_number_lists):
-        predicted_argument_lists.append(
-            predicted_Y_loaded_model[sum(argument_number_lists[:i]):sum(argument_number_lists[:i]) + n])
-    return predicted_argument_lists
+def get_predicted_label_list_divided_by_file(dataset,predicted_Y_loaded_model):
+    label_number_lists = []
+    for labels in dataset._label_list["test"]:
+        label_number_lists.append(len(labels))
+    predicted_label_lists = []
+    for i, n in enumerate(label_number_lists):
+        predicted_label_lists.append(
+            predicted_Y_loaded_model[sum(label_number_lists[:i]):sum(label_number_lists[:i]) + n])
+    return predicted_label_lists
 
 def build_vocabulary(datafold=["train", "valid", "test"], path="",json_type=".layerHornGraph.JSON"):
     vocabulary_set=set(["unknown"])
@@ -309,6 +309,7 @@ class raw_graph_inputs():
         self._node_number_per_edge_type=[]
         self.final_graphs=None
         self.argument_scores=[]
+        self.labels=[]
         self.ranked_argument_scores=[]
         self.file_names=[]
         self.argument_identify=[]
@@ -522,12 +523,15 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
             raw_data_graph.argument_scores.append(argument_scores)
             raw_data_graph.file_names.append(file_name)
 
+
+
             #node tokenization
             tokenized_node_label_ids = []
             for symbol in node_symbols:
                 tokenized_node_label_ids.append(token_map[symbol])
 
             if label == "rank":
+                raw_data_graph.labels.append(argument_scores)
                 total_label += len(ranked_argument_scores)
                 final_graphs_v1.append(
                     HornGraphSample(
@@ -543,6 +547,7 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
                 )
                 raw_data_graph.label_size+=len(ranked_argument_scores)
             elif label == "occurrence":
+                raw_data_graph.labels.append(argument_scores)
                 total_label += len(argument_scores)
                 final_graphs_v1.append(
                     HornGraphSample(
@@ -558,6 +563,7 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
                 )
                 raw_data_graph.label_size += len(argument_scores)
             elif label == "argument_identify":
+                raw_data_graph.labels.append(argument_identify)
                 total_label += len(argument_identify)
                 final_graphs_v1.append(
                     HornGraphSample(
@@ -573,6 +579,7 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
                 )
                 raw_data_graph.label_size += len(argument_identify)
             elif label == "control_location_identify":
+                raw_data_graph.labels.append(control_location_identify)
                 total_label += len(control_location_identify)
                 final_graphs_v1.append(
                     HornGraphSample(
