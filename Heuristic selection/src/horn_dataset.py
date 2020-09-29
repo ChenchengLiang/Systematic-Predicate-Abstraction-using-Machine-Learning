@@ -2,7 +2,7 @@ from typing import Any, Dict,Optional
 import tensorflow as tf
 from dotToGraphInfo import GraphInfo,ArgumentInfo,DotToGraphInfo,parseArguments,parseArgumentsFromJson
 import tf2_gnn
-from horn_graph_argument_selection_task import InvariantArgumentSelectionTask,InvariantNodeIdentifyTask
+from tf2_gnn.models import InvariantArgumentSelectionTask,InvariantNodeIdentifyTask
 from tf2_gnn.data import GraphDataset,GraphSample,DataFold,GraphBatchTFDataDescription,HornGraphSample,HornGraphDataset
 import numpy as np
 from typing import List,Set,Iterator,Tuple
@@ -105,8 +105,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             dataset,
             log_fun=log,
             run_id=run_id,
-            max_epochs=1000,
-            patience=50,
+            max_epochs=5,
+            patience=5,
             save_dir=save_dir,
             quiet=quiet,
             aml_run=None,

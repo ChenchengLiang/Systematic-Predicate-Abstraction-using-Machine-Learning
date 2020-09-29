@@ -3,7 +3,7 @@ import tensorflow as tf
 from dotToGraphInfo import GraphInfo,ArgumentInfo,DotToGraphInfo
 from typing import Tuple
 import tf2_gnn
-from horn_graph_argument_selection_task import InvariantArgumentSelectionTask
+from tf2_gnn.models import InvariantArgumentSelectionTask
 from tf2_gnn.data import GraphDataset,GraphSample
 import numpy as np
 from typing import List,Set,Iterator
