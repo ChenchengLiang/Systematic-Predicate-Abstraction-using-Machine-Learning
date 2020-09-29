@@ -311,7 +311,11 @@ def unique_names(rootdir):
                 os.rename(file,preffix+"-"+str(count)+suffix)
             count += 1
 
-def add_JSON_field(rootdir,file_type=".layerHornGraph.JSON"):
+
+
+
+
+def generate_JSON_field(rootdir,file_type=".layerHornGraph.JSON"):
     for root, subdirs, files in os.walk(rootdir):
         if len(subdirs)==1 and subdirs[0]=="wrong_extracted_cases":
             os.rmdir(root+"/wrong_extracted_cases")
@@ -364,19 +368,25 @@ def add_layer_version_horn_graph_json_file(rootdir):
                         loaded_graph = json.load(f)
                         for field in old_field:
                             json_obj[field] = loaded_graph[field]
+                    print("../eldarica-graph-generation-temp/eld", file, "-getHornGraph")
                     eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-getHornGraph"], stdout=subprocess.DEVNULL,
                                            shell=False)
                     eld.wait()
-                    print("../eldarica-graph-generation-temp/eld",file,"-getHornGraph")
                     #add more field
-                    with open(layer_version_json_file) as layer_f:
-                        loaded_graph = json.load(layer_f)
-                        for field in new_field:
-                            json_obj[field] = loaded_graph[field]
-                    # write json object to JSON file
-                    clear_file(layer_version_json_file)
-                    with open(layer_version_json_file, 'w') as f:
-                        json.dump(json_obj, f)
+                    if os.path.isfile(layer_version_json_file):
+                        with open(layer_version_json_file) as layer_f:
+                            loaded_graph = json.load(layer_f)
+                            for field in new_field:
+                                json_obj[field] = loaded_graph[field]
+                        # write json object to JSON file
+                        clear_file(layer_version_json_file)
+                        with open(layer_version_json_file, 'w') as f:
+                            json.dump(json_obj, f)
+                    else:
+                        for f in glob.glob(file+"*"):
+                            copy(f,"../benchmarks/memory_problem_cases/")
+                            os.remove(f)
+
 
 
 def main():
@@ -406,7 +416,7 @@ def main():
 
     #get_statistic_data("../benchmarks/LIA-lin-traiData/")
 
-    #add_JSON_field("../benchmarks/temp-extract-trainData-datafold")
+    #generate_JSON_field("../benchmarks/temp-extract-trainData-datafold")
 
     add_layer_version_horn_graph_json_file("../benchmarks/LIA-lin-noInterval-trainData-datafold--temp")
 

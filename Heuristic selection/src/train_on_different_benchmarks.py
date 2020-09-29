@@ -15,9 +15,11 @@ def main():
     #benchmark_list.append(["../benchmarks/temp/", int(413*0.6), int(413*0.2), int(413*0.2)])
     #benchmark_list.append(["../benchmarks/LIA-lin-trainData-intervals-datafold/", int(413 * 0.6), int(413 * 0.2), int(413 * 0.2)])
     #benchmark_list.append(["../benchmarks/LIA-lin-trainData-noIntevals-datafold/", int(413 * 0.6), int(413 * 0.2), int(413 * 0.2)])
-    benchmark_list.append(["../benchmarks/temp-extract-trainData-datafold/", 0.6, 0.2, 0.2])
-    #benchmark_list.append(["../benchmarks/LIA-nonlin-trainData-noIntervals-datafold/", 0.6, 0.2, 0.2])
-    # benchmark_list.append(["../benchmarks/one_graph_debug/", int(1), int(1), int(1)])
+    #benchmark_list.append(["../benchmarks/LIA-lin-noInterval-trainData-datafold--temp/", 0.6, 0.2, 0.2])
+    #benchmark_list.append(["../benchmarks/single_example_test/"])
+    benchmark_list.append(["../benchmarks/temp-extract-trainData-datafold/"])
+
+    #todo: try simpler, task.
 
     force_read = True
     split_flag = False

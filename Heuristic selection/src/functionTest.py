@@ -15,6 +15,7 @@ import re
 import glob
 import json
 import tensorflow_datasets as tfds
+from shutil import copyfile,copy,rmtree,copytree,copy2
 def sleep(seconds=1):
     time.sleep(seconds)
     print("wait for",seconds)
@@ -90,11 +91,9 @@ def main():
     # smt2_file=json_file[:json_file.find(".JSON")]
     # print(smt2_file)
 
-    eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld", "../benchmarks/LIA-lin-noInterval-trainData-datafold-temp/valid_data/gulwani_cegar2.c_000.smt2", "-getHornGraph"],
-                           stdout=subprocess.DEVNULL,
-                           shell=True)
-    eld.wait()
-    pass
+    for f in glob.glob("../benchmarks/memory_problem_cases/insertion_sort_inlined_unsafe.c_000.smt2" + "*"):
+        copy(f, "../benchmarks/temp1/")
+        os.remove(f)
 
 if __name__ == '__main__':
     main()

@@ -47,9 +47,9 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters["message_calculation_class"]="rgcn"#rgcn,ggnn,rgat
     #parameters['num_heads'] = 2
     parameters['hidden_dim'] = 64 #64
-    parameters['num_layers'] = 2
+    parameters['num_layers'] = 1
     parameters['node_label_embedding_size'] = nodeFeatureDim
-    parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
+    parameters['max_nodes_per_batch']=1000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
     parameters['regression_hidden_layer_size'] = [64,64] #[64,64]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
@@ -287,10 +287,10 @@ def get_predicted_argument_list_divided_by_file(dataset,predicted_Y_loaded_model
             predicted_Y_loaded_model[sum(argument_number_lists[:i]):sum(argument_number_lists[:i]) + n])
     return predicted_argument_lists
 
-def build_vocabulary(datafold=["train", "valid", "test"], path=""):
+def build_vocabulary(datafold=["train", "valid", "test"], path="",json_type=".layerHornGraph.JSON"):
     vocabulary_set=set(["unknown"])
     for fold in datafold:
-        for json_file in glob.glob(path+fold+"_data/*.JSON"):
+        for json_file in glob.glob(path+fold+"_data/*"+json_type):
             with open(json_file) as f:
                 loaded_graph = json.load(f)
                 vocabulary_set.update(loaded_graph["nodeSymbolList"])
@@ -517,23 +517,6 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         raw_batch["node_labels"].extend(graph_sample._node_label)
         raw_batch["current_node_index"].extend(graph_sample._current_node_index)
 
-        # print("graph_sample.node_features+offset",graph_sample.node_features+offset)
-        # print("graph_sample._node_argument+offset", graph_sample._node_argument + offset)
-        # print("raw_batch.node_features", raw_batch["node_features"])
-        # print("raw_batch._node_argument",raw_batch["node_argument"])
-        # print("raw_batch.adjacency_lists", raw_batch["adjacency_lists"])
-
-        #
-        # for edge_type_idx, (batch_adjacency_list,sample_adjacency_list) in enumerate(zip(raw_batch["adjacency_lists"],graph_sample.adjacency_lists)):
-        #     edge_number=sample_adjacency_list.shape[1]
-        #     #print("edge_number",edge_number)
-        #     batch_adjacency_list.append(
-        #         graph_sample.adjacency_lists[edge_type_idx]
-        #         # .reshape(-1, edge_number)
-        #         # + raw_batch["num_nodes_in_batch"] #offset
-        #     )
-
-
     def _finalise_batch(self, raw_batch) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         batch_features: Dict[str, Any] = {}
         batch_labels: Dict[str, Any] = {"node_labels": raw_batch["node_labels"]}
@@ -557,10 +540,6 @@ class HornGraphDataset(GraphDataset[HornGraphSample]):
         batch_features["node_argument"] = raw_batch["node_argument"]
         batch_features["current_node_index"] = raw_batch["current_node_index"]
         return batch_features, batch_labels
-
-
-
-
 
 def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","valid","test"],label="rank",path="../",file_type=".smt2"):
     benchmark_name=benchmark.replace("/", "-")
@@ -601,7 +580,7 @@ class parsed_dot_format:
 
 def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../",
                           buckets=0,split_flag=False,from_json=False,file_type=".smt2",json_type=".JSON"):
-    vocabulary_set, token_map = build_vocabulary(datafold=["train", "valid", "test"], path=path)
+    vocabulary_set, token_map = build_vocabulary(datafold=["train", "valid", "test"], path=path,json_type=json_type)
     benchmark_name = benchmark.replace("/", "-")
     for df in data_fold:
         print("write data_fold to pickle data:", df)
