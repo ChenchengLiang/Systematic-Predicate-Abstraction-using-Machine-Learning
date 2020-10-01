@@ -19,8 +19,5 @@ Go to src file
 Run python3 debug-example.py
 
 
-Only two python files are directly connected to tf2_gnn:
-https://github.com/ChenchengLiang/Systematic-Predicate-Abstraction-using-Machine-Learning/blob/master/Heuristic%20selection/src/learnArguments/horn_graph_argument_selection_task.py
-and
-https://github.com/ChenchengLiang/Systematic-Predicate-Abstraction-using-Machine-Learning/blob/master/Heuristic%20selection/src/learnArguments/horn_dataset.py
-
+Corresponding tf2_gnn code can be find here:
+https://github.com/ChenchengLiang/tf2-gnn/tree/master/tf2_gnn
