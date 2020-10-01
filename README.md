@@ -3,13 +3,11 @@ Running instruction (for debug):
 1. Install libraries:
 
 
-a). git clone the fork of tf2_gnn
+    a). git clone the fork of tf2_gnn
 https://github.com/ChenchengLiang/tf2-gnn
 Install as site-package.
 
-b). Other site-package needed: 
-networkx,
-graphviz
+    b). Other site-package needed: networkx, graphviz
 
 2. Download and run the code:
 git clone https://github.com/ChenchengLiang/Systematic-Predicate-Abstraction-using-Machine-Learning
