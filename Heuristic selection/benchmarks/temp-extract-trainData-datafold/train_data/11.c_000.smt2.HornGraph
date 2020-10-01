@@ -1,0 +1,90 @@
+-------------
+h5(P2, P1, P0) :- P0 = 100 & P2 = 0 & P1 = 0.
+Head arguments: ListBuffer((P2,P2), (P1,P1), (P0,P0))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((P2,P2), (P1,P1), (P0,P0))
+relativeComplimentOfBodyArg:ListBuffer()
+Vector(P2, P1, P0)
+List()
+(((P0 = 100) & (P2 = 0)) & (P1 = 0))
+variables in guard: ListBuffer()
+Data flow:
+P2 <- 0
+P1 <- 0
+P0 <- 100
+Guard:
+dataflow number:3
+guard number:0
+-------------
+h5(P2, P1, P0) :- h5(P2 - 2, P1 - 1, P0), -1 >= P1 - 1 - P0.
+Head arguments: ListBuffer((P2,P2), (P1,P1), (P0,P0))
+Body arguments: ListBuffer(((P2 + -2),(P2 + -2)), ((P1 + -1),(P1 + -1)), (P0,P0))
+Common Arguments:ListBuffer((P0,P0))
+relativeComplimentOfHeadArg:ListBuffer((P2,P2), (P1,P1))
+relativeComplimentOfBodyArg:ListBuffer(((P2 + -2),(P2 + -2)), ((P1 + -1),(P1 + -1)))
+Vector(P2, P1, P0)
+List(h5((P2 + -2), (P1 + -1), P0))
+((-1 + -1 * ((P1 + -1) + -1 * P0)) >= 0)
+variables in guard: ListBuffer(-1, P1, P0)
+Data flow:
+P1 <- _P1
+P2<-(P2 + -2)
+P1<-(P1 + -1)
+P0<-P0
+Guard:
+((-1 * _P1 + P0) >= 0)
+dataflow number:2
+guard number:1
+-------------
+CHC_COMP_FALSE :- h5(P2, P1, P0), -1 >= P2 - 2*P0 & P1 >= P0.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((P2,P2), (P1,P1), (P0,P0))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+relativeComplimentOfBodyArg:ListBuffer((P2,P2), (P1,P1), (P0,P0))
+List()
+List(h5(P2, P1, P0))
+(((-1 + -1 * (P2 + -2 * P0)) >= 0) & ((P1 + -1 * P0) >= 0))
+variables in guard: ListBuffer(-1, P2, -2, P0, P1)
+Data flow:
+Guard:
+((-1 + -1 * (P2 + -2 * P0)) >= 0)
+((P1 + -1 * P0) >= 0)
+dataflow number:0
+guard number:2
+-------------
+CHC_COMP_FALSE :- h5(P2, P1, P0), P2 - 2*P0 >= 1 & P1 >= P0.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((P2,P2), (P1,P1), (P0,P0))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+relativeComplimentOfBodyArg:ListBuffer((P2,P2), (P1,P1), (P0,P0))
+List()
+List(h5(P2, P1, P0))
+((((P2 + -2 * P0) + -1) >= 0) & ((P1 + -1 * P0) >= 0))
+variables in guard: ListBuffer(P2, -2, P0, -1, P1)
+Data flow:
+Guard:
+(((P2 + -2 * P0) + -1) >= 0)
+((P1 + -1 * P0) >= 0)
+dataflow number:0
+guard number:2
+-------------
+false :- CHC_COMP_FALSE.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+relativeComplimentOfBodyArg:ListBuffer()
+List()
+List(CHC_COMP_FALSE)
+true
+variables in guard: ListBuffer(true)
+Data flow:
+Guard:
+true
+dataflow number:0
+guard number:1
+Hints:
+-----------

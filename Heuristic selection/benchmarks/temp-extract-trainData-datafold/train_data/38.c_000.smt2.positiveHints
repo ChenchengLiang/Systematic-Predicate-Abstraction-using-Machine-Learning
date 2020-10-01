@@ -1,0 +1,6 @@
+6:h5:VerifHintInitPred(((-2 * _2 + _1) >= 0))
+11:h5:VerifHintInitPred(((1 + (2 * _2 + -1 * _1)) >= 0))
+3:h5:VerifHintInitPred((((2 * _2 + -1 * _1) >= 0) | (((1 + (_3 + -2 * _1)) = 0) & ((1 + (2 * _2 + -1 * _1)) = 0))))
+4:h5:VerifHintInitPred(((-1 + (-2 * _2 + _1)) >= 0))
+14:h5:VerifHintInitPred(EX any. ((-1 + (2 * _0[any] + _4)) = 0))
+15:h5:VerifHintInitPred(EX any. ((2 * _0[any] + _4) = 0))

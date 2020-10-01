@@ -418,7 +418,7 @@ def main():
 
     #generate_JSON_field("../benchmarks/temp-extract-trainData-datafold")
 
-    add_layer_version_horn_graph_json_file("../benchmarks/LIA-lin-noInterval-trainData-datafold--temp")
+    add_layer_version_horn_graph_json_file("../benchmarks/LIA-lin-noInterval-trainData-datafold-temp")
 
 if __name__ == '__main__':
     main()

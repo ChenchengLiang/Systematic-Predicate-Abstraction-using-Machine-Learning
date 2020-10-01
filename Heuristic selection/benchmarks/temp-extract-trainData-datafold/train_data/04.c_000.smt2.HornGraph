@@ -1,0 +1,57 @@
+-------------
+h5(P1, P0) :- P1 = -50 & P0 = P2.
+Head arguments: ListBuffer((P1,P1), (P0,P0))
+Body arguments: ListBuffer()
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((P1,P1), (P0,P0))
+relativeComplimentOfBodyArg:ListBuffer()
+Vector(P1, P0)
+List()
+((P1 = -50) & (P0 = P2))
+variables in guard: ListBuffer()
+Data flow:
+P1 <- -50
+P0 <- P2
+Guard:
+dataflow number:2
+guard number:0
+-------------
+h5(P1, P0) :- h5(P1, P0 - 1), P1 = 1 + P1 - P0 & -1 >= P1.
+Head arguments: ListBuffer((P1,P1), (P0,P0))
+Body arguments: ListBuffer((P1,P1), ((P0 + -1),(P0 + -1)))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer((P1,P1), (P0,P0))
+relativeComplimentOfBodyArg:ListBuffer((P1,P1), ((P0 + -1),(P0 + -1)))
+Vector(P1, P0)
+List(h5(P1, (P0 + -1)))
+((P1 = ((1 + P1) + -1 * P0)) & ((-1 + -1 * P1) >= 0))
+variables in guard: ListBuffer(-1, P1)
+Data flow:
+P1 <- _P1
+P0 <- _P0
+P1<-P1
+P0<-(P0 + -1)
+Guard:
+((-1 + -1 * P1) >= 0)
+(P1 = (1 + (_P1 + -1 * _P0)))
+dataflow number:2
+guard number:2
+-------------
+false :- h5(P1, P0), 0 >= P0 & P1 >= 0.
+Head arguments: ListBuffer()
+Body arguments: ListBuffer((P1,P1), (P0,P0))
+Common Arguments:ListBuffer()
+relativeComplimentOfHeadArg:ListBuffer()
+relativeComplimentOfBodyArg:ListBuffer((P1,P1), (P0,P0))
+List()
+List(h5(P1, P0))
+((-1 * P0 >= 0) & (P1 >= 0))
+variables in guard: ListBuffer(-1, P0, P1)
+Data flow:
+Guard:
+(-1 * P0 >= 0)
+(P1 >= 0)
+dataflow number:0
+guard number:2
+Hints:
+-----------

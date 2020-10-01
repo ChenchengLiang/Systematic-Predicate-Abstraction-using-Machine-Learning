@@ -30,7 +30,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     #if not os.path.isfile("../pickleData/"+"train-"+benchmark_name+"-gnnInput_train_data.txt"):
     if force_read==True:
         write_graph_to_pickle(benchmark_name,  data_fold=["train", "valid", "test"],
-                              label=label,path=path,buckets=buckets,split_flag=split_flag,from_json=from_json,
+                              label=label,path=path,from_json=from_json,
                               file_type=file_type,json_type=json_type)
     else:
         print("Use pickle data for training")
@@ -40,8 +40,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     else:
         print("Use label in pickle data for training")
 
-
-    #read_graph_from_pickle_file(benchmark_name,force_read=force_read,label=label,path=path,file_type=file_type)
+    #read_graph_from_pickle_file(benchmark_name,force_read=force_read,label=label,path=path,file_type=file_type,from_json=from_json,json_type=json_type)
     nodeFeatureDim = 64 #64
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
     parameters["message_calculation_class"]="rgcn"#rgcn,ggnn,rgat
@@ -81,7 +80,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     best_valid_epoch_average = []
     accuracy_average=[]
     model=None
-    for n in range(train_n_times):
+    for n in range(train_n_times): # train n time to get average performance, default is one
         # get model
         if label == "argument_identify":
             model = InvariantNodeIdentifyTask(parameters, dataset)
@@ -129,11 +128,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         # test_metric, test_metric_string = model.compute_epoch_metrics(test_results)
         # predicted_Y_loaded_model=model.predict(test_data)
 
-
         print("test_metric_string",test_metric_string)
         print("test_metric",test_metric)
-
-
 
         true_Y=[]
         for data in iter(test_data):
@@ -165,8 +161,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         test_loss_average.append(predicted_Y_loaded_model[-1])
         best_valid_epoch_average.append(best_valid_epoch)
 
-
-
+    #get aberage training performance
     train_loss_list_average=np.mean(train_loss_list_average,axis=0)
     valid_loss_list_average=np.mean(valid_loss_list_average,axis=0)
     test_loss_list_average=np.mean(test_loss_list_average,axis=0)
@@ -178,7 +173,6 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     mean_accuracy=np.mean(accuracy_average)
 
     write_accuracy_to_log(label, benchmark_name, accuracy_average,best_valid_epoch_average)
-
     #visualize results
     draw_training_results(train_loss_list_average, valid_loss_list_average,test_loss_list_average, mean_loss_list_average,
                           mse_loaded_model_average, valid_loss_list, true_Y, predicted_Y_loaded_model, label,
@@ -301,7 +295,6 @@ def build_vocabulary(datafold=["train", "valid", "test"], path="",json_type=".la
         token_id=token_id+1
     return vocabulary_set,token_map
 
-
 class raw_graph_inputs():
     def __init__(self,num_edge_types,total_number_of_nodes):
         self._num_edge_types=num_edge_types
@@ -318,25 +311,13 @@ class raw_graph_inputs():
         self.vocabulary_set=set()
         self.token_map={}
 
-def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","valid","test"],label="rank",path="../",file_type=".smt2"):
+def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","valid","test"],label="rank",path="../",file_type=".smt2",json_type=".JSON",from_json=True):
     benchmark_name=benchmark.replace("/", "-")
     if os.path.isfile("../pickleData/"+label+"-"+benchmark_name+"-gnnInput_train_data.txt") and force_read==False:
         print("read existed training data")
 
     else:
-        for df in data_fold:
-            print("write data_fold to pickle data:",df)
-            graphInfoList = DotToGraphInfo(df+"Data",path)
-            graphInfoList._file_type=file_type
-            # get raw gnn inputs
-            graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists,\
-            graphs_argument_scores, total_number_of_node,graphs_control_location_indices,graph_info_list = graphInfoList.getHornGraphSample_no_offset()
-
-
-            form_horn_graph_samples(graphs_node_label_ids, graphs_argument_indices, graphs_adjacency_lists,
-                                    graphs_argument_scores, total_number_of_node, graphs_control_location_indices,
-                                    label, benchmark, df)
-
+        write_graph_to_pickle(benchmark, data_fold=data_fold, label=label, path=path, from_json=from_json, file_type=file_type, json_type=json_type)
 
 
 class parsed_dot_format:
@@ -355,8 +336,7 @@ class parsed_dot_format:
         self.vocabulary_set=vocabulary_set
         self.token_map=token_map
 
-def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../",
-                          buckets=0,split_flag=False,from_json=False,file_type=".smt2",json_type=".JSON"):
+def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../",from_json=False,file_type=".smt2",json_type=".JSON"):
     vocabulary_set, token_map = build_vocabulary(datafold=["train", "valid", "test"], path=path,json_type=json_type)
     benchmark_name = benchmark.replace("/", "-")
     for df in data_fold:
@@ -371,21 +351,6 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
         total_number_of_node=0
         file_type=".smt2"
         file_name_list=[]
-
-        #read from .gv
-        if split_flag==True:
-            for i in range(1,buckets+1):
-                p = subprocess.Popen(["../venv/bin/python3", "split_read_graphs.py", path,df,str(i),file_type,label,str(buckets),"gnn_inputs"])
-                p.wait()
-                # os.kill(p.pid,signal.SIGKILL)
-                print("curssor=",i)
-            for i in range(1,buckets+1):
-                graphs_node_label_ids.extend(pickleRead(df+"-graphs_node_label_ids-"+str(i)))
-                graphs_argument_indices.extend(pickleRead(df+"-graphs_argument_indices-"+str(i)))
-                graphs_adjacency_lists.extend(pickleRead(df+"-graphs_adjacency_lists-" + str(i)))
-                graphs_argument_scores.extend(pickleRead(df+"-graphs_argument_scores-" + str(i)))
-                graphs_control_location_indices.extend(pickleRead(df + "-total_control_flow_node_list-" + str(i)))
-                total_number_of_node+=pickleRead(df+"-total_number_of_node-" + str(i))
 
         # read from JSON
         if from_json==True:
@@ -522,8 +487,6 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
             raw_data_graph.ranked_argument_scores.append(ranked_argument_scores)
             raw_data_graph.argument_scores.append(argument_scores)
             raw_data_graph.file_names.append(file_name)
-
-
 
             #node tokenization
             tokenized_node_label_ids = []
