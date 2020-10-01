@@ -355,8 +355,9 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
         # read from JSON
         if from_json==True:
             suffix=file_type
-            for fileGraph, fileArgument in zip(sorted(glob.glob(path +df+"_data/"+ '*' + suffix + json_type)),
-                                               sorted(glob.glob(path +df+"_data/"+ '*' + suffix + '.arguments'))):
+            # for fileGraph, fileArgument in zip(sorted(glob.glob(path +df+"_data/"+ '*' + suffix + json_type)),
+            #                                    sorted(glob.glob(path +df+"_data/"+ '*' + suffix + '.arguments'))):
+            for fileGraph in sorted(glob.glob(path +df+"_data/"+ '*' + suffix + json_type)):
                 fileName = fileGraph[:fileGraph.find(suffix + json_type) + len(suffix)]
                 fileName = fileName[fileName.rindex("/") + 1:]
                 #print("fileName",fileName)
