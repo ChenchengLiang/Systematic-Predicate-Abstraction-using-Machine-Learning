@@ -334,6 +334,13 @@ def rank_arguments_naive(arr):
     ranks[temp] = np.arange(len(array))
     return ranks
 
+def replicate_files(directory,times):
+    for file in glob.glob(directory+"*"):
+        for i in range(1, times):
+            fileName=file[file.rfind("/")+1:]
+            shutil.copy(file,directory+str(i)+"-"+fileName)
+
+
 
 
 

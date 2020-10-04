@@ -312,9 +312,6 @@ def unique_names(rootdir):
             count += 1
 
 
-
-
-
 def generate_JSON_field(rootdir,file_type=".layerHornGraph.JSON"):
     for root, subdirs, files in os.walk(rootdir):
         if len(subdirs)==1 and subdirs[0]=="wrong_extracted_cases":
@@ -368,8 +365,8 @@ def add_layer_version_horn_graph_json_file(rootdir):
                         loaded_graph = json.load(f)
                         for field in old_field:
                             json_obj[field] = loaded_graph[field]
-                    print("../eldarica-graph-generation-temp/eld", file, "-getHornGraph")
-                    eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-getHornGraph"], stdout=subprocess.DEVNULL,
+                    print("../eldarica-graph-generation/eld", file, "-getHornGraph")
+                    eld = subprocess.Popen(["../eldarica-graph-generation/eld",file,"-getHornGraph"], stdout=subprocess.DEVNULL,
                                            shell=False)
                     eld.wait()
                     #add more field

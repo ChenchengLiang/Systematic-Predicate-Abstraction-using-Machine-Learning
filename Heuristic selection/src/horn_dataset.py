@@ -41,15 +41,15 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         print("Use label in pickle data for training")
 
     #read_graph_from_pickle_file(benchmark_name,force_read=force_read,label=label,path=path,file_type=file_type,from_json=from_json,json_type=json_type)
-    nodeFeatureDim = 64 #64
+    nodeFeatureDim = 2 #64
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
     parameters["message_calculation_class"]="rgcn"#rgcn,ggnn,rgat
     #parameters['num_heads'] = 2
-    parameters['hidden_dim'] = 64 #64
+    parameters['hidden_dim'] = 2 #64
     parameters['num_layers'] = 1
     parameters['node_label_embedding_size'] = nodeFeatureDim
     parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
-    parameters['regression_hidden_layer_size'] = [64,64] #[64,64]
+    parameters['regression_hidden_layer_size'] = [2,2] #[64,64]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
 
@@ -104,8 +104,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             dataset,
             log_fun=log,
             run_id=run_id,
-            max_epochs=5,
-            patience=5,
+            max_epochs=1000,
+            patience=50,
             save_dir=save_dir,
             quiet=quiet,
             aml_run=None,
@@ -349,7 +349,7 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
         parsed_arguments = []
         graphs_control_location_indices=[]
         total_number_of_node=0
-        file_type=".smt2"
+        file_type=file_type
         file_name_list=[]
 
         # read from JSON
@@ -360,13 +360,18 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
             for fileGraph in sorted(glob.glob(path +df+"_data/"+ '*' + suffix + json_type)):
                 fileName = fileGraph[:fileGraph.find(suffix + json_type) + len(suffix)]
                 fileName = fileName[fileName.rindex("/") + 1:]
-                #print("fileName",fileName)
-                file_name_list.append(fileGraph[:fileGraph.find(json_type)])
                 # read graph
                 #print("read graph from",fileGraph)
                 with open(fileGraph) as f:
                     loaded_graph = json.load(f)
-                    if len(loaded_graph["nodeIds"])!=0:
+                    #todo:check all labels if equal to empty
+                    if len(loaded_graph["nodeIds"]) == 0:
+                        print("nodeIds==0",fileName)
+                        for f in glob.glob(path+df+"_data/"+fileName + "*"):
+                            shutil.copy(f, "../benchmarks/problem_cases/")
+                            os.remove(f)
+                    else:
+                        file_name_list.append(fileGraph[:fileGraph.find(json_type)])
                         graphs_node_label_ids.append(loaded_graph["nodeIds"])
                         graphs_node_symbols.append(loaded_graph["nodeSymbolList"])
                         graphs_argument_indices.append(loaded_graph["argumentIndices"])

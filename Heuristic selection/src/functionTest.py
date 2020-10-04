@@ -14,8 +14,8 @@ import tensorflow as tf
 import re
 import glob
 import json
-import tensorflow_datasets as tfds
 from shutil import copyfile,copy,rmtree,copytree,copy2
+from Miscellaneous import replicate_files
 def sleep(seconds=1):
     time.sleep(seconds)
     print("wait for",seconds)
@@ -58,42 +58,53 @@ def pool_kill_popen_test(to):
         print(x.pid)
         os.kill(x.pid, signal.SIGKILL)
 
+def mnist_example():
+    mnist = tf.keras.datasets.mnist
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    x_train, x_test = x_train / 255.0, x_test / 255.0
+
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.Flatten(input_shape=(28, 28)),
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dropout(0.2),
+        tf.keras.layers.Dense(10)
+    ])
+
+    predictions = model(x_train[:1]).numpy()
+    predictions
+    tf.nn.softmax(predictions).numpy()
+    loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+    loss_fn(y_train[:1], predictions).numpy()
+    model.compile(optimizer='adam',
+                  loss=loss_fn,
+                  metrics=['accuracy'])
+
+    model.fit(x_train, y_train, epochs=5)
+
+    model.evaluate(x_test, y_test, verbose=2)
+    probability_model = tf.keras.Sequential([
+        model,
+        tf.keras.layers.Softmax()
+    ])
+    probability_model(x_test[:5])
 
 def main():
-    #pairwise_ranking_label_example(x,2)
+    mnist_example()
 
-    #occurance_to_rank_examples()
 
-    # parameterList=[10,15,20]
-    # pool = Pool(processes=8)
-    # pool.map(pool_kill_popen_test, parameterList)
-    # x=[]
-    # np.min(x)
-    # x=tf.math.equal([1,1], tf.math.round([0.3,0.7]))
-    # x=np.array(x)
+
+    # tf.debugging.set_log_device_placement(True)
     #
-    # x = [int(val) for val in x]
-    # print(x)
-    # x=[0,1]
-    # print(np.concatenate(x))
-    # first_layer_name= re.sub(r'(?<!^)(?=[A-Z])', '_', "InvariantNodeIdentifyTask").lower()
-    # print(first_layer_name)
-    #filePath="../benchmarks/LIA-lin/hopv/lia/termination/Ackermann00_000.smt2"
-    # filePath="../benchmarks/sv-comp-c/05.c-1.smt2"
-    # eld = subprocess.Popen(["../eldarica-graph-generation/eld", \
-    #                         filePath, "-getHornGraph"], stdout=subprocess.DEVNULL, shell=False)
-    # eld.wait(timeout=60)
+    # # Create some tensors
+    # a = tf.constant([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+    # b = tf.constant([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])
+    # c = tf.matmul(a, b)
+    #
+    # print(c)
 
-    # x=sorted(glob.glob("../benchmarks/LIA-lin-extracted-intervals/hopv/lia/mochi/trainData/" + '*' + '.smt2'))
-    # print(x)
-
-    # json_file="xadasd.smt2.JSON"
-    # smt2_file=json_file[:json_file.find(".JSON")]
-    # print(smt2_file)
-
-    for f in glob.glob("../benchmarks/memory_problem_cases/insertion_sort_inlined_unsafe.c_000.smt2" + "*"):
-        copy(f, "../benchmarks/temp1/")
-        os.remove(f)
+    # print(tf.test.is_built_with_cuda())
+    #
+    # tf.test.is_gpu_available(cuda_only=False, min_cuda_compute_capability=None)
 
 if __name__ == '__main__':
     main()
