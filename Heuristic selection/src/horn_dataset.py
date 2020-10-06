@@ -41,15 +41,15 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         print("Use label in pickle data for training")
 
     #read_graph_from_pickle_file(benchmark_name,force_read=force_read,label=label,path=path,file_type=file_type,from_json=from_json,json_type=json_type)
-    nodeFeatureDim = 2 #64
+    nodeFeatureDim = 64 #64
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
     parameters["message_calculation_class"]="rgcn"#rgcn,ggnn,rgat
     #parameters['num_heads'] = 2
-    parameters['hidden_dim'] = 2 #64
+    parameters['hidden_dim'] = 64 #64
     parameters['num_layers'] = 1
     parameters['node_label_embedding_size'] = nodeFeatureDim
     parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
-    parameters['regression_hidden_layer_size'] = [2,2] #[64,64]
+    parameters['regression_hidden_layer_size'] = [64,64] #[64,64]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
 
@@ -105,28 +105,31 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             log_fun=log,
             run_id=run_id,
             max_epochs=1000,
-            patience=50,
+            patience=10,
             save_dir=save_dir,
             quiet=quiet,
             aml_run=None,
         )
 
         #predict
-        print("trained_model_path",trained_model_path)
+
+        #trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2020-10-06_19-59-07_best.pkl"
+        print("trained_model_path", trained_model_path)
 
         test_data = dataset.get_tensorflow_dataset(DataFold.TEST)
 
+        # use model in memory
+        #_, _, test_results = model.run_one_epoch(test_data, training=False, quiet=quiet)
+        #test_metric, test_metric_string = model.compute_epoch_metrics(test_results)
+        predicted_Y_loaded_model_from_memory = model.predict(test_data)
+
         #load model from files
-        print("trained_model_path",trained_model_path)
         loaded_model = tf2_gnn.cli_utils.model_utils.load_model_for_prediction(trained_model_path, dataset)
         _, _, test_results = loaded_model.run_one_epoch(test_data, training=False, quiet=quiet)
         test_metric, test_metric_string = loaded_model.compute_epoch_metrics(test_results)
         predicted_Y_loaded_model = loaded_model.predict(test_data)
 
-        #use model in memory
-        # _, _, test_results = model.run_one_epoch(test_data, training=False, quiet=quiet)
-        # test_metric, test_metric_string = model.compute_epoch_metrics(test_results)
-        # predicted_Y_loaded_model=model.predict(test_data)
+
 
         print("test_metric_string",test_metric_string)
         print("test_metric",test_metric)
@@ -142,6 +145,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
 
         print("true_Y", true_Y)
         print("predicted_Y_loaded_model", predicted_Y_loaded_model)
+        print("predicted_Y_loaded_model_from_memory", predicted_Y_loaded_model_from_memory)
 
         mse_mean = tf.keras.losses.MSE(
             [np.mean(true_Y)]*len(true_Y), true_Y)

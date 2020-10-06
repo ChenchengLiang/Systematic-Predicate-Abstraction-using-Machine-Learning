@@ -4,17 +4,17 @@ import os
 import tensorflow as tf
 def main():
     benchmark_list = []
-    #benchmark_list.append(["../benchmarks/temp-extract-trainData-datafold-copy/"])
+    benchmark_list.append(["../benchmarks/temp-extract-trainData-datafold/"])
     #benchmark_list.append(["../benchmarks/single_example_test/"])
-    benchmark_list.append(["../benchmarks/LIA-lin-noInterval-trainData-datafold-temp/"])
+    #benchmark_list.append(["../benchmarks/LIA-lin-noInterval-trainData-datafold-temp/"])
 
-    force_read = True
-    form_label = True
+    force_read = False
+    form_label = False
     from_json=True
     file_type = ".smt2"
-    label = "occurrence"
+    #label = "occurrence"
     #label = "rank"
-    #label = "argument_identify"
+    label = "argument_identify"
     #label = "argument_identify_no_batchs"
     #label = "control_location_identify"
 
