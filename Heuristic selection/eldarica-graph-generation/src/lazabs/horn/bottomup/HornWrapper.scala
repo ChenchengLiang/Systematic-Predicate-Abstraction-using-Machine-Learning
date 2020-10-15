@@ -1,5 +1,5 @@
 /**
-  * Copyright (c) 2011-2020 Hossein Hojjat and Philipp Ruemmer.
+  * Copyright (c) 2011-2020 Hossein Hojjat, Philipp Ruemmer, Chencheng Liang.
   * All rights reserved.
   *
   * Redistribution and use in source and binary forms, with or without
@@ -53,7 +53,8 @@ import lazabs.horn.abstractions.{AbsLattice, AbsReader, AbstractionRecord, Empty
 import AbstractionRecord.AbstractionMap
 import StaticAbstractionBuilder.AbstractionType
 import lazabs.horn.abstractions.VerificationHints.VerifHintTplEqTerm
-import lazabs.horn.concurrency.{DrawHornGraph, HintsSelection, ReaderMain,DrawLayerHornGraph}
+import lazabs.horn.concurrency.{DrawHornGraph, DrawHyperEdgeHornGraph, DrawLayerHornGraph, HintsSelection, ReaderMain}
+import lazabs.horn.concurrency.DrawHornGraph.HornGraphType
 
 import scala.collection.mutable.{LinkedHashMap, HashMap => MHashMap, HashSet => MHashSet}
 
@@ -238,11 +239,17 @@ class HornWrapper(constraints: Seq[HornClause],
   if (GlobalParameters.get.getHornGraph == true) {
     val argumentList = (for (p <- HornClauses.allPredicates(simplifiedClauses)) yield (p, p.arity)).toList
     val argumentInfo = HintsSelection.writeArgumentScoreToFile(GlobalParameters.get.fileName, argumentList, sortedHints,countOccurrence=false)
-    //DrawHornGraph.writeHornClausesGraphToFile(GlobalParameters.get.fileName, simplifiedClauses, sortedHints,argumentInfo) //write horn graph and gnn to file
     //println(simplifiedClauses)
-    //val hornGraph = new GraphTranslator(simpClauses, GlobalParameters.get.fileName)
-
-    val layerHornGraph= new DrawLayerHornGraph(GlobalParameters.get.fileName, simplifiedClauses, sortedHints,argumentInfo)
+    GlobalParameters.get.hornGraphType match {
+      case HornGraphType.hyperEdgeHraph=>{
+        val hyperedgeHornGraph = new DrawHyperEdgeHornGraph(GlobalParameters.get.fileName, simplifiedClauses, sortedHints,argumentInfo)
+//        val hornGraph = new DrawHornGraph
+//        hornGraph.writeHornClausesGraphToFile(GlobalParameters.get.fileName, simplifiedClauses, sortedHints,argumentInfo)
+      }
+      case _=>{
+        val layerHornGraph= new DrawLayerHornGraph(GlobalParameters.get.fileName, simplifiedClauses, sortedHints,argumentInfo)
+      }
+    }
     sys.exit()
   }
 

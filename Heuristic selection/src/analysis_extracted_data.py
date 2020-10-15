@@ -344,12 +344,21 @@ def generate_JSON_field(rootdir,file_type=".layerHornGraph.JSON"):
                     json.dump(json_obj, f)
 
 
-def add_layer_version_horn_graph_json_file(rootdir):
+def add_horn_graph_json_file(rootdir,graph_type="-getHornGraph",json_file_type=".layerHornGraph.JSON"):
     old_field = ["argumentOccurrence"]
-    new_field = ["nodeIds", "nodeSymbolList", "argumentIndices", "argumentIDList", "argumentNameList",
-                 "argumentOccurrence", "binaryAdjacentList", "ternaryAdjacencyList", "predicateArgumentEdges",
-                 "predicateInstanceEdges","argumentInstanceEdges", "controlHeadEdges", "controlBodyEdges", "controlArgumentEdges", "guardEdges",
-                 "dataEdges", "unknownEdges"]
+    new_field = []
+    if json_file_type==".layerHornGraph.JSON":
+        new_field = ["nodeIds", "nodeSymbolList", "argumentIndices", "argumentIDList", "argumentNameList",
+                    "binaryAdjacentList", "ternaryAdjacencyList", "predicateArgumentEdges",
+                     "predicateInstanceEdges", "argumentInstanceEdges", "controlHeadEdges", "controlBodyEdges",
+                     "controlArgumentEdges", "guardEdges",
+                     "dataEdges", "unknownEdges"]
+    else:
+        new_field = ["nodeIds", "nodeSymbolList","falseIndices", "argumentIndices", "argumentIDList", "argumentNameList","controlLocationIndices",
+                     "binaryAdjacentList", "ternaryAdjacencyList", "unknownEdges",
+                     "argumentEdges","guardASTEdges","dataFlowASTEdges","controlFlowHyperEdges","dataFlowHyperEdges"]
+
+
     for root, subdirs, files in os.walk(rootdir):
         if len(subdirs)==1 and subdirs[0]=="wrong_extracted_cases":
             os.rmdir(root+"/wrong_extracted_cases")
@@ -357,27 +366,27 @@ def add_layer_version_horn_graph_json_file(rootdir):
         if len(subdirs)==0:
             for file in glob.glob(root+"/*.smt2"):
                 json_file = file + ".JSON"
-                layer_version_json_file = file + ".layerHornGraph.JSON"
-                if not os.path.isfile(layer_version_json_file):
+                graph_json_file = file + json_file_type
+                if not os.path.isfile(graph_json_file):
                     #read JSON' label
                     json_obj = {}
                     with open(json_file) as f:
                         loaded_graph = json.load(f)
                         for field in old_field:
                             json_obj[field] = loaded_graph[field]
-                    print("../eldarica-graph-generation/eld", file, "-getHornGraph")
-                    eld = subprocess.Popen(["../eldarica-graph-generation/eld",file,"-getHornGraph"], stdout=subprocess.DEVNULL,
+                    print("../eldarica-graph-generation/eld", file, graph_type)
+                    eld = subprocess.Popen(["../eldarica-graph-generation/eld",file,graph_type], stdout=subprocess.DEVNULL,
                                            shell=False)
                     eld.wait()
                     #add more field
-                    if os.path.isfile(layer_version_json_file):
-                        with open(layer_version_json_file) as layer_f:
+                    if os.path.isfile(graph_json_file):
+                        with open(graph_json_file) as layer_f:
                             loaded_graph = json.load(layer_f)
                             for field in new_field:
                                 json_obj[field] = loaded_graph[field]
                         # write json object to JSON file
-                        clear_file(layer_version_json_file)
-                        with open(layer_version_json_file, 'w') as f:
+                        clear_file(graph_json_file)
+                        with open(graph_json_file, 'w') as f:
                             json.dump(json_obj, f)
                     else:
                         for f in glob.glob(file+"*"):
@@ -388,16 +397,6 @@ def add_layer_version_horn_graph_json_file(rootdir):
 
 def main():
     benchmark_list = []
-    #benchmark_list.append(["../benchmarks/trainData-chc-comp-predicates/", 120, 11, 30,".smt2"])
-    # benchmark_list.append(["../benchmarks/trainData-sv-comp-c-predicates/", 70, 10, 26,".c"])
-    #benchmark_list.append(["../benchmarks/trainData-sv-comp-smt-predicates/", 100, 20, 20,".smt2"])
-    # benchmark_list.append(["../benchmarks/trainData-chc-comp-predicates+sv-comp-smt-predicates/", 220, 30, 51,".smt2"])
-    # benchmark_list.append(
-    #     ["../benchmarks/trainData-chc-comp-predicates+sv-comp-smt-predicates+sv-comp-c-predicates/", 330, 30, 57,".c"])
-    # benchmark_list.append(["../benchmarks/trainData-sv-comp-smt-templates/", 25, 8, 5,".smt2"])
-    ###benchmark_list.append(["../benchmarks/trainData-sv-comp-c-templates/", 25, 5, 8,".c"])
-    #benchmark_list.append(["../benchmarks/trainData-chc-comp-templates/", 25, 5, 5,".smt2"])
-    #benchmark_list.append(["../benchmarks/temp/", int(18 * 0.6), int(18 * 0.2), int(18 * 0.2), ".smt2"])
     #benchmark_list.append(["../benchmarks/temp-extract/", int(545 * 0.6), int(545 * 0.2), int(545 * 0.2), ".smt2"])
     # buckets = 10
     # for benchmark in benchmark_list:
@@ -414,8 +413,11 @@ def main():
     #get_statistic_data("../benchmarks/LIA-lin-traiData/")
 
     #generate_JSON_field("../benchmarks/temp-extract-trainData-datafold")
-
-    add_layer_version_horn_graph_json_file("../benchmarks/LIA-lin-noInterval-trainData-datafold-temp")
+    # graph_type="-getHornGraph:biDirectionLayerGraph"
+    # json_file_type=".layerHornGraph.JSON"
+    graph_type = "-getHornGraph:hyperEdgeGraph"
+    json_file_type = ".hyperEdgeHornGraph.JSON"
+    add_horn_graph_json_file("../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph",graph_type=graph_type,json_file_type=json_file_type)
 
 if __name__ == '__main__':
     main()

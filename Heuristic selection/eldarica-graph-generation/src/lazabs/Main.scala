@@ -29,30 +29,14 @@
  */
 
 package lazabs
-
 import java.io.{File, FileInputStream, FileNotFoundException, InputStream, PrintWriter}
-import java.lang.System.currentTimeMillis
-
-import parser._
-import lazabs.art._
 import lazabs.art.SearchMethod._
-import lazabs.horn.global.HornClause
 import lazabs.prover._
 import lazabs.viewer._
-import lazabs.utils.Inline._
-//import lazabs.utils.PointerAnalysis
-//import lazabs.cfg.MakeCFG
 import lazabs.nts._
-import lazabs.horn.parser.HornReader
-import lazabs.horn.bottomup.HornPredAbs.RelationSymbol
-import lazabs.horn.abstractions.AbsLattice
 import lazabs.horn.abstractions.StaticAbstractionBuilder.AbstractionType
+import lazabs.horn.concurrency.DrawHornGraph.{HornGraphType}
 import lazabs.horn.concurrency.CCReader
-import lazabs.horn.abstractions.VerificationHints
-import lazabs.horn.concurrency.{VerificationLoop}
-
-import ap.util.Debug
-
 import ap.util.Debug
 
 object GlobalParameters {
@@ -71,8 +55,8 @@ object GlobalParameters {
 
 class GlobalParameters extends Cloneable {
   //var printHints=VerificationHints(Map())
-  var totalHints=0 //DEBUG
-  var threadTimeout = 2000 //debug
+  var totalHints=0
+  var threadTimeout = 2000
   var solvabilityTimeout=2000
   var extractTemplates=false
   var extractPredicates=false
@@ -80,6 +64,7 @@ class GlobalParameters extends Cloneable {
   var rank=0.0
   var getSMT2=false
   var getHornGraph=false
+  var hornGraphType:HornGraphType.Value=HornGraphType.monoDirectionLayerGraph
   var hornGraphWithHints=false
   var in: InputStream = null
   var fileName = ""
@@ -224,13 +209,12 @@ class GlobalParameters extends Cloneable {
     that.assertions = this.assertions
     that.verifyInterpolants = this.verifyInterpolants
     that.timeoutChecker = this.timeoutChecker
-    //DEBUG
-    that.threadTimeout = this.threadTimeout //debug
+    that.threadTimeout = this.threadTimeout
     that.solvabilityTimeout=this.solvabilityTimeout
-    that.rank = this.rank //debug
-    //that.printHints = this.printHints //DEBUG
-    that.extractTemplates=this.extractTemplates//debug
-    that.extractPredicates=this.extractPredicates//debug
+    that.rank = this.rank
+    //that.printHints = this.printHints
+    that.extractTemplates=this.extractTemplates
+    that.extractPredicates=this.extractPredicates
     that.readHints=this.readHints
     that.getSMT2=this.getSMT2
     that.getHornGraph=this.getHornGraph
@@ -329,7 +313,26 @@ object Main {
       case "-extractPredicates" :: rest => extractPredicates = true; arguments(rest)
       case "-readHints" :: rest => readHints = true; arguments(rest)
       case "-getSMT2" :: rest => getSMT2 = true; arguments(rest)
-      case "-getHornGraph" :: rest => getHornGraph = true; arguments(rest)
+      case "-getHornGraph" :: rest => {
+        getHornGraph = true
+        hornGraphType = HornGraphType.monoDirectionLayerGraph
+        arguments(rest)
+      }
+      case "-getHornGraph:monoDirectionLayerGraph" :: rest => {
+        getHornGraph = true
+        hornGraphType = HornGraphType.monoDirectionLayerGraph
+        arguments(rest)
+      }
+      case "-getHornGraph:biDirectionLayerGraph" :: rest => {
+        getHornGraph = true
+        hornGraphType = HornGraphType.biDirectionLayerGraph
+        arguments(rest)
+      }
+      case "-getHornGraph:hyperEdgeGraph" :: rest => {
+        getHornGraph = true
+        hornGraphType = HornGraphType.hyperEdgeHraph
+        arguments(rest)
+      }
       case "-hornGraphWithHints" :: rest => hornGraphWithHints = true; arguments(rest)
       case "-pIntermediate" :: rest => printIntermediateClauseSets = true; arguments(rest)
       case "-sp" :: rest => smtPrettyPrint = true; arguments(rest)
@@ -389,15 +392,15 @@ object Main {
         templateBasedInterpolationTimeout =
           (java.lang.Float.parseFloat(tTimeout.drop(12)) * 1000).toInt;
         arguments(rest)
-      case tTimeout :: rest if (tTimeout.startsWith("-absTimeout:")) =>  //debug
+      case tTimeout :: rest if (tTimeout.startsWith("-absTimeout:")) =>
         threadTimeout =
           (java.lang.Float.parseFloat(tTimeout.drop(12)) ).toInt;
         arguments(rest)
-      case tTimeout :: rest if (tTimeout.startsWith("-solvabilityTimeout:")) =>  //debug
+      case tTimeout :: rest if (tTimeout.startsWith("-solvabilityTimeout:")) =>
         solvabilityTimeout =
           (java.lang.Float.parseFloat(tTimeout.drop("-solvabilityTimeout:".length)) ).toInt;
         arguments(rest)
-      case tTimeout :: rest if (tTimeout.startsWith("-rank:")) =>  //debug
+      case tTimeout :: rest if (tTimeout.startsWith("-rank:")) =>
         rank =
           (java.lang.Float.parseFloat(tTimeout.drop(6))); //parse input string
         arguments(rest)
@@ -533,6 +536,7 @@ object Main {
           " -rank:n\tuse top n or score above n ranked hints read from file\n"+
           " -getSMT2\tget SMT2 file\n"+
           " -getHornGraph\tget horn graph file and GNN input\n"+
+          " -getHornGraph:t\tInterp. getHornGraph: monoDirectionLayerGraph, biDirectionLayerGraph, hyperEdgeGraph\n" +
           " -hornGraphWithHints\tget horn graph file with hints\n"
 
 

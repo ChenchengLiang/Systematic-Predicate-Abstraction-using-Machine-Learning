@@ -42,7 +42,6 @@ import scala.collection.mutable.ArrayBuffer
 
 
 
-/////debug/////
 class TrainDataGenerator(smallSystem : ParametricEncoder.System,system : ParametricEncoder.System){
   import VerificationLoop._
   val processNum = smallSystem.processes.size
@@ -111,7 +110,7 @@ class TrainDataGenerator(smallSystem : ParametricEncoder.System,system : Paramet
 
       //Output graphs
       //val hornGraph = new GraphTranslator(simpClauses, GlobalParameters.get.fileName)
-      DrawHornGraph.writeHornClausesGraphToFile(GlobalParameters.get.fileName,simpClauses,sortedHints,argumentInfo)
+      val hornGraph = new DrawHyperEdgeHornGraph(GlobalParameters.get.fileName,simpClauses,sortedHints,argumentInfo)
       val hintGraph= new GraphTranslator_hint(simpClauses, GlobalParameters.get.fileName, sortedHints,InitialHintsWithID)
       val layerHornGraph= new DrawLayerHornGraph(GlobalParameters.get.fileName, simpClauses, sortedHints,argumentInfo)
     }

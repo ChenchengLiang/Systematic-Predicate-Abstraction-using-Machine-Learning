@@ -100,17 +100,17 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         log_file = os.path.join(save_dir, f"{run_id}.log")
 
         trained_model_path,train_loss_list,valid_loss_list,best_valid_epoch,train_metric_list,valid_metric_list = train(
-            model,
-            dataset,
+        #trained_model_path = train(
+            model=model,
+            dataset=dataset,
             log_fun=log,
             run_id=run_id,
-            max_epochs=1000,
-            patience=10,
+            max_epochs=200,
+            patience=50,
             save_dir=save_dir,
             quiet=quiet,
             aml_run=None,
         )
-
         #predict
 
         #trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2020-10-06_19-59-07_best.pkl"
@@ -129,8 +129,6 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         test_metric, test_metric_string = loaded_model.compute_epoch_metrics(test_results)
         predicted_Y_loaded_model = loaded_model.predict(test_data)
 
-
-
         print("test_metric_string",test_metric_string)
         print("test_metric",test_metric)
 
@@ -144,8 +142,9 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         print("\n mse_loaded_model_predicted_Y_and_True_Y", mse_loaded_model)
 
         print("true_Y", true_Y)
-        print("predicted_Y_loaded_model", predicted_Y_loaded_model)
         print("predicted_Y_loaded_model_from_memory", predicted_Y_loaded_model_from_memory)
+        print("predicted_Y_loaded_model", predicted_Y_loaded_model)
+
 
         mse_mean = tf.keras.losses.MSE(
             [np.mean(true_Y)]*len(true_Y), true_Y)
@@ -155,15 +154,18 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         accuracy = num_correct / len(predicted_Y_loaded_model)
 
         accuracy_average.append(accuracy)
-        train_loss_list_average.append(train_loss_list)
-        valid_loss_list_average.append(valid_loss_list)
+
         test_loss_list_average.append(predicted_Y_loaded_model)
         mean_loss_list_average.append(mean_loss_list)
         mse_loaded_model_average.append(mse_loaded_model)
+        test_loss_average.append(predicted_Y_loaded_model[-1])
+
+        train_loss_list_average.append(train_loss_list)
+        valid_loss_list_average.append(valid_loss_list)
         train_loss_average.append(train_loss_list[-1])
         valid_loss_average.append(valid_loss_list[-1])
-        test_loss_average.append(predicted_Y_loaded_model[-1])
         best_valid_epoch_average.append(best_valid_epoch)
+
 
     #get aberage training performance
     train_loss_list_average=np.mean(train_loss_list_average,axis=0)
@@ -257,10 +259,10 @@ def write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss,valid
         mse_list=[]
         for predicted_arguments, arguments,ranks in zip(predicted_argument_lists,dataset._label_list["test"],dataset._ranked_argument_scores["test"]):
             out_file.write("-------"+ "\n")
-            out_file.write("original argument scores:"+ str(arguments)+ "\n")
-            out_file.write("original rank:"+ str(ranks)+ "\n")
-            out_file.write("predicted argument scores:"+ str(predicted_arguments)+ "\n")
-            out_file.write("predicted rank:"+ str(ss.rankdata(predicted_arguments,method="dense"))+ "\n")
+            out_file.write("true label:"+ str(arguments)+ "\n")
+            out_file.write("true label rank:"+ str(ranks)+ "\n")
+            out_file.write("predicted label:"+ str(predicted_arguments)+ "\n")
+            out_file.write("predicted label rank:"+ str(ss.rankdata(predicted_arguments,method="dense"))+ "\n")
             mse=tf.keras.losses.MSE(arguments,predicted_arguments)
             out_file.write("mse:" + str(mse) + "\n")
             mse_list.append(mse)
@@ -323,7 +325,6 @@ def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","
     else:
         write_graph_to_pickle(benchmark, data_fold=data_fold, label=label, path=path, from_json=from_json, file_type=file_type, json_type=json_type)
 
-
 class parsed_dot_format:
     def __init__(self,graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
                  graphs_argument_scores,total_number_of_node,graph_control_location_indices,file_name_list,parsed_arguments,
@@ -368,39 +369,58 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                 #print("read graph from",fileGraph)
                 with open(fileGraph) as f:
                     loaded_graph = json.load(f)
-                    #todo:check all labels if equal to empty
+                    #todo:debug check all field if equal to empty
                     if len(loaded_graph["nodeIds"]) == 0:
                         print("nodeIds==0",fileName)
                         for f in glob.glob(path+df+"_data/"+fileName + "*"):
                             shutil.copy(f, "../benchmarks/problem_cases/")
                             os.remove(f)
+                    # if len(loaded_graph["argumentEdges"]) == 0:
+                    #     print("argumentEdges==0",fileName)
+                    # if len(loaded_graph["guardASTEdges"]) == 0:
+                    #     print("guardASTEdges==0",fileName)
+                    # if len(loaded_graph["dataFlowASTEdges"]) == 0:
+                    #     print("dataFlowASTEdges==0",fileName)
+                    # if len(loaded_graph["binaryAdjacentList"]) == 0:
+                    #     print("binaryAdjacentList==0",fileName)
+                    # if len(loaded_graph["ternaryAdjacencyList"]) == 0:
+                    #     print("ternaryAdjacencyList==0",fileName)
+                    # if len(loaded_graph["controlFlowHyperEdges"]) == 0:
+                    #     print("controlFlowHyperEdges==0",fileName)
+                    # if len(loaded_graph["dataFlowHyperEdges"]) == 0:
+                    #     print("dataFlowHyperEdges==0",fileName)
                     else:
                         file_name_list.append(fileGraph[:fileGraph.find(json_type)])
                         graphs_node_label_ids.append(loaded_graph["nodeIds"])
                         graphs_node_symbols.append(loaded_graph["nodeSymbolList"])
                         graphs_argument_indices.append(loaded_graph["argumentIndices"])
-                        #for hyperedge horn graph
-                        # graphs_adjacency_lists.append([
-                        #     #np.array(loaded_graph["argumentDataFlowEdges"]),
-                        #     #np.array(loaded_graph["dataFlowASTEdges"]),
-                        #     np.array(loaded_graph["guardASTEdges"]),
-                        #     np.array(loaded_graph["dataFlowEdges"]),
-                        #     np.array(loaded_graph["argumentEdges"]),
-                        #     np.array(loaded_graph["controlFlowHyperEdges"]),
-                        #     np.array(loaded_graph["dataFlowHyperEdges"])])
-                        #for layer horn graph
-                        graphs_adjacency_lists.append([
-                            np.array(loaded_graph["binaryAdjacentList"]),
-                            np.array(loaded_graph["predicateArgumentEdges"]),
-                            np.array(loaded_graph["predicateInstanceEdges"]),
-                            np.array(loaded_graph["argumentInstanceEdges"]),
-                            np.array(loaded_graph["controlHeadEdges"]),
-                            np.array(loaded_graph["controlBodyEdges"]),
-                            np.array(loaded_graph["controlArgumentEdges"]),
-                        np.array(loaded_graph["guardEdges"]),
-                        np.array(loaded_graph["dataEdges"]),
-                        #np.array(loaded_graph["unknownEdges"])
-                        ])
+                        graphs_control_location_indices.append(loaded_graph["controlLocationIndices"])
+                        if json_type==".hyperEdgeHornGraph.JSON":
+                            #for hyperedge horn graph
+                            graphs_adjacency_lists.append([
+                                np.array(loaded_graph["argumentEdges"]),
+                                np.array(loaded_graph["guardASTEdges"]),
+                                np.array(loaded_graph["dataFlowASTEdges"]),
+                                np.array(loaded_graph["binaryAdjacentList"]),
+                                np.array(loaded_graph["controlFlowHyperEdges"]),
+                                np.array(loaded_graph["dataFlowHyperEdges"]),
+                                np.array(loaded_graph["ternaryAdjacencyList"])
+                            ])
+
+                        else:
+                            #for layer horn graph
+                            graphs_adjacency_lists.append([
+                                np.array(loaded_graph["binaryAdjacentList"]),
+                                np.array(loaded_graph["predicateArgumentEdges"]),
+                                np.array(loaded_graph["predicateInstanceEdges"]),
+                                np.array(loaded_graph["argumentInstanceEdges"]),
+                                np.array(loaded_graph["controlHeadEdges"]),
+                                np.array(loaded_graph["controlBodyEdges"]),
+                                np.array(loaded_graph["controlArgumentEdges"]),
+                                np.array(loaded_graph["guardEdges"]),
+                                np.array(loaded_graph["dataEdges"])
+                                #np.array(loaded_graph["unknownEdges"])
+                            ])
 
                         #graphs_control_location_indices.append(loaded_graph["controlLocationIndices"])
                         total_number_of_node += len(loaded_graph["nodeIds"])

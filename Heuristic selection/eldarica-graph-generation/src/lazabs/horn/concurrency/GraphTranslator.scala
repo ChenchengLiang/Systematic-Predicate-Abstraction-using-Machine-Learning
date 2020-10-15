@@ -4,7 +4,6 @@ import java.io.{File, FileWriter, PrintWriter}
 import ap.parser._
 import lazabs.horn.abstractions.VerificationHints._
 import lazabs.horn.bottomup.HornClauses
-import lazabs.horn.concurrency.DrawHornGraph.GNNInput
 import lazabs.horn.preprocessor.HornPreprocessor.VerificationHints
 
 import scala.collection.mutable.ListBuffer
@@ -478,7 +477,7 @@ class BinarySearchTreeForGraphClass (ASTtype:String = ""){
           gnn_inputs.binaryAdjacency.incrementBinaryEdge(ASTEdges(0),ASTEdges(1))
           if (treeType=="dataFlow"){
             gnn_inputs.dataFlowASTEdges.incrementBinaryEdge(ASTEdges(0),ASTEdges(1))
-            gnn_inputs.dataFlowEdges.incrementBinaryEdge(ASTEdges(0),ASTEdges(1))
+            //gnn_inputs.dataFlowEdges.incrementBinaryEdge(ASTEdges(0),ASTEdges(1))
           }else{gnn_inputs.guardASTEdges.incrementBinaryEdge(ASTEdges(0),ASTEdges(1))}
         }
       }
@@ -492,7 +491,7 @@ class BinarySearchTreeForGraphClass (ASTtype:String = ""){
           gnn_inputs.binaryAdjacency.incrementBinaryEdge(ASTEdges(0),ASTEdges(1))
           if (treeType=="dataFlow"){
             gnn_inputs.dataFlowASTEdges.incrementBinaryEdge(ASTEdges(0),ASTEdges(1))
-            gnn_inputs.dataFlowEdges.incrementBinaryEdge(ASTEdges(0),ASTEdges(1))
+            //gnn_inputs.dataFlowEdges.incrementBinaryEdge(ASTEdges(0),ASTEdges(1))
           }else{gnn_inputs.guardASTEdges.incrementBinaryEdge(ASTEdges(0),ASTEdges(1))}
         }
       }
