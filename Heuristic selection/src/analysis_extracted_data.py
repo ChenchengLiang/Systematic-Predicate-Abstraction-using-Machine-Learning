@@ -312,13 +312,24 @@ def unique_names(rootdir):
             count += 1
 
 
-def generate_JSON_field(rootdir,file_type=".layerHornGraph.JSON"):
+def generate_JSON_field(rootdir,file_type=".layerHornGraph.JSON",graph_type="-getHornGraph"):
     for root, subdirs, files in os.walk(rootdir):
         if len(subdirs)==1 and subdirs[0]=="wrong_extracted_cases":
             os.rmdir(root+"/wrong_extracted_cases")
-    old_field=["nodeIds","nodeSymbolList","argumentIndices","argumentIDList","argumentNameList","argumentOccurrence","binaryAdjacentList","predicateArgumentEdges",
-               "predicateInstanceEdges","controlHeadEdges","controlBodyEdges","controlArgumentEdges","guardEdges","dataEdges","unknownEdges"]
-    new_field=["argumentInstanceEdges"]
+    old_field=[]
+    new_field=[]
+    if file_type==".layerHornGraph.JSON":
+        old_field=[]
+        new_field=["predicateIndices","predicateOccurrenceInClause","nodeIds", "nodeSymbolList","falseIndices", "argumentIndices", "controlLocationIndices",
+                     "binaryAdjacentList", "ternaryAdjacencyList","unknownEdges","argumentIDList", "argumentNameList",
+                     "predicateArgumentEdges","predicateInstanceEdges", "argumentInstanceEdges", "controlHeadEdges", "controlBodyEdges",
+                     "controlArgumentEdges", "guardEdges","dataEdges","argumentOccurrence"]
+    else:
+        old_field = ["nodeIds", "nodeSymbolList","falseIndices", "argumentIndices", "controlLocationIndices",
+                     "binaryAdjacentList", "ternaryAdjacencyList","unknownEdges","argumentIDList", "argumentNameList",
+                     "argumentEdges","guardASTEdges","dataFlowASTEdges","controlFlowHyperEdges","dataFlowHyperEdges"]
+        new_field = ["predicateIndices","predicateOccurrenceInClause"]
+
     for root, subdirs, files in os.walk(rootdir):
         if len(subdirs)==0:
             for file in glob.glob(root+"/*.smt2"):
@@ -330,7 +341,7 @@ def generate_JSON_field(rootdir,file_type=".layerHornGraph.JSON"):
                     loaded_graph = json.load(f)
                     for field in old_field:
                         json_obj[field] = loaded_graph[field]
-                eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-getHornGraph"], stdout=subprocess.DEVNULL,
+                eld = subprocess.Popen(["../eldarica-graph-generation/eld",file,graph_type], stdout=subprocess.DEVNULL,
                                        shell=False)
                 eld.wait()
                 #add more field
@@ -348,14 +359,14 @@ def add_horn_graph_json_file(rootdir,graph_type="-getHornGraph",json_file_type="
     old_field = ["argumentOccurrence"]
     new_field = []
     if json_file_type==".layerHornGraph.JSON":
-        new_field = ["nodeIds", "nodeSymbolList", "argumentIndices", "argumentIDList", "argumentNameList",
-                    "binaryAdjacentList", "ternaryAdjacencyList", "predicateArgumentEdges",
-                     "predicateInstanceEdges", "argumentInstanceEdges", "controlHeadEdges", "controlBodyEdges",
-                     "controlArgumentEdges", "guardEdges",
-                     "dataEdges", "unknownEdges"]
+        new_field = ["nodeIds", "nodeSymbolList","falseIndices", "argumentIndices", "controlLocationIndices",
+                     "binaryAdjacentList", "ternaryAdjacencyList","unknownEdges","argumentIDList", "argumentNameList",
+                     "predicateArgumentEdges","predicateInstanceEdges", "argumentInstanceEdges", "controlHeadEdges", "controlBodyEdges",
+                     "controlArgumentEdges", "guardEdges","dataEdges"]
+
     else:
-        new_field = ["nodeIds", "nodeSymbolList","falseIndices", "argumentIndices", "argumentIDList", "argumentNameList","controlLocationIndices",
-                     "binaryAdjacentList", "ternaryAdjacencyList", "unknownEdges",
+        new_field = ["nodeIds", "nodeSymbolList","falseIndices", "argumentIndices", "controlLocationIndices",
+                     "binaryAdjacentList", "ternaryAdjacencyList","unknownEdges","argumentIDList", "argumentNameList",
                      "argumentEdges","guardASTEdges","dataFlowASTEdges","controlFlowHyperEdges","dataFlowHyperEdges"]
 
 
@@ -367,33 +378,37 @@ def add_horn_graph_json_file(rootdir,graph_type="-getHornGraph",json_file_type="
             for file in glob.glob(root+"/*.smt2"):
                 json_file = file + ".JSON"
                 graph_json_file = file + json_file_type
-                if not os.path.isfile(graph_json_file):
-                    #read JSON' label
-                    json_obj = {}
-                    with open(json_file) as f:
-                        loaded_graph = json.load(f)
-                        for field in old_field:
+                #if not os.path.isfile(graph_json_file):
+                #read JSON' label
+                json_obj = {}
+                with open(json_file) as f:
+                    loaded_graph = json.load(f)
+                    for field in old_field:
+                        json_obj[field] = loaded_graph[field]
+                print("../eldarica-graph-generation/eld", file, graph_type)
+                eld = subprocess.Popen(["../eldarica-graph-generation/eld",file,graph_type], stdout=subprocess.DEVNULL,
+                                       shell=False)
+                eld.wait()
+                #add more field
+                if os.path.isfile(graph_json_file):
+                    with open(graph_json_file) as layer_f:
+                        loaded_graph = json.load(layer_f)
+                        for field in new_field:
                             json_obj[field] = loaded_graph[field]
-                    print("../eldarica-graph-generation/eld", file, graph_type)
-                    eld = subprocess.Popen(["../eldarica-graph-generation/eld",file,graph_type], stdout=subprocess.DEVNULL,
-                                           shell=False)
-                    eld.wait()
-                    #add more field
-                    if os.path.isfile(graph_json_file):
-                        with open(graph_json_file) as layer_f:
-                            loaded_graph = json.load(layer_f)
-                            for field in new_field:
-                                json_obj[field] = loaded_graph[field]
-                        # write json object to JSON file
-                        clear_file(graph_json_file)
-                        with open(graph_json_file, 'w') as f:
-                            json.dump(json_obj, f)
-                    else:
-                        for f in glob.glob(file+"*"):
-                            copy(f,"../benchmarks/memory_problem_cases/")
-                            os.remove(f)
+                    # write json object to JSON file
+                    clear_file(graph_json_file)
+                    with open(graph_json_file, 'w') as f:
+                        json.dump(json_obj, f)
+                else:
+                    for f in glob.glob(file+"*"):
+                        copy(f,"../benchmarks/memory_problem_cases/")
+                        os.remove(f)
 
-
+class parameters():
+    def __init__(self, root_dir,json_file_type,graph_type):
+        self.root_dir=root_dir
+        self.json_file_type=json_file_type
+        self.graph_type=graph_type
 
 def main():
     benchmark_list = []
@@ -413,11 +428,17 @@ def main():
     #get_statistic_data("../benchmarks/LIA-lin-traiData/")
 
     #generate_JSON_field("../benchmarks/temp-extract-trainData-datafold")
-    # graph_type="-getHornGraph:biDirectionLayerGraph"
-    # json_file_type=".layerHornGraph.JSON"
-    graph_type = "-getHornGraph:hyperEdgeGraph"
-    json_file_type = ".hyperEdgeHornGraph.JSON"
-    add_horn_graph_json_file("../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph",graph_type=graph_type,json_file_type=json_file_type)
+
+    parameter_for_JSON = parameters(root_dir="../benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph",json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph:biDirectionLayerGraph")
+    # parameter_for_JSON = parameters(root_dir="../benchmarks/small-dataset-trainData-datafold-mono-direction-layer-graph",
+    #                                 json_file_type=".layerHornGraph.JSON",
+    #                                 graph_type="-getHornGraph:monoDirectionLayerGraph")
+    # parameter_for_JSON = parameters(root_dir="small-dataset-trainData-datafold-hyperedge-graph",
+    #                                 json_file_type=".hyperEdgeHornGraph.JSON",
+    #                                 graph_type="-getHornGraph:hyperEdgeGraph")
+    generate_JSON_field(parameter_for_JSON.root_dir, file_type=parameter_for_JSON.json_file_type,graph_type=parameter_for_JSON.graph_type)
+    #add_horn_graph_json_file("../benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph",graph_type=graph_type,json_file_type=json_file_type)
+
 
 if __name__ == '__main__':
     main()

@@ -6,8 +6,8 @@ def main():
     benchmark_list = []
 
     #benchmark_list.append(["../benchmarks/single_example_test/"])
-    benchmark_list.append(["../benchmarks/small-dataset-trainData-datafold-hyperedge-graph/"])
-    #benchmark_list.append(["../benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph/"])
+    #benchmark_list.append(["../benchmarks/small-dataset-trainData-datafold-hyperedge-graph/"])
+    benchmark_list.append(["../benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph/"])
     #benchmark_list.append(["../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/"])
     json_type=""
     force_read = True
@@ -16,12 +16,13 @@ def main():
     file_type = ".smt2"
     #label = "occurrence"
     #label = "rank"
-    label = "argument_identify"
+    #label = "argument_identify"
     #label = "argument_identify_no_batchs"
     #label = "control_location_identify"
+    label = "predicate_occurrence_in_clauses"
 
-    json_type = ".hyperEdgeHornGraph.JSON"
-    #json_type = ".layerHornGraph.JSON"
+    #json_type = ".hyperEdgeHornGraph.JSON"
+    json_type = ".layerHornGraph.JSON"
 
     os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
     # gpus = tf.config.experimental.list_physical_devices('GPU')
