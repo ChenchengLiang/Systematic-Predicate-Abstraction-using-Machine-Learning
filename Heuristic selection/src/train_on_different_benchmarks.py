@@ -26,9 +26,11 @@ def main():
     #param= parameters("../benchmarks/small-dataset-trainData-datafold-hyperedge-graph/",json_type=".hyperEdgeHornGraph.JSON",label="predicate_occurrence_in_clauses")
     #param = parameters("../benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_clauses")
     #param = parameters("../benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_SCG")
-    param = parameters("../benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="argument_identify")
+    #param = parameters("../benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="argument_identify")
     #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph/",json_type=".hyperEdgeHornGraph.JSON", label="predicate_occurrence_in_clauses")
     #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph",json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_clauses")
+    # param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph",json_type=".hyperEdgeHornGraph.JSON", label="predicate_occurrence_in_SCG")
+    param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph",json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_SCG")
     os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
     # gpus = tf.config.experimental.list_physical_devices('GPU')
     # for gpu in gpus:

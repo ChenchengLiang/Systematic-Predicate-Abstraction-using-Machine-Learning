@@ -91,7 +91,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         elif label=="predicate_occurrence_in_clauses":
             model = InvariantArgumentSelectionTask(parameters, dataset)
         elif label=="predicate_occurrence_in_SCG":
-            model = InvariantArgumentSelectionTask(parameters, dataset)
+            model = InvariantNodeIdentifyTask(parameters, dataset)
         else:
             model = InvariantArgumentSelectionTask(parameters, dataset)
 

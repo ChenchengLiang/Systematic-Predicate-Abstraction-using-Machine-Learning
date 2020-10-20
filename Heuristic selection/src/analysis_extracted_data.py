@@ -430,17 +430,20 @@ def main():
     #get_statistic_data("../benchmarks/LIA-lin-traiData/")
 
     #generate_JSON_field("../benchmarks/temp-extract-trainData-datafold")
-
-    #parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph",json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph:biDirectionLayerGraph")
+    #parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph",json_file_type=".hyperEdgeHornGraph.JSON",graph_type="-getHornGraph:hyperEdgeGraph")
+    parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph",json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph:biDirectionLayerGraph")
     #parameter_for_JSON = parameters(root_dir="../benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph",json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph:biDirectionLayerGraph")
     #parameter_for_JSON = parameters(root_dir="../benchmarks/small-dataset-trainData-datafold-mono-direction-layer-graph",json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph:monoDirectionLayerGraph")
     #parameter_for_JSON = parameters(root_dir="../benchmarks/small-dataset-trainData-datafold-hyperedge-graph",json_file_type=".hyperEdgeHornGraph.JSON",graph_type="-getHornGraph:hyperEdgeGraph")
-    #parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph",json_file_type=".hyperEdgeHornGraph.JSON",graph_type="-getHornGraph:hyperEdgeGraph")
-    parameter_for_JSON = parameters(root_dir="../benchmarks/single_example_test",
-                                    json_file_type=".layerHornGraph.JSON",
-                                    graph_type="-getHornGraph:biDirectionLayerGraph")
+    #parameter_for_JSON = parameters(root_dir="../benchmarks/single_example_test",json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph:biDirectionLayerGraph")
 
     generate_JSON_field(parameter_for_JSON.root_dir, file_type=parameter_for_JSON.json_file_type,graph_type=parameter_for_JSON.graph_type)
+
+    parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph",
+                                    json_file_type=".hyperEdgeHornGraph.JSON",
+                                    graph_type="-getHornGraph:hyperEdgeGraph")
+    generate_JSON_field(parameter_for_JSON.root_dir, file_type=parameter_for_JSON.json_file_type,
+                        graph_type=parameter_for_JSON.graph_type)
     #add_horn_graph_json_file(parameter_for_JSON.root_dir,graph_type=parameter_for_JSON.graph_type,json_file_type=parameter_for_JSON.json_file_type)
 
 
