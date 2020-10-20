@@ -1,5 +1,6 @@
 import tensorflow as tf
 import tf2_gnn
+import os
 def main():
 
     '''
@@ -18,7 +19,7 @@ def main():
     node_to_graph_map [0 0 0 0 0 0 0 0 1 1 1 1 2 2 2]
     graph node ID list [0,1,2,...,14]
     '''
-
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
     nodeFeatureDim=3
     # first graph has 8 nodes, second graph has 4 nodes, third graph has 3 nodes
@@ -48,7 +49,8 @@ def main():
          adjacency_lists = (
              tf.constant([[0,1,1], [1,2,3],[1,1,2],[1,1,1],[2,2,2],[1,2,3]], dtype=tf.int32), #edge type 1
              tf.constant([[1,2,3,4],[1,2,3,4]], dtype=tf.int32), #edge type 2
-             tf.constant([[2, 0],[1, 2],[1,2],[3,10]], dtype=tf.int32) #edge type 3
+             tf.constant([[2, 1],[1, 2],[1,4],[3,10]], dtype=tf.int32), #edge type 3
+             tf.constant([[2, 0], [1, 2], [1, 2], [3, 10]], dtype=tf.int32)  # edge type 3
              ),
          node_to_graph_map = node_to_graph_map,
          #tf.fill(dims=(numberOfNode,), value=0),

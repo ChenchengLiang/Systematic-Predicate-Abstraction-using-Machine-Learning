@@ -48,8 +48,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters['hidden_dim'] = 64 #64
     parameters['num_layers'] = 1
     parameters['node_label_embedding_size'] = nodeFeatureDim
-    parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
-    parameters['regression_hidden_layer_size'] = [64,64] #[64,64]
+    parameters['max_nodes_per_batch']=1000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
+    parameters['regression_hidden_layer_size'] = [64,64,64,64] #[64,64]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
 
@@ -90,8 +90,11 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             model = InvariantNodeIdentifyTask(parameters, dataset)
         elif label=="predicate_occurrence_in_clauses":
             model = InvariantArgumentSelectionTask(parameters, dataset)
+        elif label=="predicate_occurrence_in_SCG":
+            model = InvariantArgumentSelectionTask(parameters, dataset)
         else:
             model = InvariantArgumentSelectionTask(parameters, dataset)
+
 
         #train
         quiet=False
@@ -102,28 +105,27 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         log_file = os.path.join(save_dir, f"{run_id}.log")
 
         trained_model_path,train_loss_list,valid_loss_list,best_valid_epoch,train_metric_list,valid_metric_list = train(
-        #trained_model_path = train(
             model=model,
             dataset=dataset,
             log_fun=log,
             run_id=run_id,
             max_epochs=200,
-            patience=50,
+            patience=20,
             save_dir=save_dir,
             quiet=quiet,
-            aml_run=None,
-        )
+            aml_run=None)
         #predict
-
         #trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2020-10-06_19-59-07_best.pkl"
         print("trained_model_path", trained_model_path)
 
         test_data = dataset.get_tensorflow_dataset(DataFold.TEST)
 
         # use model in memory
-        #_, _, test_results = model.run_one_epoch(test_data, training=False, quiet=quiet)
-        #test_metric, test_metric_string = model.compute_epoch_metrics(test_results)
+        _, _, test_results = model.run_one_epoch(test_data, training=False, quiet=quiet)
+        test_metric, test_metric_string = model.compute_epoch_metrics(test_results)
         predicted_Y_loaded_model_from_memory = model.predict(test_data)
+        print("test_metric_string model from memory", test_metric_string)
+        print("test_metric model from memory", test_metric)
 
         #load model from files
         loaded_model = tf2_gnn.cli_utils.model_utils.load_model_for_prediction(trained_model_path, dataset)
@@ -337,7 +339,7 @@ class parsed_dot_format:
         self.graphs_adjacency_lists=graphs_adjacency_lists
         self.graphs_argument_scores=graphs_argument_scores
         self.total_number_of_node=total_number_of_node
-        self.graph_control_location_indices=graph_control_location_indices
+        self.graphs_control_location_indices=graph_control_location_indices
         self.file_name_list=file_name_list
         self.parsed_arguments=parsed_arguments
         self.graphs_node_symbols=graphs_node_symbols
@@ -404,6 +406,9 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                         if label=="predicate_occurrence_in_clauses":
                             graphs_predicate_indices.append(loaded_graph["predicateIndices"])
                             graphs_learning_labels.append(loaded_graph["predicateOccurrenceInClause"])
+                        elif label=="predicate_occurrence_in_SCG":
+                            graphs_predicate_indices.append(loaded_graph["predicateIndices"])
+                            graphs_learning_labels.append(loaded_graph["predicateStrongConnectedComponent"])
                         elif label=="control_location_identify":
                             graphs_control_location_indices.append(loaded_graph["controlLocationIndices"])
                         else:
@@ -413,6 +418,7 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                                                                       loaded_graph["argumentNameList"],
                                                                       loaded_graph["argumentOccurrence"])
                             graphs_argument_scores.append([int(argument.score) for argument in parsed_arguments])
+                            graphs_control_location_indices.append(loaded_graph["controlLocationIndices"])
 
                         if json_type==".hyperEdgeHornGraph.JSON": #read adjacency_lists
                             #for hyperedge horn graph
@@ -459,8 +465,8 @@ def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "
     benchmark_name = benchmark.replace("/", "-")
     for df in datafold:
         parsed_dot_file = pickleRead("train-" + benchmark_name + "-gnnInput_" + df + "_data")
-        if label == "predicate_occurrence_in_clauses":
-            form_predicate_occurrence_in_clauses_label_graph_sample(parsed_dot_file.graphs_node_label_ids,
+        if label == "predicate_occurrence_in_clauses" or label == "predicate_occurrence_in_SCG":
+            form_predicate_occurrence_related_label_graph_sample(parsed_dot_file.graphs_node_label_ids,
                                                                     parsed_dot_file.graphs_node_symbols,
                                                                     parsed_dot_file.graphs_adjacency_lists,
                                                                     parsed_dot_file.total_number_of_node,
@@ -468,7 +474,7 @@ def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "
                                                                     parsed_dot_file.token_map,
                                                                     parsed_dot_file.file_name_list, benchmark, df,
                                                                     parsed_dot_file.graphs_predicate_indices,
-                                                                    parsed_dot_file.graphs_learning_labels)
+                                                                    parsed_dot_file.graphs_learning_labels,label)
 
         else:
             form_horn_graph_samples(parsed_dot_file.graphs_node_label_ids, parsed_dot_file.graphs_node_symbols,
@@ -496,10 +502,10 @@ def get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,voca
     raw_data_graph.token_map = token_map
     return raw_data_graph
 
-def form_predicate_occurrence_in_clauses_label_graph_sample(graphs_node_label_ids,graphs_node_symbols,
+def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,graphs_node_symbols,
                                                             graphs_adjacency_lists,total_number_of_node,
                                                             vocabulary_set,token_map,file_name_list,benchmark,df,
-                                                            graphs_predicate_indices,graphs_learning_labels):
+                                                            graphs_predicate_indices,graphs_learning_labels,label):
     final_graphs=[]
     raw_data_graph=get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,vocabulary_set,token_map)
 
@@ -514,9 +520,7 @@ def form_predicate_occurrence_in_clauses_label_graph_sample(graphs_node_label_id
         for symbol in node_symbols:
             tokenized_node_label_ids.append(token_map[symbol])
         raw_data_graph.labels.append(learning_labels)
-        print(file_name)
-        print(predicate_indices)
-        print(learning_labels)
+
         final_graphs.append(
             HornGraphSample(
                 adjacency_lists=tuple(adjacency_lists),
@@ -525,9 +529,10 @@ def form_predicate_occurrence_in_clauses_label_graph_sample(graphs_node_label_id
                 node_label=tf.constant(learning_labels),
             )
         )
+
         raw_data_graph.label_size += len(learning_labels)
     raw_data_graph.final_graphs = final_graphs.copy()
-    pickleWrite(raw_data_graph, "predicate_occurrence_in_clauses" + "-" + benchmark + "-gnnInput_" + df + "_data")
+    pickleWrite(raw_data_graph, label + "-" + benchmark + "-gnnInput_" + df + "_data")
 
 def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_argument_indices, graphs_adjacency_lists,
                             graphs_argument_scores, total_number_of_node,graphs_control_location_indices, file_name_list,
@@ -588,9 +593,9 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
                         #node_features=tf.constant(node_label_ids),
                         node_label=tf.constant(ranked_argument_scores),
                         # node_label=tf.constant(argument_scores),
-                        node_argument=tf.constant(argument_indices),
-                        current_node_index=tf.constant([]),
-                        node_control_location=tf.constant(control_location_indices)
+                        node_indices=tf.constant(argument_indices),
+                        #current_node_index=tf.constant([]),
+                        #node_control_location=tf.constant(control_location_indices)
                     )
                 )
                 raw_data_graph.label_size+=len(ranked_argument_scores)
@@ -604,9 +609,9 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
                         #node_features=tf.constant(node_label_ids),
                         # node_label=tf.constant(ranked_argument_scores),
                         node_label=tf.constant(argument_scores),  # argument_scores
-                        node_argument=tf.constant(argument_indices),
-                        current_node_index=tf.constant([]),
-                        node_control_location=tf.constant(control_location_indices)
+                        node_indices=tf.constant(argument_indices),
+                        #current_node_index=tf.constant([]),
+                        #node_control_location=tf.constant(control_location_indices)
                     )
                 )
                 raw_data_graph.label_size += len(argument_scores)
@@ -619,10 +624,10 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
                         node_features=tf.constant(tokenized_node_label_ids),
                         #node_features=tf.constant(node_label_ids),
                         # node_label=tf.constant(ranked_argument_scores),
-                        node_label=tf.constant(argument_identify),
-                        node_argument=tf.constant(argument_indices),
-                        current_node_index=tf.constant([]),
-                        node_control_location=tf.constant(control_location_indices)
+                        node_indices=tf.constant(argument_indices),
+                        node_label=tf.constant(argument_identify)
+                        #current_node_index=tf.constant([]),
+                        #node_control_location=tf.constant(control_location_indices)
                     )
                 )
                 raw_data_graph.label_size += len(argument_identify)
@@ -636,9 +641,9 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
                         #node_features=tf.constant(node_label_ids),
                         # node_label=tf.constant(ranked_argument_scores),
                         node_label=tf.constant(control_location_identify),
-                        node_argument=tf.constant(argument_indices),
-                        current_node_index=tf.constant([]),
-                        node_control_location=tf.constant(control_location_indices)
+                        node_indices=tf.constant(argument_indices),
+                        #current_node_index=tf.constant([]),
+                        #node_control_location=tf.constant(control_location_indices)
                     )
                 )
                 raw_data_graph.label_size += len(control_location_identify)
