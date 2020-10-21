@@ -7,8 +7,8 @@ def main():
     #benchmark_list.append(["../benchmarks/small-dataset-trainData-datafold-hyperedge-graph/"])
     #benchmark_list.append(["../benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph/"])
     benchmark_list.append(["../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/"])
-    force_read = True
-    form_label = True
+    force_read = False
+    form_label = False
     from_json=True
     file_type = ".smt2"
     #label = "occurrence"
@@ -28,14 +28,13 @@ def main():
     #param = parameters("../benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_SCG")
     #param = parameters("../benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="argument_identify")
     #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph/",json_type=".hyperEdgeHornGraph.JSON", label="predicate_occurrence_in_clauses")
-    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph",json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_clauses")
-    # param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph",json_type=".hyperEdgeHornGraph.JSON", label="predicate_occurrence_in_SCG")
-    param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph",json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_SCG")
-    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_clauses")
+    # param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/",json_type=".hyperEdgeHornGraph.JSON", label="predicate_occurrence_in_SCG")
+    param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_SCG")
+    #os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
     # gpus = tf.config.experimental.list_physical_devices('GPU')
     # for gpu in gpus:
     #     tf.config.experimental.set_memory_growth(gpu, True)
-
 
     train_on_graphs(benchmark_name=param.root_dir[len("../benchmarks/"):-1], label=param.label, force_read=force_read,
                     train_n_times=1,path=param.root_dir, file_type=file_type, form_label=form_label, from_json=from_json,

@@ -46,9 +46,9 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters["message_calculation_class"]="rgcn"#rgcn,ggnn,rgat
     #parameters['num_heads'] = 2
     parameters['hidden_dim'] = 64 #64
-    parameters['num_layers'] = 1
+    parameters['num_layers'] = 2
     parameters['node_label_embedding_size'] = nodeFeatureDim
-    parameters['max_nodes_per_batch']=1000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
+    parameters['max_nodes_per_batch']=5000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
     parameters['regression_hidden_layer_size'] = [64,64,64,64] #[64,64]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
@@ -64,6 +64,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters.update(these_hypers)
     #get dataset
     dataset=HornGraphDataset(parameters)
+    dataset._use_worker_threads=False #solve Failed setting context: CUDA_ERROR_NOT_INITIALIZED: initialization error
     dataset.load_data([DataFold.TRAIN,DataFold.VALIDATION,DataFold.TEST])
     parameters["node_vocab_size"]=dataset._node_vocab_size
     def log(msg):
