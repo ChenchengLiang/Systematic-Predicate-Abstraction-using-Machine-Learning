@@ -12,46 +12,28 @@ from Miscellaneous import pickleWrite,pickleRead
 import os
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-import random
 import scipy.stats as ss
-import subprocess
 import json
 import glob
 import shutil
-from tf2_gnn.cli import test as model_test
-
-'''
-All graphs read from .gv files or JSON files will be stored to pickle a file (a parsed_dot_format object).
-parsed_dot_format object includes multiple all graphs info.
-'''
 
 def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",
-                    split_flag=False,buckets=10,from_json=False,json_type=".JSON",form_label=False):
-    #if not os.path.isfile("../pickleData/"+"train-"+benchmark_name+"-gnnInput_train_data.txt"):
-    if force_read==True:
-        write_graph_to_pickle(benchmark_name,  data_fold=["train", "valid", "test"],
-                              label=label,path=path,from_json=from_json,
-                              file_type=file_type,json_type=json_type)
-    else:
-        print("Use pickle data for training")
-    #if form_label == True and not os.path.isfile("../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):
-    if form_label == True:
-        form_GNN_inputs_and_labels(label=label, datafold=["train", "valid", "test"], benchmark=benchmark_name)
-    else:
-        print("Use label in pickle data for training")
+                    split_flag=False,buckets=10,from_json=False,json_type=".JSON",form_label=False,GPU=False,pickle=True):
 
     #read_graph_from_pickle_file(benchmark_name,force_read=force_read,label=label,path=path,file_type=file_type,from_json=from_json,json_type=json_type)
     nodeFeatureDim = 64 #64
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
-    parameters["message_calculation_class"]="rgcn"#rgcn,ggnn,rgat
+    #parameters["message_calculation_class"]="rgcn"#rgcn,ggnn,rgat
     #parameters['num_heads'] = 2
     parameters['hidden_dim'] = 64 #64
-    parameters['num_layers'] = 2
+    parameters['num_layers'] = 1
     parameters['node_label_embedding_size'] = nodeFeatureDim
-    parameters['max_nodes_per_batch']=5000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
-    parameters['regression_hidden_layer_size'] = [64,64,64,64] #[64,64]
+    parameters['max_nodes_per_batch']=1000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
+    parameters['regression_hidden_layer_size'] = [64,64] #[64,64]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
+    # parameters["add_self_loop_edges"]=False
+    # parameters["tie_fwd_bkwd_edges"]=True
 
     these_hypers: Dict[str, Any] = {
         "optimizer": "Adam",  # One of "SGD", "RMSProp", "Adam"
@@ -64,7 +46,24 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters.update(these_hypers)
     #get dataset
     dataset=HornGraphDataset(parameters)
-    dataset._use_worker_threads=False #solve Failed setting context: CUDA_ERROR_NOT_INITIALIZED: initialization error
+    dataset._read_from_pickle = pickle
+    if pickle==True:
+        if force_read==True:
+            write_graph_to_pickle(benchmark_name,  data_fold=["train", "valid", "test"],
+                                  label=label,path=path,from_json=from_json,
+                                  file_type=file_type,json_type=json_type)
+        else:
+            print("Use pickle data for training")
+        #if form_label == True and not os.path.isfile("../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):
+        if form_label == True:
+            form_GNN_inputs_and_labels(label=label, datafold=["train", "valid", "test"], benchmark=benchmark_name)
+        else:
+            print("Use label in pickle data for training")
+    else:
+        dataset._path=path
+        dataset._json_type=json_type
+    if GPU==True:
+        dataset._use_worker_threads=False #solve Failed setting context: CUDA_ERROR_NOT_INITIALIZED: initialization error
     dataset.load_data([DataFold.TRAIN,DataFold.VALIDATION,DataFold.TEST])
     parameters["node_vocab_size"]=dataset._node_vocab_size
     def log(msg):
@@ -104,6 +103,10 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         run_id = make_run_id(model_name, task_name)
         save_dir=os.path.abspath("trained_model")
         log_file = os.path.join(save_dir, f"{run_id}.log")
+        # import multiprocessing
+        # process_train = multiprocessing.Process(train, args=(model,dataset,log,run_id,200,20,save_dir,quiet,None))
+        # process_train.start()
+        # process_train.join()
 
         trained_model_path,train_loss_list,valid_loss_list,best_valid_epoch,train_metric_list,valid_metric_list = train(
             model=model,
@@ -223,6 +226,8 @@ def draw_training_results(train_loss_list_average,valid_loss_list_average,test_l
 
     # scatter on true y and predicted y
     a = plt.axes(aspect='equal')
+    if label=="predicate_occurrence_in_SCG" or label=="argument_identify":
+        predicted_Y_loaded_model=tf.math.round(predicted_Y_loaded_model)
     plt.scatter(true_Y, predicted_Y_loaded_model)
     plt.xlabel('True Values')
     plt.ylabel('Predictions')
@@ -261,20 +266,21 @@ def write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss,valid
 
         predicted_argument_lists=get_predicted_label_list_divided_by_file(dataset, predicted_Y_loaded_model)
         mse_list=[]
-        for predicted_arguments, arguments in zip(predicted_argument_lists,dataset._label_list["test"]):
+        for predicted_label, arguments in zip(predicted_argument_lists,dataset._label_list["test"]):
             out_file.write("-------"+ "\n")
             out_file.write("true label:"+ str(arguments)+ "\n")
             out_file.write("true label rank:"+ str(ss.rankdata(arguments,method="dense"))+ "\n")
-            out_file.write("predicted label:"+ str(predicted_arguments)+ "\n")
-            out_file.write("predicted label rank:"+ str(ss.rankdata(predicted_arguments,method="dense"))+ "\n")
-            mse=tf.keras.losses.MSE(arguments,predicted_arguments)
+            out_file.write("predicted label:"+ str(predicted_label)+ "\n")
+            out_file.write("rounded label:" + str(tf.math.round(predicted_label)) + "\n")
+            out_file.write("predicted label rank:"+ str(ss.rankdata(tf.math.round(predicted_label),method="dense"))+ "\n")
+            mse=tf.keras.losses.MSE(arguments,predicted_label)
             out_file.write("mse:" + str(mse) + "\n")
             mse_list.append(mse)
 
         out_file.write("-------"+ "\n")
         out_file.write("mean(mse_list):" + str(np.mean(mse_list)) + "\n")
         plt.xlabel('graph number')
-        plt.ylabel('mse of predicted argument score')
+        plt.ylabel('mse of predicted label')
         plt.plot(mse_list,label="predicted_data_mse")
         plt.plot([mean_loss_list_average]*len(mse_list),label="mean_mse")
         plt.legend()
@@ -323,6 +329,7 @@ class raw_graph_inputs():
         self.vocabulary_set=set()
         self.token_map={}
 
+
 def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","valid","test"],label="rank",path="../",file_type=".smt2",json_type=".JSON",from_json=True):
     benchmark_name=benchmark.replace("/", "-")
     if os.path.isfile("../pickleData/"+label+"-"+benchmark_name+"-gnnInput_train_data.txt") and force_read==False:
@@ -331,7 +338,7 @@ def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","
     else:
         write_graph_to_pickle(benchmark, data_fold=data_fold, label=label, path=path, from_json=from_json, file_type=file_type, json_type=json_type)
 
-class parsed_dot_format:
+class parsed_graph_data:
     def __init__(self,graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
                  graphs_argument_scores,total_number_of_node,graph_control_location_indices,file_name_list,parsed_arguments,
                  graphs_node_symbols,graphs_predicate_indices,graphs_learning_labels,vocabulary_set, token_map):
@@ -455,7 +462,7 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                     #     parsed_arguments = parseArguments(f.read())
                     #     graphs_argument_scores.append([int(argument.score) for argument in parsed_arguments])
 
-        pickle_data=parsed_dot_format(graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
+        pickle_data=parsed_graph_data(graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
                                       graphs_argument_scores,total_number_of_node,graphs_control_location_indices,file_name_list,
                                       parsed_arguments,graphs_node_symbols,graphs_predicate_indices,graphs_learning_labels,vocabulary_set, token_map)
         pickleWrite(pickle_data, "train-" + benchmark_name + "-gnnInput_" + df + "_data")
@@ -506,7 +513,7 @@ def get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,voca
 def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,graphs_node_symbols,
                                                             graphs_adjacency_lists,total_number_of_node,
                                                             vocabulary_set,token_map,file_name_list,benchmark,df,
-                                                            graphs_predicate_indices,graphs_learning_labels,label):
+                                                            graphs_predicate_indices,graphs_learning_labels,label,pickle=True):
     final_graphs=[]
     raw_data_graph=get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,vocabulary_set,token_map)
 
@@ -524,21 +531,23 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
 
         final_graphs.append(
             HornGraphSample(
-                adjacency_lists=tuple(adjacency_lists),
-                node_features=tf.constant(tokenized_node_label_ids),
-                node_indices=tf.constant(predicate_indices),
-                node_label=tf.constant(learning_labels),
+                adjacency_lists=adjacency_lists,
+                node_features=np.array(tokenized_node_label_ids),
+                node_indices=np.array(predicate_indices),
+                node_label=np.array(learning_labels),
             )
         )
 
         raw_data_graph.label_size += len(learning_labels)
     raw_data_graph.final_graphs = final_graphs.copy()
-    pickleWrite(raw_data_graph, label + "-" + benchmark + "-gnnInput_" + df + "_data")
+    if pickle==True:
+        pickleWrite(raw_data_graph, label + "-" + benchmark + "-gnnInput_" + df + "_data")
+    return raw_data_graph
 
 def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_argument_indices, graphs_adjacency_lists,
                             graphs_argument_scores, total_number_of_node,graphs_control_location_indices, file_name_list,
                             graphs_predicate_indices,graphs_learning_labels,
-                            label,vocabulary_set,token_map,benchmark, df):
+                            label,vocabulary_set,token_map,benchmark, df,pickle=True):
     final_graphs_v1 = []
     raw_data_graph = get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,vocabulary_set,token_map)
 
@@ -583,20 +592,15 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
             for symbol in node_symbols:
                 tokenized_node_label_ids.append(token_map[symbol])
 
-            # todo:form new label
             if label == "rank":
                 raw_data_graph.labels.append(argument_scores)
                 total_label += len(ranked_argument_scores)
                 final_graphs_v1.append(
                     HornGraphSample(
-                        adjacency_lists=tuple(adjacency_lists),
-                        node_features=tf.constant(tokenized_node_label_ids),
-                        #node_features=tf.constant(node_label_ids),
-                        node_label=tf.constant(ranked_argument_scores),
-                        # node_label=tf.constant(argument_scores),
-                        node_indices=tf.constant(argument_indices),
-                        #current_node_index=tf.constant([]),
-                        #node_control_location=tf.constant(control_location_indices)
+                        adjacency_lists=adjacency_lists,
+                        node_features=np.array(tokenized_node_label_ids),
+                        node_label=np.array(ranked_argument_scores),
+                        node_indices=np.array(argument_indices),
                     )
                 )
                 raw_data_graph.label_size+=len(ranked_argument_scores)
@@ -605,14 +609,10 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
                 total_label += len(argument_scores)
                 final_graphs_v1.append(
                     HornGraphSample(
-                        adjacency_lists=tuple(adjacency_lists),
-                        node_features=tf.constant(tokenized_node_label_ids),
-                        #node_features=tf.constant(node_label_ids),
-                        # node_label=tf.constant(ranked_argument_scores),
-                        node_label=tf.constant(argument_scores),  # argument_scores
-                        node_indices=tf.constant(argument_indices),
-                        #current_node_index=tf.constant([]),
-                        #node_control_location=tf.constant(control_location_indices)
+                        adjacency_lists=adjacency_lists,
+                        node_features=np.array(tokenized_node_label_ids),
+                        node_label=np.array(argument_scores),  # argument_scores
+                        node_indices=np.array(argument_indices),
                     )
                 )
                 raw_data_graph.label_size += len(argument_scores)
@@ -621,12 +621,12 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
                 total_label += len(argument_identify)
                 final_graphs_v1.append(
                     HornGraphSample(
-                        adjacency_lists=tuple(adjacency_lists),
-                        node_features=tf.constant(tokenized_node_label_ids),
+                        adjacency_lists=adjacency_lists,
+                        node_features=np.array(tokenized_node_label_ids),
                         #node_features=tf.constant(node_label_ids),
                         # node_label=tf.constant(ranked_argument_scores),
-                        node_indices=tf.constant(argument_indices),
-                        node_label=tf.constant(argument_identify)
+                        node_indices=np.array(argument_indices),
+                        node_label=np.array(argument_identify)
                         #current_node_index=tf.constant([]),
                         #node_control_location=tf.constant(control_location_indices)
                     )
@@ -637,12 +637,12 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
                 total_label += len(control_location_identify)
                 final_graphs_v1.append(
                     HornGraphSample(
-                        adjacency_lists=tuple(adjacency_lists),
-                        node_features=tf.constant(tokenized_node_label_ids),
+                        adjacency_lists=adjacency_lists,
+                        node_features=np.array(tokenized_node_label_ids),
                         #node_features=tf.constant(node_label_ids),
                         # node_label=tf.constant(ranked_argument_scores),
-                        node_label=tf.constant(control_location_identify),
-                        node_indices=tf.constant(argument_indices),
+                        node_label=np.array(control_location_identify),
+                        node_indices=np.array(argument_indices),
                         #current_node_index=tf.constant([]),
                         #node_control_location=tf.constant(control_location_indices)
                     )
@@ -655,14 +655,14 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
                     if i in argument_indices:
                         final_graphs_v1.append(
                             HornGraphSample(
-                                adjacency_lists=tuple(adjacency_lists),
-                                node_features=tf.constant(tokenized_node_label_ids),
+                                adjacency_lists=adjacency_lists,
+                                node_features=np.array(tokenized_node_label_ids),
                                 #node_features=tf.constant(node_label_ids),
                                 # node_label=tf.constant(ranked_argument_scores),
-                                node_label=tf.constant([1]),
-                                node_argument=tf.constant(argument_indices),
-                                current_node_index=tf.constant([i]),
-                                node_control_location=tf.constant(control_location_indices)
+                                node_label=np.array([1]),
+                                node_argument=np.array(argument_indices),
+                                current_node_index=np.array([i]),
+                                node_control_location=np.array(control_location_indices)
                             )
                         )
 
@@ -683,6 +683,17 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
             else:
                 pass
     raw_data_graph.final_graphs = final_graphs_v1.copy()
-    pickleWrite(raw_data_graph, label + "-" + benchmark + "-gnnInput_" + df + "_data")
+    if pickle == True:
+        pickleWrite(raw_data_graph, label + "-" + benchmark + "-gnnInput_" + df + "_data")
     print("total_label",total_label)
     print("total_nodes",total_nodes)
+    return raw_data_graph
+
+
+
+
+
+
+
+
+

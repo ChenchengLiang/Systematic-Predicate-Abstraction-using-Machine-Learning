@@ -319,13 +319,13 @@ def generate_JSON_field(rootdir,file_type=".layerHornGraph.JSON",graph_type="-ge
     old_field=[]
     new_field=[]
     if file_type==".layerHornGraph.JSON":
-        old_field=[]
+        old_field=["argumentOccurrence"]
         new_field=["nodeIds", "nodeSymbolList","falseIndices", "argumentIndices", "controlLocationIndices",
                      "binaryAdjacentList", "ternaryAdjacencyList","unknownEdges","argumentIDList", "argumentNameList",
                      "predicateArgumentEdges","predicateInstanceEdges", "argumentInstanceEdges", "controlHeadEdges", "controlBodyEdges",
-                     "controlArgumentEdges", "guardEdges","dataEdges","argumentOccurrence","predicateIndices","predicateOccurrenceInClause","predicateStrongConnectedComponent"]
+                     "controlArgumentEdges", "guardEdges","dataEdges","predicateIndices","predicateOccurrenceInClause","predicateStrongConnectedComponent"]
     else:
-        old_field = []
+        old_field = ["argumentOccurrence"]
         new_field = ["nodeIds", "nodeSymbolList","falseIndices", "argumentIndices", "controlLocationIndices",
                      "binaryAdjacentList", "ternaryAdjacencyList","unknownEdges","argumentIDList", "argumentNameList",
                      "argumentEdges","guardASTEdges","dataFlowASTEdges","controlFlowHyperEdges","dataFlowHyperEdges",
@@ -363,13 +363,14 @@ def add_horn_graph_json_file(rootdir,graph_type="-getHornGraph",json_file_type="
         new_field = ["nodeIds", "nodeSymbolList","falseIndices", "argumentIndices", "controlLocationIndices",
                      "binaryAdjacentList", "ternaryAdjacencyList","unknownEdges","argumentIDList", "argumentNameList",
                      "predicateArgumentEdges","predicateInstanceEdges", "argumentInstanceEdges", "controlHeadEdges", "controlBodyEdges",
-                     "controlArgumentEdges", "guardEdges","dataEdges"]
+                     "controlArgumentEdges", "guardEdges","dataEdges",
+                     "predicateIndices","predicateOccurrenceInClause","predicateStrongConnectedComponent"]
 
     else:
         new_field = ["nodeIds", "nodeSymbolList","falseIndices", "argumentIndices", "controlLocationIndices",
                      "binaryAdjacentList", "ternaryAdjacencyList","unknownEdges","argumentIDList", "argumentNameList",
                      "argumentEdges","guardASTEdges","dataFlowASTEdges","controlFlowHyperEdges","dataFlowHyperEdges",
-                     "predicateIndices","predicateOccurrenceInClause"]
+                     "predicateIndices","predicateOccurrenceInClause","predicateStrongConnectedComponent"]
 
 
     for root, subdirs, files in os.walk(rootdir):
@@ -431,20 +432,19 @@ def main():
 
     #generate_JSON_field("../benchmarks/temp-extract-trainData-datafold")
     #parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph",json_file_type=".hyperEdgeHornGraph.JSON",graph_type="-getHornGraph:hyperEdgeGraph")
-    parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph",json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph:biDirectionLayerGraph")
+    #parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph",json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph:biDirectionLayerGraph")
     #parameter_for_JSON = parameters(root_dir="../benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph",json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph:biDirectionLayerGraph")
     #parameter_for_JSON = parameters(root_dir="../benchmarks/small-dataset-trainData-datafold-mono-direction-layer-graph",json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph:monoDirectionLayerGraph")
     #parameter_for_JSON = parameters(root_dir="../benchmarks/small-dataset-trainData-datafold-hyperedge-graph",json_file_type=".hyperEdgeHornGraph.JSON",graph_type="-getHornGraph:hyperEdgeGraph")
+    #parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph",json_file_type=".hyperEdgeHornGraph.JSON",graph_type="-getHornGraph:hyperEdgeGraph")
+    parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph",
+                                    json_file_type=".layerHornGraph.JSON",
+                                    graph_type="-getHornGraph:biDirectionLayerGraph")
     #parameter_for_JSON = parameters(root_dir="../benchmarks/single_example_test",json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph:biDirectionLayerGraph")
 
-    generate_JSON_field(parameter_for_JSON.root_dir, file_type=parameter_for_JSON.json_file_type,graph_type=parameter_for_JSON.graph_type)
+    #generate_JSON_field(parameter_for_JSON.root_dir, file_type=parameter_for_JSON.json_file_type,graph_type=parameter_for_JSON.graph_type)
 
-    parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph",
-                                    json_file_type=".hyperEdgeHornGraph.JSON",
-                                    graph_type="-getHornGraph:hyperEdgeGraph")
-    generate_JSON_field(parameter_for_JSON.root_dir, file_type=parameter_for_JSON.json_file_type,
-                        graph_type=parameter_for_JSON.graph_type)
-    #add_horn_graph_json_file(parameter_for_JSON.root_dir,graph_type=parameter_for_JSON.graph_type,json_file_type=parameter_for_JSON.json_file_type)
+    add_horn_graph_json_file(parameter_for_JSON.root_dir,graph_type=parameter_for_JSON.graph_type,json_file_type=parameter_for_JSON.json_file_type)
 
 
 if __name__ == '__main__':

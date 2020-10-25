@@ -89,7 +89,9 @@ def mnist_example():
     probability_model(x_test[:5])
 
 def main():
-    mnist_example()
+    #mnist_example()
+    x=[0.1,0.2,0.7,0.6]
+    print(tf.math.round(x))
 
 
 

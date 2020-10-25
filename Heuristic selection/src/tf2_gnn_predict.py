@@ -78,11 +78,12 @@ def main():
     benchmark_name = path[len("../benchmarks/"):-1]
     force_read=True
     form_label=True
-    label = "occurrence"
+    #label = "occurrence"
     # label = "rank"
     # label = "argument_identify"
     # label = "argument_identify_no_batchs"
     # label = "control_location_identify"
+    label = "predicate_occurrence_in_SCG"
 
     if force_read==True:
         write_graph_to_pickle(benchmark_name,  data_fold=["test"], label=label,path=path,from_json=True,file_type="smt2",json_type=json_type)
