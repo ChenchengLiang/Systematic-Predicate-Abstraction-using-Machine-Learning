@@ -24,34 +24,29 @@ def separate_dataset_to_train_valid_test_files(source,destination,train_rate=0.6
     clear_directory(destination)
 
     temp_shuffle=[]
-    for lg,g,a,i,p,n,j,lj,s in zip(sorted(glob.glob(source + '*' + '.layerHornGraph.gv')),sorted(glob.glob(source + '*' + 'auto.gv')),
+    for g,a,i,p,n,j,s in zip(sorted(glob.glob(source + '*' + 'auto.gv')),
                                 sorted(glob.glob(source + '*' + '.arguments')),sorted(glob.glob(source + '*' + '.initialHints')),
                                    sorted(glob.glob(source + '*' + '.positiveHints')),sorted(glob.glob(source + '*' + '.negativeHints')),
-                                   sorted(glob.glob(source + '*' + 'smt2.JSON')),sorted(glob.glob(source + '*' + '.layerHornGraph.JSON')),
+                                   sorted(glob.glob(source + '*' + 'smt2.JSON')),
                            sorted(glob.glob(source + '*' + '.smt2'))):
-        temp_shuffle.append([lg,g,a,i,p,n,j,lj,s])
+        temp_shuffle.append([g,a,i,p,n,j,s])
     random.shuffle(temp_shuffle)
-    lgv_files=[]
     gv_files=[]
     arguments_files=[]
     initial_hints_files=[]
     positive_hints_files=[]
     negative_hints_files=[]
     json_files=[]
-    ljson_files=[]
     smt2_files=[]
     for t in temp_shuffle:
-        lgv_files.append(t[0])
-        gv_files.append(t[1])
-        arguments_files.append(t[2])
-        initial_hints_files.append(t[3])
-        positive_hints_files.append(t[4])
-        negative_hints_files.append(t[5])
-        json_files.append(t[6])
-        ljson_files.append(t[7])
-        smt2_files.append(t[8])
+        gv_files.append(t[0])
+        arguments_files.append(t[1])
+        initial_hints_files.append(t[2])
+        positive_hints_files.append(t[3])
+        negative_hints_files.append(t[4])
+        json_files.append(t[5])
+        smt2_files.append(t[6])
 
-    lgv_fold=[lgv_files[:train],lgv_files[train:train+valid],lgv_files[train+valid:]]
     gv_fold = [gv_files[:train],gv_files[train:train+valid],gv_files[train+valid:]]
     argument_fold = [arguments_files[:train], arguments_files[train:train + valid], arguments_files[train + valid:]]
     initial_hints_fold = [initial_hints_files[:train], initial_hints_files[train:train + valid], initial_hints_files[train + valid:]]
@@ -59,22 +54,19 @@ def separate_dataset_to_train_valid_test_files(source,destination,train_rate=0.6
     negative_fold = [negative_hints_files[:train], negative_hints_files[train:train + valid], negative_hints_files[train + valid:]]
     json_fold=[json_files[:train], json_files[train:train + valid], json_files[train + valid:]]
     smt2_fold = [smt2_files[:train], smt2_files[train:train + valid], smt2_files[train + valid:]]
-    ljson_fold=[ljson_files[:train],ljson_files[train:train+valid],ljson_files[train+valid:]]
-    for lgvs,gvs,arguments,initial_hints,positive_hints,negative_hints,jsons,ljsons,smts,fold in zip(lgv_fold,gv_fold,argument_fold,initial_hints_fold,positive_fold,negative_fold,json_fold,ljson_fold,smt2_fold,["train","valid","test"]):
+    for gvs,arguments,initial_hints,positive_hints,negative_hints,jsons,smts,fold in zip(gv_fold,argument_fold,initial_hints_fold,positive_fold,negative_fold,json_fold,smt2_fold,["train","valid","test"]):
         try:
             rmtree(destination+fold+"_data")
             os.mkdir(destination + fold + "_data")
         except:
             os.mkdir(destination+fold+"_data")
-        for lgv,gv,argument,initial_hint,positive_hint,negative_hint,json,ljson,smt in zip(lgvs,gvs,arguments,initial_hints,positive_hints,negative_hints,jsons,ljsons,smts):
-            copy(lgv, destination + fold + "_data")
+        for gv,argument,initial_hint,positive_hint,negative_hint,json,smt in zip(gvs,arguments,initial_hints,positive_hints,negative_hints,jsons,smts):
             copy(gv, destination+fold+"_data")
             copy(argument, destination+fold+"_data")
             copy(initial_hint, destination + fold + "_data")
             copy(positive_hint, destination + fold + "_data")
             copy(negative_hint, destination + fold + "_data")
             copy(json, destination + fold + "_data")
-            copy(ljson, destination + fold + "_data")
             copy(smt,destination + fold + "_data")
 
     if remove_src == True:
@@ -312,31 +304,32 @@ def unique_names(rootdir):
             count += 1
 
 
-def generate_JSON_field(rootdir,file_type=".layerHornGraph.JSON",graph_type="-getHornGraph"):
+def generate_JSON_field(rootdir,json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph"):
     for root, subdirs, files in os.walk(rootdir):
         if len(subdirs)==1 and subdirs[0]=="wrong_extracted_cases":
             os.rmdir(root+"/wrong_extracted_cases")
     old_field=[]
     new_field=[]
-    if file_type==".layerHornGraph.JSON":
-        old_field=["argumentOccurrence"]
+    if json_file_type==".layerHornGraph.JSON":
+        old_field=[]
         new_field=["nodeIds", "nodeSymbolList","falseIndices", "argumentIndices", "controlLocationIndices",
                      "binaryAdjacentList", "ternaryAdjacencyList","unknownEdges","argumentIDList", "argumentNameList",
                      "predicateArgumentEdges","predicateInstanceEdges", "argumentInstanceEdges", "controlHeadEdges", "controlBodyEdges",
-                     "controlArgumentEdges", "guardEdges","dataEdges","predicateIndices","predicateOccurrenceInClause","predicateStrongConnectedComponent"]
+                     "argumentOccurrence","controlArgumentEdges", "guardEdges","dataEdges","predicateIndices","predicateOccurrenceInClause","predicateStrongConnectedComponent","argumentBoundList"]
     else:
-        old_field = ["argumentOccurrence"]
+        old_field = []
         new_field = ["nodeIds", "nodeSymbolList","falseIndices", "argumentIndices", "controlLocationIndices",
                      "binaryAdjacentList", "ternaryAdjacencyList","unknownEdges","argumentIDList", "argumentNameList",
                      "argumentEdges","guardASTEdges","dataFlowASTEdges","controlFlowHyperEdges","dataFlowHyperEdges",
-                     "predicateIndices","predicateOccurrenceInClause","predicateStrongConnectedComponent"]
+                     "argumentOccurrence","predicateIndices","predicateOccurrenceInClause","predicateStrongConnectedComponent","argumentBoundList"]
 
     for root, subdirs, files in os.walk(rootdir):
         if len(subdirs)==0:
             for file in glob.glob(root+"/*.smt2"):
                 print(file)
                 #read JSON' label
-                json_file=file+file_type
+                json_file=file+".JSON"
+                graph_json_file=file+json_file_type
                 json_obj = {}
                 with open(json_file) as f:
                     loaded_graph = json.load(f)
@@ -346,31 +339,31 @@ def generate_JSON_field(rootdir,file_type=".layerHornGraph.JSON",graph_type="-ge
                                        shell=False)
                 eld.wait()
                 #add more field
-                with open(json_file) as f:
+                with open(graph_json_file) as f:
                     loaded_graph = json.load(f)
                     for field in new_field:
                         json_obj[field] = loaded_graph[field]
                 # write json object to JSON file
-                clear_file(json_file)
-                with open(json_file, 'w') as f:
+                clear_file(graph_json_file)
+                with open(graph_json_file, 'w') as f:
                     json.dump(json_obj, f)
 
 
 def add_horn_graph_json_file(rootdir,graph_type="-getHornGraph",json_file_type=".layerHornGraph.JSON"):
-    old_field = ["argumentOccurrence"]
+    old_field = []
     new_field = []
     if json_file_type==".layerHornGraph.JSON":
         new_field = ["nodeIds", "nodeSymbolList","falseIndices", "argumentIndices", "controlLocationIndices",
                      "binaryAdjacentList", "ternaryAdjacencyList","unknownEdges","argumentIDList", "argumentNameList",
                      "predicateArgumentEdges","predicateInstanceEdges", "argumentInstanceEdges", "controlHeadEdges", "controlBodyEdges",
                      "controlArgumentEdges", "guardEdges","dataEdges",
-                     "predicateIndices","predicateOccurrenceInClause","predicateStrongConnectedComponent"]
+                     "argumentOccurrence","predicateIndices","predicateOccurrenceInClause","predicateStrongConnectedComponent","argumentBoundList"]
 
     else:
         new_field = ["nodeIds", "nodeSymbolList","falseIndices", "argumentIndices", "controlLocationIndices",
                      "binaryAdjacentList", "ternaryAdjacencyList","unknownEdges","argumentIDList", "argumentNameList",
                      "argumentEdges","guardASTEdges","dataFlowASTEdges","controlFlowHyperEdges","dataFlowHyperEdges",
-                     "predicateIndices","predicateOccurrenceInClause","predicateStrongConnectedComponent"]
+                     "argumentOccurrence","predicateIndices","predicateOccurrenceInClause","predicateStrongConnectedComponent","argumentBoundList"]
 
 
     for root, subdirs, files in os.walk(rootdir):
@@ -393,19 +386,21 @@ def add_horn_graph_json_file(rootdir,graph_type="-getHornGraph",json_file_type="
                                        shell=False)
                 eld.wait()
                 #add more field
+                with open(graph_json_file) as layer_f:
+                    loaded_graph = json.load(layer_f)
+                    for field in new_field:
+                        json_obj[field] = loaded_graph[field]
                 if os.path.isfile(graph_json_file):
-                    with open(graph_json_file) as layer_f:
-                        loaded_graph = json.load(layer_f)
-                        for field in new_field:
-                            json_obj[field] = loaded_graph[field]
                     # write json object to JSON file
                     clear_file(graph_json_file)
                     with open(graph_json_file, 'w') as f:
                         json.dump(json_obj, f)
                 else:
-                    for f in glob.glob(file+"*"):
-                        copy(f,"../benchmarks/memory_problem_cases/")
-                        os.remove(f)
+                    with open(graph_json_file, 'w') as f:
+                        json.dump(json_obj, f)
+                    # for f in glob.glob(file+"*"):
+                    #     copy(f,"../benchmarks/memory_problem_cases/")
+                    #     os.remove(f)
 
 class parameters():
     def __init__(self, root_dir,json_file_type,graph_type):
@@ -414,7 +409,6 @@ class parameters():
         self.graph_type=graph_type
 
 def main():
-    benchmark_list = []
     #benchmark_list.append(["../benchmarks/temp-extract/", int(545 * 0.6), int(545 * 0.2), int(545 * 0.2), ".smt2"])
     # buckets = 10
     # for benchmark in benchmark_list:
@@ -437,14 +431,14 @@ def main():
     #parameter_for_JSON = parameters(root_dir="../benchmarks/small-dataset-trainData-datafold-mono-direction-layer-graph",json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph:monoDirectionLayerGraph")
     #parameter_for_JSON = parameters(root_dir="../benchmarks/small-dataset-trainData-datafold-hyperedge-graph",json_file_type=".hyperEdgeHornGraph.JSON",graph_type="-getHornGraph:hyperEdgeGraph")
     #parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph",json_file_type=".hyperEdgeHornGraph.JSON",graph_type="-getHornGraph:hyperEdgeGraph")
-    parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph",
-                                    json_file_type=".layerHornGraph.JSON",
-                                    graph_type="-getHornGraph:biDirectionLayerGraph")
-    #parameter_for_JSON = parameters(root_dir="../benchmarks/single_example_test",json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph:biDirectionLayerGraph")
+    #parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph",json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph:biDirectionLayerGraph")
+    #parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph",json_file_type=".hyperEdgeHornGraph.JSON", graph_type="-getHornGraph:hyperEdgeGraph")
+    parameter_for_JSON = parameters(root_dir="../benchmarks/lin+nonlin_train_fold",
+                                    json_file_type=".hyperEdgeHornGraph.JSON",
+                                    graph_type="-getHornGraph:hyperEdgeGraph")
+    generate_JSON_field(parameter_for_JSON.root_dir, json_file_type=parameter_for_JSON.json_file_type,
+                             graph_type=parameter_for_JSON.graph_type)
 
-    #generate_JSON_field(parameter_for_JSON.root_dir, file_type=parameter_for_JSON.json_file_type,graph_type=parameter_for_JSON.graph_type)
-
-    add_horn_graph_json_file(parameter_for_JSON.root_dir,graph_type=parameter_for_JSON.graph_type,json_file_type=parameter_for_JSON.json_file_type)
 
 
 if __name__ == '__main__':

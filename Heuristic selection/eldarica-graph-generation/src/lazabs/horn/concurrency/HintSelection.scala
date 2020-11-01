@@ -28,20 +28,15 @@
  */
 package lazabs.horn.concurrency
 import ap.terfor.preds.Predicate
-import ap.terfor._
 import ap.parser.{IExpression, _}
 import lazabs.GlobalParameters
 import lazabs.horn.abstractions.{AbstractionRecord, LoopDetector, StaticAbstractionBuilder, VerificationHints}
 import lazabs.horn.bottomup._
-import lazabs.horn.concurrency.ParametricEncoder.{Infinite, Singleton}
 
-import scala.collection.immutable.ListMap
 import scala.io.Source
-import scala.collection.mutable.{ArrayBuffer, LinkedHashSet, ListBuffer, Seq, HashMap => MHashMap, HashSet => MHashSet}
+import scala.collection.mutable.{LinkedHashMap, ListBuffer, HashMap => MHashMap, HashSet => MHashSet}
 import java.io.{File, FileWriter, PrintWriter}
-import java.lang.System.currentTimeMillis
 
-import ap.parser._
 import ap.terfor.conjunctions.Conjunction
 import lazabs.horn.abstractions.AbstractionRecord.AbstractionMap
 import lazabs.horn.abstractions.VerificationHints.{VerifHintElement, _}
@@ -50,28 +45,15 @@ import lazabs.horn.bottomup.Util.Dag
 import lazabs.horn.preprocessor.HornPreprocessor.{Clauses, VerificationHints}
 import java.nio.file.{Files, Paths, StandardCopyOption}
 
-import lazabs.horn.bottomup.HornPredAbs.RelationSymbolPred
-import lazabs.horn.global.HornClause
-import lazabs.horn.preprocessor.HornPreprocessor
-import lazabs.viewer.HornPrinter
 import ap.parser._
 import IExpression._
-
-import scala.collection.{Set => GSet}
 import lazabs.horn.bottomup.HornClauses
-import lazabs.horn.global._
-
-import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
-import scala.util.control.Breaks._
-import scala.concurrent.ExecutionContext.Implicits.global
 import java.lang.System.currentTimeMillis
 
-import ap.basetypes.IdealInt
-import ap.theories.{SimpleArray, TheoryRegistry}
-import lazabs.Main
-import lazabs.horn.bottomup.HornClauses.Clause
-import lazabs.horn.concurrency.GraphTranslator
+import ap.PresburgerTools
+import ap.theories.TheoryCollector
+import ap.types.TypeTheory
+import lazabs.horn.bottomup.HornPredAbs.{NormClause, RelationSymbol, SymbolFactory}
 
 class wrappedHintWithID {
   var ID: Int = 0
@@ -1124,7 +1106,6 @@ object HintsSelection {
     )
     // could return `path`
   }
-
   def getArgumentInfo(argumentList:List[(IExpression.Predicate,Int)]):ListBuffer[argumentInfo]= {
     var argID=0
     var arguments:ListBuffer[argumentInfo]=ListBuffer[argumentInfo]()
@@ -1134,6 +1115,11 @@ object HintsSelection {
         argID=argID+1
       }
     }
+    arguments
+  }
+
+  def getArgumentInfoFromFile(argumentList:List[(IExpression.Predicate,Int)]):ListBuffer[argumentInfo]= {
+    val arguments=getArgumentInfo(argumentList)
     val argumentFileName=GlobalParameters.get.fileName+".arguments"
     if(scala.reflect.io.File(argumentFileName).exists){
       //read score from .argument file
@@ -1144,7 +1130,15 @@ object HintsSelection {
       }
     }
 
-    (arguments)
+    arguments
+  }
+  def getArgumentBound(argumentList:List[(IExpression.Predicate,Int)],argumentBounds: scala.collection.mutable.Map[Predicate, List[(String, String)]]): ListBuffer[argumentInfo]  ={
+    val arguments=getArgumentInfo(argumentList)
+    for ((k,v) <-argumentBounds;arg<-arguments)if(arg.location.toString()==k.toString()){
+      println(arg.location,k)
+        arg.bound=v(arg.index)
+    }
+    arguments
   }
   def writeArgumentScoreToFile(file:String,
                                argumentList:List[(IExpression.Predicate,Int)],
@@ -1152,7 +1146,7 @@ object HintsSelection {
                                countOccurrence:Boolean=true): ListBuffer[argumentInfo] ={
     println("Write arguments to file")
     val fileName = file.substring(file.lastIndexOf("/") + 1)
-    val arguments=getArgumentInfo(argumentList)
+    val arguments=getArgumentInfoFromFile(argumentList)
     val writer = new PrintWriter(new File(file + ".arguments")) //python path
 
     if (countOccurrence==true){
@@ -1205,4 +1199,93 @@ class argumentInfo(id:Int,loc: IExpression.Predicate,ind:Int)
   var score=0
   val head=location.toString()
   val headName=location.name
+  var bound:Pair[String,String] = ("","")
+}
+
+class simplifiedHornPredAbsForArgumentBounds[CC <% HornClauses.ConstraintClause](iClauses: Iterable[CC],
+                                                                                 initialPredicates: Map[Predicate, Seq[IFormula]],
+                                                                                 predicateGenerator: Dag[AndOrNode[HornPredAbs.NormClause, Unit]] =>
+                                                                                   Either[Seq[(Predicate, Seq[Conjunction])],
+                                                                                     Dag[(IAtom, HornPredAbs.NormClause)]], counterexampleMethod: HornPredAbs.CounterexampleMethod.Value = HornPredAbs.CounterexampleMethod.FirstBestShortest)  {
+  val theories = {
+    val coll = new TheoryCollector
+    coll addTheory TypeTheory
+    for (c <- iClauses)
+      c collectTheories coll
+    coll.theories
+  }
+  implicit val sf = new SymbolFactory(theories)
+  val relationSymbols =
+    (for (c <- iClauses.iterator;
+          lit <- (Iterator single c.head) ++ c.body.iterator;
+          p = lit.predicate)
+      yield (p -> RelationSymbol(p))).toMap
+
+  // make sure that arguments constants have been instantiated
+  for (c <- iClauses) {
+    val preds = for (lit <- c.head :: c.body.toList) yield lit.predicate
+    for (p <- preds.distinct) {
+      val rs = relationSymbols(p)
+      for (i <- 0 until (preds count (_ == p)))
+        rs arguments i
+    }
+  }
+  // translate clauses to internal form
+  val (normClauses, relationSymbolBounds) = {
+    val rawNormClauses = new LinkedHashMap[NormClause, CC]
+
+    for (c <- iClauses) {
+      lazabs.GlobalParameters.get.timeoutChecker()
+      rawNormClauses.put(NormClause(c, (p) => relationSymbols(p)), c)
+    }
+
+    if (lazabs.GlobalParameters.get.intervals) {
+      val res = new LinkedHashMap[NormClause, CC]
+
+      val propagator =
+        new IntervalPropagator (rawNormClauses.keys.toIndexedSeq,
+          sf.reducerSettings)
+
+      for ((nc, oc) <- propagator.result)
+        res.put(nc, rawNormClauses(oc))
+      (res.toSeq, propagator.rsBounds)
+    } else {
+      val emptyBounds =
+        (for (rs <- relationSymbols.valuesIterator)
+          yield (rs -> Conjunction.TRUE)).toMap
+      (rawNormClauses.toSeq, emptyBounds)
+    }
+  }
+  // print argument bounds
+  var argumentBounds: scala.collection.mutable.Map[Predicate, List[Pair[String, String]]] = scala.collection.mutable.Map()
+  for ((rs, bounds) <- relationSymbolBounds; if (rs.pred.name != "FALSE")) { //don't learn from FALSE predicate
+    //println(rs.pred.name + ":")
+    var argumentBoundList: List[Pair[String, String]] = List()
+    if (bounds.isTrue) { //FALSE's bounds is true
+      for (s <- rs.arguments(0))
+        argumentBoundList :+= Pair("\"None\"", "\"None\"")
+    } else if (bounds.isFalse) {
+      for (s <- rs.arguments(0))
+        argumentBoundList :+= Pair("\"False\"", "\"False\"")
+    } else {
+      for (s <- rs.arguments(0)) {
+        //print("  " + s + ": ")
+        val lc = ap.terfor.linearcombination.LinearCombination(s, bounds.order)
+        var lowerBound: String = ""
+        var upperBound: String = ""
+        PresburgerTools.lowerBound(lc, bounds) match {
+          case Some(x) => lowerBound = x.toString()
+          case _ => lowerBound = "\"None\""
+        }
+        //print(", ")
+        (for (b <- PresburgerTools.lowerBound(-lc, bounds)) yield -b) match {
+          case Some(x) => upperBound = x.toString()
+          case _ => upperBound = "\"None\""
+        }
+        argumentBoundList :+= Pair(lowerBound, upperBound)
+        //println()
+      }
+    }
+    argumentBounds(rs.pred) = argumentBoundList
+  }
 }

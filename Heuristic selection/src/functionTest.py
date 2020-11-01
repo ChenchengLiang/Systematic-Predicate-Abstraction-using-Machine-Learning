@@ -11,6 +11,8 @@ import scipy.stats as ss
 import signal
 import matplotlib.pyplot as plt
 import tensorflow as tf
+from decimal import Decimal
+import sys
 import re
 import glob
 import json
@@ -90,8 +92,9 @@ def mnist_example():
 
 def main():
     #mnist_example()
-    x=[0.1,0.2,0.7,0.6]
-    print(tf.math.round(x))
+    pass
+    print(float("inf")+1)
+    print(np.array([1, 2, 3.3]))
 
 
 
