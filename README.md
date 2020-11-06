@@ -14,6 +14,8 @@ sh Systematic-Predicate-Abstraction-using-Machine-Learning/install_tf2_gnn.sh
 
 3. Run the debug file:
 
-python3 Systematic-Predicate-Abstraction-using-Machine-Learning/Heuristic\ selection/src/debug_example.py /path/to/the/folder/debug_data_set/
+Go to Systematic-Predicate-Abstraction-using-Machine-Learning/Heuristic\ selection/src
+
+Run python3 debug_example.py /path/to/the/folder/debug_data_set/
 
 
