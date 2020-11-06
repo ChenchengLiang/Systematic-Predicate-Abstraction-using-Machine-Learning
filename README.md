@@ -4,7 +4,10 @@ Running instruction (for debug):
 
 
     a). git clone the fork of tf2_gnn
-https://github.com/ChenchengLiang/tf2-gnn/tree/horn_graph_with_hyperedge
+https://github.com/ChenchengLiang/tf2-gnn
+
+Go to tf2-gnn folder
+git checkout horn_graph_with_hyperedge
 Install as site-package (pip install -e ./ ).
 
     b). Other site-package needed: networkx, graphviz
