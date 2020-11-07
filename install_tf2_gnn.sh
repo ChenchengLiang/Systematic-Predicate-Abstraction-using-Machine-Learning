@@ -6,7 +6,7 @@ p install -e ./
 
 pip install networkx
 pip install graphviz
-pip install genism
+pip install gensim
 pip install nltk
 pip install matplotlib
 pip install numba
