@@ -30,12 +30,19 @@
 package lazabs.horn.concurrency
 
 import java.io.{File, PrintWriter}
-import ap.parser.IExpression.{ConstantTerm, Eq}
+
+import ap.parser.IExpression.{ConstantTerm, Eq, Predicate}
 import ap.parser.{IBinJunctor, IConstant, IExpression, IFormula, ITerm, LineariseVisitor, Simplifier, SymbolCollector}
+import jdk.nashorn.internal.objects.Global
+import lazabs.GlobalParameters
+import lazabs.horn.abstractions.VerificationHints.VerifHintInitPred
+import lazabs.horn.bottomup.HornClauses
 import lazabs.horn.bottomup.HornClauses.Clause
+import lazabs.horn.concurrency.DrawHornGraph.HornGraphType
 import lazabs.horn.preprocessor.HornPreprocessor.{Clauses, VerificationHints}
+
 import scala.collection.mutable.ListBuffer
-import lazabs.horn.concurrency.DrawHyperEdgeHornGraph.{HyperEdgeType}
+import lazabs.horn.concurrency.DrawHyperEdgeHornGraph.HyperEdgeType
 
 object DrawHyperEdgeHornGraph {
 
@@ -54,12 +61,13 @@ class hyperEdgeInfo(name: String, from: String = "", to: String, nodeType: Hyper
 }
 
 class DrawHyperEdgeHornGraph(file: String, simpClauses: Clauses, hints: VerificationHints, argumentInfoList: ListBuffer[argumentInfo]) extends DrawHornGraph(file: String, simpClauses: Clauses, hints: VerificationHints, argumentInfoList: ListBuffer[argumentInfo]) {
-
   println("Write hyperedge horn graph to file")
   edgeNameMap += ("controlFlowHyperEdge" -> "CFHE")
   edgeNameMap += ("dataFlowHyperEdge" -> "DFHE")
   edgeNameMap += ("dataFlowAST" -> "data")
   edgeNameMap += ("guardAST" -> "guard")
+  edgeNameMap += ("templateAST"->"tAST")
+  edgeNameMap += ("template"->"template")
   edgeNameMap += ("argument" -> "arg")
   //turn on/off edge's label
   var edgeNameSwitch = true
@@ -67,6 +75,14 @@ class DrawHyperEdgeHornGraph(file: String, simpClauses: Clauses, hints: Verifica
     for (key <- edgeNameMap.keys)
       edgeNameMap += (key -> "")
   }
+  edgeDirectionMap += ("controlFlowHyperEdge" -> false)
+  edgeDirectionMap += ("dataFlowHyperEdge" -> false)
+  edgeDirectionMap += ("dataFlowAST" -> false)
+  edgeDirectionMap += ("guardAST" -> false)
+  edgeDirectionMap += ("templateAST"->false)
+  edgeDirectionMap += ("template" -> false)
+  edgeDirectionMap += ("argument" -> false)
+
   //node cotegory: Operator and Constant don't need canonical name. FALSE is unique category
   val controlNodePrefix = "CONTROLN_"
   val symbolicConstantNodePrefix = "SYMBOLIC_CONSTANT_"
@@ -82,14 +98,13 @@ class DrawHyperEdgeHornGraph(file: String, simpClauses: Clauses, hints: Verifica
   nodeShapeMap += ("FALSE" -> "component")
   nodeShapeMap += ("controlFlowHyperEdge" -> "diamond")
   nodeShapeMap += ("dataFlowHyperEdge" -> "diamond")
+  nodeShapeMap += ("template" -> "component")
 
   val sp = new Simplifier()
   val dataFlowInfoWriter = new PrintWriter(new File(file + ".HornGraph"))
   var tempID = 0
   var clauseNumber = 0
   var hyperEdgeList = scala.collection.mutable.ListBuffer[hyperEdgeInfo]()
-
-
   for (clause <- simpClauses) {
     //var hyperEdgeList = List[hyperEdgeInfo]()
     hyperEdgeList.clear()
@@ -114,13 +129,17 @@ class DrawHyperEdgeHornGraph(file: String, simpClauses: Clauses, hints: Verifica
           createNode(argumentnodeName, "ARG_" + tempID.toString, "predicateArgument", nodeShapeMap("predicateArgument"))
           constantNodeSetInOneClause(arg.toString) = argumentnodeName
           argumentNodeArray :+= argumentnodeName
-          gnn_input.argumentInfoHornGraphList += new argumentInfoHronGraph(normalizedClause.head.pred.name, tempID,gnn_input.GNNNodeID-1)
+          val localArgInfo=new argumentInfoHronGraph(normalizedClause.head.pred.name, tempID,gnn_input.GNNNodeID-1)
+          localArgInfo.canonicalName=argumentnodeName
+          localArgInfo.constNames:+=arg.toString
+          gnn_input.argumentInfoHornGraphList += localArgInfo
           tempID += 1
           //connect to control flow node
           addBinaryEdge(argumentnodeName, controlFlowNodeName, "argument")
           drawDataFlow(arg, dataFlowSet)
         }
         argumentNodeSetInOneClause(normalizedClause.head.pred.name) = argumentNodeArray
+
       } else {
         for (controlNodeName <- argumentNodeSetInOneClause.keySet) if (controlNodeName == normalizedClause.head.pred.name) {
           for ((argNodeName, arg) <- argumentNodeSetInOneClause(controlNodeName) zip normalizedClause.head.args) {
@@ -162,7 +181,10 @@ class DrawHyperEdgeHornGraph(file: String, simpClauses: Clauses, hints: Verifica
             createNode(argumentnodeName, "ARG_" + tempID.toString, "predicateArgument", nodeShapeMap("predicateArgument"))
             constantNodeSetInOneClause(arg.toString) = argumentnodeName
             argumentNodeArray :+= argumentnodeName
-            gnn_input.argumentInfoHornGraphList += new argumentInfoHronGraph(body.pred.name, tempID,gnn_input.GNNNodeID-1)
+            val localArgInfo=new argumentInfoHronGraph(normalizedClause.head.pred.name, tempID,gnn_input.GNNNodeID-1)
+            localArgInfo.canonicalName=argumentnodeName
+            localArgInfo.constNames:+=arg.toString
+            gnn_input.argumentInfoHornGraphList += localArgInfo
             tempID += 1
             //connect to control flow node
             addBinaryEdge(argumentnodeName, controlFlowNodeName, "argument")
@@ -213,15 +235,29 @@ class DrawHyperEdgeHornGraph(file: String, simpClauses: Clauses, hints: Verifica
         }
       }
     }
-
     clauseNumber += 1
   }
+
+  //todo:move to draw horn graph
+  //draw templates
+  for (argInfo<-gnn_input.argumentInfoHornGraphList){
+    argumentNodeSetInPredicates("_"+argInfo.index.toString)=argInfo.canonicalName //add _ to differentiate index with other constants
+  }
+  astEdgeType = "templateAST"
+  for(p<-HornClauses.allPredicates(simpClauses)){
+    val templateNameList=drawTemplates(p)
+    for (templateNodeName<-templateNameList)
+      addBinaryEdge(templateNodeName,controlFlowNodeSetInOneClause(p.name),"template")
+  }
+
+
   writerGraph.write("}" + "\n")
   writerGraph.close()
   dataFlowInfoWriter.close()
 
-  val (argumentIDList, argumentNameList, argumentOccurrenceList,argumentBoundList,argumentIndicesList) = matchArguments()
-  writeGNNInputToJSONFile(argumentIDList, argumentNameList, argumentOccurrenceList,argumentBoundList,argumentIndicesList)
+  val (argumentIDList, argumentNameList, argumentOccurrenceList,argumentBoundList,argumentIndicesList,argumentBinaryOccurrenceList) = matchArguments()
+  writeGNNInputToJSONFile(argumentIDList, argumentNameList, argumentOccurrenceList,argumentBoundList,argumentIndicesList,argumentBinaryOccurrenceList)
+
 
   def drawPredicateNode(controlFlowNodeName: String, predicateName: String, className: String): Unit = {
     //draw predicate node

@@ -22,10 +22,10 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     #parameters["message_calculation_class"]="rgcn"#rgcn,ggnn,rgat
     #parameters['num_heads'] = 2
     parameters['hidden_dim'] = 64 #64
-    parameters['num_layers'] = 5
+    parameters['num_layers'] = 2
     parameters['node_label_embedding_size'] = nodeFeatureDim
-    parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
-    parameters['regression_hidden_layer_size'] = [64,64,64,64] #[64,64]
+    parameters['max_nodes_per_batch']=500000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
+    parameters['regression_hidden_layer_size'] = [64,64,64,64]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
     max_epochs = 200
@@ -49,7 +49,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         if force_read==True:
             write_graph_to_pickle(benchmark_name,  data_fold=["train", "valid", "test"],
                                   label=label,path=path,from_json=from_json,
-                                  file_type=file_type,json_type=json_type)
+                                  file_type=file_type,json_type=json_type,max_nodes_per_batch=parameters['max_nodes_per_batch'])
         else:
             print("Use pickle data for training")
         #if form_label == True and not os.path.isfile("../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):
@@ -57,7 +57,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             form_GNN_inputs_and_labels(label=label, datafold=["train", "valid", "test"], benchmark=benchmark_name)
         else:
             print("Use label in pickle data for training")
-    else:
+    elif pickle==False:
         dataset._path=path
         dataset._json_type=json_type
     if GPU==True:
@@ -79,19 +79,18 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     accuracy_average=[]
     model=None
     for n in range(train_n_times): # train n time to get average performance, default is one
-        # get model
+        # initial different models by different training task
         if label == "argument_identify" or label == "control_location_identify" or label == "argument_identify_no_batchs": #all nodes binary classification task
             model = InvariantNodeIdentifyTask(parameters, dataset)
-        elif label=="predicate_occurrence_in_clauses":#single output regression task
+        elif label=="predicate_occurrence_in_clauses" or label=="argument_lower_bound" or label=="argument_upper_bound":#gathered nodes single output regression task
             model = InvariantArgumentSelectionTask(parameters, dataset)
         elif label=="predicate_occurrence_in_SCG" or label=="argument_lower_bound_existence" or label=="argument_upper_bound_existence": #gathered nodes binary classification task
             model = InvariantNodeIdentifyTask(parameters, dataset)
-        elif label=="argument_bound": #two outputs regression task
+        elif label=="argument_bound": #gathered nodes two outputs regression task
             patience=max_epochs
             model = InvariantArgumentSelectionTask(parameters, dataset)
         else:
             model = InvariantArgumentSelectionTask(parameters, dataset)
-
 
         #train
         quiet=False
@@ -105,7 +104,6 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         # process_train.start()
         # process_train.join()
 
-
         trained_model_path,train_loss_list,valid_loss_list,best_valid_epoch,train_metric_list,valid_metric_list = train(
             model=model,
             dataset=dataset,
@@ -117,7 +115,6 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             quiet=quiet,
             aml_run=None)
         #predict
-        #trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2020-10-06_19-59-07_best.pkl"
         print("trained_model_path", trained_model_path)
 
         test_data = dataset.get_tensorflow_dataset(DataFold.TEST)
@@ -182,7 +179,6 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     valid_loss_average=np.mean(valid_loss_average)
     best_valid_epoch_average=np.mean(best_valid_epoch_average)
     mean_accuracy=np.mean(accuracy_average)
-
     write_accuracy_to_log(label, benchmark_name, accuracy_average,best_valid_epoch_average)
     #visualize results
     draw_training_results(train_loss_list_average, valid_loss_list_average,test_loss_list_average, mean_loss_list_average,
@@ -286,7 +282,7 @@ def write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss,valid
 
         predicted_argument_lists=get_predicted_label_list_divided_by_file(dataset, predicted_Y_loaded_model)
         mse_list=[]
-        for predicted_label, arguments, file_name in zip(predicted_argument_lists,dataset._label_list["test"],dataset._file_list):
+        for predicted_label, arguments, file_name in zip(predicted_argument_lists,dataset._label_list["test"],dataset._file_list["test"]):
             out_file.write("-------"+ "\n")
             out_file.write(file_name + "\n")
             out_file.write("true label:"+ str(arguments)+ "\n")
@@ -328,13 +324,13 @@ class raw_graph_inputs():
         self.token_map={}
 
 
-def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","valid","test"],label="rank",path="../",file_type=".smt2",json_type=".JSON",from_json=True):
-    benchmark_name=benchmark.replace("/", "-")
-    if os.path.isfile("../pickleData/"+label+"-"+benchmark_name+"-gnnInput_train_data.txt") and force_read==False:
-        print("read existed training data")
-
-    else:
-        write_graph_to_pickle(benchmark, data_fold=data_fold, label=label, path=path, from_json=from_json, file_type=file_type, json_type=json_type)
+# def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","valid","test"],label="rank",path="../",file_type=".smt2",json_type=".JSON",from_json=True):
+#     benchmark_name=benchmark.replace("/", "-")
+#     if os.path.isfile("../pickleData/"+label+"-"+benchmark_name+"-gnnInput_train_data.txt") and force_read==False:
+#         print("read existed training data")
+#
+#     else:
+#         write_graph_to_pickle(benchmark, data_fold=data_fold, label=label, path=path, from_json=from_json, file_type=file_type, json_type=json_type)
 
 class parsed_graph_data:
     def __init__(self,graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
@@ -354,7 +350,7 @@ class parsed_graph_data:
         self.graphs_predicate_indices=graphs_predicate_indices
         self.graphs_learning_labels=graphs_learning_labels
 
-def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../",from_json=False,file_type=".smt2",json_type=".JSON"):
+def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../",from_json=False,file_type=".smt2",json_type=".JSON",max_nodes_per_batch=10000):
     vocabulary_set, token_map = build_vocabulary(datafold=["train", "valid", "test"], path=path,json_type=json_type)
     benchmark_name = benchmark.replace("/", "-")
     for df in data_fold:
@@ -377,7 +373,8 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
             suffix=file_type
             # for fileGraph, fileArgument in zip(sorted(glob.glob(path +df+"_data/"+ '*' + suffix + json_type)),
             #                                    sorted(glob.glob(path +df+"_data/"+ '*' + suffix + '.arguments'))):
-            for fileGraph in sorted(glob.glob(path +df+"_data/"+ '*' + suffix + json_type)):
+            fileSet=set(sorted(glob.glob(path +df+"_data/"+ '*' + suffix + json_type)))
+            for fileGraph in fileSet:
                 fileName = fileGraph[:fileGraph.find(suffix + json_type) + len(suffix)]
                 fileName = fileName[fileName.rindex("/") + 1:]
                 # read graph
@@ -388,9 +385,11 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                     #todo:debug check all field if equal to empty
                     if len(loaded_graph["nodeIds"]) == 0:
                         print("nodeIds==0",fileName)
-                        for f in glob.glob(path+df+"_data/"+fileName + "*"):
-                            shutil.copy(f, "../benchmarks/problem_cases/")
-                            os.remove(f)
+                        # for f in glob.glob(path+df+"_data/"+fileName + "*"):
+                        #     shutil.copy(f, "../benchmarks/problem_cases/")
+                        #     os.remove(f)
+                    elif len(loaded_graph["nodeIds"]) >= max_nodes_per_batch: #
+                        print("more than " + str(max_nodes_per_batch) + " nodes","skip",fileName)
                     # if len(loaded_graph["argumentEdges"]) == 0:
                     #     print("argumentEdges==0",fileName)
                     # if len(loaded_graph["guardASTEdges"]) == 0:
@@ -416,7 +415,7 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                         elif label=="predicate_occurrence_in_SCG":
                             graphs_predicate_indices.append(loaded_graph["predicateIndices"])
                             graphs_learning_labels.append(loaded_graph["predicateStrongConnectedComponent"])
-                        elif label=="argument_bound" or label=="argument_lower_bound_existence" or label=="argument_upper_bound_existence":
+                        elif label=="argument_bound" or label=="argument_lower_bound_existence" or label=="argument_upper_bound_existence" or label=="argument_lower_bound" or label=="argument_upper_bound":
                             graphs_argument_indices.append(loaded_graph["argumentIndices"])
                             graphs_learning_labels.append(loaded_graph["argumentBoundList"])
                         elif label=="control_location_identify":
@@ -475,7 +474,7 @@ def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "
     benchmark_name = benchmark.replace("/", "-")
     for df in datafold:
         parsed_dot_file = pickleRead("train-" + benchmark_name + "-gnnInput_" + df + "_data")
-        if label == "predicate_occurrence_in_clauses" or label == "predicate_occurrence_in_SCG" or label=="argument_bound" or label=="argument_lower_bound_existence" or label=="argument_upper_bound_existence":
+        if label == "predicate_occurrence_in_clauses" or label == "predicate_occurrence_in_SCG" or label=="argument_bound" or label=="argument_lower_bound_existence" or label=="argument_upper_bound_existence" or label=="argument_lower_bound" or label=="argument_upper_bound":
             form_predicate_occurrence_related_label_graph_sample(parsed_dot_file.graphs_node_label_ids,
                                                                     parsed_dot_file.graphs_node_symbols,
                                                                     parsed_dot_file.graphs_adjacency_lists,
@@ -555,6 +554,22 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
                 temp_graph_label.append(learning_labels[1])
             graphs_learning_labels_temp.append(temp_graph_label)
         graphs_learning_labels = graphs_learning_labels_temp
+    elif label=="argument_lower_bound":
+        (graphs_node_indices, graphs_learning_labels, graphs_node_label_ids,
+        graphs_node_symbols,graphs_adjacency_lists, file_name_list) = form_argument_bound_label(graphs_argument_indices,
+                                                                           graphs_learning_labels,
+                                                                           graphs_node_label_ids,
+                                                                           graphs_node_symbols,
+                                                                           graphs_adjacency_lists, file_name_list,label)
+
+    elif label=="argument_upper_bound":
+        (graphs_node_indices, graphs_learning_labels, graphs_node_label_ids,
+        graphs_node_symbols, graphs_adjacency_lists, file_name_list) = form_argument_bound_label(graphs_argument_indices,
+                                                                                                graphs_learning_labels,
+                                                                                                graphs_node_label_ids,
+                                                                                                graphs_node_symbols,
+                                                                                                graphs_adjacency_lists,
+                                                                                                file_name_list, label)
     for node_label_ids, node_symbols, adjacency_lists,file_name,node_indices,learning_labels in zip(graphs_node_label_ids,graphs_node_symbols,
                                                                                                          graphs_adjacency_lists,
                                                                                                          file_name_list,
@@ -566,16 +581,27 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
         for symbol in node_symbols:
             tokenized_node_label_ids.append(token_map[symbol])
         raw_data_graph.labels.append(learning_labels)
-        # print("------debug------")
-        # print("tokenized_node_label_ids",tokenized_node_label_ids)
-        # print("node_indices   ", node_indices)
-        # print("learning_labels", learning_labels)
-        if(len(node_indices)!=len(learning_labels)):
-            print("------debug------")
-            print("file_name",file_name)
-            print("tokenized_node_label_ids", tokenized_node_label_ids)
-            print("node_indices   ", node_indices)
-            print("learning_labels", learning_labels)
+
+        # if(len(tokenized_node_label_ids)>130000):
+        #     print("------debug------")
+        #     print("file_name",file_name)
+        #     print("number of node", len(tokenized_node_label_ids))
+        #     print("number of edges per edge type")
+        #     for edge_type in adjacency_lists:
+        #         print(len(edge_type),end=" ")
+        #     print("\n node_indices ", len(node_indices))
+        #     print("learning_labels", len(learning_labels))
+
+        # for edge_type in adjacency_lists:
+        #     if len(edge_type)==0 and len(tokenized_node_label_ids)<50:
+        #         print("------debug------")
+        #         print("file_name", file_name)
+        #         print("number of node", len(tokenized_node_label_ids))
+        #         print("number of edges per edge type")
+        #         for edge_type in adjacency_lists:
+        #             print(len(edge_type), end=" ")
+        #         print("\n node_indices ", len(node_indices))
+        #         print("learning_labels", len(learning_labels))
 
         final_graphs.append(
             HornGraphSample(
@@ -590,6 +616,44 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
     if pickle==True:
         pickleWrite(raw_data_graph, label + "-" + benchmark + "-gnnInput_" + df + "_data")
     return raw_data_graph
+
+
+def form_argument_bound_label(graphs_argument_indices, graphs_learning_labels, graphs_node_label_ids, graphs_node_symbols,
+            graphs_adjacency_lists, file_name_list,label):
+    bound_index=0
+    if label=="argument_lower_bound":
+        bound_index=0
+    elif label=="argument_upper_bound":
+        bound_index=1
+    graphs_node_indices_temp = []
+    graphs_learning_labels_temp = []
+    node_label_ids_temp = []
+    node_symbols_temp = []
+    adjacency_lists_temp = []
+    file_name_list_temp = []
+    for one_graph_indices, one_graph_learning_labels, one_graphs_node_label_ids, one_graphs_node_symbols, one_graphs_adjacency_lists, one_file_name_list in zip(
+            graphs_argument_indices, graphs_learning_labels, graphs_node_label_ids, graphs_node_symbols,
+            graphs_adjacency_lists, file_name_list):
+        temp_indces = []
+        temp_labels = []
+        for index, learning_label in zip(one_graph_indices, one_graph_learning_labels):
+            if not isinstance(learning_label[bound_index], str):
+                temp_indces.append(index)
+                temp_labels.append(learning_label[bound_index])
+
+        if len(temp_labels) != 0:  # delete this graph
+            graphs_node_indices_temp.append(temp_indces)
+            graphs_learning_labels_temp.append(temp_labels)
+            node_label_ids_temp.append(one_graphs_node_label_ids)
+            node_symbols_temp.append(one_graphs_node_symbols)
+            adjacency_lists_temp.append(one_graphs_adjacency_lists)
+            file_name_list_temp.append(one_file_name_list)
+            # print("one_graph_learning_labels", one_graph_learning_labels)
+            # print("temp_labels", temp_labels)
+            # print("temp_indces", temp_indces)
+    # if len(graphs_learning_labels_temp)==0:
+    return graphs_node_indices_temp,graphs_learning_labels_temp,node_label_ids_temp,node_symbols_temp,adjacency_lists_temp,file_name_list_temp
+
 
 def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_argument_indices, graphs_adjacency_lists,
                             graphs_argument_scores, total_number_of_node,graphs_control_location_indices, file_name_list,
@@ -754,6 +818,17 @@ def build_vocabulary(datafold=["train", "valid", "test"], path="",json_type=".la
         token_id=token_id+1
     return vocabulary_set,token_map
 
+
+def count_paramsters(model):
+    from keras import backend as K
+    trainable_count = int(
+        np.sum([K.count_params(p) for p in set(model.trainable_weights)]))
+    non_trainable_count = int(
+        np.sum([K.count_params(p) for p in set(model.non_trainable_weights)]))
+
+    print('Total params: {:,}'.format(trainable_count + non_trainable_count))
+    print('Trainable params: {:,}'.format(trainable_count))
+    print('Non-trainable params: {:,}'.format(non_trainable_count))
 
 
 

@@ -53,6 +53,7 @@ import java.lang.System.currentTimeMillis
 import ap.PresburgerTools
 import ap.theories.TheoryCollector
 import ap.types.TypeTheory
+import lazabs.horn.bottomup.HornClauses.Clause
 import lazabs.horn.bottomup.HornPredAbs.{NormClause, RelationSymbol, SymbolFactory}
 
 class wrappedHintWithID {
@@ -1132,11 +1133,24 @@ object HintsSelection {
 
     arguments
   }
-  def getArgumentBound(argumentList:List[(IExpression.Predicate,Int)],argumentBounds: scala.collection.mutable.Map[Predicate, List[(String, String)]]): ListBuffer[argumentInfo]  ={
+  def getArgumentBoundForSmt(argumentList:List[(IExpression.Predicate,Int)],disjunctive:Boolean,simplifiedClauses:Seq[Clause],simpHints: VerificationHints
+                       ,predGenerator:Dag[DisjInterpolator.AndOrNode[HornPredAbs.NormClause, Unit]] => Either[Seq[(Predicate, Seq[Conjunction])], Dag[(IAtom, HornPredAbs.NormClause)]]): ListBuffer[argumentInfo]  ={
+    val counterexampleMethod =
+      if (disjunctive)
+        HornPredAbs.CounterexampleMethod.AllShortest
+      else
+        HornPredAbs.CounterexampleMethod.FirstBestShortest
+    val simpPredAbs =
+      new simplifiedHornPredAbsForArgumentBounds(simplifiedClauses, //HornPredAbs
+        simpHints.toInitialPredicates, predGenerator,
+        counterexampleMethod)
+    getArgumentBound(argumentList,simpPredAbs.argumentBounds)
+  }
+  def getArgumentBound(argumentList:List[(IExpression.Predicate,Int)],argumentBounds:scala.collection.mutable.Map[Predicate, List[(String, String)]]): ListBuffer[argumentInfo]  ={
     val arguments=getArgumentInfo(argumentList)
     for ((k,v) <-argumentBounds;arg<-arguments)if(arg.location.toString()==k.toString()){
       println(arg.location,k)
-        arg.bound=v(arg.index)
+      arg.bound=v(arg.index)
     }
     arguments
   }
@@ -1168,8 +1182,10 @@ object HintsSelection {
       for(arg<-arguments){
         for(hint<-positiveHintInfoList){
           if(arg.location.equals(hint.head))
-            if(ContainsSymbol(hint.expression, IVariable(arg.index)))
+            if(ContainsSymbol(hint.expression, IVariable(arg.index))) {
               arg.score=arg.score+1
+              arg.binaryOccurenceLabel=1
+            }
         }
       }
 
@@ -1200,6 +1216,7 @@ class argumentInfo(id:Int,loc: IExpression.Predicate,ind:Int)
   val head=location.toString()
   val headName=location.name
   var bound:Pair[String,String] = ("","")
+  var binaryOccurenceLabel=0
 }
 
 class simplifiedHornPredAbsForArgumentBounds[CC <% HornClauses.ConstraintClause](iClauses: Iterable[CC],
@@ -1271,16 +1288,14 @@ class simplifiedHornPredAbsForArgumentBounds[CC <% HornClauses.ConstraintClause]
       for (s <- rs.arguments(0)) {
         //print("  " + s + ": ")
         val lc = ap.terfor.linearcombination.LinearCombination(s, bounds.order)
-        var lowerBound: String = ""
-        var upperBound: String = ""
-        PresburgerTools.lowerBound(lc, bounds) match {
-          case Some(x) => lowerBound = x.toString()
-          case _ => lowerBound = "\"None\""
+        val lowerBound=PresburgerTools.lowerBound(lc, bounds) match {
+          case Some(x) => x.toString()
+          case _ => "\"None\""
         }
         //print(", ")
-        (for (b <- PresburgerTools.lowerBound(-lc, bounds)) yield -b) match {
-          case Some(x) => upperBound = x.toString()
-          case _ => upperBound = "\"None\""
+        val upperBound= (for (b <- PresburgerTools.lowerBound(-lc, bounds)) yield -b) match {
+          case Some(x) => x.toString()
+          case _ => "\"None\""
         }
         argumentBoundList :+= Pair(lowerBound, upperBound)
         //println()

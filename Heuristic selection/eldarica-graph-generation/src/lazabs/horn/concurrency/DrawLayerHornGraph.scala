@@ -29,12 +29,14 @@
 package lazabs.horn.concurrency
 
 import ap.parser.{IAtom, IBinFormula, IBinJunctor, IBoolLit, IConstant, IEpsilon, IExpression, IFormulaITE, IFunApp, IIntFormula, IIntLit, INamedPart, INot, IPlus, IQuantified, ITerm, ITermITE, ITimes, ITrigger, IVariable, LineariseVisitor}
+import lazabs.GlobalParameters
+import lazabs.horn.concurrency.DrawHornGraph.HornGraphType
 import lazabs.horn.preprocessor.HornPreprocessor.{Clauses, VerificationHints}
 import play.api.libs.json.Json
+
 import scala.collection.mutable.ListBuffer
 
 class DrawLayerHornGraph(file: String, simpClauses: Clauses, hints: VerificationHints, argumentInfoList: ListBuffer[argumentInfo]) extends DrawHornGraph(file: String, simpClauses: Clauses, hints: VerificationHints, argumentInfoList: ListBuffer[argumentInfo]) {
-
   println("Write layer horn graph to file")
   edgeNameMap += ("predicateArgument" -> "PA")
   edgeNameMap += ("predicateInstance" -> "PI")
@@ -51,6 +53,31 @@ class DrawLayerHornGraph(file: String, simpClauses: Clauses, hints: Verification
     for (key <- edgeNameMap.keys)
       edgeNameMap += (key -> "")
   }
+  GlobalParameters.get.hornGraphType match {
+    case DrawHornGraph.HornGraphType.hybridDirectionLayerGraph =>{
+      edgeDirectionMap += ("predicateArgument" -> false)
+      edgeDirectionMap += ("predicateInstance" -> false)
+      edgeDirectionMap += ("argumentInstance" -> true)
+      edgeDirectionMap += ("controlHead" -> false)
+      edgeDirectionMap += ("controlBody" -> false)
+      edgeDirectionMap += ("controlArgument" -> false)
+      edgeDirectionMap += ("guard" -> false)
+      edgeDirectionMap += ("data" -> false)
+      edgeDirectionMap += ("subTerm" -> false)
+    }
+    case DrawHornGraph.HornGraphType.biDirectionLayerGraph =>{
+      edgeDirectionMap += ("predicateArgument" -> true)
+      edgeDirectionMap += ("predicateInstance" -> true)
+      edgeDirectionMap += ("argumentInstance" -> true)
+      edgeDirectionMap += ("controlHead" -> true)
+      edgeDirectionMap += ("controlBody" -> true)
+      edgeDirectionMap += ("controlArgument" -> true)
+      edgeDirectionMap += ("guard" -> true)
+      edgeDirectionMap += ("data" -> true)
+      edgeDirectionMap += ("subTerm" -> true)
+    }
+  }
+
 
   //node shape map
   nodeShapeMap += ("constant" -> "circle")
@@ -98,9 +125,9 @@ class DrawLayerHornGraph(file: String, simpClauses: Clauses, hints: Verification
     createNode(clauseHeadNodeName,
       "HEAD", "clauseHead", nodeShapeMap("clauseHead"))
     //clause layer: create edge between head and clause node
-    addBinaryEdge(clauseNodeName, clauseHeadNodeName, "controlHead")
+    addBinaryEdge(clauseNodeName, clauseHeadNodeName, "controlHead", edgeDirectionMap("controlHead"))
     //predicateLayer->clauseLayer: connect predicate to clause head
-    addBinaryEdge(predicateNameMap(clause.head.pred.name).predicateCanonicalName, clauseHeadNodeName, "predicateInstance")
+    addBinaryEdge(predicateNameMap(clause.head.pred.name).predicateCanonicalName,clauseHeadNodeName, "predicateInstance",edgeDirectionMap("predicateInstance"))
     var tempIDForArgument = 0
     for ((headArgument, predicateArgument) <- clause.head.args zip predicateNameMap(clause.head.pred.name).argumentCanonicalNameList) {
       //clause layer: create clause head argument node
@@ -108,7 +135,7 @@ class DrawLayerHornGraph(file: String, simpClauses: Clauses, hints: Verification
       createNode(clauseArgumentNodeName,
         "ARG" + tempIDForArgument.toString, "clauseArgument", nodeShapeMap("clauseArgument"))
       //clause layer: create edge between head and argument
-      addBinaryEdge(clauseHeadNodeName, clauseArgumentNodeName, "controlArgument")
+      addBinaryEdge(clauseHeadNodeName,clauseArgumentNodeName, "controlArgument",edgeDirectionMap("controlArgument"))
       //predicateLayer->clauseLayer: connect predicate argument to clause argument
       drawAST(headArgument, clauseArgumentNodeName)
       tempIDForArgument += 1
@@ -123,9 +150,9 @@ class DrawLayerHornGraph(file: String, simpClauses: Clauses, hints: Verification
         "BODY" + tempIDForPredicate.toString, "clauseBody", nodeShapeMap("clauseBody"))
       tempIDForPredicate += 1
       //clause layer: create edge between body and clause node
-      addBinaryEdge(clauseNodeName, clauseBodyNodeName, "controlBody")
+      addBinaryEdge(clauseBodyNodeName,clauseNodeName, "controlBody",edgeDirectionMap("controlBody"))
       //predicateLayer->clauseLayer: connect predicate to clause body
-      addBinaryEdge(predicateNameMap(bodyPredicate.pred.name).predicateCanonicalName, clauseBodyNodeName, "predicateInstance")
+      addBinaryEdge(clauseBodyNodeName,predicateNameMap(bodyPredicate.pred.name).predicateCanonicalName, "predicateInstance",edgeDirectionMap("predicateInstance"))
 
       tempIDForArgument = 0
       for ((bodyArgument, predicateArgument) <- bodyPredicate.args zip predicateNameMap(bodyPredicate.pred.name).argumentCanonicalNameList) {
@@ -134,9 +161,9 @@ class DrawLayerHornGraph(file: String, simpClauses: Clauses, hints: Verification
         createNode(clauseArgumentNodeName,
           "ARG" + tempIDForArgument.toString, "clauseArgument", nodeShapeMap("clauseArgument"))
         //clause layer: create edge between body and argument
-        addBinaryEdge(clauseBodyNodeName, clauseArgumentNodeName, "controlArgument")
+        addBinaryEdge(clauseArgumentNodeName,clauseBodyNodeName, "controlArgument",edgeDirectionMap("controlArgument"))
         //predicateLayer->clauseLayer: connect predicate argument to clause argument
-        addBinaryEdge(predicateArgument._1, clauseArgumentNodeName, "argumentInstance")
+        addBinaryEdge(predicateArgument._1, clauseArgumentNodeName, "argumentInstance",edgeDirectionMap("argumentInstance"))
         drawAST(bodyArgument, clauseArgumentNodeName)
         tempIDForArgument += 1
       }
@@ -145,8 +172,8 @@ class DrawLayerHornGraph(file: String, simpClauses: Clauses, hints: Verification
   writerGraph.write("}" + "\n")
   writerGraph.close()
   //form label here
-  val (argumentIDList, argumentNameList, argumentOccurrenceList,argumentBoundList,argumentIndicesList) = matchArguments()
-  writeGNNInputToJSONFile(argumentIDList, argumentNameList, argumentOccurrenceList,argumentBoundList,argumentIndicesList)
+  val (argumentIDList, argumentNameList, argumentOccurrenceList,argumentBoundList,argumentIndicesList,argumentBinaryOccurrenceList) = matchArguments()
+  writeGNNInputToJSONFile(argumentIDList, argumentNameList, argumentOccurrenceList,argumentBoundList,argumentIndicesList,argumentBinaryOccurrenceList)
   /*
   //write JSON file by json library
   val layerVersionGraphGNNInput=Json.obj("nodeIds" -> gnn_input.nodeIds,"nodeSymbolList"->gnn_input.nodeSymbols,
@@ -187,7 +214,7 @@ class DrawLayerHornGraph(file: String, simpClauses: Clauses, hints: Verification
           createNode(argumentNodeCanonicalName,
             "Arg" + tempID.toString, "predicateArgument", nodeShapeMap("predicateArgument"))
           //create edge from argument to predicate
-          addBinaryEdge(predicateNodeCanonicalName, argumentNodeCanonicalName, "predicateArgument")
+          addBinaryEdge(predicateNodeCanonicalName, argumentNodeCanonicalName, "predicateArgument",edgeDirectionMap("predicateArgument"))
           predicateNameMap(pred.pred.name).argumentCanonicalNameList += Pair(argumentNodeCanonicalName, tempID)
           gnn_input.argumentInfoHornGraphList += new argumentInfoHronGraph(pred.pred.name, tempID,gnn_input.GNNNodeID-1)
           tempID += 1
@@ -205,3 +232,4 @@ class DrawLayerHornGraph(file: String, simpClauses: Clauses, hints: Verification
 
 
 }
+
