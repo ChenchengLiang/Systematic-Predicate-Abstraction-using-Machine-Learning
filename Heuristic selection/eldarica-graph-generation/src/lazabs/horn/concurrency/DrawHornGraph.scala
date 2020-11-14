@@ -57,13 +57,14 @@ object DrawHornGraph {
   }
 }
 
+
 class argumentInfoHronGraph(headName: String, ind: Int, globalIndex: Int) {
   var ID = 0
   val head = headName
   val index = ind
   val name = "argument" + ind.toString
   var score = 0
-  var bound: Pair[String, String] = ("", "")
+  var bound: Pair[String, String] = (addQuotes("None"),addQuotes("None"))
   val globalIndexInGraph = globalIndex
   var binaryOccurrenceInTemplates=0
   var constNames=Array[String]()
@@ -85,7 +86,9 @@ class Adjacency(edge_name: String, edge_number: Int) {
     ternaryEdge :+= Triple(from, to1, to2)
 }
 
-class GNNInput(simpClauses:Clauses) {
+class GNNInput(clauseCollection:ClauseInfo) {
+  val simpClauses=clauseCollection.simplifiedClause
+  val clausesInCE = clauseCollection.clausesInCounterExample
   var GNNNodeID = 0
   var hyperEdgeNodeID = 0
   var TotalNodeID = 0
@@ -97,6 +100,9 @@ class GNNInput(simpClauses:Clauses) {
   //canonical node category for layer horn graph
   var clauseHeadCanonicalID, clauseBodyCanonicalID, clauseArgCanonicalID, clauseCanonicalID, predicateNameCanonicalID,
   predicateArgumentCanonicalID, operatorUniqueID, constantUniqueID = 0
+
+  //canonical node category for both graph
+  var templateCanonicalID=0
 
   var nodeIds = Array[Int]()
   //var nodeSymbols = new ListBuffer[String]()
@@ -129,13 +135,17 @@ class GNNInput(simpClauses:Clauses) {
   var controlLocationIndices = Array[Int]()
   var falseIndices = Array[Int]()
   var argumentIndices = Array[Int]()
+  var templateIndices = Array[Int]()
+  var templateRelevanceLabel = Array[Int]()
+  var clauseIndices = Array[Int]()
   var predicateIndices = Array[Int]()
   var predicateOccurrenceInClause = Array[Int]()
+  var clausesOccurrenceInCounterExample = Array[Int]()
   var predicateStrongConnectedComponent = Array[Int]()
   var argumentInfoHornGraphList = new ListBuffer[argumentInfoHronGraph]
   var nodeNameToIDMap = MuMap[String, Int]()
 
-  val learningLabel= new FormLearningLabels(simpClauses)
+  val learningLabel= new FormLearningLabels(clauseCollection)
   val predicateOccurrenceInClauseLabel=learningLabel.getPredicateOccurenceInClauses()
   val predicateStrongConnectedComponentLabel=learningLabel.getStrongConnectedComponentPredicateList()
 
@@ -166,6 +176,9 @@ class GNNInput(simpClauses:Clauses) {
           case "guard" => guardEdges.incrementBinaryEdge(fromID, toID)
           case "data" => dataEdges.incrementBinaryEdge(fromID, toID)
           case "subTerm" => subTermEdges.incrementBinaryEdge(fromID, toID)
+          case "templateAST" => templateASTEdges.incrementBinaryEdge(fromID, toID)
+          case "template" => templateEdges.incrementBinaryEdge(fromID, toID)
+
         }
       }
     }
@@ -192,6 +205,22 @@ class GNNInput(simpClauses:Clauses) {
 
   def incrementArgumentIndicesAndNodeIds(nodeUniqueName: String, nodeClass: String, nodeName: String): Unit = {
     argumentIndices :+= GNNNodeID
+    incrementNodeIds(nodeUniqueName, nodeClass, nodeName)
+  }
+  def incrementTemplateIndicesAndNodeIds(nodeUniqueName: String, nodeClass: String, nodeName: String,hintLabel:Boolean): Unit = {
+    templateIndices :+= GNNNodeID
+    hintLabel match {
+      case true =>templateRelevanceLabel:+=1
+      case false =>templateRelevanceLabel:+=0
+    }
+    incrementNodeIds(nodeUniqueName, nodeClass, nodeName)
+  }
+  def incrementClauseIndicesAndNodeIds(nodeUniqueName: String, nodeClass: String, nodeName: String,clauseInfo:Clauses): Unit ={
+    clauseIndices :+=GNNNodeID
+    if (!clauseInfo.isEmpty && clausesInCE.contains(clauseInfo.head)) {
+      clausesOccurrenceInCounterExample :+=1
+    } else
+      clausesOccurrenceInCounterExample :+=0
     incrementNodeIds(nodeUniqueName, nodeClass, nodeName)
   }
 
@@ -288,6 +317,10 @@ class GNNInput(simpClauses:Clauses) {
         nodeSymbols :+= nodeClass + "_" + predicateArgumentCanonicalID.toString
         predicateArgumentCanonicalID += 1
       }
+      case "template" => {
+        nodeSymbols :+= nodeClass + "_" + templateCanonicalID.toString
+        templateCanonicalID += 1
+      }
       case "FALSE" => nodeSymbols :+= nodeName
       case "operator" => nodeSymbols :+= nodeName
       case "constant" => nodeSymbols :+= nodeName
@@ -296,7 +329,9 @@ class GNNInput(simpClauses:Clauses) {
   }
 }
 
-class DrawHornGraph(file: String, simpClauses: Clauses, hints: VerificationHints, argumentInfoList: ListBuffer[argumentInfo]) {
+class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: VerificationHintsInfo, argumentInfoList: ListBuffer[argumentInfo]) {
+  val simpClauses = clausesCollection.simplifiedClause
+  val clausesInCE = clausesCollection.clausesInCounterExample
   val graphType = GlobalParameters.get.hornGraphType match {
     case DrawHornGraph.HornGraphType.hyperEdgeGraph => "hyperEdgeHornGraph"
     case _ => "layerHornGraph"
@@ -307,16 +342,19 @@ class DrawHornGraph(file: String, simpClauses: Clauses, hints: VerificationHints
   var nodeShapeMap: Map[String, String] = Map()
   val constantNodeSetInOneClause = scala.collection.mutable.Map[String, String]() //map[constantName->constantNameWithCanonicalNumber]
   val argumentNodeSetInPredicates = scala.collection.mutable.Map[String, String]() //map[argumentConstantName->argumentNameWithCanonicalNumber]
-  val controlFlowNodeSetInOneClause = scala.collection.mutable.Map[String, String]()
+  val controlFlowNodeSetInOneClause = scala.collection.mutable.Map[String, String]()// predicate.name -> canonical name
   val argumentNodeSetInOneClause = scala.collection.mutable.Map[String, Array[String]]() //predicateName:String -> arguments Array[String]
   var astEdgeType = ""
-  val gnn_input = new GNNInput(simpClauses)
+  val gnn_input = new GNNInput(clausesCollection)
   val writerGraph = new PrintWriter(new File(file + "." + graphType + ".gv"))
+
+  edgeNameMap += ("templateAST"->"tAST")
+  edgeNameMap += ("template"->"template")
+  edgeDirectionMap += ("templateAST"->false)
+  edgeDirectionMap += ("template" -> false)
+  nodeShapeMap += ("template" -> "component")
+
   writerGraph.write("digraph dag {" + "\n")
-
-
-
-
 
 
   def addBinaryEdge(from: String, to: String, label: String, biDirection:Boolean=false): Unit = {
@@ -367,12 +405,16 @@ class DrawHornGraph(file: String, simpClauses: Clauses, hints: VerificationHints
           toNodeClass match {
             case "clause" => addBinaryEdge(from, to, "guard",edgeDirectionMap("guard"))
             case "clauseArgument" => addBinaryEdge(from, to, "data",edgeDirectionMap("data"))
-            case _ => addBinaryEdge(from, to, "subTerm",edgeDirectionMap("subTerm"))
+            case _ => {
+              astEdgeType match {
+                case "templateAST"=>{addBinaryEdge(from, to, "templateAST",edgeDirectionMap("templateAST"))}
+                case _=>{addBinaryEdge(from, to, "subTerm",edgeDirectionMap("subTerm"))}
+              }
+            }
           }
         }
       }
     }
-
   }
 
   def drawASTBinaryRelation(op: String, previousNodeName: String, e1: IExpression, e2: IExpression): String = {
@@ -418,7 +460,7 @@ class DrawHornGraph(file: String, simpClauses: Clauses, hints: VerificationHints
 
   }
 
-  def createNode(canonicalName: String, labelName: String, className: String, shape: String): Unit = {
+  def createNode(canonicalName: String, labelName: String, className: String, shape: String, clauseLabelInfo:Clauses=Seq(),hintLabel:Boolean=false): Unit = {
     writerGraph.write(addQuotes(canonicalName) +
       " [label=" + addQuotes(labelName) + " nodeName=" + addQuotes(canonicalName) + " class=" + className + " shape=" + addQuotes(shape) + "];" + "\n")
     className match {
@@ -426,6 +468,8 @@ class DrawHornGraph(file: String, simpClauses: Clauses, hints: VerificationHints
       case "CONTROL" => gnn_input.incrementControlLocationIndicesAndNodeIds(canonicalName, className, labelName)
       case "predicateName" => gnn_input.incrementPredicateIndicesAndNodeIds(canonicalName, className, labelName)
       case "FALSE" => gnn_input.incrementFalseIndicesAndNodeIds(canonicalName, className, labelName)
+      case "template"=>gnn_input.incrementTemplateIndicesAndNodeIds(canonicalName, className, labelName,hintLabel)
+      case "clause"=> gnn_input.incrementClauseIndicesAndNodeIds(canonicalName, className, labelName,clauseLabelInfo)
       case _ => gnn_input.incrementNodeIds(canonicalName, className, labelName)
     }
   }
@@ -499,6 +543,13 @@ class DrawHornGraph(file: String, simpClauses: Clauses, hints: VerificationHints
     writeGNNInputFieldToJSONFile("nodeSymbolList", StringArray(gnn_input.nodeSymbols), writer, lastFiledFlag)
     writeGNNInputFieldToJSONFile("falseIndices", IntArray(gnn_input.falseIndices), writer, lastFiledFlag)
     writeGNNInputFieldToJSONFile("argumentIndices", IntArray(argumentIndicesList.toArray), writer, lastFiledFlag)
+    writeGNNInputFieldToJSONFile("argumentBoundList", PairStringArray(argumentBoundList.toArray), writer, lastFiledFlag)
+    writeGNNInputFieldToJSONFile("argumentBinaryOccurrenceList", IntArray(argumentBinaryOccurrenceList.toArray), writer, lastFiledFlag)
+    writeGNNInputFieldToJSONFile("argumentOccurrence", IntArray(argumentOccurrenceList.toArray), writer, lastFiledFlag)
+    writeGNNInputFieldToJSONFile("templateIndices", IntArray(gnn_input.templateIndices), writer, lastFiledFlag)
+    writeGNNInputFieldToJSONFile("templateRelevanceLabel", IntArray(gnn_input.templateRelevanceLabel), writer, lastFiledFlag)
+    writeGNNInputFieldToJSONFile("clauseIndices", IntArray(gnn_input.clauseIndices), writer, lastFiledFlag)
+    writeGNNInputFieldToJSONFile("clauseBinaryOccurrenceInCounterExampleList", IntArray(gnn_input.clausesOccurrenceInCounterExample), writer, lastFiledFlag)
     writeGNNInputFieldToJSONFile("controlLocationIndices", IntArray(gnn_input.controlLocationIndices), writer, lastFiledFlag)
     writeGNNInputFieldToJSONFile("binaryAdjacentList", PairArray(gnn_input.binaryAdjacency.binaryEdge), writer, lastFiledFlag)
     writeGNNInputFieldToJSONFile("ternaryAdjacencyList", TripleArray(gnn_input.ternaryAdjacency.ternaryEdge), writer, lastFiledFlag)
@@ -529,10 +580,8 @@ class DrawHornGraph(file: String, simpClauses: Clauses, hints: VerificationHints
         writeGNNInputFieldToJSONFile("dataEdges", PairArray(gnn_input.dataEdges.binaryEdge), writer, lastFiledFlag)
       }
     }
-    writeGNNInputFieldToJSONFile("argumentBoundList", PairStringArray(argumentBoundList.toArray), writer, lastFiledFlag)
-    writeGNNInputFieldToJSONFile("argumentBinaryOccurrenceList", IntArray(argumentBinaryOccurrenceList.toArray), writer, lastFiledFlag)
     lastFiledFlag = true
-    writeGNNInputFieldToJSONFile("argumentOccurrence", IntArray(argumentOccurrenceList.toArray), writer, lastFiledFlag)
+    writeGNNInputFieldToJSONFile("dummyFiled", IntArray(Array[Int]()), writer, lastFiledFlag)
     writer.write("}")
     writer.close()
   }
@@ -660,13 +709,12 @@ class DrawHornGraph(file: String, simpClauses: Clauses, hints: VerificationHints
   }
   def drawTemplates(pre:Predicate): List[String] ={
     var templateNameList:List[String]=List()
-    for((hp,templates)<-hints.predicateHints) if(hp.name==pre.name &&hp.arity==pre.arity){
-      var templateCounter=0
+    for((hp,templates)<-hints.initialHints.predicateHints) if(hp.name==pre.name &&hp.arity==pre.arity){
       for (t<-templates){
-        val templateNodeName=templateNodePrefix+templateCounter.toString
+        val templateNodeName=templateNodePrefix+gnn_input.templateCanonicalID.toString
         templateNameList:+=templateNodeName
-        createNode(templateNodeName,templateNodeName,"template",nodeShapeMap("template"))
-        templateCounter+=1
+        val hintLabel = if (hints.positiveHints.predicateHints.keySet.contains(hp) && hints.positiveHints.predicateHints(hp).contains(t)) true else false
+        createNode(templateNodeName,templateNodeName,"template",nodeShapeMap("template"),hintLabel=hintLabel)
         t match {
           case VerifHintInitPred(e)=>{
             drawAST(e,templateNodeName)
@@ -676,6 +724,13 @@ class DrawHornGraph(file: String, simpClauses: Clauses, hints: VerificationHints
       }
     }
     templateNameList
+  }
+
+  def updateArgumentInfoHornGraphList(pre:String,tempID:Int,argumentnodeName:String,arg:ITerm): Unit ={
+    val localArgInfo=new argumentInfoHronGraph(pre, tempID,gnn_input.GNNNodeID-1)
+    localArgInfo.canonicalName=argumentnodeName
+    localArgInfo.constNames:+=arg.toString
+    gnn_input.argumentInfoHornGraphList += localArgInfo
   }
 
 }

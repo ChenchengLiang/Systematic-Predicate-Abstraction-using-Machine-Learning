@@ -70,7 +70,7 @@ import HornPredAbs.RelationSymbol
 import lazabs.horn.abstractions._
 import AbstractionRecord.AbstractionMap
 import ap.terfor.conjunctions.Conjunction
-import lazabs.horn.concurrency.HintsSelection.initialIDForHints
+import lazabs.horn.concurrency.HintsSelection.{getClausesInCounterExamples, initialIDForHints}
 import lazabs.horn.concurrency._
 
 import scala.collection.immutable.ListMap
@@ -492,17 +492,17 @@ object TrainDataGeneratorPredicatesSmt2 {
           if (selectedPredicates.isEmpty) {
 
           } else {
-            //todo:form argument occurrence label
-            //todo: form template relevant filter label
-
+            val hintsCollection=new VerificationHintsInfo(initialPredicates,selectedPredicates,initialPredicates.filterPredicates(selectedPredicates.predicateHints.keySet))
+            val clausesInCE=getClausesInCounterExamples(test,simplifiedClauses)
+            val clauseCollection = new ClauseInfo(simplifiedClauses,clausesInCE)
             //Output graphs
             val argumentList = (for (p <- HornClauses.allPredicates(simplifiedClauses)) yield (p, p.arity)).toList
-            val argumentInfo = HintsSelection.writeArgumentScoreToFile(GlobalParameters.get.fileName, argumentList, selectedPredicates,countOccurrence=true)
+            val argumentInfo = HintsSelection.writeArgumentOccurrenceInHintsToFile(GlobalParameters.get.fileName, argumentList, selectedPredicates,countOccurrence=true)
             //val argumentInfo = HintsSelection.getArgumentBoundForSmt(argumentList,disjunctive,simplifiedClauses,simpHints,predGenerator)
-            val hyperedgeHornGraph = new DrawHyperEdgeHornGraph(GlobalParameters.get.fileName, simplifiedClauses, selectedPredicates,argumentInfo)
-            GlobalParameters.get.hornGraphType=HornGraphType.biDirectionLayerGraph
-            val layerHornGraph= new DrawLayerHornGraph(GlobalParameters.get.fileName, simplifiedClauses, selectedPredicates,argumentInfo)
-
+            GlobalParameters.get.hornGraphType=HornGraphType.hyperEdgeGraph
+            val hyperedgeHornGraph = new DrawHyperEdgeHornGraph(GlobalParameters.get.fileName, clauseCollection, hintsCollection,argumentInfo)
+            GlobalParameters.get.hornGraphType=HornGraphType.hybridDirectionLayerGraph
+            val layerHornGraph= new DrawLayerHornGraph(GlobalParameters.get.fileName, clauseCollection, hintsCollection,argumentInfo)
 
             //val filePath=GlobalParameters.get.fileName.substring(0,GlobalParameters.get.fileName.lastIndexOf("/")+1)
 

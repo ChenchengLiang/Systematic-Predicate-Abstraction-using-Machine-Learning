@@ -312,13 +312,15 @@ class VerificationLoop(system : ParametricEncoder.System,
         //writeHintsWithIDToFile(InitialHintsWithID, fileName, "initial")//write hints and their ID to file
         HintsSelection.writeSMTFormatToFile(simpClauses,GlobalParameters.get.fileName)  //write smt2 format to file
         val argumentList=(for (p <- HornClauses.allPredicates(simpClauses)) yield (p, p.arity)).toList
-        //val argumentInfo = HintsSelection.writeArgumentScoreToFile(GlobalParameters.get.fileName,argumentList,optimizedHints,countOccurrence = false)
+        //val argumentInfo = HintsSelection.writeArgumentOccurrenceInHintsToFile(GlobalParameters.get.fileName,argumentList,optimizedHints,countOccurrence = false)
         val argumentInfo = HintsSelection.getArgumentBound(argumentList,simpPredAbs.argumentBounds)
+        val emptyHintsCollection=new VerificationHintsInfo(VerificationHints(Map()),VerificationHints(Map()),VerificationHints(Map()))
+        val clauseCollection = new ClauseInfo(simpClauses,Seq())
         GlobalParameters.get.hornGraphType match {
           case HornGraphType.hyperEdgeGraph=>
-            val hyperedgeHornGraph = new DrawHyperEdgeHornGraph(GlobalParameters.get.fileName, simpClauses, optimizedHints,argumentInfo)
+            val hyperedgeHornGraph = new DrawHyperEdgeHornGraph(GlobalParameters.get.fileName, clauseCollection, emptyHintsCollection,argumentInfo)
           case _=>
-            val layerHornGraph= new DrawLayerHornGraph(GlobalParameters.get.fileName, simpClauses, optimizedHints,argumentInfo)
+            val layerHornGraph= new DrawLayerHornGraph(GlobalParameters.get.fileName, clauseCollection, emptyHintsCollection,argumentInfo)
         }
         sys.exit()
       }

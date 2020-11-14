@@ -17,14 +17,17 @@ import shutil
 
 def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",
                     split_flag=False,buckets=10,from_json=False,json_type=".JSON",form_label=False,GPU=False,pickle=True):
+    graph_type=json_type[1:json_type.find(".JSON")]
+    print("graph_type",graph_type)
     nodeFeatureDim = 64 #64
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
+    parameters['graph_type'] = graph_type  # hyperEdgeHornGraph or layerHornGraph
     #parameters["message_calculation_class"]="rgcn"#rgcn,ggnn,rgat
     #parameters['num_heads'] = 2
     parameters['hidden_dim'] = 64 #64
     parameters['num_layers'] = 2
     parameters['node_label_embedding_size'] = nodeFeatureDim
-    parameters['max_nodes_per_batch']=500000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
+    parameters['max_nodes_per_batch']=50000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
     parameters['regression_hidden_layer_size'] = [64,64,64,64]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
@@ -49,12 +52,12 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         if force_read==True:
             write_graph_to_pickle(benchmark_name,  data_fold=["train", "valid", "test"],
                                   label=label,path=path,from_json=from_json,
-                                  file_type=file_type,json_type=json_type,max_nodes_per_batch=parameters['max_nodes_per_batch'])
+                                  file_type=file_type,json_type=json_type,max_nodes_per_batch=parameters['max_nodes_per_batch'],graph_type=graph_type)
         else:
             print("Use pickle data for training")
         #if form_label == True and not os.path.isfile("../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):
         if form_label == True:
-            form_GNN_inputs_and_labels(label=label, datafold=["train", "valid", "test"], benchmark=benchmark_name)
+            form_GNN_inputs_and_labels(label=label, datafold=["train", "valid", "test"], benchmark=benchmark_name,graph_type=graph_type)
         else:
             print("Use label in pickle data for training")
     elif pickle==False:
@@ -78,13 +81,14 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     best_valid_epoch_average = []
     accuracy_average=[]
     model=None
+
     for n in range(train_n_times): # train n time to get average performance, default is one
         # initial different models by different training task
         if label == "argument_identify" or label == "control_location_identify" or label == "argument_identify_no_batchs": #all nodes binary classification task
             model = InvariantNodeIdentifyTask(parameters, dataset)
         elif label=="predicate_occurrence_in_clauses" or label=="argument_lower_bound" or label=="argument_upper_bound":#gathered nodes single output regression task
             model = InvariantArgumentSelectionTask(parameters, dataset)
-        elif label=="predicate_occurrence_in_SCG" or label=="argument_lower_bound_existence" or label=="argument_upper_bound_existence": #gathered nodes binary classification task
+        elif label=="predicate_occurrence_in_SCG" or label=="argument_lower_bound_existence" or label=="argument_upper_bound_existence" or label=="argument_occurrence_binary" or label=="template_relevance": #gathered nodes binary classification task
             model = InvariantNodeIdentifyTask(parameters, dataset)
         elif label=="argument_bound": #gathered nodes two outputs regression task
             patience=max_epochs
@@ -168,40 +172,42 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         valid_loss_average.append(valid_loss_list[-1])
         best_valid_epoch_average.append(best_valid_epoch)
 
-
-    #get aberage training performance
-    train_loss_list_average=np.mean(train_loss_list_average,axis=0)
-    valid_loss_list_average=np.mean(valid_loss_list_average,axis=0)
-    test_loss_list_average=np.mean(test_loss_list_average,axis=0)
-    mean_loss_list_average=np.mean(mean_loss_list)
-    mse_loaded_model_average=np.mean(mse_loaded_model)
-    train_loss_average=np.mean(train_loss_average)
-    valid_loss_average=np.mean(valid_loss_average)
-    best_valid_epoch_average=np.mean(best_valid_epoch_average)
-    mean_accuracy=np.mean(accuracy_average)
-    write_accuracy_to_log(label, benchmark_name, accuracy_average,best_valid_epoch_average)
-    #visualize results
-    draw_training_results(train_loss_list_average, valid_loss_list_average,test_loss_list_average, mean_loss_list_average,
+    # get aberage training performance
+    train_loss_list_average = np.mean(train_loss_list_average, axis=0)
+    valid_loss_list_average = np.mean(valid_loss_list_average, axis=0)
+    test_loss_list_average = np.mean(test_loss_list_average, axis=0)
+    mean_loss_list_average = np.mean(mean_loss_list)
+    mse_loaded_model_average = np.mean(mse_loaded_model)
+    train_loss_average = np.mean(train_loss_average)
+    valid_loss_average = np.mean(valid_loss_average)
+    best_valid_epoch_average = np.mean(best_valid_epoch_average)
+    mean_accuracy = np.mean(accuracy_average)
+    write_accuracy_to_log(label, benchmark_name, accuracy_average, best_valid_epoch_average, graph_type)
+    # visualize results
+    draw_training_results(train_loss_list_average, valid_loss_list_average, test_loss_list_average,
+                          mean_loss_list_average,
                           mse_loaded_model_average, valid_loss_list, true_Y, predicted_Y_loaded_model, label,
-                          benchmark_name)
-    write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss_average,
-                               valid_loss_average, mse_loaded_model, mean_loss_list,accuracy_average,best_valid_epoch_average,
-                               benchmark=benchmark_name,label=label)
+                          benchmark_name, graph_type)
+    write_train_results_to_log(dataset, predicted_Y_loaded_model, train_loss_average,
+                               valid_loss_average, mse_loaded_model, mean_loss_list, accuracy_average,
+                               best_valid_epoch_average,
+                               benchmark=benchmark_name, label=label, graph_type=graph_type)
 
 
-
-def write_accuracy_to_log(label,benchmark,accuracy_list,best_valid_epoch_list):
+def write_accuracy_to_log(label, benchmark, accuracy_list, best_valid_epoch_list, graph_type):
     mean_accuracy = np.mean(accuracy_list)
     best_valid_epoch_average = np.mean(best_valid_epoch_list)
-    with open("trained_model/" + label + "-" + benchmark + ".log", 'w') as out_file:
+    with open("trained_model/" + label + "-" + graph_type + "-" + benchmark + ".log", 'w') as out_file:
         out_file.write("accuracy_list:" + str(accuracy_list) + "\n")
         out_file.write("accuracy mean:" + str(mean_accuracy) + "\n")
         out_file.write("best_valid_epoch_list:" + str(best_valid_epoch_list) + "\n")
         out_file.write("best_valid_epoch_average:" + str(best_valid_epoch_average) + "\n")
 
 
-def draw_training_results(train_loss_list_average,valid_loss_list_average,test_loss_list_average,mean_loss_list_average,
-                          mse_loaded_model_average,valid_loss_list,true_Y,predicted_Y_loaded_model,label,benchmark_name):
+def draw_training_results(train_loss_list_average, valid_loss_list_average, test_loss_list_average,
+                          mean_loss_list_average,
+                          mse_loaded_model_average, valid_loss_list, true_Y, predicted_Y_loaded_model, label,
+                          benchmark_name, graph_type):
     # mse on train, validation,test,mean
     plt.plot(train_loss_list_average, color="blue")
     plt.plot(valid_loss_list_average, color="green")
@@ -214,14 +220,14 @@ def draw_training_results(train_loss_list_average,valid_loss_list_average,test_l
     mean_loss_legend = mpatches.Patch(color='red', label='mean_loss')
     test_loss_legend = mpatches.Patch(color='black', label='test_loss')
     plt.legend(handles=[train_loss_legend, valid_loss_legend, mean_loss_legend, test_loss_legend])
-    plt.savefig("trained_model/" + label + "-" + benchmark_name + ".png")
+    plt.savefig("trained_model/" + label + "-" + graph_type + "-" + benchmark_name + ".png")
     plt.clf()
     # plt.show()
 
     # scatter on true y and predicted y
     a = plt.axes(aspect='equal')
-    if label=="predicate_occurrence_in_SCG" or label=="argument_identify" or label=="argument_lower_bound_existence" or label=="argument_upper_bound_existence":
-        predicted_Y_loaded_model=tf.math.round(predicted_Y_loaded_model)
+    if label == "predicate_occurrence_in_SCG" or label == "argument_identify" or label == "argument_lower_bound_existence" or label == "argument_upper_bound_existence" or label == "argument_occurrence_binary" or label == "template_relevance":
+        predicted_Y_loaded_model = tf.math.round(predicted_Y_loaded_model)
     plt.scatter(true_Y, predicted_Y_loaded_model)
     plt.xlabel('True Values')
     plt.ylabel('Predictions')
@@ -248,60 +254,65 @@ def draw_training_results(train_loss_list_average,valid_loss_list_average,test_l
     plt.xlim(lims)
     plt.ylim(lims)
     _ = plt.plot(lims, lims)
-    plt.savefig("trained_model/" + label + "-" + benchmark_name + "-scatter.png")
+    plt.savefig("trained_model/" + label + "-" + graph_type + "-" + benchmark_name + "-scatter.png")
     plt.clf()
 
     # error distribution on true y and predicted y
-    if np.min(predicted_Y_loaded_model)==float("-inf") or np.max(predicted_Y_loaded_model)==float("inf") or np.min(true_Y)==float("-inf") or np.max(true_Y)==float("inf"):
+    if np.min(predicted_Y_loaded_model) == float("-inf") or np.max(predicted_Y_loaded_model) == float("inf") or np.min(
+            true_Y) == float("-inf") or np.max(true_Y) == float("inf"):
         pass
     else:
         error = predicted_Y_loaded_model - true_Y
         plt.hist(error, bins=25)
         plt.xlabel("Prediction Error [occurence]")
         _ = plt.ylabel("Count")
-        plt.savefig("trained_model/" + label + "-" + benchmark_name + "-error-distribution.png")
+        plt.savefig("trained_model/" + label + "-" + graph_type + "-" + benchmark_name + "-error-distribution.png")
         plt.clf()
 
-def write_train_results_to_log(dataset,predicted_Y_loaded_model,train_loss,valid_loss,mse_loaded_model_list,mean_loss_list,accuracy_list,
-                               best_valid_epoch,benchmark="unknown",label="rank"):
+
+def write_train_results_to_log(dataset, predicted_Y_loaded_model, train_loss, valid_loss, mse_loaded_model_list,
+                               mean_loss_list, accuracy_list,
+                               best_valid_epoch, benchmark="unknown", label="rank", graph_type="hyperEdgeHornGraph"):
     mean_loss_list_average = np.mean(mean_loss_list)
     mse_loaded_model_average = np.mean(mse_loaded_model_list)
     mean_accuracy = np.mean(accuracy_list)
-    with open("trained_model/"+label+"-"+benchmark+".log", 'w') as out_file:
+    with open("trained_model/" + label + "-" + graph_type + "-" + benchmark + ".log", 'w') as out_file:
         out_file.write("best_valid_epoch:" + str(best_valid_epoch) + "\n")
-        out_file.write("train loss:"+ str(train_loss)+"\n")
-        out_file.write("valid loss:"+ str(valid_loss)+"\n")
+        out_file.write("train loss:" + str(train_loss) + "\n")
+        out_file.write("valid loss:" + str(valid_loss) + "\n")
         out_file.write("test loss list:" + str(mse_loaded_model_list) + "\n")
-        out_file.write("mean test loss:"+ str(mse_loaded_model_average)+"\n")
+        out_file.write("mean test loss:" + str(mse_loaded_model_average) + "\n")
 
         out_file.write("mean loss list:" + str(mean_loss_list) + "\n")
-        out_file.write("mean mean loss:"+ str(mean_loss_list_average)+"\n")
+        out_file.write("mean mean loss:" + str(mean_loss_list_average) + "\n")
 
         out_file.write("accuracy list:" + str(accuracy_list) + "\n")
         out_file.write("mean accuracy:" + str(mean_accuracy) + "\n")
 
-        predicted_argument_lists=get_predicted_label_list_divided_by_file(dataset, predicted_Y_loaded_model)
-        mse_list=[]
-        for predicted_label, arguments, file_name in zip(predicted_argument_lists,dataset._label_list["test"],dataset._file_list["test"]):
-            out_file.write("-------"+ "\n")
+        predicted_argument_lists = get_predicted_label_list_divided_by_file(dataset, predicted_Y_loaded_model)
+        mse_list = []
+        for predicted_label, arguments, file_name in zip(predicted_argument_lists, dataset._label_list["test"],
+                                                         dataset._file_list["test"]):
+            out_file.write("-------" + "\n")
             out_file.write(file_name + "\n")
-            out_file.write("true label:"+ str(arguments)+ "\n")
-            out_file.write("true label rank:"+ str(ss.rankdata(arguments,method="dense"))+ "\n")
-            out_file.write("predicted label:"+ str(predicted_label)+ "\n")
+            out_file.write("true label:" + str(arguments) + "\n")
+            out_file.write("true label rank:" + str(ss.rankdata(arguments, method="dense")) + "\n")
+            out_file.write("predicted label:" + str(predicted_label) + "\n")
             out_file.write("rounded label:" + str(tf.math.round(predicted_label)) + "\n")
-            out_file.write("predicted label rank:"+ str(ss.rankdata(tf.math.round(predicted_label),method="dense"))+ "\n")
-            mse=tf.keras.losses.MSE(arguments,predicted_label)
+            out_file.write(
+                "predicted label rank:" + str(ss.rankdata(tf.math.round(predicted_label), method="dense")) + "\n")
+            mse = tf.keras.losses.MSE(arguments, predicted_label)
             out_file.write("mse:" + str(mse) + "\n")
             mse_list.append(mse)
 
-        out_file.write("-------"+ "\n")
+        out_file.write("-------" + "\n")
         out_file.write("mean(mse_list):" + str(np.mean(mse_list)) + "\n")
         plt.xlabel('graph number')
         plt.ylabel('mse of predicted label')
-        plt.plot(mse_list,label="predicted_data_mse")
-        plt.plot([mean_loss_list_average]*len(mse_list),label="mean_mse")
+        plt.plot(mse_list, label="predicted_data_mse")
+        plt.plot([mean_loss_list_average] * len(mse_list), label="mean_mse")
         plt.legend()
-        plt.savefig("trained_model/" + label + "-" + benchmark + "-test-mse.png")
+        plt.savefig("trained_model/" + label + "-" + graph_type + "-" + benchmark + "-test-mse.png")
         plt.clf()
 
 
@@ -323,15 +334,6 @@ class raw_graph_inputs():
         self.vocabulary_set=set()
         self.token_map={}
 
-
-# def read_graph_from_pickle_file(benchmark,force_read=False, data_fold=["train","valid","test"],label="rank",path="../",file_type=".smt2",json_type=".JSON",from_json=True):
-#     benchmark_name=benchmark.replace("/", "-")
-#     if os.path.isfile("../pickleData/"+label+"-"+benchmark_name+"-gnnInput_train_data.txt") and force_read==False:
-#         print("read existed training data")
-#
-#     else:
-#         write_graph_to_pickle(benchmark, data_fold=data_fold, label=label, path=path, from_json=from_json, file_type=file_type, json_type=json_type)
-
 class parsed_graph_data:
     def __init__(self,graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
                  graphs_argument_scores,total_number_of_node,graph_control_location_indices,file_name_list,parsed_arguments,
@@ -350,7 +352,7 @@ class parsed_graph_data:
         self.graphs_predicate_indices=graphs_predicate_indices
         self.graphs_learning_labels=graphs_learning_labels
 
-def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../",from_json=False,file_type=".smt2",json_type=".JSON",max_nodes_per_batch=10000):
+def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../",from_json=False,file_type=".smt2",json_type=".JSON",max_nodes_per_batch=10000,graph_type="hyperEdgeHornGraph"):
     vocabulary_set, token_map = build_vocabulary(datafold=["train", "valid", "test"], path=path,json_type=json_type)
     benchmark_name = benchmark.replace("/", "-")
     for df in data_fold:
@@ -420,6 +422,13 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                             graphs_learning_labels.append(loaded_graph["argumentBoundList"])
                         elif label=="control_location_identify":
                             graphs_control_location_indices.append(loaded_graph["controlLocationIndices"])
+                        elif label=="argument_occurrence_binary":
+                            graphs_argument_indices.append(loaded_graph["argumentIndices"])
+                            graphs_learning_labels.append(loaded_graph["argumentBinaryOccurrenceList"])
+                        elif label=="template_relevance":
+                            graphs_predicate_indices.append(loaded_graph["templateIndices"])
+                            graphs_learning_labels.append(loaded_graph["templateRelevanceLabel"])
+
                         else:
                             graphs_argument_indices.append(loaded_graph["argumentIndices"])
                             # read argument from JSON file
@@ -440,7 +449,6 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                                 np.array(loaded_graph["dataFlowHyperEdges"]),
                                 np.array(loaded_graph["ternaryAdjacencyList"])
                             ])
-
                         else:
                             #for layer horn graph
                             graphs_adjacency_lists.append([
@@ -466,15 +474,15 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
         pickle_data=parsed_graph_data(graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
                                       graphs_argument_scores,total_number_of_node,graphs_control_location_indices,file_name_list,
                                       parsed_arguments,graphs_node_symbols,graphs_predicate_indices,graphs_learning_labels,vocabulary_set, token_map)
-        pickleWrite(pickle_data, "train-" + benchmark_name + "-gnnInput_" + df + "_data")
+        pickleWrite(pickle_data, "train-" +label+"-"+ graph_type +"-"+benchmark_name + "-gnnInput_" + df + "_data")
 
 
-def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "test"], benchmark=""):
+def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "test"], benchmark="",graph_type="hyperEdgeHornGraph"):
     print("form labels")
     benchmark_name = benchmark.replace("/", "-")
     for df in datafold:
-        parsed_dot_file = pickleRead("train-" + benchmark_name + "-gnnInput_" + df + "_data")
-        if label == "predicate_occurrence_in_clauses" or label == "predicate_occurrence_in_SCG" or label=="argument_bound" or label=="argument_lower_bound_existence" or label=="argument_upper_bound_existence" or label=="argument_lower_bound" or label=="argument_upper_bound":
+        parsed_dot_file = pickleRead("train-" +label+"-"+ graph_type +"-"+benchmark_name + "-gnnInput_" + df + "_data")
+        if label == "predicate_occurrence_in_clauses" or label == "predicate_occurrence_in_SCG" or label=="argument_bound" or label=="argument_lower_bound_existence" or label=="argument_upper_bound_existence" or label=="argument_lower_bound" or label=="argument_upper_bound" or label=="argument_occurrence_binary" or label=="template_relevance":
             form_predicate_occurrence_related_label_graph_sample(parsed_dot_file.graphs_node_label_ids,
                                                                     parsed_dot_file.graphs_node_symbols,
                                                                     parsed_dot_file.graphs_adjacency_lists,
@@ -484,7 +492,7 @@ def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "
                                                                     parsed_dot_file.file_name_list, benchmark, df,
                                                                     parsed_dot_file.graphs_argument_indices,
                                                                     parsed_dot_file.graphs_predicate_indices,
-                                                                    parsed_dot_file.graphs_learning_labels,label)
+                                                                    parsed_dot_file.graphs_learning_labels,label,graph_type)
 
         else:
             form_horn_graph_samples(parsed_dot_file.graphs_node_label_ids, parsed_dot_file.graphs_node_symbols,
@@ -492,7 +500,7 @@ def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "
                                     parsed_dot_file.graphs_argument_scores, parsed_dot_file.total_number_of_node,
                                     parsed_dot_file.graphs_control_location_indices, parsed_dot_file.file_name_list,
                                     parsed_dot_file.graphs_predicate_indices, parsed_dot_file.graphs_learning_labels,
-                                    label, parsed_dot_file.vocabulary_set, parsed_dot_file.token_map, benchmark, df)
+                                    label, parsed_dot_file.vocabulary_set, parsed_dot_file.token_map, benchmark, df,graph_type)
 def get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,vocabulary_set,token_map):
     raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists[0]),
                                       total_number_of_node)  # graphs_adjacency_lists[0] means the first graph's adjacency_list
@@ -515,11 +523,13 @@ def get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,voca
 def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,graphs_node_symbols,
                                                             graphs_adjacency_lists,total_number_of_node,
                                                             vocabulary_set,token_map,file_name_list,benchmark,df,
-                                                            graphs_argument_indices,graphs_predicate_indices,graphs_learning_labels,label,pickle=True):
+                                                            graphs_argument_indices,graphs_predicate_indices,graphs_learning_labels,label,graph_type,pickle=True):
     final_graphs=[]
     raw_data_graph=get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,vocabulary_set,token_map)
-    if label=="predicate_occurrence_in_SCG" or label=="predicate_occurrence_in_clauses":
+    if label=="predicate_occurrence_in_SCG" or label=="predicate_occurrence_in_clauses" or label=="template_relevance":
         graphs_node_indices=graphs_predicate_indices
+    elif label=="argument_occurrence_binary":
+        graphs_node_indices = graphs_argument_indices
     elif label=="argument_bound":
         graphs_node_indices = graphs_argument_indices
         for one_graph_learning_labels in graphs_learning_labels: #transform "None" to infinity
@@ -603,6 +613,9 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
         #         print("\n node_indices ", len(node_indices))
         #         print("learning_labels", len(learning_labels))
 
+        print("node_indices",node_indices)
+        print("learning_labels",learning_labels)
+
         final_graphs.append(
             HornGraphSample(
                 adjacency_lists=adjacency_lists,
@@ -614,7 +627,7 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
         raw_data_graph.label_size += len(learning_labels)
     raw_data_graph.final_graphs = final_graphs.copy()
     if pickle==True:
-        pickleWrite(raw_data_graph, label + "-" + benchmark + "-gnnInput_" + df + "_data")
+        pickleWrite(raw_data_graph, label +"-"+graph_type+ "-" + benchmark + "-gnnInput_" + df + "_data")
     return raw_data_graph
 
 
@@ -658,7 +671,7 @@ def form_argument_bound_label(graphs_argument_indices, graphs_learning_labels, g
 def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_argument_indices, graphs_adjacency_lists,
                             graphs_argument_scores, total_number_of_node,graphs_control_location_indices, file_name_list,
                             graphs_predicate_indices,graphs_learning_labels,
-                            label,vocabulary_set,token_map,benchmark, df,pickle=True):
+                            label,vocabulary_set,token_map,benchmark, df,graph_type,pickle=True,):
     final_graphs_v1 = []
     raw_data_graph = get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,vocabulary_set,token_map)
 
@@ -787,7 +800,7 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
                 pass
     raw_data_graph.final_graphs = final_graphs_v1.copy()
     if pickle == True:
-        pickleWrite(raw_data_graph, label + "-" + benchmark + "-gnnInput_" + df + "_data")
+        pickleWrite(raw_data_graph, label +"-" +graph_type+"-" + benchmark + "-gnnInput_" + df + "_data")
     print("total_label",total_label)
     print("total_nodes",total_nodes)
     return raw_data_graph
@@ -808,6 +821,7 @@ def build_vocabulary(datafold=["train", "valid", "test"], path="",json_type=".la
     vocabulary_set=set(["unknown"])
     for fold in datafold:
         for json_file in glob.glob(path+fold+"_data/*"+json_type):
+            print(json_file)
             with open(json_file) as f:
                 loaded_graph = json.load(f)
                 vocabulary_set.update(loaded_graph["nodeSymbolList"])

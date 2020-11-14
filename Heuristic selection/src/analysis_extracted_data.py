@@ -304,7 +304,7 @@ def unique_names(rootdir):
             count += 1
 
 
-def generate_JSON_field(rootdir,json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph"):
+def generate_JSON_field(rootdir,json_file_type=".layerHornGraph.JSON",eldarica_parameters="-getHornGraph"):
     for root, subdirs, files in os.walk(rootdir):
         if len(subdirs)==1 and subdirs[0]=="wrong_extracted_cases":
             os.rmdir(root+"/wrong_extracted_cases")
@@ -335,7 +335,7 @@ def generate_JSON_field(rootdir,json_file_type=".layerHornGraph.JSON",graph_type
                     loaded_graph = json.load(f)
                     for field in old_field:
                         json_obj[field] = loaded_graph[field]
-                eld = subprocess.Popen(["../eldarica-graph-generation/eld",file,graph_type], stdout=subprocess.DEVNULL,
+                eld = subprocess.Popen(["../eldarica-graph-generation/eld",file,eldarica_parameters], stdout=subprocess.DEVNULL,
                                        shell=False)
                 eld.wait()
                 #add more field
@@ -402,11 +402,45 @@ def add_horn_graph_json_file(rootdir,graph_type="-getHornGraph",json_file_type="
                     #     copy(f,"../benchmarks/memory_problem_cases/")
                     #     os.remove(f)
 
+
+def separateDatasetToFold(path):
+    file_list=[]
+    for (dirpath, dirnames, filenames) in os.walk(path):
+        file_list += [os.path.join(dirpath, file) for file in filenames]
+    random.shuffle(file_list)
+    print("file_list",len(file_list))
+    directory = path+"-datafold"
+    data_fold_folder_list=[os.path.join(directory,"train_data"),os.path.join(directory, "valid_data"),os.path.join(directory, "test_data")]
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+        for folder in data_fold_folder_list:
+            os.makedirs(folder)
+    file_fold_list=[file_list[:int(len(file_list)/3)],file_list[int(len(file_list)/3):int(len(file_list)*2/3)],file_list[int(len(file_list)*2/3):]]
+
+    for fold_folder,file_fold in zip(data_fold_folder_list,file_fold_list):
+        print("file_fold",len(file_fold))
+        for file in file_fold:
+            copy(file,fold_folder)
+
+
+def extract_train_data(rootdir):
+    for root, subdirs, files in os.walk(rootdir):
+        if len(subdirs)==0:
+            for file in glob.glob(root+"/*.smt2"):
+                print("extracting",file)
+                eld = subprocess.Popen(["../eldarica-graph-generation/eld",file,"-extractPredicates","-noIntervals","-absTimeout:120"], stdout=subprocess.DEVNULL,
+                                       shell=False)
+                eld.wait()
+
+
+
+
+
 class parameters():
-    def __init__(self, root_dir,json_file_type,graph_type):
+    def __init__(self, root_dir,json_file_type,eldarica_parameters):
         self.root_dir=root_dir
         self.json_file_type=json_file_type
-        self.graph_type=graph_type
+        self.eldarica_parameters=eldarica_parameters
 
 def main():
     #benchmark_list.append(["../benchmarks/temp-extract/", int(545 * 0.6), int(545 * 0.2), int(545 * 0.2), ".smt2"])
@@ -436,11 +470,15 @@ def main():
     #     root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph",
     #     json_file_type=".layerHornGraph.JSON", graph_type="-getHornGraph:hybridDirectionLayerGraph")
     #parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph",json_file_type=".hyperEdgeHornGraph.JSON", graph_type="-getHornGraph:hyperEdgeGraph")
-    parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph",
-                                    json_file_type=".layerHornGraph.JSON",
-                                    graph_type="-getHornGraph:hybridDirectionLayerGraph")
-    generate_JSON_field(parameter_for_JSON.root_dir, json_file_type=parameter_for_JSON.json_file_type,
-                             graph_type=parameter_for_JSON.graph_type)
+    # parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-datafold",
+    #                                 json_file_type=".layerHornGraph.JSON",
+    #                                 eldarica_parameters="-getHornGraph:hybridDirectionLayerGraph")
+    # generate_JSON_field(parameter_for_JSON.root_dir, json_file_type=parameter_for_JSON.json_file_type,
+    #                          eldarica_parameters=parameter_for_JSON.eldarica_parameters)
+
+
+    #separateDatasetToFold("../benchmarks/LIA-lin")
+    extract_train_data("../benchmarks/LIA-lin-noInterval-trainData-datafold-templates")
 
 
 

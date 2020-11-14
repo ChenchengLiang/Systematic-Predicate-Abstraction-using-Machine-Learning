@@ -8,7 +8,9 @@ import lazabs.horn.concurrency.DrawHornGraph.addQuotes
 import lazabs.horn.preprocessor.HornPreprocessor.{Clauses, VerificationHints}
 
 
-class FormLearningLabels (simpClauses: Clauses){
+class FormLearningLabels (clauseCollection: ClauseInfo){
+  val simpClauses=clauseCollection.simplifiedClause
+  val clausesInCE=clauseCollection.clausesInCounterExample
   //hints: VerificationHints
   class predicateNodeInfo(nodeName:String,index:Int){
     val name=nodeName
@@ -26,7 +28,6 @@ class FormLearningLabels (simpClauses: Clauses){
       println
     }
   }
-
 
   def getStrongConnectedComponentPredicateList(): Map[String,Int] ={
     var nodeCounter=0
@@ -56,7 +57,6 @@ class FormLearningLabels (simpClauses: Clauses){
           " [label=" + addQuotes(bodyName)  + " shape=" + "box" + "];" + "\n")
         //add edge
         writerPredicateGraph.write(addQuotes(bodyName) + " -> " + addQuotes(headName) + "\n")
-        //for(pn<-predicateNodeList) if(pn.name==headName) pn.predecessorNameList:+=bodyName else if (pn.name==bodyName) pn.successorNameList:+=headName
         predicateName2NodeMap(headName).predecessorNameList:+=bodyName
         predicateName2NodeMap(bodyName).successorNameList:+=headName
         predicateName2NodeMap(bodyName).successorIndexList:+=predicateName2NodeMap(headName).nodeIndex
@@ -65,7 +65,6 @@ class FormLearningLabels (simpClauses: Clauses){
     writerPredicateGraph.write("}" + "\n")
     writerPredicateGraph.close()
 
-    //todo:identify circles
     //form g: Map[Int, List[Int]]
     val g = for (node<-predicateName2NodeMap.values) yield (node.nodeIndex-> node.successorIndexList)
     //find out strong connected graph
@@ -110,8 +109,6 @@ class FormLearningLabels (simpClauses: Clauses){
 
   }
 
-
-
   def getPredicateOccurenceInClauses(): Map[Predicate,Int] ={
     //form predicate head occurrence in clauses
     var predicateOccurrenceMap:Map[Predicate,Int]=(for(clause<-simpClauses;p<-clause.predicates if (p.name!="FALSE") ) yield (p->0)).toMap
@@ -123,6 +120,8 @@ class FormLearningLabels (simpClauses: Clauses){
     }
     predicateOccurrenceMap
   }
+
+
 }
 
 class TarjanRecursive {
