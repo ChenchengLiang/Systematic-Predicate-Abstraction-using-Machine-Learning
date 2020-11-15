@@ -18,6 +18,7 @@ def main():
     # label = "argument_upper_bound"
     label = "argument_occurrence_binary"
     label = "template_relevance"
+    label = "clause_occurrence_in_counter_examples_binary"
     # json_type = ".hyperEdgeHornGraph.JSON"
     # json_type = ".layerHornGraph.JSON"
     force_read = True
@@ -27,29 +28,10 @@ def main():
     GPU=False
     pickle = True
 
-    #param = parameters("../benchmarks/single_example_test/",json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_SCG")
-    #param= parameters("../benchmarks/small-dataset-trainData-datafold-hyperedge-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/small-dataset-trainData-datafold-hyperedge-graph/",json_type=".hyperEdgeHornGraph.JSON",label="predicate_occurrence_in_clauses")
-    #param = parameters("../benchmarks/small-dataset-trainData-datafold-hyperedge-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/small-dataset-trainData-datafold-hyperedge-graph/",json_type=".hyperEdgeHornGraph.JSON", label="predicate_occurrence_in_SCG")
-    #param = parameters("../benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_clauses")
-    #param = parameters("../benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_SCG")
-    #param = parameters("../benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="argument_lower_bound_existence")
-    #param = parameters("../benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="argument_lower_bound")
-    #param = parameters("../benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="argument_identify")
-    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph/",json_type=".hyperEdgeHornGraph.JSON", label="predicate_occurrence_in_clauses")
-    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_clauses")
-    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph/",json_type=".hyperEdgeHornGraph.JSON", label="predicate_occurrence_in_SCG")
-    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph/",json_type=".hyperEdgeHornGraph.JSON", label="predicate_occurrence_in_clauses")
-    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_SCG")
-    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_SCG")
-    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="argument_lower_bound_existence")
-    #parameter_list.append(parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="argument_upper_bound_existence"))
-    #parameter_list.append(parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_SCG"))
     # parameter_list.append(
     #     parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/",
     #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/",
     #                json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_clauses"))
-
-
     # parameter_list.append(
     #     parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/",
     #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/",
@@ -60,34 +42,17 @@ def main():
     #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-mono-direction-layer-graph/",
     #                json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_SCG"))
 
-
-
     parameter_list.append(
-        parameters("../benchmarks/small-dataset-datafold/",
-                   "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/small-dataset-datafold/",
-                   json_type=".hyperEdgeHornGraph.JSON", label="argument_occurrence_binary"))
+        parameters("../benchmarks/small-dataset-datafold-unsat/",
+                   "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/small-dataset-datafold-unsat/",
+                   json_type=".hyperEdgeHornGraph.JSON", label="clause_occurrence_in_counter_examples_binary"))
     parameter_list.append(
-        parameters("../benchmarks/small-dataset-datafold/",
-                   "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/small-dataset-datafold/",
-                   json_type=".layerHornGraph.JSON", label="argument_occurrence_binary"))
-
-    # parameter_list.append(
-    #     parameters("../benchmarks/small-dataset-datafold/",
-    #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/small-dataset-datafold/",
-    #                json_type=".hyperEdgeHornGraph.JSON", label="template_relevance"))
+        parameters("../benchmarks/small-dataset-datafold-unsat/",
+                   "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/small-dataset-datafold-unsat/",
+                   json_type=".layerHornGraph.JSON", label="clause_occurrence_in_counter_examples_binary"))
 
 
-    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph/",json_type=".hyperEdgeHornGraph.JSON", label="argument_lower_bound_existence")
-    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph/",json_type=".hyperEdgeHornGraph.JSON", label="argument_upper_bound_existence")
-    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="argument_lower_bound_existence")
-    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="argument_upper_bound_existence")
-    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph/",json_type=".hyperEdgeHornGraph.JSON", label="argument_lower_bound")
-    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph/",json_type=".hyperEdgeHornGraph.JSON", label="argument_upper_bound")
-    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="argument_lower_bound")
-    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="argument_upper_bound")
-    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph/",json_type=".hyperEdgeHornGraph.JSON", label="occurrence")
-    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph/",json_type=".hyperEdgeHornGraph.JSON", label="argument_identify")
-    #param = parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/","/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/",json_type=".layerHornGraph.JSON", label="argument_identify")
+
     if GPU==False:
         os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
         tf.keras.backend.clear_session()

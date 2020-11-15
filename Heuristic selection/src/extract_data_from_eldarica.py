@@ -123,14 +123,19 @@ def extract_data_pool(rootdir="../benchmarks/LIA-lin/"):
             copy_and_remove(json_file, root + "/trainData")
         for gv_file in glob.glob(root+"/*.gv"):
             copy_and_remove(gv_file, root + "/trainData")
-
-
-
-
             #copy_tree("../trainData/", root + "/trainData")
-
-
     return True
+
+def extract_train_data_unsat(file):
+    print("extracting",file)
+    eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-getLabelFromCE"], stdout=subprocess.DEVNULL,shell=False)
+    eld.wait()
+def extract_train_data_unsat_pool(filePath):
+    file_list = []
+    for (dirpath, dirnames, filenames) in os.walk(filePath):
+        file_list += [os.path.join(dirpath, file) for file in filenames]
+    pool = Pool(processes=5)
+    pool.map(extract_train_data_unsat, file_list)
 
 def main():
     # benchmark_list = ["../benchmarks/temp-extract"]
@@ -140,7 +145,8 @@ def main():
     #     #gather_all_train_data(src=benchmark,dst=benchmark+"-trainData")
     #     separate_dataset_to_train_valid_test_files(benchmark+"-trainData/",benchmark+"-trainData-datafold/")
 
-    separate_sat_unsat_dataset_pool("../benchmarks/LIA-lin-datafold/")
+    #separate_sat_unsat_dataset_pool("../benchmarks/LIA-lin-datafold/")
+    extract_train_data_unsat_pool("../benchmarks/small-dataset-datafold-unsat/")
 
     # gather_all_train_data(src="../benchmarks/temp-train-6",dst="../benchmarks/temp-train-7")
     # separate_dataset_to_train_valid_test_files("../benchmarks/temp-train-7/",

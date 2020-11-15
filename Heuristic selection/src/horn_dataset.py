@@ -17,6 +17,9 @@ import shutil
 
 def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",
                     split_flag=False,buckets=10,from_json=False,json_type=".JSON",form_label=False,GPU=False,pickle=True):
+    gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
+                                                 "argument_upper_bound_existence", "argument_occurrence_binary",
+                                                 "template_relevance", "clause_occurrence_in_counter_examples_binary"]
     graph_type=json_type[1:json_type.find(".JSON")]
     print("graph_type",graph_type)
     nodeFeatureDim = 64 #64
@@ -31,6 +34,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters['regression_hidden_layer_size'] = [64,64,64,64]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
+    parameters ["gathered_nodes_binary_classification_task"]=gathered_nodes_binary_classification_task
     max_epochs = 200
     patience = 20
     # parameters["add_self_loop_edges"]=False
@@ -57,7 +61,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             print("Use pickle data for training")
         #if form_label == True and not os.path.isfile("../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):
         if form_label == True:
-            form_GNN_inputs_and_labels(label=label, datafold=["train", "valid", "test"], benchmark=benchmark_name,graph_type=graph_type)
+            form_GNN_inputs_and_labels(label=label, datafold=["train", "valid", "test"], benchmark=benchmark_name,graph_type=graph_type,gathered_nodes_binary_classification_task=gathered_nodes_binary_classification_task)
         else:
             print("Use label in pickle data for training")
     elif pickle==False:
@@ -82,13 +86,14 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     accuracy_average=[]
     model=None
 
+
     for n in range(train_n_times): # train n time to get average performance, default is one
         # initial different models by different training task
         if label == "argument_identify" or label == "control_location_identify" or label == "argument_identify_no_batchs": #all nodes binary classification task
             model = InvariantNodeIdentifyTask(parameters, dataset)
         elif label=="predicate_occurrence_in_clauses" or label=="argument_lower_bound" or label=="argument_upper_bound":#gathered nodes single output regression task
             model = InvariantArgumentSelectionTask(parameters, dataset)
-        elif label=="predicate_occurrence_in_SCG" or label=="argument_lower_bound_existence" or label=="argument_upper_bound_existence" or label=="argument_occurrence_binary" or label=="template_relevance": #gathered nodes binary classification task
+        elif label in gathered_nodes_binary_classification_task: #gathered nodes binary classification task
             model = InvariantNodeIdentifyTask(parameters, dataset)
         elif label=="argument_bound": #gathered nodes two outputs regression task
             patience=max_epochs
@@ -187,7 +192,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     draw_training_results(train_loss_list_average, valid_loss_list_average, test_loss_list_average,
                           mean_loss_list_average,
                           mse_loaded_model_average, valid_loss_list, true_Y, predicted_Y_loaded_model, label,
-                          benchmark_name, graph_type)
+                          benchmark_name, graph_type,gathered_nodes_binary_classification_task)
     write_train_results_to_log(dataset, predicted_Y_loaded_model, train_loss_average,
                                valid_loss_average, mse_loaded_model, mean_loss_list, accuracy_average,
                                best_valid_epoch_average,
@@ -207,7 +212,7 @@ def write_accuracy_to_log(label, benchmark, accuracy_list, best_valid_epoch_list
 def draw_training_results(train_loss_list_average, valid_loss_list_average, test_loss_list_average,
                           mean_loss_list_average,
                           mse_loaded_model_average, valid_loss_list, true_Y, predicted_Y_loaded_model, label,
-                          benchmark_name, graph_type):
+                          benchmark_name, graph_type,gathered_nodes_binary_classification_task):
     # mse on train, validation,test,mean
     plt.plot(train_loss_list_average, color="blue")
     plt.plot(valid_loss_list_average, color="green")
@@ -226,7 +231,7 @@ def draw_training_results(train_loss_list_average, valid_loss_list_average, test
 
     # scatter on true y and predicted y
     a = plt.axes(aspect='equal')
-    if label == "predicate_occurrence_in_SCG" or label == "argument_identify" or label == "argument_lower_bound_existence" or label == "argument_upper_bound_existence" or label == "argument_occurrence_binary" or label == "template_relevance":
+    if label in gathered_nodes_binary_classification_task:
         predicted_Y_loaded_model = tf.math.round(predicted_Y_loaded_model)
     plt.scatter(true_Y, predicted_Y_loaded_model)
     plt.xlabel('True Values')
@@ -428,6 +433,9 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                         elif label=="template_relevance":
                             graphs_predicate_indices.append(loaded_graph["templateIndices"])
                             graphs_learning_labels.append(loaded_graph["templateRelevanceLabel"])
+                        elif label=="clause_occurrence_in_counter_examples_binary":
+                            graphs_predicate_indices.append(loaded_graph["clauseIndices"])
+                            graphs_learning_labels.append(loaded_graph["clauseBinaryOccurrenceInCounterExampleList"])
 
                         else:
                             graphs_argument_indices.append(loaded_graph["argumentIndices"])
@@ -477,12 +485,12 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
         pickleWrite(pickle_data, "train-" +label+"-"+ graph_type +"-"+benchmark_name + "-gnnInput_" + df + "_data")
 
 
-def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "test"], benchmark="",graph_type="hyperEdgeHornGraph"):
+def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "test"], benchmark="",graph_type="hyperEdgeHornGraph",gathered_nodes_binary_classification_task="gathered_nodes_binary_classification_task"):
     print("form labels")
     benchmark_name = benchmark.replace("/", "-")
     for df in datafold:
         parsed_dot_file = pickleRead("train-" +label+"-"+ graph_type +"-"+benchmark_name + "-gnnInput_" + df + "_data")
-        if label == "predicate_occurrence_in_clauses" or label == "predicate_occurrence_in_SCG" or label=="argument_bound" or label=="argument_lower_bound_existence" or label=="argument_upper_bound_existence" or label=="argument_lower_bound" or label=="argument_upper_bound" or label=="argument_occurrence_binary" or label=="template_relevance":
+        if label in gathered_nodes_binary_classification_task:
             form_predicate_occurrence_related_label_graph_sample(parsed_dot_file.graphs_node_label_ids,
                                                                     parsed_dot_file.graphs_node_symbols,
                                                                     parsed_dot_file.graphs_adjacency_lists,
@@ -526,7 +534,7 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
                                                             graphs_argument_indices,graphs_predicate_indices,graphs_learning_labels,label,graph_type,pickle=True):
     final_graphs=[]
     raw_data_graph=get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,vocabulary_set,token_map)
-    if label=="predicate_occurrence_in_SCG" or label=="predicate_occurrence_in_clauses" or label=="template_relevance":
+    if label=="predicate_occurrence_in_SCG" or label=="predicate_occurrence_in_clauses" or label=="template_relevance" or label=="clause_occurrence_in_counter_examples_binary":
         graphs_node_indices=graphs_predicate_indices
     elif label=="argument_occurrence_binary":
         graphs_node_indices = graphs_argument_indices
@@ -612,9 +620,6 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
         #             print(len(edge_type), end=" ")
         #         print("\n node_indices ", len(node_indices))
         #         print("learning_labels", len(learning_labels))
-
-        print("node_indices",node_indices)
-        print("learning_labels",learning_labels)
 
         final_graphs.append(
             HornGraphSample(
@@ -821,7 +826,6 @@ def build_vocabulary(datafold=["train", "valid", "test"], path="",json_type=".la
     vocabulary_set=set(["unknown"])
     for fold in datafold:
         for json_file in glob.glob(path+fold+"_data/*"+json_type):
-            print(json_file)
             with open(json_file) as f:
                 loaded_graph = json.load(f)
                 vocabulary_set.update(loaded_graph["nodeSymbolList"])

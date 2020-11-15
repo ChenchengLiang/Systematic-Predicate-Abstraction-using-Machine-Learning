@@ -423,7 +423,7 @@ def separateDatasetToFold(path):
             copy(file,fold_folder)
 
 
-def extract_train_data(rootdir):
+def extract_train_data_templates(rootdir):
     for root, subdirs, files in os.walk(rootdir):
         if len(subdirs)==0:
             for file in glob.glob(root+"/*.smt2"):
@@ -431,6 +431,7 @@ def extract_train_data(rootdir):
                 eld = subprocess.Popen(["../eldarica-graph-generation/eld",file,"-extractPredicates","-noIntervals","-absTimeout:120"], stdout=subprocess.DEVNULL,
                                        shell=False)
                 eld.wait()
+
 
 
 
@@ -478,7 +479,7 @@ def main():
 
 
     #separateDatasetToFold("../benchmarks/LIA-lin")
-    extract_train_data("../benchmarks/LIA-lin-noInterval-trainData-datafold-templates")
+    extract_train_data_templates("../benchmarks/LIA-lin-noInterval-trainData-datafold-templates")
 
 
 
