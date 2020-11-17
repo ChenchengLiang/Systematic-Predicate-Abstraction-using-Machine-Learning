@@ -610,16 +610,16 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
         #     print("\n node_indices ", len(node_indices))
         #     print("learning_labels", len(learning_labels))
 
-        # for edge_type in adjacency_lists:
-        #     if len(edge_type)==0 and len(tokenized_node_label_ids)<50:
-        #         print("------debug------")
-        #         print("file_name", file_name)
-        #         print("number of node", len(tokenized_node_label_ids))
-        #         print("number of edges per edge type")
-        #         for edge_type in adjacency_lists:
-        #             print(len(edge_type), end=" ")
-        #         print("\n node_indices ", len(node_indices))
-        #         print("learning_labels", len(learning_labels))
+        for edge_type in adjacency_lists:
+            if len(edge_type)==0 :#and len(tokenized_node_label_ids)<50
+                print("------debug------")
+                print("file_name", file_name)
+                print("number of node", len(tokenized_node_label_ids))
+                print("number of edges per edge type")
+                for edge_type in adjacency_lists:
+                    print(len(edge_type), end=" ")
+                print("\n node_indices ", len(node_indices))
+                print("learning_labels", len(learning_labels))
 
         final_graphs.append(
             HornGraphSample(

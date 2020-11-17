@@ -27,6 +27,11 @@ def main():
     file_type = ".smt2"
     GPU=False
     pickle = True
+    benchmar_name="LIA-lin-noInterval-trainData-datafold-graphs/"
+    parameter_list.append(
+        parameters("../benchmarks/"+benchmar_name,
+                   "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmar_name,
+                   json_type=".hyperEdgeHornGraph.JSON", label="clause_occurrence_in_counter_examples_binary"))
 
     # parameter_list.append(
     #     parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/",
@@ -42,14 +47,22 @@ def main():
     #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-mono-direction-layer-graph/",
     #                json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_SCG"))
 
+    # parameter_list.append(
+    #     parameters("../benchmarks/LIA-lin-unsat-datafold/",
+    #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-unsat-datafold/",
+    #                json_type=".hyperEdgeHornGraph.JSON", label="clause_occurrence_in_counter_examples_binary"))
+    # parameter_list.append(
+    #     parameters("../benchmarks/LIA-lin-unsat-datafold/",
+    #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-unsat-datafold/",
+    #                json_type=".layerHornGraph.JSON", label="clause_occurrence_in_counter_examples_binary"))
     parameter_list.append(
-        parameters("../benchmarks/small-dataset-datafold-unsat/",
-                   "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/small-dataset-datafold-unsat/",
-                   json_type=".hyperEdgeHornGraph.JSON", label="clause_occurrence_in_counter_examples_binary"))
+        parameters("../benchmarks/LIA-lin-unsat-datafold/",
+                   "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-unsat-datafold/",
+                   json_type=".bi-layerHornGraph.JSON", label="clause_occurrence_in_counter_examples_binary"))
     parameter_list.append(
-        parameters("../benchmarks/small-dataset-datafold-unsat/",
-                   "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/small-dataset-datafold-unsat/",
-                   json_type=".layerHornGraph.JSON", label="clause_occurrence_in_counter_examples_binary"))
+        parameters("../benchmarks/LIA-lin-unsat-datafold/",
+                   "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-unsat-datafold/",
+                   json_type=".mono-layerHornGraph.JSON", label="clause_occurrence_in_counter_examples_binary"))
 
 
 
