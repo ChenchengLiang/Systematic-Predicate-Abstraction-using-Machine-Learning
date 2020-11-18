@@ -1,0 +1,1178 @@
+best_valid_epoch:40.0
+train loss:616.0452
+valid loss:30327.277
+test loss list:tf.Tensor(203.31874, shape=(), dtype=float32)
+mean test loss:203.31874
+mean loss list:tf.Tensor(2491.4841, shape=(), dtype=float32)
+mean mean loss:2491.4841
+accuracy list:[<tf.Tensor: shape=(), dtype=float64, numpy=0.33742833742833744>]
+mean accuracy:0.33742833742833744
+-------
+true label:[5]
+true label rank:[1]
+predicted label:tf.Tensor([5.3023357], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.0914069, shape=(), dtype=float32)
+-------
+true label:[31]
+true label rank:[1]
+predicted label:tf.Tensor([34.2465], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(10.53975, shape=(), dtype=float32)
+-------
+true label:[5]
+true label rank:[1]
+predicted label:tf.Tensor([5.8082104], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.653204, shape=(), dtype=float32)
+-------
+true label:[11, 11, 19, 12]
+true label rank:[1 1 3 2]
+predicted label:tf.Tensor([12.172834 13.08092  29.900791 23.980682], shape=(4,), dtype=float32)
+predicted label rank:[1 2 4 3]
+mse:tf.Tensor(67.01744, shape=(), dtype=float32)
+-------
+true label:[5]
+true label rank:[1]
+predicted label:tf.Tensor([5.3023357], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.0914069, shape=(), dtype=float32)
+-------
+true label:[5, 5, 5, 5, 5]
+true label rank:[1 1 1 1 1]
+predicted label:tf.Tensor([ 5.3098655  8.823717   8.083538  10.012929  16.72265  ], shape=(5,), dtype=float32)
+predicted label rank:[1 3 2 4 5]
+mse:tf.Tensor(37.355003, shape=(), dtype=float32)
+-------
+true label:[4, 7, 3]
+true label rank:[2 3 1]
+predicted label:tf.Tensor([4.1256657 8.579868  3.3533356], shape=(3,), dtype=float32)
+predicted label rank:[2 3 1]
+mse:tf.Tensor(0.8788739, shape=(), dtype=float32)
+-------
+true label:[6, 5, 3]
+true label rank:[3 2 1]
+predicted label:tf.Tensor([5.601998  4.6788597 3.0540047], shape=(3,), dtype=float32)
+predicted label rank:[3 2 1]
+mse:tf.Tensor(0.0881511, shape=(), dtype=float32)
+-------
+true label:[8, 7, 5, 5, 3]
+true label rank:[4 3 2 2 1]
+predicted label:tf.Tensor([7.7565393 6.3196893 3.6590717 6.872944  3.4567106], shape=(5,), dtype=float32)
+predicted label rank:[5 3 2 4 1]
+mse:tf.Tensor(1.2073376, shape=(), dtype=float32)
+-------
+true label:[7, 3, 5, 3]
+true label rank:[3 1 2 1]
+predicted label:tf.Tensor([6.7144666 2.9134812 4.920902  3.5350223], shape=(4,), dtype=float32)
+predicted label rank:[4 1 3 2]
+mse:tf.Tensor(0.09538004, shape=(), dtype=float32)
+-------
+true label:[3, 7, 4, 3, 3]
+true label rank:[1 3 2 1 1]
+predicted label:tf.Tensor([3.5509353 7.0808296 3.9088104 3.7207065 3.7584896], shape=(5,), dtype=float32)
+predicted label rank:[1 5 4 2 3]
+mse:tf.Tensor(0.28262058, shape=(), dtype=float32)
+-------
+true label:[6, 3]
+true label rank:[2 1]
+predicted label:tf.Tensor([5.4430323 2.7907832], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(0.17699237, shape=(), dtype=float32)
+-------
+true label:[5, 3]
+true label rank:[2 1]
+predicted label:tf.Tensor([4.5397577 2.8180513], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(0.12246413, shape=(), dtype=float32)
+-------
+true label:[5, 3]
+true label rank:[2 1]
+predicted label:tf.Tensor([4.5397577 2.8180513], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(0.12246413, shape=(), dtype=float32)
+-------
+true label:[5]
+true label rank:[1]
+predicted label:tf.Tensor([4.5397577], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.21182294, shape=(), dtype=float32)
+-------
+true label:[14, 12, 8, 8, 6, 6, 6, 6, 4, 4, 4, 4, 6, 6, 12, 20, 20, 14, 68, 492, 172, 37, 172, 16, 12, 8, 4, 4, 8, 8, 20, 49, 35, 14, 8, 4, 4, 4, 4, 8, 4, 4, 8, 4, 4, 12, 12, 12, 12, 12, 20, 8, 12, 16, 16, 12, 101, 17]
+true label rank:[ 5  4  3  3  2  2  2  2  1  1  1  1  2  2  4  8  8  5 12 15 14 10 14  6
+  4  3  1  1  3  3  8 11  9  5  3  1  1  1  1  3  1  1  3  1  1  4  4  4
+  4  4  8  3  4  6  6  4 13  7]
+predicted label:tf.Tensor(
+[ 12.144294   11.399161    7.535013    6.6484427   6.288521    6.168582
+   4.4954042   3.9307961   3.6029108   3.3938785   3.8767362   3.6304286
+   6.713501    5.6524253   9.727862   14.027297   13.5156     13.377193
+  68.49863   548.5226    158.61597    28.415567  159.00966    14.325872
+  11.6575985   7.936967    3.6482427   3.6144214   8.661356    9.041929
+  22.172752   40.823208   38.497517   12.537832    7.183346    3.3826118
+   3.520625    3.7383544   3.7978458   6.03675     3.6286824   3.8437185
+   7.344094    3.4468393   3.668366   11.440838   10.777568   10.943671
+  10.881535   11.640371   15.516014    6.954564    9.315475   13.806002
+  12.190266    9.293616  103.54283    14.477302 ], shape=(58,), dtype=float32)
+predicted label rank:[40 36 26 21 20 19 16 15  5  2 14  8 22 17 32 46 44 43 54 58 56 51 57 47
+ 39 27  9  6 28 29 50 53 52 42 24  1  4 11 12 18  7 13 25  3 10 37 33 35
+ 34 38 49 23 31 45 41 30 55 48]
+mse:tf.Tensor(66.94516, shape=(), dtype=float32)
+-------
+true label:[20, 6, 6, 8, 8, 58, 20, 78, 201, 28, 88, 16, 6, 6, 22, 6, 14, 22, 16, 12, 6, 6, 12, 6, 6, 10, 10, 16, 12, 16, 8, 8, 6, 6, 92]
+true label rank:[ 7  1  1  2  2 10  7 11 14  9 12  6  1  1  8  1  5  8  6  4  1  1  4  1
+  1  3  3  6  4  6  2  2  1  1 13]
+predicted label:tf.Tensor(
+[ 19.697668    5.3190274   6.7093477   6.500434    7.0563183  45.23756
+  16.756413   66.98338   191.78633    29.847317   98.26175    15.041379
+   5.46876     5.164549   29.266657   19.740543   18.901388   20.811386
+  14.151932   21.694767    5.811866    5.3769665  16.814262    6.519616
+   7.3288236   7.5121307  12.207463   15.462518    9.905351   13.183077
+   5.786949    5.4088745   4.8384137   4.7254715  96.39453  ], shape=(35,), dtype=float32)
+predicted label rank:[25  4 12 10 13 31 22 32 35 30 34 20  7  3 29 26 24 27 19 28  9  5 23 11
+ 14 15 17 21 16 18  8  6  2  1 33]
+mse:tf.Tensor(26.917875, shape=(), dtype=float32)
+-------
+true label:[16, 10, 6, 8, 8, 58, 20, 78, 173, 28, 88, 16, 6, 6, 22, 6, 14, 22, 16, 12, 6, 6, 12, 6, 6, 10, 10, 16, 12, 16, 8, 8, 6, 6, 64]
+true label rank:[ 6  3  1  2  2 10  7 12 14  9 13  6  1  1  8  1  5  8  6  4  1  1  4  1
+  1  3  3  6  4  6  2  2  1  1 11]
+predicted label:tf.Tensor(
+[ 16.29602     6.0935144   6.870009    6.2788305   6.878764   47.576965
+  17.558224   82.428154  186.55074    26.728142   94.78842    14.740675
+   5.2341733   5.1084003  25.374886    4.7710867  15.056237   18.143908
+  17.994228   17.407625    4.8913794   5.8522973  13.466654    6.783145
+   7.297819   10.085474    8.863504   14.74214     9.904068   13.154627
+   5.578187    5.3366356   5.1261435   4.677374   55.761395 ], shape=(35,), dtype=float32)
+predicted label rank:[24 10 13 11 14 31 26 33 35 30 34 21  6  4 29  2 23 28 27 25  3  9 20 12
+ 15 18 16 22 17 19  8  7  5  1 32]
+mse:tf.Tensor(15.867025, shape=(), dtype=float32)
+-------
+true label:[16, 10, 6, 8, 8, 58, 20, 78, 173, 28, 88, 16, 6, 6, 22, 6, 14, 22, 16, 12, 6, 6, 12, 6, 6, 10, 10, 16, 12, 16, 8, 8, 6, 6, 64]
+true label rank:[ 6  3  1  2  2 10  7 12 14  9 13  6  1  1  8  1  5  8  6  4  1  1  4  1
+  1  3  3  6  4  6  2  2  1  1 11]
+predicted label:tf.Tensor(
+[ 16.29602     6.0935144   6.870009    6.2788305   6.878764   47.576965
+  17.558224   82.428154  186.55074    26.728142   94.78842    14.740675
+   5.2341733   5.1084003  25.374886    4.7710867  15.056237   18.143908
+  17.994228   17.407625    4.8913794   5.8522973  13.466654    6.783145
+   7.297819   10.085474    8.863504   14.74214     9.904068   13.154627
+   5.578187    5.3366356   5.1261435   4.677374   55.761395 ], shape=(35,), dtype=float32)
+predicted label rank:[24 10 13 11 14 31 26 33 35 30 34 21  6  4 29  2 23 28 27 25  3  9 20 12
+ 15 18 16 22 17 19  8  7  5  1 32]
+mse:tf.Tensor(15.867025, shape=(), dtype=float32)
+-------
+true label:[214, 18, 19, 26, 4, 4, 10, 10, 5, 5, 5, 5, 4, 4, 8, 3, 3, 10, 3, 3, 3, 3, 8, 15, 9, 6, 14, 14]
+true label rank:[13 10 11 12  2  2  7  7  3  3  3  3  2  2  5  1  1  7  1  1  1  1  5  9
+  6  4  8  8]
+predicted label:tf.Tensor(
+[213.82909    16.135399   18.662445   35.898396    3.740026    3.875876
+  22.616184   22.7061      5.0030484   6.129415    9.250894    6.4978623
+   3.8657992   3.6901052   8.456553    3.6398988   3.5604599   9.5227995
+   3.4409513   3.920636    3.4424033   3.599208    7.6898055  13.535115
+   7.1382985   4.840616   13.320402   12.976877 ], shape=(28,), dtype=float32)
+predicted label rank:[28 23 24 27  7  9 25 26 12 13 18 14  8  6 17  5  3 19  1 10  2  4 16 22
+ 15 11 21 20]
+mse:tf.Tensor(16.261248, shape=(), dtype=float32)
+-------
+true label:[193, 64, 4, 4, 20, 5, 5, 5, 5, 4, 4, 8, 4, 4, 6, 6, 4, 4, 4, 4, 12, 23, 8, 9, 6, 8, 8]
+true label rank:[10  9  1  1  7  2  2  2  2  1  1  4  1  1  3  3  1  1  1  1  6  8  4  5
+  3  4  4]
+predicted label:tf.Tensor(
+[191.71965    61.21334     3.609607    3.566471   20.359138    5.404954
+   4.529849    5.664356    3.965776    3.8792603   3.2863882   7.139926
+   4.154284    3.8794003   5.049583    5.6839123   3.8053584   3.8802311
+   3.8556967   3.6008599  10.988939   23.639057    7.8935537   7.062831
+   5.729265    6.1930585   6.405653 ], shape=(27,), dtype=float32)
+predicted label rank:[27 26  4  2 24 14 12 15 10  7  1 21 11  8 13 16  5  9  6  3 23 25 22 20
+ 17 18 19]
+mse:tf.Tensor(0.94009084, shape=(), dtype=float32)
+-------
+true label:[42]
+true label rank:[1]
+predicted label:tf.Tensor([43.715897], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(2.9443011, shape=(), dtype=float32)
+-------
+true label:[130, 11, 11, 8, 3, 3, 4, 8, 14, 14, 9]
+true label rank:[7 5 5 3 1 1 2 3 6 6 4]
+predicted label:tf.Tensor(
+[126.266556   14.520588   14.432166    9.714426    4.006473    2.792866
+   3.7879806   7.48636    11.349224   12.76343     7.121893 ], shape=(11,), dtype=float32)
+predicted label rank:[11 10  9  6  3  1  2  5  7  8  4]
+mse:tf.Tensor(4.9545307, shape=(), dtype=float32)
+-------
+true label:[126, 5, 8, 4, 4, 3, 3, 4, 12, 11, 13, 18]
+true label rank:[9 3 4 2 2 1 1 2 6 5 7 8]
+predicted label:tf.Tensor(
+[116.799576    6.0568905   6.9327374   3.4974132   3.4961715   3.8832614
+   3.2452686   3.3816605  10.560328   10.786143   12.591832   18.006927 ], shape=(12,), dtype=float32)
+predicted label rank:[12  6  7  4  3  5  1  2  8  9 10 11]
+mse:tf.Tensor(7.5765, shape=(), dtype=float32)
+-------
+true label:[126, 5, 8, 4, 4, 3, 3, 4, 14, 12, 14, 18]
+true label rank:[8 3 4 2 2 1 1 2 6 5 6 7]
+predicted label:tf.Tensor(
+[124.3562      6.0568905   6.9327374   3.4974132   3.4961715   3.8832614
+   3.2452686   3.3816605  11.527001   11.088167   13.616007   17.800434 ], shape=(12,), dtype=float32)
+predicted label rank:[12  6  7  4  3  5  1  2  9  8 10 11]
+mse:tf.Tensor(1.1518058, shape=(), dtype=float32)
+-------
+true label:[137, 11, 5, 4, 4, 3, 3, 4, 12, 9, 11, 14]
+true label rank:[8 5 3 2 2 1 1 2 6 4 5 7]
+predicted label:tf.Tensor(
+[138.48988     9.978352    4.1686397   3.7857778   3.261406    2.8446581
+   4.3251753   3.5140758  14.26758    10.457202    9.01852    12.59597  ], shape=(12,), dtype=float32)
+predicted label rank:[12  8  5  4  2  1  6  3 11  9  7 10]
+mse:tf.Tensor(1.6437794, shape=(), dtype=float32)
+-------
+true label:[94, 8, 5, 4, 4, 3, 3, 4, 10, 26, 22]
+true label rank:[8 4 3 2 2 1 1 2 5 7 6]
+predicted label:tf.Tensor(
+[99.739716   9.113395   5.140415   5.8997183  4.7808456  3.8587132
+  3.7892969  4.204767  10.890712  29.242754  16.936026 ], shape=(11,), dtype=float32)
+predicted label rank:[11  7  5  6  4  2  1  3  8 10  9]
+mse:tf.Tensor(6.979756, shape=(), dtype=float32)
+-------
+true label:[119, 11, 11, 4, 4, 3, 3, 4, 10, 31, 27]
+true label rank:[7 4 4 2 2 1 1 2 3 6 5]
+predicted label:tf.Tensor(
+[116.39536    12.157028    9.950668    3.845153    3.6421835   3.0746894
+   3.087596    3.6461024   9.05493    31.254068   25.889072 ], shape=(11,), dtype=float32)
+predicted label rank:[11  8  7  5  3  1  2  4  6 10  9]
+mse:tf.Tensor(1.064211, shape=(), dtype=float32)
+-------
+true label:[130, 11, 11, 4, 4, 3, 3, 4, 8, 14, 14, 9]
+true label rank:[7 5 5 2 2 1 1 2 3 6 6 4]
+predicted label:tf.Tensor(
+[124.42922    12.157028    9.950668    3.845153    3.6421835   3.0746894
+   3.087596    3.6461024   7.3231897  11.018737   13.497787    8.417261 ], shape=(12,), dtype=float32)
+predicted label rank:[12 10  8  5  3  1  2  4  6  9 11  7]
+mse:tf.Tensor(3.6418068, shape=(), dtype=float32)
+-------
+true label:[130, 11, 11, 4, 4, 3, 3, 4, 8, 14, 14, 9]
+true label rank:[7 5 5 2 2 1 1 2 3 6 6 4]
+predicted label:tf.Tensor(
+[124.42922    12.157028    9.950668    3.845153    3.6421835   3.0746894
+   3.087596    3.6461024   7.3231897  11.018737   13.497787    8.417261 ], shape=(12,), dtype=float32)
+predicted label rank:[12 10  8  5  3  1  2  4  6  9 11  7]
+mse:tf.Tensor(3.6418068, shape=(), dtype=float32)
+-------
+true label:[138, 9, 16, 4, 4, 3, 3, 4, 10, 72, 68]
+true label rank:[8 3 5 2 2 1 1 2 4 7 6]
+predicted label:tf.Tensor(
+[126.256546   10.736662   15.123732    3.8878784   4.129516    3.2633204
+   3.3848581   3.9704912  10.845292   68.21001    86.71089  ], shape=(11,), dtype=float32)
+predicted label rank:[11  6  8  3  5  1  2  4  7  9 10]
+mse:tf.Tensor(46.101475, shape=(), dtype=float32)
+-------
+true label:[4, 6, 5, 5, 6, 5]
+true label rank:[1 3 2 2 3 2]
+predicted label:tf.Tensor([3.4630969 5.319256  5.075779  4.2437587 4.994697  5.1977477], shape=(6,), dtype=float32)
+predicted label rank:[1 6 4 2 3 5]
+mse:tf.Tensor(0.39650986, shape=(), dtype=float32)
+-------
+true label:[4, 3]
+true label rank:[2 1]
+predicted label:tf.Tensor([3.4264817 3.126029 ], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(0.17240328, shape=(), dtype=float32)
+-------
+true label:[177]
+true label rank:[1]
+predicted label:tf.Tensor([167.9164], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(82.51184, shape=(), dtype=float32)
+-------
+true label:[5, 6, 6, 10, 14]
+true label rank:[1 2 2 3 4]
+predicted label:tf.Tensor([ 4.318805   7.666193   5.7217216  8.9422    23.592073 ], shape=(5,), dtype=float32)
+predicted label rank:[1 3 2 4 5]
+mse:tf.Tensor(19.288897, shape=(), dtype=float32)
+-------
+true label:[7, 17, 18]
+true label rank:[1 2 3]
+predicted label:tf.Tensor([ 5.4256306 16.887081  14.878206 ], shape=(3,), dtype=float32)
+predicted label rank:[1 3 2]
+mse:tf.Tensor(4.078995, shape=(), dtype=float32)
+-------
+true label:[4, 3]
+true label rank:[2 1]
+predicted label:tf.Tensor([3.7168605 3.126029 ], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(0.048025634, shape=(), dtype=float32)
+-------
+true label:[3, 4, 4]
+true label rank:[1 2 2]
+predicted label:tf.Tensor([2.4244418 3.7131197 3.84367  ], shape=(3,), dtype=float32)
+predicted label rank:[1 2 3]
+mse:tf.Tensor(0.1460022, shape=(), dtype=float32)
+-------
+true label:[3, 4, 4, 4, 4, 5, 3, 6, 4]
+true label rank:[1 2 2 2 2 3 1 4 2]
+predicted label:tf.Tensor(
+[3.7167034 3.8493414 3.7982976 4.593456  3.3271866 3.7119625 2.9363642
+ 6.0789075 4.003482 ], shape=(9,), dtype=float32)
+predicted label rank:[4 6 5 8 2 3 1 9 7]
+mse:tf.Tensor(0.3390269, shape=(), dtype=float32)
+-------
+true label:[6, 7, 4, 5, 5]
+true label rank:[3 4 1 2 2]
+predicted label:tf.Tensor([6.019468  7.071554  3.0423617 5.1559753 5.435364 ], shape=(5,), dtype=float32)
+predicted label rank:[4 5 1 2 3]
+mse:tf.Tensor(0.22728798, shape=(), dtype=float32)
+-------
+true label:[3, 3]
+true label rank:[1 1]
+predicted label:tf.Tensor([2.8563147 3.712872 ], shape=(2,), dtype=float32)
+predicted label rank:[1 2]
+mse:tf.Tensor(0.264416, shape=(), dtype=float32)
+-------
+true label:[4, 6, 9, 5]
+true label rank:[1 3 4 2]
+predicted label:tf.Tensor([4.9956675 4.4920855 8.008173  4.038439 ], shape=(4,), dtype=float32)
+predicted label rank:[3 2 4 1]
+mse:tf.Tensor(1.2933702, shape=(), dtype=float32)
+-------
+true label:[4, 5, 3]
+true label rank:[2 3 1]
+predicted label:tf.Tensor([5.127431  4.049963  3.3089151], shape=(3,), dtype=float32)
+predicted label rank:[3 2 1]
+mse:tf.Tensor(0.75636643, shape=(), dtype=float32)
+-------
+true label:[25, 28, 28, 28, 28, 11, 14, 14, 14, 14, 14, 14, 14, 14, 28, 15, 11, 10, 6, 10, 6]
+true label rank:[6 7 7 7 7 3 4 4 4 4 4 4 4 4 7 5 3 2 1 2 1]
+predicted label:tf.Tensor(
+[27.316868 32.84179  30.089733 30.041988 29.744999 10.861246 13.257222
+ 19.593004 13.579268 14.95339  13.931093 13.651763 15.583135 16.115126
+ 30.226517 14.935879 10.794421 10.930042  5.082302  8.756533  4.813013], shape=(21,), dtype=float32)
+predicted label rank:[16 21 19 18 17  5  7 15  8 12 10  9 13 14 20 11  4  6  2  3  1]
+mse:tf.Tensor(4.290633, shape=(), dtype=float32)
+-------
+true label:[21, 26, 26, 30, 30, 7, 14, 14, 14, 14, 14, 14, 14, 14, 34, 21, 11, 6, 8, 4, 6]
+true label rank:[ 7  8  8  9  9  3  6  6  6  6  6  6  6  6 10  7  5  2  4  1  2]
+predicted label:tf.Tensor(
+[23.404558  32.29543   28.584986  31.073366  32.47266    8.020977
+ 14.139696  15.027243  13.950755  12.958641  13.489508  12.27739
+ 15.18561   12.597176  33.27965   23.051472  13.6138735  5.8108234
+  5.4592514  3.3352935  6.34372  ], shape=(21,), dtype=float32)
+predicted label rank:[16 19 17 18 20  5 12 13 11  8  9  6 14  7 21 15 10  3  2  1  4]
+mse:tf.Tensor(4.1799593, shape=(), dtype=float32)
+-------
+true label:[23, 26, 26, 30, 30, 9, 14, 14, 14, 14, 14, 14, 14, 14, 28, 15, 12, 11, 8, 4, 6, 4]
+true label rank:[ 9 10 10 12 12  4  7  7  7  7  7  7  7  7 11  8  6  5  3  1  2  1]
+predicted label:tf.Tensor(
+[25.391281  28.853443  29.360582  32.665092  30.48006   10.00808
+ 13.052525  12.484726  14.043687  15.078534  14.017544  14.580317
+ 13.516289  14.7424    31.6733    16.674152  13.111143  11.505621
+  9.128902   3.7371972  6.6080174  3.972978 ], shape=(22,), dtype=float32)
+predicted label rank:[17 18 19 22 20  5  8  7 12 15 11 13 10 14 21 16  9  6  4  1  3  2]
+mse:tf.Tensor(2.6583865, shape=(), dtype=float32)
+-------
+true label:[25, 26, 30, 13, 26, 30, 14, 14, 14, 14, 14, 14, 14, 14, 34, 21, 11, 7, 8, 9]
+true label rank:[ 8  9 10  5  9 10  6  6  6  6  6  6  6  6 11  7  4  1  2  3]
+predicted label:tf.Tensor(
+[27.366802  30.616817  32.27113   13.895029  27.050676  32.36997
+ 14.354363  14.174425  13.885823  13.301329  13.162674  13.048077
+ 14.305988  13.094377  34.542984  23.870014  12.092752   6.845492
+  8.455978   8.4993515], shape=(20,), dtype=float32)
+predicted label rank:[16 17 18 10 15 19 13 11  9  8  7  5 12  6 20 14  4  1  2  3]
+mse:tf.Tensor(2.649156, shape=(), dtype=float32)
+-------
+true label:[27, 26, 30, 7, 26, 30, 14, 14, 14, 14, 14, 14, 14, 14, 28, 15, 11, 11, 8, 6, 5, 4]
+true label rank:[10  9 12  4  9 12  7  7  7  7  7  7  7  7 11  8  6  6  5  3  2  1]
+predicted label:tf.Tensor(
+[29.422705  27.466972  31.476805   8.544173  28.375402  33.318
+ 14.311729  12.571592  14.026033  15.265881  12.873116  13.974727
+ 16.62009   14.259421  32.399635  16.094494   9.977398  12.038664
+  9.253189   5.8104777  4.6784296  3.726722 ], shape=(22,), dtype=float32)
+predicted label rank:[19 17 20  4 18 22 13  8 11 14  9 10 16 12 21 15  6  7  5  3  2  1]
+mse:tf.Tensor(2.983894, shape=(), dtype=float32)
+-------
+true label:[64, 40, 40, 16, 16, 16, 16, 25, 25, 22, 11, 11, 25, 9, 10]
+true label rank:[8 7 7 4 4 4 4 6 6 5 3 3 6 1 2]
+predicted label:tf.Tensor(
+[56.019817 46.954594 44.535297 18.360664 17.12136  19.006542 17.67614
+ 30.863937 27.773762 23.57917  12.425207 12.639095 23.23144   9.066605
+ 10.487046], shape=(15,), dtype=float32)
+predicted label rank:[15 14 13  7  5  8  6 12 11 10  3  4  9  1  2]
+mse:tf.Tensor(13.597209, shape=(), dtype=float32)
+-------
+true label:[108, 80, 32, 12, 12, 12, 12, 32, 18, 22, 7, 39, 44]
+true label rank:[9 8 5 2 2 2 2 5 3 4 1 6 7]
+predicted label:tf.Tensor(
+[101.076225  82.12648   37.40092   11.208659  12.400501  12.929216
+  14.03105   28.81911   18.7785    27.36163    6.075245  54.443596
+  73.40784 ], shape=(13,), dtype=float32)
+predicted label rank:[13 12  9  2  3  4  5  8  6  7  1 10 11]
+mse:tf.Tensor(94.69674, shape=(), dtype=float32)
+-------
+true label:[3]
+true label rank:[1]
+predicted label:tf.Tensor([2.9654374], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.0011945724, shape=(), dtype=float32)
+-------
+true label:[3]
+true label rank:[1]
+predicted label:tf.Tensor([2.9654374], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.0011945724, shape=(), dtype=float32)
+-------
+true label:[3, 5]
+true label rank:[1 2]
+predicted label:tf.Tensor([5.3153696 5.741992 ], shape=(2,), dtype=float32)
+predicted label rank:[1 2]
+mse:tf.Tensor(2.9557443, shape=(), dtype=float32)
+-------
+true label:[10]
+true label rank:[1]
+predicted label:tf.Tensor([14.306302], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(18.544237, shape=(), dtype=float32)
+-------
+true label:[4]
+true label rank:[1]
+predicted label:tf.Tensor([3.5945287], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.164407, shape=(), dtype=float32)
+-------
+true label:[4, 3]
+true label rank:[2 1]
+predicted label:tf.Tensor([3.7168605 3.126029 ], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(0.048025634, shape=(), dtype=float32)
+-------
+true label:[4]
+true label rank:[1]
+predicted label:tf.Tensor([3.5945287], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.164407, shape=(), dtype=float32)
+-------
+true label:[5, 5]
+true label rank:[1 1]
+predicted label:tf.Tensor([5.163035 5.691341], shape=(2,), dtype=float32)
+predicted label rank:[1 2]
+mse:tf.Tensor(0.25226632, shape=(), dtype=float32)
+-------
+true label:[26]
+true label rank:[1]
+predicted label:tf.Tensor([27.441463], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(2.077817, shape=(), dtype=float32)
+-------
+true label:[39]
+true label rank:[1]
+predicted label:tf.Tensor([38.611015], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.15130909, shape=(), dtype=float32)
+-------
+true label:[23]
+true label rank:[1]
+predicted label:tf.Tensor([24.57019], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(2.465498, shape=(), dtype=float32)
+-------
+true label:[29]
+true label rank:[1]
+predicted label:tf.Tensor([31.28783], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(5.2341676, shape=(), dtype=float32)
+-------
+true label:[5, 5, 5, 5, 5]
+true label rank:[1 1 1 1 1]
+predicted label:tf.Tensor([ 5.790452   7.7354584  8.7327    11.768399  16.72265  ], shape=(5,), dtype=float32)
+predicted label rank:[1 2 3 4 5]
+mse:tf.Tensor(41.054474, shape=(), dtype=float32)
+-------
+true label:[3, 3, 4, 3]
+true label rank:[1 1 2 1]
+predicted label:tf.Tensor([2.9699378 3.1859448 5.2013645 3.301651 ], shape=(4,), dtype=float32)
+predicted label rank:[1 2 4 3]
+mse:tf.Tensor(0.39243728, shape=(), dtype=float32)
+-------
+true label:[47]
+true label rank:[1]
+predicted label:tf.Tensor([47.244186], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.059627, shape=(), dtype=float32)
+-------
+true label:[638]
+true label rank:[1]
+predicted label:tf.Tensor([635.7667], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(4.9875236, shape=(), dtype=float32)
+-------
+true label:[42]
+true label rank:[1]
+predicted label:tf.Tensor([43.711407], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(2.9289129, shape=(), dtype=float32)
+-------
+true label:[3, 3, 8, 5, 3, 5, 3, 3, 4, 3]
+true label rank:[1 1 4 3 1 3 1 1 2 1]
+predicted label:tf.Tensor(
+[2.7468393 3.1503065 8.716286  5.798365  3.0663073 5.017025  2.4830484
+ 2.9739394 4.086628  3.0780883], shape=(10,), dtype=float32)
+predicted label rank:[ 2  6 10  9  4  8  1  3  7  5]
+mse:tf.Tensor(0.15233411, shape=(), dtype=float32)
+-------
+true label:[4, 3, 3, 3, 6, 5, 4, 3, 5, 3]
+true label rank:[2 1 1 1 4 3 2 1 3 1]
+predicted label:tf.Tensor(
+[6.523339  5.180079  3.068496  3.7166042 5.0266185 5.223542  3.2107916
+ 3.0584536 5.839411  3.4006128], shape=(10,), dtype=float32)
+predicted label rank:[10  7  2  5  6  8  3  1  9  4]
+mse:tf.Tensor(1.4127007, shape=(), dtype=float32)
+-------
+true label:[7, 3, 5, 3]
+true label rank:[3 1 2 1]
+predicted label:tf.Tensor([6.7144666 2.9134812 4.920902  3.5350223], shape=(4,), dtype=float32)
+predicted label rank:[4 1 3 2]
+mse:tf.Tensor(0.09538004, shape=(), dtype=float32)
+-------
+true label:[44]
+true label rank:[1]
+predicted label:tf.Tensor([46.119328], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(4.491549, shape=(), dtype=float32)
+-------
+true label:[154]
+true label rank:[1]
+predicted label:tf.Tensor([207.76093], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(2890.237, shape=(), dtype=float32)
+-------
+true label:[209]
+true label rank:[1]
+predicted label:tf.Tensor([186.64136], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(499.9089, shape=(), dtype=float32)
+-------
+true label:[8, 6, 18, 10, 7, 10, 18, 8, 18, 12, 10, 14, 6, 9, 8, 5, 8, 10, 6, 10, 8, 6, 8, 6, 12]
+true label rank:[4 2 9 6 3 6 9 4 9 7 6 8 2 5 4 1 4 6 2 6 4 2 4 2 7]
+predicted label:tf.Tensor(
+[ 6.556737   5.716245  23.014091  10.291918   8.533644   8.891083
+ 19.560644   7.65536   24.0234    12.131077   9.136616  12.506335
+  6.901325  10.532213   8.914602   4.316583   8.61878    9.975848
+  5.0486116 13.057407   8.445306   4.540532   9.649034   5.253239
+ 16.640965 ], shape=(25,), dtype=float32)
+predicted label rank:[ 6  5 24 17 10 12 23  8 25 19 14 20  7 18 13  1 11 16  3 21  9  2 15  4
+ 22]
+mse:tf.Tensor(4.601793, shape=(), dtype=float32)
+-------
+true label:[393, 6, 5, 178, 220, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 18, 16, 16, 16, 16, 16, 16, 16, 16, 10]
+true label rank:[8 2 1 6 7 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+ 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 5 4 4 4 4 4 4 4 4 3]
+predicted label:tf.Tensor(
+[386.5008      5.2279434   3.556052  181.58195   206.14839    13.013952
+  14.9586315  17.322084   17.645023   16.30841    15.561456   15.618299
+  17.969404   16.520039   16.077744   16.402779   17.094116   16.048199
+  16.183924   15.563443   17.198143   16.81248    17.076653   15.803614
+  17.683704   17.421183   15.033819   15.217032   14.927555   15.725073
+  14.177592   15.111514   14.764366   13.985802   15.373932   15.241702
+  16.017899   16.220465   16.884445   16.416878   17.239285   17.025492
+  15.891605   15.886968   15.760406   16.105612   16.642231   16.434193
+  16.684597   16.613153   15.127969   16.56532    14.9564495  15.987619
+  14.945196   16.174654   15.229189   14.906855   14.462959   14.386889
+  14.280637   13.885149   14.125179   14.474164    8.702648 ], shape=(65,), dtype=float32)
+predicted label rank:[65  2  1 63 64  4 18 58 60 42 26 28 62 46 37 43 55 36 40 27 56 51 54 31
+ 61 59 19 22 15 29  8 20 13  6 25 24 35 41 52 44 57 53 33 32 30 38 49 45
+ 50 48 21 47 17 34 16 39 23 14 11 10  9  5  7 12  3]
+mse:tf.Tensor(5.0043483, shape=(), dtype=float32)
+-------
+true label:[275, 6, 5, 183, 5, 7, 6, 7, 7, 5, 7, 5, 7, 5, 75, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 16, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 9]
+true label rank:[9 2 1 8 1 3 2 3 3 1 3 1 3 1 7 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5
+ 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 6 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5
+ 4]
+predicted label:tf.Tensor(
+[275.25064     4.2297316   9.53441   183.43315     4.5178986   6.642872
+   7.373779    7.141633    6.6077104   5.7416306   8.261173    4.961546
+   7.502873    5.055853   71.2694     14.425988   14.181328   15.54938
+  15.306261   13.375329   15.335129   13.555674   14.370762   14.994673
+  15.838291   15.408101   14.633645   14.279996   14.360971   13.580508
+  14.706719   12.897774   13.888147   12.742027   13.950668   14.578381
+  13.047416   13.825783   12.869362   13.664091   14.2444725  13.102869
+  13.503567   13.8243265  13.599021   13.744368   12.980991   13.606307
+  13.653539   14.355965   14.361204   15.308777   14.934038   13.565958
+  18.489641   13.132787   15.856767   14.138044   13.62616    14.765553
+  13.350713   15.271577   13.785815   14.867273   13.717155   14.788031
+  12.719349   14.873526   13.5148325  14.309696   12.870752   13.965186
+  13.598028   13.589323    9.821659 ], shape=(75,), dtype=float32)
+predicted label rank:[75  1 12 74  2  7  9  8  6  5 11  3 10  4 73 54 46 69 65 24 67 27 53 63
+ 70 68 56 48 51 29 57 18 42 15 43 55 20 41 16 36 47 21 25 40 32 38 19 33
+ 35 50 52 66 62 28 72 22 71 45 34 58 23 64 39 60 37 59 14 61 26 49 17 44
+ 31 30 13]
+mse:tf.Tensor(1.1737661, shape=(), dtype=float32)
+-------
+true label:[3, 4]
+true label rank:[1 2]
+predicted label:tf.Tensor([3.2859428 3.9062204], shape=(2,), dtype=float32)
+predicted label rank:[1 2]
+mse:tf.Tensor(0.045278944, shape=(), dtype=float32)
+-------
+true label:[4, 4, 4, 4, 3, 3, 3, 3, 3]
+true label rank:[2 2 2 2 1 1 1 1 1]
+predicted label:tf.Tensor(
+[4.9536304 4.0729923 4.085422  3.9570882 3.2762892 3.3871808 3.3042512
+ 3.2437882 3.380213 ], shape=(9,), dtype=float32)
+predicted label rank:[9 7 8 6 2 5 3 1 4]
+mse:tf.Tensor(0.16074282, shape=(), dtype=float32)
+-------
+true label:[46]
+true label rank:[1]
+predicted label:tf.Tensor([48.14723], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(4.610589, shape=(), dtype=float32)
+-------
+true label:[35]
+true label rank:[1]
+predicted label:tf.Tensor([35.00407], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(1.6567195e-05, shape=(), dtype=float32)
+-------
+true label:[73, 21]
+true label rank:[2 1]
+predicted label:tf.Tensor([93.40602  27.857363], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(231.71457, shape=(), dtype=float32)
+-------
+true label:[111, 55]
+true label rank:[2 1]
+predicted label:tf.Tensor([108.79948   57.751705], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(6.2070923, shape=(), dtype=float32)
+-------
+true label:[73, 41]
+true label rank:[2 1]
+predicted label:tf.Tensor([75.823166 40.637882], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(4.050698, shape=(), dtype=float32)
+-------
+true label:[47, 25]
+true label rank:[2 1]
+predicted label:tf.Tensor([52.01328  38.237774], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(100.185814, shape=(), dtype=float32)
+-------
+true label:[33, 13]
+true label rank:[2 1]
+predicted label:tf.Tensor([37.5297   24.340385], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(74.561264, shape=(), dtype=float32)
+-------
+true label:[3]
+true label rank:[1]
+predicted label:tf.Tensor([2.5571792], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.19609025, shape=(), dtype=float32)
+-------
+true label:[16]
+true label rank:[1]
+predicted label:tf.Tensor([13.242962], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(7.601259, shape=(), dtype=float32)
+-------
+true label:[3]
+true label rank:[1]
+predicted label:tf.Tensor([2.7167974], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.08020374, shape=(), dtype=float32)
+-------
+true label:[3, 4]
+true label rank:[1 2]
+predicted label:tf.Tensor([2.7985573 3.9369273], shape=(2,), dtype=float32)
+predicted label rank:[1 2]
+mse:tf.Tensor(0.022278666, shape=(), dtype=float32)
+-------
+true label:[3, 5, 3]
+true label rank:[1 2 1]
+predicted label:tf.Tensor([3.2570133 4.912615  3.105706 ], shape=(3,), dtype=float32)
+predicted label rank:[2 3 1]
+mse:tf.Tensor(0.02828859, shape=(), dtype=float32)
+-------
+true label:[3, 4, 4, 4, 4]
+true label rank:[1 2 2 2 2]
+predicted label:tf.Tensor([2.639052  5.1593127 5.8514814 8.43776   5.0200806], shape=(5,), dtype=float32)
+predicted label rank:[1 3 4 5 2]
+mse:tf.Tensor(5.1273108, shape=(), dtype=float32)
+-------
+true label:[4, 3, 4, 4, 4]
+true label rank:[2 1 2 2 2]
+predicted label:tf.Tensor([3.6794167 4.1146164 6.040892  7.881958  5.401252 ], shape=(5,), dtype=float32)
+predicted label rank:[1 2 4 5 3]
+mse:tf.Tensor(4.508698, shape=(), dtype=float32)
+-------
+true label:[4]
+true label rank:[1]
+predicted label:tf.Tensor([3.3277497], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.45192042, shape=(), dtype=float32)
+-------
+true label:[3]
+true label rank:[1]
+predicted label:tf.Tensor([2.8926795], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.0115177, shape=(), dtype=float32)
+-------
+true label:[4, 3, 3]
+true label rank:[2 1 1]
+predicted label:tf.Tensor([3.8342469 3.5760884 3.1969056], shape=(3,), dtype=float32)
+predicted label rank:[3 2 1]
+mse:tf.Tensor(0.13270794, shape=(), dtype=float32)
+-------
+true label:[5, 4]
+true label rank:[2 1]
+predicted label:tf.Tensor([3.7695036 2.7220035], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(1.5736983, shape=(), dtype=float32)
+-------
+true label:[5, 5]
+true label rank:[1 1]
+predicted label:tf.Tensor([5.163035 5.691341], shape=(2,), dtype=float32)
+predicted label rank:[1 2]
+mse:tf.Tensor(0.25226632, shape=(), dtype=float32)
+-------
+true label:[3, 4, 4, 4]
+true label rank:[1 2 2 2]
+predicted label:tf.Tensor([3.0826907 4.05738   3.4110217 4.311313 ], shape=(4,), dtype=float32)
+predicted label rank:[1 3 2 4]
+mse:tf.Tensor(0.11348539, shape=(), dtype=float32)
+-------
+true label:[3, 4, 4, 4, 4]
+true label rank:[1 2 2 2 2]
+predicted label:tf.Tensor([4.892269  3.5928812 4.3132343 4.6102734 3.1179435], shape=(5,), dtype=float32)
+predicted label rank:[5 2 3 4 1]
+mse:tf.Tensor(0.99900025, shape=(), dtype=float32)
+-------
+true label:[3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 3, 3, 3, 3, 3, 3]
+true label rank:[1 2 1 2 1 2 1 2 1 2 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[4.959736  4.533199  3.5197089 4.1647286 3.7957668 3.6806052 4.013552
+ 3.5723665 4.1912603 4.01237   4.0592546 3.1877334 2.9406343 3.39382
+ 3.5201638 3.4696043 3.286797 ], shape=(17,), dtype=float32)
+predicted label rank:[17 16  6 14 10  9 12  8 15 11 13  2  1  4  7  5  3]
+mse:tf.Tensor(0.5691767, shape=(), dtype=float32)
+-------
+true label:[687, 146, 126, 430, 599, 62]
+true label rank:[6 3 2 4 5 1]
+predicted label:tf.Tensor([321.26248  137.63869  116.20475  310.98895  423.90207   34.287792], shape=(6,), dtype=float32)
+predicted label rank:[5 3 2 4 6 1]
+mse:tf.Tensor(29920.111, shape=(), dtype=float32)
+-------
+true label:[5, 5, 5, 5]
+true label rank:[1 1 1 1]
+predicted label:tf.Tensor([ 5.083307  7.071421  8.764557 14.932945], shape=(4,), dtype=float32)
+predicted label rank:[1 2 3 4]
+mse:tf.Tensor(29.283253, shape=(), dtype=float32)
+-------
+true label:[5, 5]
+true label rank:[1 1]
+predicted label:tf.Tensor([4.7015524 7.344021 ], shape=(2,), dtype=float32)
+predicted label rank:[1 2]
+mse:tf.Tensor(2.7917523, shape=(), dtype=float32)
+-------
+true label:[8]
+true label rank:[1]
+predicted label:tf.Tensor([9.734856], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(3.0097241, shape=(), dtype=float32)
+-------
+true label:[4, 35, 14, 45]
+true label rank:[1 3 2 4]
+predicted label:tf.Tensor([ 4.1740165 26.73526   33.213577  27.75855  ], shape=(4,), dtype=float32)
+predicted label rank:[1 2 4 3]
+mse:tf.Tensor(183.69135, shape=(), dtype=float32)
+-------
+true label:[30, 11, 11, 17, 17, 8, 8, 8, 8, 8, 8, 8, 8, 64, 44, 16, 8, 12, 16, 8, 8, 8, 7, 31, 21, 17, 10, 10, 10, 7, 5]
+true label rank:[10  5  5  8  8  3  3  3  3  3  3  3  3 13 12  7  3  6  7  3  3  3  2 11
+  9  8  4  4  4  2  1]
+predicted label:tf.Tensor(
+[30.820885  12.696059  12.062884  15.806682  15.034445   7.1784563
+  7.0703526  6.363555   7.3289347  8.06357    7.7980537  6.890863
+  9.364723  52.661266  48.94117   13.973565   7.6974583 12.375923
+ 15.441043   7.9839916  7.853063   8.674586   6.7727623 24.955486
+ 18.282993  14.5257015  9.478964  10.305949  10.521301   6.369692
+  4.4180956], shape=(31,), dtype=float32)
+predicted label rank:[29 21 19 26 24  7  6  2  8 13 10  5 15 31 30 22  9 20 25 12 11 14  4 28
+ 27 23 16 17 18  3  1]
+mse:tf.Tensor(7.333807, shape=(), dtype=float32)
+-------
+true label:[18, 10, 10, 16, 10, 10, 10, 10, 44, 18, 10, 10, 9, 14, 7, 9, 7, 8, 6, 6, 10, 7, 13]
+true label rank:[ 9  5  5  8  5  5  5  5 10  9  5  5  4  7  2  4  2  3  1  1  5  2  6]
+predicted label:tf.Tensor(
+[21.24653    8.7107525  8.811594  15.872363   9.502221  10.902548
+ 10.917459  10.943012  52.422016  18.669456   9.997915   9.282581
+  8.790928  17.710777   7.770254   7.415024   4.923295   8.52819
+  7.440476   6.3989224 10.069515   6.8017015 10.737108 ], shape=(23,), dtype=float32)
+predicted label rank:[22  8 10 19 12 16 17 18 23 21 13 11  9 20  6  4  1  7  5  2 14  3 15]
+mse:tf.Tensor(5.096825, shape=(), dtype=float32)
+-------
+true label:[119, 17]
+true label rank:[2 1]
+predicted label:tf.Tensor([110.08546   12.119241], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(51.645447, shape=(), dtype=float32)
+-------
+true label:[38, 110, 129, 25]
+true label rank:[2 3 4 1]
+predicted label:tf.Tensor([179.00389   66.23082  110.908646  25.444464], shape=(4,), dtype=float32)
+predicted label rank:[4 2 3 1]
+mse:tf.Tensor(5531.333, shape=(), dtype=float32)
+-------
+true label:[233, 41]
+true label rank:[2 1]
+predicted label:tf.Tensor([221.35033  33.06981], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(99.30141, shape=(), dtype=float32)
+-------
+true label:[145, 17]
+true label rank:[2 1]
+predicted label:tf.Tensor([147.92744   13.483574], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(10.467592, shape=(), dtype=float32)
+-------
+true label:[33, 9]
+true label rank:[2 1]
+predicted label:tf.Tensor([35.151157 12.63381 ], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(8.916027, shape=(), dtype=float32)
+-------
+true label:[103, 17]
+true label rank:[2 1]
+predicted label:tf.Tensor([101.528656  28.071587], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(62.372444, shape=(), dtype=float32)
+-------
+true label:[117, 17]
+true label rank:[2 1]
+predicted label:tf.Tensor([107.50363    9.938944], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(70.01976, shape=(), dtype=float32)
+-------
+true label:[191, 13]
+true label rank:[2 1]
+predicted label:tf.Tensor([188.82845   23.734661], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(59.9743, shape=(), dtype=float32)
+-------
+true label:[193, 9]
+true label rank:[2 1]
+predicted label:tf.Tensor([192.39922   11.178971], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(2.5544288, shape=(), dtype=float32)
+-------
+true label:[131, 13]
+true label rank:[2 1]
+predicted label:tf.Tensor([123.871025  10.065157], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(29.717794, shape=(), dtype=float32)
+-------
+true label:[3]
+true label rank:[1]
+predicted label:tf.Tensor([2.8926795], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.0115177, shape=(), dtype=float32)
+-------
+true label:[4]
+true label rank:[1]
+predicted label:tf.Tensor([3.1054175], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.8002779, shape=(), dtype=float32)
+-------
+true label:[32]
+true label rank:[1]
+predicted label:tf.Tensor([34.213737], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(4.900634, shape=(), dtype=float32)
+-------
+true label:[6, 5]
+true label rank:[2 1]
+predicted label:tf.Tensor([5.035761  6.9191628], shape=(2,), dtype=float32)
+predicted label rank:[1 2]
+mse:tf.Tensor(2.3064713, shape=(), dtype=float32)
+-------
+true label:[37]
+true label rank:[1]
+predicted label:tf.Tensor([37.238937], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.057091072, shape=(), dtype=float32)
+-------
+true label:[4, 3]
+true label rank:[2 1]
+predicted label:tf.Tensor([4.120576  3.0685012], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(0.009615484, shape=(), dtype=float32)
+-------
+true label:[163, 26, 155, 129, 126, 112, 102]
+true label rank:[7 1 6 5 4 3 2]
+predicted label:tf.Tensor(
+[255.33015   40.35812  104.79183  157.10727  107.7535    81.01007
+  55.295933], shape=(7,), dtype=float32)
+predicted label rank:[7 1 4 6 5 3 2]
+mse:tf.Tensor(2216.639, shape=(), dtype=float32)
+-------
+true label:[6, 15, 3, 3, 3, 11, 11, 3, 3, 19, 4, 13, 15, 62]
+true label rank:[3 6 1 1 1 4 4 1 1 7 2 5 6 8]
+predicted label:tf.Tensor(
+[14.103494  17.912785   3.6281762  4.9664354  3.23841   27.804104
+ 11.978794   3.0572042  3.7128544 24.005907   4.2726035 27.39451
+ 35.370457  37.776073 ], shape=(14,), dtype=float32)
+predicted label rank:[ 8  9  3  6  2 12  7  1  4 10  5 11 13 14]
+mse:tf.Tensor(114.02901, shape=(), dtype=float32)
+-------
+true label:[4, 4, 4, 4, 3, 3, 3, 3, 3]
+true label rank:[2 2 2 2 1 1 1 1 1]
+predicted label:tf.Tensor(
+[4.943994  3.9311383 4.108335  4.013885  3.3092928 3.3121827 3.0020213
+ 3.2917383 3.2511997], shape=(9,), dtype=float32)
+predicted label rank:[9 6 8 7 4 5 1 3 2]
+mse:tf.Tensor(0.13879251, shape=(), dtype=float32)
+-------
+true label:[4, 4, 4, 4, 3, 3, 3, 3, 3]
+true label rank:[2 2 2 2 1 1 1 1 1]
+predicted label:tf.Tensor(
+[4.943994  3.9311383 4.108335  4.013885  3.3092928 3.3121827 3.0020213
+ 3.2917383 3.2511997], shape=(9,), dtype=float32)
+predicted label rank:[9 6 8 7 4 5 1 3 2]
+mse:tf.Tensor(0.13879251, shape=(), dtype=float32)
+-------
+true label:[3, 3, 3, 3, 3, 3, 3, 3, 3]
+true label rank:[1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[4.3569603 4.2849617 3.8807588 4.139569  3.6708355 3.3684514 3.113533
+ 3.2486024 3.346283 ], shape=(9,), dtype=float32)
+predicted label rank:[9 8 6 7 5 4 1 2 3]
+mse:tf.Tensor(0.70524466, shape=(), dtype=float32)
+-------
+true label:[3]
+true label rank:[1]
+predicted label:tf.Tensor([2.81979], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.032475684, shape=(), dtype=float32)
+-------
+true label:[12, 12, 16, 12, 6, 6, 16, 70, 317, 160, 82, 12, 8, 6, 10, 16, 16, 12, 20, 10, 10, 8, 8, 8, 4, 4, 8, 6, 6, 8, 4, 4, 5, 5, 12, 5, 5, 8, 8, 12, 12, 8, 6, 6, 82, 82]
+true label rank:[ 6  6  7  6  3  3  7  9 12 11 10  6  4  3  5  7  7  6  8  5  5  4  4  4
+  1  1  4  3  3  4  1  1  2  2  6  2  2  4  4  6  6  4  3  3 10 10]
+predicted label:tf.Tensor(
+[ 10.59632    13.274572   13.276403   10.514072    4.889464    5.8583794
+  15.246649   65.78586   273.39035   128.8166     99.21788     8.105584
+   7.128591    4.9321885  11.913057   14.27388    15.725565   14.251551
+  59.798527    8.715696    8.981902    7.8547335   6.7317467   8.3573265
+   4.09337     3.703258    8.460129    4.069806    5.922498    8.933058
+   4.3257103   4.7329645   5.403142    4.4926157  11.046721    3.8937666
+   4.727912    7.312152    7.800778   10.475984   10.030197    7.288859
+   4.946188    5.952611   71.7863     43.573605 ], shape=(46,), dtype=float32)
+predicted label rank:[31 34 35 30  9 13 38 42 46 45 44 22 17 10 33 37 39 36 41 25 27 21 16 23
+  4  1 24  3 14 26  5  8 12  6 32  2  7 19 20 29 28 18 11 15 43 40]
+mse:tf.Tensor(139.52391, shape=(), dtype=float32)
+-------
+true label:[28, 72, 68, 82]
+true label rank:[1 3 2 4]
+predicted label:tf.Tensor([ 25.983154  63.2233    78.08032  115.793144], shape=(4,), dtype=float32)
+predicted label rank:[1 2 3 4]
+mse:tf.Tensor(331.1719, shape=(), dtype=float32)
+-------
+true label:[6, 46, 41, 5, 6, 5, 6, 5, 6, 5, 6, 4, 6, 7, 4]
+true label rank:[3 6 5 2 3 2 3 2 3 2 3 1 3 4 1]
+predicted label:tf.Tensor(
+[ 5.5363536 43.75964   36.173145   5.0029497  5.297618   4.167202
+  6.6147027  5.777685   6.344619   5.768115   4.9035244  4.142289
+  6.8821783  7.909731   6.406395 ], shape=(15,), dtype=float32)
+predicted label rank:[ 6 15 14  4  5  2 11  8  9  7  3  1 12 13 10]
+mse:tf.Tensor(2.6686745, shape=(), dtype=float32)
+-------
+true label:[6, 46, 42, 5, 6, 6, 6, 6, 6, 5, 6, 5, 5, 6]
+true label rank:[2 4 3 1 2 2 2 2 2 1 2 1 1 2]
+predicted label:tf.Tensor(
+[ 7.3426785 46.67776   35.715042   5.9163227  4.951048   3.958096
+  4.07763    7.6379986  6.742235   5.9688387  5.761183   4.165964
+  5.479439   5.299496 ], shape=(14,), dtype=float32)
+predicted label rank:[11 14 13  8  4  1  2 12 10  9  7  3  6  5]
+mse:tf.Tensor(4.0866776, shape=(), dtype=float32)
+-------
+true label:[28, 72, 68, 131]
+true label rank:[1 3 2 4]
+predicted label:tf.Tensor([ 29.070524  67.38664   63.906124 107.67448 ], shape=(4,), dtype=float32)
+predicted label rank:[1 3 2 4]
+mse:tf.Tensor(145.81723, shape=(), dtype=float32)
+-------
+true label:[4, 3, 3]
+true label rank:[2 1 1]
+predicted label:tf.Tensor([3.9466903 2.9268477 4.1586037], shape=(3,), dtype=float32)
+predicted label rank:[2 1 3]
+mse:tf.Tensor(0.45018518, shape=(), dtype=float32)
+-------
+true label:[3, 3]
+true label rank:[1 1]
+predicted label:tf.Tensor([3.0058553 3.5419285], shape=(2,), dtype=float32)
+predicted label rank:[1 2]
+mse:tf.Tensor(0.1468604, shape=(), dtype=float32)
+-------
+true label:[4, 5]
+true label rank:[1 2]
+predicted label:tf.Tensor([3.7376003 7.29815  ], shape=(2,), dtype=float32)
+predicted label rank:[1 2]
+mse:tf.Tensor(2.6751735, shape=(), dtype=float32)
+-------
+true label:[3, 3]
+true label rank:[1 1]
+predicted label:tf.Tensor([4.2366023 3.0870924], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(0.7683852, shape=(), dtype=float32)
+-------
+true label:[21]
+true label rank:[1]
+predicted label:tf.Tensor([22.035591], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(1.072449, shape=(), dtype=float32)
+-------
+true label:[292, 129]
+true label rank:[2 1]
+predicted label:tf.Tensor([242.49129  106.928795], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(1469.1254, shape=(), dtype=float32)
+-------
+true label:[3]
+true label rank:[1]
+predicted label:tf.Tensor([2.8036041], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.03857134, shape=(), dtype=float32)
+-------
+true label:[3]
+true label rank:[1]
+predicted label:tf.Tensor([2.9654374], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.0011945724, shape=(), dtype=float32)
+-------
+true label:[3]
+true label rank:[1]
+predicted label:tf.Tensor([2.6425414], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.12777664, shape=(), dtype=float32)
+-------
+true label:[8, 6, 7, 5, 10, 12, 5, 6, 12, 8, 10, 8, 10, 6, 10, 12, 16, 12, 9, 12, 8, 11, 7, 9, 6, 9, 10, 6, 19]
+true label rank:[ 4  2  3  1  6  8  1  2  8  4  6  4  6  2  6  8  9  8  5  8  4  7  3  5
+  2  5  6  2 10]
+predicted label:tf.Tensor(
+[ 9.520506   7.3773074 14.142662   7.110741  13.435333  19.322746
+  7.3548427  5.9549866 12.590901   8.241864  12.4513645  9.078663
+ 12.270018   7.270422  14.622452  15.135948  19.462528  16.706718
+ 10.997755  16.297031   9.246537  16.79757    8.150246  10.719179
+  7.244376  10.4370575  9.817808   5.1286526  8.014431 ], shape=(29,), dtype=float32)
+predicted label rank:[13  7 22  3 21 28  6  2 20 10 19 11 18  5 23 24 29 26 17 25 12 27  9 16
+  4 15 14  1  8]
+mse:tf.Tensor(13.701125, shape=(), dtype=float32)
+-------
+true label:[4]
+true label rank:[1]
+predicted label:tf.Tensor([3.0859137], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.8355538, shape=(), dtype=float32)
+-------
+true label:[3, 5, 4]
+true label rank:[1 3 2]
+predicted label:tf.Tensor([2.9781575 4.8807693 3.3702703], shape=(3,), dtype=float32)
+predicted label rank:[1 3 2]
+mse:tf.Tensor(0.1370842, shape=(), dtype=float32)
+-------
+true label:[3]
+true label rank:[1]
+predicted label:tf.Tensor([2.9499028], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.0025097323, shape=(), dtype=float32)
+-------
+true label:[3]
+true label rank:[1]
+predicted label:tf.Tensor([2.9499028], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.0025097323, shape=(), dtype=float32)
+-------
+true label:[197]
+true label rank:[1]
+predicted label:tf.Tensor([176.1327], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(435.44397, shape=(), dtype=float32)
+-------
+true label:[6, 5]
+true label rank:[2 1]
+predicted label:tf.Tensor([3.3102422 2.9597495], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(5.6987095, shape=(), dtype=float32)
+-------
+true label:[5, 7, 13, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 7, 8, 8, 8, 8, 8]
+true label rank:[1 2 4 1 1 1 1 1 1 1 1 1 1 2 3 3 3 3 3]
+predicted label:tf.Tensor(
+[ 5.729181   6.311384   3.99022    4.184152   3.92628    4.378107
+  4.726216   3.9188006  6.1675067  4.9778366  4.9861135  5.221463
+  5.6137724  6.3438873 10.294592   6.1798368 11.971819   6.8605814
+  7.643258 ], shape=(19,), dtype=float32)
+predicted label rank:[11 14  3  4  2  5  6  1 12  7  8  9 10 15 18 13 19 16 17]
+mse:tf.Tensor(5.980539, shape=(), dtype=float32)
+-------
+true label:[5, 5, 7, 5, 5, 6, 5, 5, 5, 8, 8, 8]
+true label rank:[1 1 3 1 1 2 1 1 1 4 4 4]
+predicted label:tf.Tensor(
+[ 5.753133   5.211015   7.8714857  6.15622    4.599737   5.4080853
+  5.145215   4.4651613  5.2458653  7.588242   7.56475   16.975183 ], shape=(12,), dtype=float32)
+predicted label rank:[ 7  4 11  8  2  6  3  1  5 10  9 12]
+mse:tf.Tensor(7.041594, shape=(), dtype=float32)
+-------
+true label:[5, 5, 5, 5, 6, 8, 8, 8, 7, 5, 5, 5, 10, 5, 5]
+true label rank:[1 1 1 1 2 4 4 4 3 1 1 1 5 1 1]
+predicted label:tf.Tensor(
+[ 5.067425   5.7143955  5.1767445  7.0681653  3.7787967  5.4211626
+  7.116577   6.854353   9.565811   6.7864895  5.8358927  6.554946
+ 10.476599   6.0147276  6.578535 ], shape=(15,), dtype=float32)
+predicted label rank:[ 2  5  3 12  1  4 13 11 14 10  6  8 15  7  9]
+mse:tf.Tensor(2.3427093, shape=(), dtype=float32)
+-------
+true label:[32, 5, 43, 13, 5, 5, 7]
+true label rank:[4 1 5 3 1 1 2]
+predicted label:tf.Tensor(
+[37.879898   4.764332  49.1879    19.379707   8.040472   8.2432375
+  9.805237 ], shape=(7,), dtype=float32)
+predicted label rank:[6 1 7 5 2 3 4]
+mse:tf.Tensor(20.178848, shape=(), dtype=float32)
+-------
+true label:[4, 4, 4, 3, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+true label rank:[2 2 2 1 2 2 2 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[4.981864  3.510428  3.949155  3.450119  3.7934089 3.914064  4.1594067
+ 3.232224  4.4854    4.0063086 4.0128508 4.2355537 4.131426  3.1082144
+ 3.4337025 3.1212409 3.6575837], shape=(17,), dtype=float32)
+predicted label rank:[17  6 10  5  8  9 14  3 16 11 12 15 13  1  4  2  7]
+mse:tf.Tensor(0.5433478, shape=(), dtype=float32)
+-------
+true label:[4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+true label rank:[2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[4.7506437 3.6308222 3.929251  4.1385393 3.9325986 3.222914  4.094856
+ 4.2395015 4.4792285 4.125192  4.2483997 4.2776794 4.1949615 2.832849
+ 3.4350872 3.3990793 3.267952  2.9001584 3.217558 ], shape=(19,), dtype=float32)
+predicted label rank:[19  8  9 13 10  4 11 15 18 12 16 17 14  1  7  6  5  2  3]
+mse:tf.Tensor(0.6364179, shape=(), dtype=float32)
+-------
+true label:[3, 3, 3]
+true label rank:[1 1 1]
+predicted label:tf.Tensor([4.1787295 3.1408963 3.1969056], shape=(3,), dtype=float32)
+predicted label rank:[3 1 2]
+mse:tf.Tensor(0.48267567, shape=(), dtype=float32)
+-------
+true label:[3, 4]
+true label rank:[1 2]
+predicted label:tf.Tensor([2.959494  2.8724341], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(0.6365227, shape=(), dtype=float32)
+-------
+true label:[4, 5, 5]
+true label rank:[1 2 2]
+predicted label:tf.Tensor([3.4555573 4.793025  3.3052979], shape=(3,), dtype=float32)
+predicted label rank:[2 3 1]
+mse:tf.Tensor(1.070424, shape=(), dtype=float32)
+-------
+true label:[3]
+true label rank:[1]
+predicted label:tf.Tensor([2.8926795], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.0115177, shape=(), dtype=float32)
+-------
+mean(mse_list):284.48492

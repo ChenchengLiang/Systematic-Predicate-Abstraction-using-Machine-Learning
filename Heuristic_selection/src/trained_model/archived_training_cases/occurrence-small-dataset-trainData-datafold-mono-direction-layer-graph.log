@@ -1,0 +1,154 @@
+best_valid_epoch:2.0
+train loss:0.021153096
+valid loss:0.8887274
+test loss list:tf.Tensor(3.2668085, shape=(), dtype=float32)
+mean test loss:3.2668085
+mean loss list:tf.Tensor(3.4378395, shape=(), dtype=float32)
+mean mean loss:3.4378395
+accuracy list:[<tf.Tensor: shape=(), dtype=float64, numpy=0.33755274261603374>]
+mean accuracy:0.33755274261603374
+-------
+original argument scores:[0, 1, 1]
+original rank:[1 2 2]
+predicted argument scores:tf.Tensor([1.2532761  1.3430349  0.99320734], shape=(3,), dtype=float32)
+predicted rank:[2 3 1]
+mse:tf.Tensor(0.56280667, shape=(), dtype=float32)
+-------
+original argument scores:[2, 2, 1, 2, 1]
+original rank:[2 2 1 2 1]
+predicted argument scores:tf.Tensor([1.2683265 1.3402299 0.9328887 1.2561814 1.8556887], shape=(5,), dtype=float32)
+predicted rank:[3 4 1 2 5]
+mse:tf.Tensor(0.45212317, shape=(), dtype=float32)
+-------
+original argument scores:[0, 2, 1, 2, 1]
+original rank:[1 3 2 3 2]
+predicted argument scores:tf.Tensor([1.2683265 1.3402299 0.9328887 1.2561814 1.8556887], shape=(5,), dtype=float32)
+predicted rank:[3 4 1 2 5]
+mse:tf.Tensor(0.6667844, shape=(), dtype=float32)
+-------
+original argument scores:[0, 2, 1, 2, 1]
+original rank:[1 3 2 3 2]
+predicted argument scores:tf.Tensor([1.2683265 1.3402299 0.9328887 1.2561814 1.8556887], shape=(5,), dtype=float32)
+predicted rank:[3 4 1 2 5]
+mse:tf.Tensor(0.6667844, shape=(), dtype=float32)
+-------
+original argument scores:[0, 3, 3]
+original rank:[1 2 2]
+predicted argument scores:tf.Tensor([1.2532761  1.3430349  0.99320734], shape=(3,), dtype=float32)
+predicted rank:[2 3 1]
+mse:tf.Tensor(2.78115, shape=(), dtype=float32)
+-------
+original argument scores:[1, 0, 1, 0, 2, 1, 2, 1, 0]
+original rank:[2 1 2 1 3 2 3 2 1]
+predicted argument scores:tf.Tensor(
+[0.8640068 1.0758584 0.7738046 1.6962172 2.1527224 1.3517604 1.0795082
+ 1.2935624 1.986711 ], shape=(9,), dtype=float32)
+predicted rank:[2 3 1 7 9 6 4 5 8]
+mse:tf.Tensor(1.0146496, shape=(), dtype=float32)
+-------
+original argument scores:[0, 0, 2, 0, 1, 2]
+original rank:[1 1 3 1 2 3]
+predicted argument scores:tf.Tensor([0.7136379  0.83070725 0.60014254 0.66150224 0.99062645 0.5072456 ], shape=(6,), dtype=float32)
+predicted rank:[4 5 2 3 6 1]
+mse:tf.Tensor(0.97082394, shape=(), dtype=float32)
+-------
+original argument scores:[0, 0, 2, 2, 3, 0, 0, 0, 2, 3, 0, 0, 2, 2, 3, 2]
+original rank:[1 1 2 2 3 1 1 1 2 3 1 1 2 2 3 2]
+predicted argument scores:tf.Tensor(
+[1.1488674  1.1258217  0.87111604 1.1416904  1.6598971  0.4840719
+ 0.38157827 0.5344793  0.73504704 0.6135579  0.4878082  0.38403684
+ 0.29541796 0.6477288  0.44412246 0.43485084], shape=(16,), dtype=float32)
+predicted rank:[15 13 12 14 16  6  2  8 11  9  7  3  1 10  5  4]
+mse:tf.Tensor(1.778563, shape=(), dtype=float32)
+-------
+original argument scores:[0, 2, 2, 1, 1, 0, 0, 2, 2, 1, 1, 0, 0, 2, 2, 1, 1, 0, 0, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0]
+original rank:[1 3 3 2 2 1 1 3 3 2 2 1 1 3 3 2 2 1 1 3 3 2 2 1 1 1 1 1 1 1]
+predicted argument scores:tf.Tensor(
+[0.9788157  1.00718    0.74132174 0.89656276 1.3307676  0.62793857
+ 0.4230672  0.51308197 0.7945097  0.59565187 0.44709834 0.2855237
+ 0.5727158  1.2353184  0.73306185 0.73678666 0.46234035 0.46969715
+ 0.44337934 0.40332597 0.5872793  0.42211145 0.5002159  0.434771
+ 0.37705773 0.40179923 0.24399273 0.37657848 0.36551818 0.48664176], shape=(30,), dtype=float32)
+predicted rank:[27 28 24 26 30 21  9 17 25 20 12  2 18 29 22 23 13 14 11  7 19  8 16 10
+  5  6  1  4  3 15]
+mse:tf.Tensor(0.59743416, shape=(), dtype=float32)
+-------
+original argument scores:[0, 2, 2, 0, 0, 0, 2, 2, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 2, 2, 0, 0, 0, 2, 2, 0, 0]
+original rank:[1 2 2 1 1 1 2 2 1 1 1 2 2 2 1 1 1 1 2 1 1 1 1 2 1 1 2 2 1 1 1 2 2 1 1]
+predicted argument scores:tf.Tensor(
+[0.95079714 1.0972564  0.7180693  0.89323485 1.4699916  0.50196004
+ 0.38873997 0.48100144 0.7584966  0.58532983 0.867617   0.5711555
+ 0.5802792  1.2703974  0.8039429  0.6707933  0.35001016 0.32399467
+ 0.5154006  0.32050282 0.8547393  0.55153924 0.53714466 0.38261497
+ 0.57938313 0.5781937  0.45661685 0.49791107 0.39803994 0.7180386
+ 0.31320697 0.53098476 0.44012243 0.37283307 0.3381411 ], shape=(35,), dtype=float32)
+predicted rank:[32 33 26 31 35 14  8 12 27 23 30 19 22 34 28 24  5  3 15  2 29 18 17  7
+ 21 20 11 13  9 25  1 16 10  6  4]
+mse:tf.Tensor(1.035185, shape=(), dtype=float32)
+-------
+original argument scores:[1, 1, 0, 3, 0, 2, 1, 0, 3, 3, 2, 0, 0, 0, 1, 1, 2, 0, 0, 0, 1, 1, 0, 2]
+original rank:[2 2 1 4 1 3 2 1 4 4 3 1 1 1 2 2 3 1 1 1 2 2 1 3]
+predicted argument scores:tf.Tensor(
+[0.5132838  0.59957224 0.45220667 0.5987591  0.7775206  0.94592434
+ 0.76259774 1.0089962  1.482166   1.0587288  0.8640037  0.33542174
+ 0.32395393 0.81484884 0.48061144 0.52520066 0.4408244  0.32037312
+ 0.35309917 0.43179873 0.5478124  0.35263598 0.42390093 0.34135842], shape=(24,), dtype=float32)
+predicted rank:[12 16 10 15 18 21 17 22 24 23 20  3  2 19 11 13  9  1  6  8 14  5  7  4]
+mse:tf.Tensor(1.0123473, shape=(), dtype=float32)
+-------
+original argument scores:[0, 9, 9, 14, 14]
+original rank:[1 2 2 3 3]
+predicted argument scores:tf.Tensor([1.3909748 1.4407182 1.028055  1.334738  2.0132523], shape=(5,), dtype=float32)
+predicted rank:[3 4 1 2 5]
+mse:tf.Tensor(85.34409, shape=(), dtype=float32)
+-------
+original argument scores:[1, 1, 3, 0, 1, 2, 0, 1, 1, 2, 0]
+original rank:[2 2 4 1 2 3 1 2 2 3 1]
+predicted argument scores:tf.Tensor(
+[1.1557779  1.2111199  0.8759805  1.0398024  0.90904516 0.46212733
+ 0.38711524 0.3986179  0.6960751  0.55609536 0.4745684 ], shape=(11,), dtype=float32)
+predicted rank:[10 11  7  9  8  3  1  2  6  5  4]
+mse:tf.Tensor(0.99534327, shape=(), dtype=float32)
+-------
+original argument scores:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 2, 2]
+original rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1
+ 1 1 2 2 2 1 1 1 1 1 2 2]
+predicted argument scores:tf.Tensor(
+[0.66076016 0.64591545 0.50589174 0.53376204 0.84537727 0.42548838
+ 0.39254707 0.48152983 0.6958086  0.5667412  0.4881913  0.29155242
+ 0.384003   0.7772315  0.64726764 0.6103896  0.4280774  0.44225413
+ 0.5009285  0.5185631  0.61403084 0.388369   0.5090138  0.50221044
+ 0.5047487  0.72093385 0.3461812  0.5495098  0.3100779  0.5168335
+ 0.22505268 0.51975465 0.37006065 0.39067328 0.32120997 0.68047833
+ 0.7617823  0.5392884  0.3325274  0.7208403  0.30016142 0.32905757
+ 0.41771454 0.35041958 0.22552511 0.4068948  0.27004498 0.5337116
+ 0.3535114 ], shape=(49,), dtype=float32)
+predicted rank:[42 40 28 34 49 20 17 23 44 37 24  4 14 48 41 38 21 22 25 31 39 15 29 26
+ 27 46 10 36  6 30  1 32 13 16  7 43 47 35  9 45  5  8 19 11  2 18  3 33
+ 12]
+mse:tf.Tensor(0.5111673, shape=(), dtype=float32)
+-------
+original argument scores:[0, 2, 2, 2, 2]
+original rank:[1 2 2 2 2]
+predicted argument scores:tf.Tensor([0.6934286  0.75483054 0.6025881  0.7838672  1.0995336 ], shape=(5,), dtype=float32)
+predicted rank:[2 3 1 4 5]
+mse:tf.Tensor(1.2547737, shape=(), dtype=float32)
+-------
+original argument scores:[1, 3, 4, 4, 5, 1, 1, 2, 2, 3, 3]
+original rank:[1 3 4 4 5 1 1 2 2 3 3]
+predicted argument scores:tf.Tensor(
+[0.9816746  1.0169597  0.8357801  1.0255144  1.4999515  0.40702537
+ 0.36350137 0.63973826 0.9579368  0.7914091  0.6754798 ], shape=(11,), dtype=float32)
+predicted rank:[ 8  9  6 10 11  2  1  3  7  5  4]
+mse:tf.Tensor(4.4561095, shape=(), dtype=float32)
+-------
+original argument scores:[2, 2, 6, 4, 6, 1, 3, 3, 3, 4, 1, 4, 4, 3, 4]
+original rank:[2 2 5 4 5 1 3 3 3 4 1 4 4 3 4]
+predicted argument scores:tf.Tensor(
+[1.3954372  1.4863958  0.97211325 1.3118939  2.109519   0.7615168
+ 0.57083714 0.70934844 1.0509808  0.8265061  0.7050302  0.3957895
+ 0.38585556 0.9397169  0.58359176], shape=(15,), dtype=float32)
+predicted rank:[13 14 10 12 15  7  3  6 11  8  5  2  1  9  4]
+mse:tf.Tensor(7.6934137, shape=(), dtype=float32)
+-------
+mean(mse_list):6.576092

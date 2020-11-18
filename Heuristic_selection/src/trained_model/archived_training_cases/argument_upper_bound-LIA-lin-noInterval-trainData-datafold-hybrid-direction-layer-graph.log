@@ -1,0 +1,2353 @@
+best_valid_epoch:18.0
+train loss:9.229532e+16
+valid loss:4.830287e+16
+test loss list:tf.Tensor(1.10218674e+18, shape=(), dtype=float32)
+mean test loss:1.10218674e+18
+mean loss list:tf.Tensor(8.3876025e+17, shape=(), dtype=float32)
+mean mean loss:8.3876025e+17
+accuracy list:[<tf.Tensor: shape=(), dtype=float64, numpy=0.07351778656126483>]
+mean accuracy:0.07351778656126483
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/four1.smt2-0046_000.smt2
+true label:[3]
+true label rank:[1]
+predicted label:tf.Tensor([1.9949219], shape=(1,), dtype=float32)
+rounded label:tf.Tensor([2.], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(1.0101819, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/metros_1_e8_725_e3_556_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, -1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 9, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, -1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 9, 1]
+true label rank:[2 2 2 2 2 2 2 2 2 2 2 2 3 2 2 3 2 2 3 2 2 3 2 2 3 2 2 3 2 2 3 2 2 3 2 2 3
+ 3 3 2 2 3 2 2 3 3 3 3 2 2 2 2 3 3 3 3 2 2 2 2 3 3 3 3 2 2 2 2 3 3 3 3 2 2
+ 2 3 3 3 3 3 1 2 2 2 3 3 3 2 2 2 3 3 2 2 2 3 3 3 2 2 4 2 3 3 3 2 2 2 3 3 3
+ 2 3 3 2 3 2 3 3 2 3 3 2 3 2 3 2 3 1 2 3 2 2 3 2 3 2 2 3 2 4 3]
+predicted label:tf.Tensor(
+[-1.62185459e+01 -3.72807789e+00  2.56051123e+03 -1.72074375e+01
+  2.10006516e+02 -1.44778872e+00  1.14049768e+03 -1.98272896e+00
+ -1.63805246e-01  1.55780991e+02 -3.99167633e+00 -3.09365678e+00
+  9.16820467e-01  5.99861572e+02 -8.09971094e-01 -4.01116535e-02
+ -1.25016928e-01 -1.98071146e+00  1.04524934e+00 -2.29392529e-01
+ -3.38800764e+00 -1.69742033e-02 -6.50864601e-01 -7.87523985e-01
+ -3.61082315e-01  5.37464844e+02  1.78907410e+02  9.77371812e-01
+  4.27085161e-01  3.22746396e+00 -2.62078881e-01 -1.00971127e+00
+ -8.16468835e-01  2.51838207e-01 -3.25439453e-01  1.14639258e+00
+ -9.00953960e+00 -1.00288782e+01 -1.52667837e+01  2.83374634e+03
+  2.08316602e+03 -1.09500380e+01 -3.55314016e+00 -5.41294336e+00
+ -2.52685308e+00 -3.64061785e+00 -3.67089272e+00 -3.27663231e+00
+  8.74065638e-01  5.12707092e+02  2.43414246e+02  2.54190254e+00
+  4.33132723e-02  4.29684162e-01 -4.22287703e-01 -5.78982472e-01
+  2.29085037e+02  2.11171555e+02  6.41952759e+02  9.46555359e+02
+ -1.91305876e-01 -1.05256867e+00 -1.33074522e+00 -2.87008166e-01
+ -3.19247580e+00  3.18138367e+02 -6.69789743e+00  1.56717386e+01
+ -1.57951307e+00 -1.85716105e+00 -1.86725426e+00 -5.61463213e+00
+  4.35288147e+02 -1.57140827e+00 -6.31915712e+00 -2.86732793e+00
+ -9.59028244e-01 -2.27269053e+00 -9.10653830e-01  1.18839391e-01
+  4.46912289e-01  2.92960815e+02  4.23095703e-01 -6.96526861e+00
+  8.34620237e-01 -9.58770275e-01 -2.95919418e-01 -8.46521091e+00
+  2.03677567e+02  1.46622550e+00  8.56331229e-01  3.02816868e-01
+  2.51503587e-01 -3.21225405e-01  1.10354805e+01 -6.26680776e-02
+  3.16720247e-01  1.17355950e-01  3.16478027e+02  4.84654846e+01
+  1.64650333e+00  1.81394804e+00  1.10831678e+00 -1.62795782e-01
+  1.91423655e-01 -1.94439068e+01 -4.60420942e+00  3.03048535e+03
+ -6.32362700e+00 -8.16871548e+00 -8.03192997e+00 -1.97492719e+00
+ -5.07457590e+00 -4.33433294e+00 -2.18990541e+00 -7.93143702e+00
+  1.34763428e+02 -8.11729357e-02  1.70788550e+00  2.84631729e+01
+ -1.28134441e+00 -2.66233683e-01  3.22561979e-01  2.31352448e-01
+  4.46386566e+02  2.45128274e-01  9.45713013e+02 -1.80317640e-01
+  9.37352255e-02  7.59066406e+02  2.80582428e-01  1.38889492e+00
+  5.85063721e+02  1.53550863e-01 -1.78514814e+00  1.36722708e+00
+  5.87899597e+02 -1.68944860e+00 -2.84082460e+00  1.52787888e+02
+  1.15130701e+01  2.61491632e+00], shape=(142,), dtype=float32)
+rounded label:tf.Tensor(
+[-1.600e+01 -4.000e+00  2.561e+03 -1.700e+01  2.100e+02 -1.000e+00
+  1.140e+03 -2.000e+00 -0.000e+00  1.560e+02 -4.000e+00 -3.000e+00
+  1.000e+00  6.000e+02 -1.000e+00 -0.000e+00 -0.000e+00 -2.000e+00
+  1.000e+00 -0.000e+00 -3.000e+00 -0.000e+00 -1.000e+00 -1.000e+00
+ -0.000e+00  5.370e+02  1.790e+02  1.000e+00  0.000e+00  3.000e+00
+ -0.000e+00 -1.000e+00 -1.000e+00  0.000e+00 -0.000e+00  1.000e+00
+ -9.000e+00 -1.000e+01 -1.500e+01  2.834e+03  2.083e+03 -1.100e+01
+ -4.000e+00 -5.000e+00 -3.000e+00 -4.000e+00 -4.000e+00 -3.000e+00
+  1.000e+00  5.130e+02  2.430e+02  3.000e+00  0.000e+00  0.000e+00
+ -0.000e+00 -1.000e+00  2.290e+02  2.110e+02  6.420e+02  9.470e+02
+ -0.000e+00 -1.000e+00 -1.000e+00 -0.000e+00 -3.000e+00  3.180e+02
+ -7.000e+00  1.600e+01 -2.000e+00 -2.000e+00 -2.000e+00 -6.000e+00
+  4.350e+02 -2.000e+00 -6.000e+00 -3.000e+00 -1.000e+00 -2.000e+00
+ -1.000e+00  0.000e+00  0.000e+00  2.930e+02  0.000e+00 -7.000e+00
+  1.000e+00 -1.000e+00 -0.000e+00 -8.000e+00  2.040e+02  1.000e+00
+  1.000e+00  0.000e+00  0.000e+00 -0.000e+00  1.100e+01 -0.000e+00
+  0.000e+00  0.000e+00  3.160e+02  4.800e+01  2.000e+00  2.000e+00
+  1.000e+00 -0.000e+00  0.000e+00 -1.900e+01 -5.000e+00  3.030e+03
+ -6.000e+00 -8.000e+00 -8.000e+00 -2.000e+00 -5.000e+00 -4.000e+00
+ -2.000e+00 -8.000e+00  1.350e+02 -0.000e+00  2.000e+00  2.800e+01
+ -1.000e+00 -0.000e+00  0.000e+00  0.000e+00  4.460e+02  0.000e+00
+  9.460e+02 -0.000e+00  0.000e+00  7.590e+02  0.000e+00  1.000e+00
+  5.850e+02  0.000e+00 -2.000e+00  1.000e+00  5.880e+02 -2.000e+00
+ -3.000e+00  1.530e+02  1.200e+01  3.000e+00], shape=(142,), dtype=float32)
+predicted label rank:[ 3 12 50  2 30 15 48 14 16 27 12 13 17 43 15 16 16 14 17 16 13 16 15 15
+ 16 40 28 17 16 19 16 15 15 16 16 17  7  6  4 51 49  5 12 11 13 12 12 13
+ 17 39 33 19 16 16 16 15 32 31 44 47 16 15 15 16 13 36  9 22 14 14 14 10
+ 37 14 10 13 15 14 15 16 16 34 16  9 17 15 16  8 29 17 17 16 16 16 20 16
+ 16 16 35 24 18 18 17 16 16  1 11 52 10  8  8 14 11 12 14  8 25 16 18 23
+ 15 16 16 16 38 16 46 16 16 45 16 17 41 16 14 17 42 14 13 26 21 19]
+mse:tf.Tensor(245143.58, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/minepump_spec5_product55_true-unreach-call.cil.c.flat_000.smt2
+true label:[1, 1, 1, 2]
+true label rank:[1 1 1 2]
+predicted label:tf.Tensor([ -33.615826 -107.3834    -86.12408   -80.8056  ], shape=(4,), dtype=float32)
+rounded label:tf.Tensor([ -34. -107.  -86.  -81.], shape=(4,), dtype=float32)
+predicted label rank:[4 1 2 3]
+mse:tf.Tensor(6848.1475, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/loop__while_after_while_if_000.smt2
+true label:[0, 0]
+true label rank:[1 1]
+predicted label:tf.Tensor([ 61.112022 387.62543 ], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([ 61. 388.], shape=(2,), dtype=float32)
+predicted label rank:[1 2]
+mse:tf.Tensor(76994.07, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/break_safe.c-1_000.smt2
+true label:[10, 11, 11]
+true label rank:[1 2 2]
+predicted label:tf.Tensor([4.331829  4.0046372 1.786106 ], shape=(3,), dtype=float32)
+rounded label:tf.Tensor([4. 4. 2.], shape=(3,), dtype=float32)
+predicted label rank:[2 2 1]
+mse:tf.Tensor(55.319702, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/reverse_ret_unsafe.c_000.smt2
+true label:[4, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[2 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 2
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1]
+predicted label:tf.Tensor(
+[-1.8074169e+00 -6.6052310e-02  2.1203208e-01  1.9823976e+00
+ -1.8287125e+00  1.3374943e+00  7.1820772e-01  4.8957068e-01
+ -1.3479831e+00  5.3300333e-01  7.3553238e+01  1.0540707e+00
+ -3.6224217e+00  1.0137303e+00  8.4252894e-01  4.2134659e+01
+  1.0261806e+00  1.0371082e+00  1.5693431e+00  2.1944468e+00
+  1.3509870e+00  1.7016597e+02  3.8564539e-01  3.7250525e+02
+  1.0697013e+00  1.2778536e+00 -1.4452899e+00  1.2924644e+00
+ -1.3317704e+00  1.6902400e+02  2.9890554e+01  1.5186682e+00
+  1.6611595e+00  8.8747466e-01  6.3844514e-01  2.3703504e+00
+  5.5744553e-01  2.9480655e+00  5.7389402e-01  5.8074927e-01
+  3.5769236e-01  9.3643939e-01  2.8730137e+00  7.5230670e-01
+  2.1771438e-02  1.3619722e+00  1.2377368e+00  2.7621472e-01
+  6.7118084e-01  1.5411160e+00  1.5970498e+01  1.5052447e+00
+  1.2068601e+00  1.1405115e+00  1.0449553e-01  1.2155999e+00
+  9.6985734e-01  1.2685585e+00  1.2669950e+00  1.0184634e+00
+  1.3488315e+00  1.5483150e+00  5.3127968e-01  3.8706279e-01
+  1.3944340e+00  1.2673028e+00  1.0731852e+00  1.3220282e+00
+  1.3047769e+00  6.0405262e-02  1.0317837e+00  1.3300843e+00
+  1.0264333e+00  1.2196469e+00  1.1011409e+00  1.3484495e+00
+  3.5119083e+01], shape=(77,), dtype=float32)
+rounded label:tf.Tensor(
+[ -2.  -0.   0.   2.  -2.   1.   1.   0.  -1.   1.  74.   1.  -4.   1.
+   1.  42.   1.   1.   2.   2.   1. 170.   0. 373.   1.   1.  -1.   1.
+  -1. 169.  30.   2.   2.   1.   1.   2.   1.   3.   1.   1.   0.   1.
+   3.   1.   0.   1.   1.   0.   1.   2.  16.   2.   1.   1.   0.   1.
+   1.   1.   1.   1.   1.   2.   1.   0.   1.   1.   1.   1.   1.   0.
+   1.   1.   1.   1.   1.   1.  35.], shape=(77,), dtype=float32)
+predicted label rank:[ 2  4  4  6  2  5  5  4  3  5 12  5  1  5  5 11  5  5  6  6  5 14  4 15
+  5  5  3  5  3 13  9  6  6  5  5  6  5  7  5  5  4  5  7  5  4  5  5  4
+  5  6  8  6  5  5  4  5  5  5  5  5  5  6  5  4  5  5  5  5  5  4  5  5
+  5  5  5  5 10]
+mse:tf.Tensor(2675.8093, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/minepump_spec2_product64_true-unreach-call.cil.c.flat_000.smt2
+true label:[1, 2, 1, 1, 1]
+true label rank:[1 2 1 1 1]
+predicted label:tf.Tensor([-168.01036   -42.952385  -57.357525  -72.61387   -38.525654], shape=(5,), dtype=float32)
+rounded label:tf.Tensor([-168.  -43.  -57.  -73.  -39.], shape=(5,), dtype=float32)
+predicted label rank:[1 4 3 2 5]
+mse:tf.Tensor(8194.42, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/bandec.smt2-0131_000.smt2
+true label:[1, 2, 2, 3, 1, 1, 3]
+true label rank:[1 2 2 3 1 1 3]
+predicted label:tf.Tensor(
+[1.4571391  1.7808244  1.5120175  1.1251745  0.47102046 0.47533822
+ 1.3182664 ], shape=(7,), dtype=float32)
+rounded label:tf.Tensor([1. 2. 2. 1. 0. 0. 1.], shape=(7,), dtype=float32)
+predicted label rank:[2 3 3 2 1 1 2]
+mse:tf.Tensor(1.0562042, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/four1.smt2-0033_000.smt2
+true label:[3, 3]
+true label rank:[1 1]
+predicted label:tf.Tensor([1.6461489 1.2953901], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([2. 1.], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(2.3693037, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/traverse3_unsafe.c_000.smt2
+true label:[7, 3, 5, 2, 2, 9, 4, 7, 0, 1, 0, 0, 0, 0, 2, 2, 2, 2, 11, 5, 9, 0, 1, 0, 0, 0, 0, 2, 2, 2, 2, 13, 6, 11, 0, 1, 0, 0, 0, 0, 2, 2, 2, 2, 15, 7, 13, 0, 1, 0, 0, 0, 0, 2, 2, 2, 2, 8, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[ 8  4  6  3  3 10  5  8  1  2  1  1  1  1  3  3  3  3 11  6 10  1  2  1
+  1  1  1  3  3  3  3 12  7 11  1  2  1  1  1  1  3  3  3  3 13  8 12  1
+  2  1  1  1  1  3  3  3  3  9 13  1  1  1  1  1  1  1  1  1  1  1  1  1
+  1  1  1  1  1  1  1  1  1  1  1]
+predicted label:tf.Tensor(
+[ 2.7903500e+00  1.1517148e+01 -5.1604366e-01  6.4356811e-02
+  2.7881112e+00  1.0541998e+00  9.8080391e-01  7.7971704e-02
+  7.5240314e-01  1.0804489e+00  1.0698307e+00  7.4267483e-01
+  6.3683248e-01  1.3192570e-01  6.1106753e-01  1.6753213e+00
+  7.7543139e-01  7.5959682e-01  6.4398599e-01  1.4597988e+00
+  5.4607868e-01  5.9570742e-01  5.3356349e-01  1.4799333e+00
+  1.0688109e+00  1.4918308e+00 -2.3858209e+00  2.2609375e+00
+  1.3148123e+00 -1.9307611e+00  1.2218751e+00  2.3824894e-01
+  1.4886620e+02  2.5212782e+02 -8.3837557e-01  6.2348553e+01
+  1.0650607e+00  1.3127695e+02  1.3948315e+02  5.3760731e-01
+  1.0575253e+00  1.7094667e+00  1.3250652e+02  9.4887376e-01
+  1.0969429e+00  1.1552134e+00  3.4488144e+00  1.9250667e+00
+  1.2113001e+01 -2.9934669e-01  1.9873370e+00  8.0820942e-01
+  2.0201485e+00  1.8545175e+00  9.0455687e-01 -1.3665750e+00
+  1.5211509e+00  1.2756222e+00  1.3597851e+00  1.2537353e+00
+  4.3745005e-01  8.4672713e-01  7.2969496e-01  1.0534544e+00
+  9.7402513e-01  6.4037776e-01  1.1724852e+00  1.2854767e+00
+  1.5151335e+02  2.6115923e+00  1.3941805e+00  1.1434796e+00
+  4.5633984e-01  1.0912203e+02  1.8154082e+02  1.1557566e+00
+  1.1947322e+00  1.2337117e+00  1.1038051e+00  1.2401087e+00
+  1.3590713e+00  1.3421204e+00  1.4586520e+00], shape=(83,), dtype=float32)
+rounded label:tf.Tensor(
+[  3.  12.  -1.   0.   3.   1.   1.   0.   1.   1.   1.   1.   1.   0.
+   1.   2.   1.   1.   1.   1.   1.   1.   1.   1.   1.   1.  -2.   2.
+   1.  -2.   1.   0. 149. 252.  -1.  62.   1. 131. 139.   1.   1.   2.
+ 133.   1.   1.   1.   3.   2.  12.  -0.   2.   1.   2.   2.   1.  -1.
+   2.   1.   1.   1.   0.   1.   1.   1.   1.   1.   1.   1. 152.   3.
+   1.   1.   0. 109. 182.   1.   1.   1.   1.   1.   1.   1.   1.], shape=(83,), dtype=float32)
+predicted label rank:[ 6  7  2  3  6  4  4  3  4  4  4  4  4  3  4  5  4  4  4  4  4  4  4  4
+  4  4  1  5  4  1  4  3 13 16  2  8  4 10 12  4  4  5 11  4  4  4  6  5
+  7  3  5  4  5  5  4  2  5  4  4  4  3  4  4  4  4  4  4  4 14  6  4  4
+  3  9 15  4  4  4  4  4  4  4  4]
+mse:tf.Tensor(2472.6409, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/bandec.smt2-0148_000.smt2
+true label:[1, 1, 2, 2, 3, 1, 1, 3]
+true label rank:[1 1 2 2 3 1 1 3]
+predicted label:tf.Tensor(
+[ 0.6894945   1.2244161   0.87685096  1.6460345   1.0572937  -0.08773332
+  1.3375134  -0.22920966], shape=(8,), dtype=float32)
+rounded label:tf.Tensor([ 1.  1.  1.  2.  1. -0.  1. -0.], shape=(8,), dtype=float32)
+predicted label rank:[2 2 2 3 2 1 2 1]
+mse:tf.Tensor(2.1290643, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/PRODUCER_CONSUMER_3_000.smt2
+true label:[0, 0]
+true label rank:[1 1]
+predicted label:tf.Tensor([-2.406687 62.06351 ], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([-2. 62.], shape=(2,), dtype=float32)
+predicted label rank:[1 2]
+mse:tf.Tensor(1928.8358, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/metros_4_e3_1091_e3_522_000.smt2
+true label:[0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 9, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1]
+true label rank:[2 2 2 2 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 2
+ 2 2 2 3 2 2 2 2 2 3 2 2 2 2 2 3 2 2 2 2 3 2 2 2 2 2 2 2 2 2 2 2 2 3 2 2 2
+ 2 3 2 2 2 1 3 2 2 2 2 3 2 2 2 2 3 3 4 2 2 2 3 3 2 2 2 2 3 3 3]
+predicted label:tf.Tensor(
+[-9.6074657e+00 -2.0521469e+00 -1.0622725e+00 -8.8469448e+00
+ -2.6583080e+00 -2.2035890e+00 -7.1333728e+00 -2.1313298e+00
+ -2.9723811e+00 -2.2310843e+00 -5.0545573e+00  1.1228224e+00
+  1.5793754e+00 -1.7008662e-01 -2.3050475e-01 -2.1955959e-02
+  2.3309326e-01  6.2147439e-01 -2.9243507e+00 -9.6434879e-01
+  3.2719004e-01 -7.0277071e-01 -3.7560868e-01 -5.0690413e+00
+ -2.1841049e+00  1.2847281e+00  3.0261707e-01 -1.7496226e+00
+ -1.6127605e+00 -1.5014737e+00 -1.5676870e+00 -4.7474222e+00
+ -2.7565784e+00 -5.8304467e+00 -4.7951670e+00 -2.7703009e+00
+ -1.1362195e+00  5.3811693e-01 -1.6118803e+00 -2.0700262e+00
+  1.6419041e+00 -1.8931705e-01 -6.0165358e-01 -9.8669522e-02
+  1.7463301e+00  2.8159032e+00  2.8645768e+00 -9.9266326e-01
+  1.7898157e-03 -9.9808419e-01 -9.9117681e-03 -1.8353071e+00
+  1.4770370e+00  1.7423275e+00  5.3553987e-01  2.1377091e+00
+  5.6514931e-01  1.1328593e+00 -3.0142632e+00 -2.8100376e+00
+ -1.8042951e+00 -2.3436184e+00 -2.8544409e+00 -4.4133663e-01
+ -6.4481370e-02 -6.9604874e-01 -4.1878271e+00  4.6463947e+00
+  3.4543784e+00  3.8052893e+00  3.0592041e+00  7.4816740e-01
+ -3.6069446e+00 -5.0663371e+00 -3.2098413e+00 -5.8169365e-01
+ -2.3171284e+00 -5.4854476e-01 -2.3627877e-01  9.9884295e-01
+ -4.8840976e-01 -1.7284734e+00  5.6631640e-03  1.0255198e+00
+  1.6951323e-01 -1.0149751e+00 -5.5064940e-01 -6.3367238e+00
+ -7.6663685e-01  3.0776930e-01 -4.0763736e+00 -8.9040589e-01
+ -1.2256255e+00 -4.5987439e-01 -4.0035295e-01 -1.7126584e-01
+ -3.7052703e-01  1.0194871e+00  3.9423895e-01 -2.8008831e-01
+  2.4501003e+02  5.4568481e+02  4.5648849e-01 -1.1077713e-01
+ -1.5748763e+00], shape=(105,), dtype=float32)
+rounded label:tf.Tensor(
+[-10.  -2.  -1.  -9.  -3.  -2.  -7.  -2.  -3.  -2.  -5.   1.   2.  -0.
+  -0.  -0.   0.   1.  -3.  -1.   0.  -1.  -0.  -5.  -2.   1.   0.  -2.
+  -2.  -2.  -2.  -5.  -3.  -6.  -5.  -3.  -1.   1.  -2.  -2.   2.  -0.
+  -1.  -0.   2.   3.   3.  -1.   0.  -1.  -0.  -2.   1.   2.   1.   2.
+   1.   1.  -3.  -3.  -2.  -2.  -3.  -0.  -0.  -1.  -4.   5.   3.   4.
+   3.   1.  -4.  -5.  -3.  -1.  -2.  -1.  -0.   1.  -0.  -2.   0.   1.
+   0.  -1.  -1.  -6.  -1.   0.  -4.  -1.  -1.  -0.  -0.  -0.  -0.   1.
+   0.  -0. 245. 546.   0.  -0.  -2.], shape=(105,), dtype=float32)
+predicted label rank:[ 1  8  9  2  7  8  3  8  7  8  5 11 12 10 10 10 10 11  7  9 10  9 10  5
+  8 11 10  8  8  8  8  5  7  4  5  7  9 11  8  8 12 10  9 10 12 13 13  9
+ 10  9 10  8 11 12 11 12 11 11  7  7  8  8  7 10 10  9  6 15 13 14 13 11
+  6  5  7  9  8  9 10 11 10  8 10 11 10  9  9  4  9 10  6  9  9 10 10 10
+ 10 11 10 10 16 17 10 10  8]
+mse:tf.Tensor(3415.7039, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/s3_clnt_1.cil-1.c-1_000.smt2
+true label:[1, 20480, 1, 5, 1, 5, 1, 4369, 5, 1, 4385, 5, 1, 4401, 5, 1, 4449, 5, 1, 4529, 5, 1, 20480, 5, 1, 20480, 5]
+true label rank:[1 8 1 2 1 2 1 3 2 1 4 2 1 5 2 1 6 2 1 7 2 1 8 2 1 8 2]
+predicted label:tf.Tensor(
+[ 1.7232426e+02  8.5922034e+02  2.0535295e+02  1.0240437e+00
+  3.8193192e+02 -1.2559135e+01  2.8806551e+01  3.8631477e+00
+  1.7503529e+00  3.0696901e+01  2.2651734e+00  5.0634384e-01
+ -9.4460154e-01 -2.3275435e-01  1.6778660e-01  1.0032089e+00
+  9.2489505e-01  1.6766562e+00 -9.8002815e-01 -5.8880234e-01
+ -6.5065575e-01 -8.8075256e-01  3.8516275e+02 -9.9043536e-01
+  1.3612890e+00  3.7316866e+00  4.9310434e-01], shape=(27,), dtype=float32)
+rounded label:tf.Tensor(
+[172. 859. 205.   1. 382. -13.  29.   4.   2.  31.   2.   1.  -1.  -0.
+   0.   1.   1.   2.  -1.  -1.  -1.  -1. 385.  -1.   1.   4.   0.], shape=(27,), dtype=float32)
+predicted label rank:[ 9 13 10  4 11  1  7  6  5  8  5  4  2  3  3  4  4  5  2  2  2  2 12  2
+  4  6  3]
+mse:tf.Tensor(48378132.0, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/chc-lia-lin-0125_000.smt2
+true label:[0, 0, 0, 0, 4, 4]
+true label rank:[1 1 1 1 2 2]
+predicted label:tf.Tensor([5829.9424    -37.338608 -195.3709    -82.79249  5175.892     -29.950804], shape=(6,), dtype=float32)
+rounded label:tf.Tensor([5830.  -37. -195.  -83. 5176.  -30.], shape=(6,), dtype=float32)
+predicted label rank:[6 3 1 2 5 4]
+mse:tf.Tensor(10130711.0, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/s3_srvr_8.cil.c-1_000.smt2
+true label:[8545, 8673, 1, 8673, 1, 8529, 8673, 8673, 8641, 8466, 8497, 8641, 8545, 8657]
+true label rank:[5 8 1 8 1 4 8 8 6 2 3 6 5 7]
+predicted label:tf.Tensor(
+[-1.5026269e+00 -3.0204954e+00  1.0290211e+00  5.1793054e+02
+  2.1151059e+02  1.4755357e+01  6.8418434e+01  9.7039485e-01
+  3.3543839e+01  4.5530475e+02  3.5555374e+02  6.6704869e-01
+  4.5455694e-01  3.6860620e+02], shape=(14,), dtype=float32)
+rounded label:tf.Tensor([ -2.  -3.   1. 518. 212.  15.  68.   1.  34. 455. 356.   1.   0. 369.], shape=(14,), dtype=float32)
+predicted label rank:[ 2  1  4 12  8  5  7  4  6 11  9  4  3 10]
+mse:tf.Tensor(61250396.0, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/tridag.smt2-0024_000.smt2
+true label:[3]
+true label rank:[1]
+predicted label:tf.Tensor([2.6927605], shape=(1,), dtype=float32)
+rounded label:tf.Tensor([3.], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.09439613, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/PRODUCER_CONSUMER_all_000.smt2
+true label:[0, 0]
+true label rank:[1 1]
+predicted label:tf.Tensor([-2.9083266 96.34887  ], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([-3. 96.], shape=(2,), dtype=float32)
+predicted label rank:[1 2]
+mse:tf.Tensor(4645.7812, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/test_locks_12.c-1_000.smt2
+true label:[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[ 1.44485831e-01  6.57377243e-01 -2.52010748e-02  1.82971358e+00
+  1.59252405e-01 -2.16475725e-01 -5.40999556e+00  4.17721367e+01
+  9.37583447e-01  7.90059090e-01 -6.02995157e-01  5.38229656e+00
+  1.15429521e+00  3.26475143e-01  3.04106045e+00  1.20697260e+00
+ -7.69576788e-01  1.90726364e+00  2.26555634e+00  2.16639471e+00
+  7.52568662e-01  1.92537003e+02  2.84395814e-01  2.64722271e+01
+  9.79586244e-01  1.15221167e+00  2.47587442e-01  1.66939211e+00
+  9.68846560e-01  1.60915512e+02 -8.56764078e-01 -2.98194766e-01
+  4.40251648e+02  2.05771804e+00 -1.79114103e-01  7.74085083e+01
+ -9.16148350e-02  9.95543361e-01  7.35190063e+02 -1.23899770e+00
+  3.32838936e+01  1.97479963e-01  2.13249445e-01  6.76918626e-01
+  5.97245693e-01 -1.12409616e+00 -1.13206737e-01  2.55562302e+02
+  7.04315901e-01  4.76658773e+00  9.82056351e+01  7.48106718e-01
+ -1.14453292e+00  1.15382560e-01 -4.02115679e+00 -8.76332521e-01
+ -2.51108408e-01  3.31459522e-01  5.14866409e+01  1.08993942e+02
+  1.16218098e-01  8.58770609e-01  5.41458428e-01 -9.66536760e-01
+ -2.20720387e+00 -1.15624726e+00  6.68579636e+01  8.56716707e-02
+  5.31687617e-01 -3.15932035e-01 -1.35064864e+00  1.30301595e-01
+ -2.52434921e+00  1.82169080e-01  1.88278794e-01  2.14251041e-01
+ -3.43030691e-01  8.57696295e-01  2.75240019e-02 -9.88052368e-01
+  9.26560163e-01 -6.03675246e-01 -8.68552089e-01 -8.28949332e-01
+ -1.60422742e-01  3.19100693e-02 -6.07178450e-01 -1.25716388e-01
+ -4.86868382e-01  5.77092041e+02  2.53923702e+00  9.73854858e+02
+ -8.70319530e-02 -3.56433868e-01 -6.03667974e-01 -1.86562657e-01
+  9.42803955e+02  1.66546214e+00  5.93912840e+00  3.47044556e+02
+ -4.46728349e-01 -1.00040483e+00  1.16152294e-01 -5.39950943e+00
+  7.28748560e-01  2.26397896e+01  9.25143242e-01 -2.90933371e+00], shape=(108,), dtype=float32)
+rounded label:tf.Tensor(
+[  0.   1.  -0.   2.   0.  -0.  -5.  42.   1.   1.  -1.   5.   1.   0.
+   3.   1.  -1.   2.   2.   2.   1. 193.   0.  26.   1.   1.   0.   2.
+   1. 161.  -1.  -0. 440.   2.  -0.  77.  -0.   1. 735.  -1.  33.   0.
+   0.   1.   1.  -1.  -0. 256.   1.   5.  98.   1.  -1.   0.  -4.  -1.
+  -0.   0.  51. 109.   0.   1.   1.  -1.  -2.  -1.  67.   0.   1.  -0.
+  -1.   0.  -3.   0.   0.   0.  -0.   1.   0.  -1.   1.  -1.  -1.  -1.
+  -0.   0.  -1.  -0.  -0. 577.   3. 974.  -0.  -0.  -1.  -0. 943.   2.
+   6. 347.  -0.  -1.   0.  -5.   1.  23.   1.  -3.], shape=(108,), dtype=float32)
+predicted label rank:[ 6  7  6  8  6  6  1 15  7  7  5 10  7  6  9  7  5  8  8  8  7 22  6 13
+  7  7  6  8  7 21  5  6 25  8  6 18  6  7 27  5 14  6  6  7  7  5  6 23
+  7 10 19  7  5  6  2  5  6  6 16 20  6  7  7  5  4  5 17  6  7  6  5  6
+  3  6  6  6  6  7  6  5  7  5  5  5  6  6  5  6  6 26  9 29  6  6  5  6
+ 28  8 11 24  6  5  6  1  7 12  7  3]
+mse:tf.Tensor(29463.74, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/minepump_spec5_product47_true-unreach-call.cil.c.flat_000.smt2
+true label:[1, 2, 1, 1]
+true label rank:[1 2 1 1]
+predicted label:tf.Tensor([-33.835896 -53.95679  -94.78684  -87.19424 ], shape=(4,), dtype=float32)
+rounded label:tf.Tensor([-34. -54. -95. -87.], shape=(4,), dtype=float32)
+predicted label rank:[4 3 1 2]
+mse:tf.Tensor(5324.511, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/break_single_merged_safe.c-1_000.smt2
+true label:[11, 11]
+true label rank:[1 1]
+predicted label:tf.Tensor([3.5806594 1.4067435], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([4. 1.], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(73.53859, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/MOESI_2_e8_926_e8_2138_000.smt2
+true label:[0, 0, 0, 0, 0, 1, 1, 1, 1]
+true label rank:[1 1 1 1 1 2 2 2 2]
+predicted label:tf.Tensor(
+[8.0084181e-01 1.0218847e+00 9.5296758e-01 1.0274750e+00 4.1007590e-01
+ 5.1098251e-01 6.8905078e+02 5.4129419e+02 1.1020660e+02], shape=(9,), dtype=float32)
+rounded label:tf.Tensor([  1.   1.   1.   1.   0.   1. 689. 541. 110.], shape=(9,), dtype=float32)
+predicted label rank:[2 2 2 2 1 2 5 4 3]
+mse:tf.Tensor(86362.42, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/bandec.smt2-0238_000.smt2
+true label:[3, 3, 3, 3, 1, 2, 3, 3, 1, 3, 3]
+true label rank:[3 3 3 3 1 2 3 3 1 3 3]
+predicted label:tf.Tensor(
+[1.0710415  1.4717202  4.672374   1.2070537  0.66004133 0.3171842
+ 1.6979902  0.81810147 1.2093067  1.1075728  2.1925707 ], shape=(11,), dtype=float32)
+rounded label:tf.Tensor([1. 1. 5. 1. 1. 0. 2. 1. 1. 1. 2.], shape=(11,), dtype=float32)
+predicted label rank:[2 2 4 2 2 1 3 2 2 2 3]
+mse:tf.Tensor(2.3407633, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/heapsort_true-unreach-call.c.flat_000.smt2
+true label:[500000, 1000000, 1000000, 1, 1000000, 1000000, 500000, 1000000, 1000000, 1000000, 1, 1000000, 1000000, 1000000]
+true label rank:[2 3 3 1 3 3 2 3 3 3 1 3 3 3]
+predicted label:tf.Tensor(
+[ 1.58237198e+02  5.13023567e+00  8.25392685e+01  1.98332977e+00
+  9.81626630e-01  3.95183682e-01 -6.39913130e+00 -1.21806631e+01
+  1.87034436e+03  4.34924561e+03 -1.00025320e+01  1.00927814e+03
+ -8.27204132e+00  1.93500042e+00], shape=(14,), dtype=float32)
+rounded label:tf.Tensor(
+[ 1.580e+02  5.000e+00  8.300e+01  2.000e+00  1.000e+00  0.000e+00
+ -6.000e+00 -1.200e+01  1.870e+03  4.349e+03 -1.000e+01  1.009e+03
+ -8.000e+00  2.000e+00], shape=(14,), dtype=float32)
+predicted label rank:[10  8  9  7  6  5  4  1 12 13  2 11  3  7]
+mse:tf.Tensor(748948000000.0, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/const_1-1.c-1_000.smt2
+true label:[1, 1024]
+true label rank:[1 2]
+predicted label:tf.Tensor([3.9558978 0.9648732], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([4. 1.], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(523304.84, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/four1.smt2-0027_000.smt2
+true label:[3]
+true label rank:[1]
+predicted label:tf.Tensor([2.6042116], shape=(1,), dtype=float32)
+rounded label:tf.Tensor([3.], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.15664849, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/minepump_spec4_product57_true-unreach-call.cil.c.flat_000.smt2
+true label:[1, 2, 1]
+true label rank:[1 2 1]
+predicted label:tf.Tensor([-39.704006 -13.51403  -37.554653], shape=(3,), dtype=float32)
+rounded label:tf.Tensor([-40. -14. -38.], shape=(3,), dtype=float32)
+predicted label rank:[1 3 2]
+mse:tf.Tensor(1127.9875, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/metros_4_e3_1091_e2_1317_000.smt2
+true label:[0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 9, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1]
+true label rank:[2 2 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 2 2 2 3 2 2 2 2 3 2 2 2
+ 2 3 2 2 2 3 2 2 2 2 2 2 2 2 2 3 2 2 2 3 2 2 1 3 2 2 2 3 2 2 2 3 3 4 2 2 3
+ 3 2 2 2 3 3 3]
+predicted label:tf.Tensor(
+[-3.8953018e+00  2.4052550e+02 -3.7361560e+00  1.4023320e+03
+ -5.8536954e+00 -5.3779249e+00 -4.4062233e-01 -3.9249907e+00
+ -1.0832660e+00 -2.0944679e-01 -1.7116928e-01  7.4217949e+01
+ -9.2603874e-01 -3.4204168e+00 -8.3966875e-01 -2.2666473e+00
+ -3.5498023e-01  1.7746647e+03 -1.6658611e+00  1.1681233e+01
+ -2.4586051e+00  1.2519948e+01  1.7663600e+00 -1.3060758e+01
+  1.3046858e+03  1.2785988e+00 -2.5872350e-01 -9.2063999e-01
+  2.9127924e+01 -2.1899366e-01  7.3010333e-02 -1.8906815e+00
+ -1.8561769e-01 -1.6008569e+00 -2.4011588e+00 -1.1551150e+00
+ -1.5290072e+00  5.6328894e+02  2.3306820e+00  2.4103260e+00
+ -1.6337538e-01  1.2722486e+02  1.0788052e+00 -1.3562488e+01
+  2.1209764e-01 -3.0322077e+00 -3.5679553e+00 -4.4937301e+00
+ -2.2579417e+00  5.0202319e+02  3.7020444e+02  1.9716206e+02
+  3.3282291e+01  1.2649944e+02 -1.1762070e-01  1.6403890e-01
+  1.2489082e+00  3.1966103e+01  5.4328365e+00  6.6505273e+02
+  5.0877301e+02  2.2837839e+00  5.1875610e+02  1.5250896e+02
+  2.6028986e+02  3.2052010e+01 -1.0446977e-01 -1.4414591e+00
+  9.1776848e+00 -1.1980348e+00  5.1162312e+01 -3.7110887e+00
+  6.6228778e+02  7.7685070e-01 -1.0937920e+00  9.0106628e+02
+ -3.7481637e+00  7.7441669e+02  1.0066551e+00  1.5278718e+00
+ -4.7474706e-01], shape=(81,), dtype=float32)
+rounded label:tf.Tensor(
+[-4.000e+00  2.410e+02 -4.000e+00  1.402e+03 -6.000e+00 -5.000e+00
+ -0.000e+00 -4.000e+00 -1.000e+00 -0.000e+00 -0.000e+00  7.400e+01
+ -1.000e+00 -3.000e+00 -1.000e+00 -2.000e+00 -0.000e+00  1.775e+03
+ -2.000e+00  1.200e+01 -2.000e+00  1.300e+01  2.000e+00 -1.300e+01
+  1.305e+03  1.000e+00 -0.000e+00 -1.000e+00  2.900e+01 -0.000e+00
+  0.000e+00 -2.000e+00 -0.000e+00 -2.000e+00 -2.000e+00 -1.000e+00
+ -2.000e+00  5.630e+02  2.000e+00  2.000e+00 -0.000e+00  1.270e+02
+  1.000e+00 -1.400e+01  0.000e+00 -3.000e+00 -4.000e+00 -4.000e+00
+ -2.000e+00  5.020e+02  3.700e+02  1.970e+02  3.300e+01  1.260e+02
+ -0.000e+00  0.000e+00  1.000e+00  3.200e+01  5.000e+00  6.650e+02
+  5.090e+02  2.000e+00  5.190e+02  1.530e+02  2.600e+02  3.200e+01
+ -0.000e+00 -1.000e+00  9.000e+00 -1.000e+00  5.100e+01 -4.000e+00
+  6.620e+02  1.000e+00 -1.000e+00  9.010e+02 -4.000e+00  7.740e+02
+  1.000e+00  2.000e+00 -0.000e+00], shape=(81,), dtype=float32)
+predicted label rank:[ 5 25  5 37  3  4  9  5  8  9  9 20  8  6  8  7  9 38  7 14  7 15 11  2
+ 36 10  9  8 16  9  9  7  9  7  7  8  7 31 11 11  9 22 10  1  9  6  5  5
+  7 28 27 24 18 21  9  9 10 17 12 33 29 11 30 23 26 17  9  8 13  8 19  5
+ 32 10  8 35  5 34 10 11  9]
+mse:tf.Tensor(130547.68, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/diamond_1-1.c-1_000.smt2
+true label:[100]
+true label rank:[1]
+predicted label:tf.Tensor([71.93881], shape=(1,), dtype=float32)
+rounded label:tf.Tensor([72.], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(787.43024, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/minepump_spec3_product49_true-unreach-call.cil.c.flat_000.smt2
+true label:[1, 2, 1, 2]
+true label rank:[1 2 1 2]
+predicted label:tf.Tensor([ -40.979763   -3.50487   -53.220264 3094.4102  ], shape=(4,), dtype=float32)
+rounded label:tf.Tensor([ -41.   -4.  -53. 3094.], shape=(4,), dtype=float32)
+predicted label rank:[2 3 1 4]
+mse:tf.Tensor(2391933.2, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/bouncy_one_counter_000.smt2
+true label:[0]
+true label rank:[1]
+predicted label:tf.Tensor([110.961754], shape=(1,), dtype=float32)
+rounded label:tf.Tensor([111.], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(12312.511, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/underapprox_2-2.c-1_000.smt2
+true label:[6]
+true label rank:[1]
+predicted label:tf.Tensor([10.229395], shape=(1,), dtype=float32)
+rounded label:tf.Tensor([10.], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(17.887781, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/inf6.correct.nts.horn-0001_000.smt2
+true label:[1, 1, 1, 1]
+true label rank:[1 1 1 1]
+predicted label:tf.Tensor([0.6001923 1.4908156 6.560577  2.9007087], shape=(4,), dtype=float32)
+rounded label:tf.Tensor([1. 1. 7. 3.], shape=(4,), dtype=float32)
+predicted label rank:[1 1 3 2]
+mse:tf.Tensor(8.733363, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/large_const_true-unreach-call.c.flat_000.smt2
+true label:[9, 8, 8, 9]
+true label rank:[2 1 1 2]
+predicted label:tf.Tensor([7.1062463e+02 4.0332578e+02 6.2777662e-01 1.1603427e+00], shape=(4,), dtype=float32)
+rounded label:tf.Tensor([711. 403.   1.   1.], shape=(4,), dtype=float32)
+predicted label rank:[3 2 1 1]
+mse:tf.Tensor(162168.86, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/count_by_1_variant_true-unreach-call.c.flat_000.smt2
+true label:[1000000]
+true label rank:[1]
+predicted label:tf.Tensor([7.1023355], shape=(1,), dtype=float32)
+rounded label:tf.Tensor([7.], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(999985800000.0, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/bandec.smt2-0260_000.smt2
+true label:[2, 2, 3, 1, 2, 3, 3, 1, 3, 3]
+true label rank:[2 2 3 1 2 3 3 1 3 3]
+predicted label:tf.Tensor(
+[  2.9209294    2.0162704   42.007954     1.3631382  135.22853
+   1.6926908    2.38417     -0.33326185   1.3014449    9.318402  ], shape=(10,), dtype=float32)
+rounded label:tf.Tensor([  3.   2.  42.   1. 135.   2.   2.  -0.   1.   9.], shape=(10,), dtype=float32)
+predicted label rank:[4 3 6 2 7 3 3 1 2 5]
+mse:tf.Tensor(1931.9115, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/bandec.smt2-0188_000.smt2
+true label:[2, 3, 3, 1, 3, 3]
+true label rank:[2 3 3 1 3 3]
+predicted label:tf.Tensor([2.5252173 2.4975784 3.0723858 1.3336782 1.5861423 0.9076059], shape=(6,), dtype=float32)
+rounded label:tf.Tensor([3. 2. 3. 1. 2. 1.], shape=(6,), dtype=float32)
+predicted label rank:[3 2 3 1 2 1]
+mse:tf.Tensor(1.1703281, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/reverse_div_unsafe.c_000.smt2
+true label:[8, 3, 6, 2, 2, 10, 4, 8, 0, 2, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 12, 5, 10, 0, 2, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 14, 6, 12, 0, 2, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 7, 14, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[ 9  4  7  3  3 10  5  9  1  3  1  1  1  1  1  2  3  3  3  3 11  6 10  1
+  3  1  1  1  1  1  2  3  3  3  3 12  7 11  1  3  1  1  1  1  1  2  3  3
+  3  3  8 12  1  3  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1
+  1  1  1  1  1  1]
+predicted label:tf.Tensor(
+[ 3.74100983e-01  1.52076507e+00  1.00072265e+00  6.83262587e-01
+  4.45380449e-01  2.96175499e+01  1.50995660e+00  6.13756895e-01
+  6.27572417e-01  1.19586396e+00  8.30298424e-01  5.81766605e-01
+  4.63396668e-01  9.86932874e-01  9.62791085e-01  1.21768332e+00
+  8.84733558e-01  4.62064743e-01  7.01947212e-01  1.85710025e+00
+  4.37162876e-01  1.72939742e+00  5.28382540e-01  1.56769753e+00
+  2.25233912e-01  6.48692966e-01  3.79751980e-01 -6.90113753e-03
+  2.03700423e-01  3.32623601e-01  5.79202652e-01  1.58694279e+00
+  3.95366669e-01 -3.89391184e-01  7.42298126e-01  1.51484489e+00
+  4.30379748e-01  1.25631201e+00  6.72381878e-01  7.42218852e-01
+  2.28858805e+00  1.24640405e+00  2.30835319e+00  1.21587045e-01
+  1.68046403e+00 -7.30762362e-01  1.46897507e+00  1.30819035e+00
+  1.40093148e+00  1.42018902e+00  1.33427572e+00  1.98730183e+00
+  1.38653517e+00  1.55973136e+00  1.45299172e+00  1.64832294e+00
+  7.03472137e-01  1.14571679e+00  1.24391198e+00  1.43064320e+00
+  1.05891836e+00  1.42780328e+00  2.43836474e+00  1.22321081e+00
+  6.79033458e-01  1.48587465e+00  9.99678612e-01  9.12642717e-01
+  6.21457338e-01  1.40199411e+00  1.00899649e+00  8.73033881e-01
+  1.03009355e+00  1.13403606e+00  7.34642744e-01  4.11753297e-01
+ -5.14239550e-01  1.07414830e+00], shape=(78,), dtype=float32)
+rounded label:tf.Tensor(
+[ 0.  2.  1.  1.  0. 30.  2.  1.  1.  1.  1.  1.  0.  1.  1.  1.  1.  0.
+  1.  2.  0.  2.  1.  2.  0.  1.  0. -0.  0.  0.  1.  2.  0. -0.  1.  2.
+  0.  1.  1.  1.  2.  1.  2.  0.  2. -1.  1.  1.  1.  1.  1.  2.  1.  2.
+  1.  2.  1.  1.  1.  1.  1.  1.  2.  1.  1.  1.  1.  1.  1.  1.  1.  1.
+  1.  1.  1.  0. -1.  1.], shape=(78,), dtype=float32)
+predicted label rank:[2 4 3 3 2 5 4 3 3 3 3 3 2 3 3 3 3 2 3 4 2 4 3 4 2 3 2 2 2 2 3 4 2 2 3 4 2
+ 3 3 3 4 3 4 2 4 1 3 3 3 3 3 4 3 4 3 4 3 3 3 3 3 3 4 3 3 3 3 3 3 3 3 3 3 3
+ 3 2 1 3]
+mse:tf.Tensor(17.070692, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/SYNAPSE_123_e8_953_e7_1465_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0]
+true label rank:[1 1 1 1 1 1 1 2 1 2 2 2 1 2 2 1 2 2 1]
+predicted label:tf.Tensor(
+[-9.2491738e-02  1.6867359e+00 -7.9461503e-01 -9.5090532e-01
+  3.5536408e-01 -3.0263467e+00 -3.4463563e+00  2.9160786e-01
+  3.3473969e-01 -8.9675403e-01 -1.8321109e+00 -1.6516557e+00
+ -1.3312731e+00  2.9672687e+02  3.5601778e+00  8.6043406e-01
+  4.0969189e+02  4.1557164e+00  1.1929767e+00], shape=(19,), dtype=float32)
+rounded label:tf.Tensor(
+[ -0.   2.  -1.  -1.   0.  -3.  -3.   0.   0.  -1.  -2.  -2.  -1. 297.
+   4.   1. 410.   4.   1.], shape=(19,), dtype=float32)
+predicted label rank:[4 6 3 3 4 1 1 4 4 3 2 2 3 8 7 5 9 7 5]
+mse:tf.Tensor(13397.3, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/chc-lia-lin-0278_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 2, 2, 0, 2, 0, 0, 0, 2, 2, 0, 2, 2, 0, 0, 0, 2, 2, 0, 2, 2, 2, 0, 0, 0, 2, 2, 2, 0, 2, 2, 2, 0, 0, 0, 2, 2, 2, 0, 2, 2, 2, 0, 0, 0, 2, 2, 2, 0, 2, 2, 2, 0, 0, 0, 2, 2, 2, 0, 2, 2, 2, 0, 0, 0, 2, 2, 2, 0, 2, 2, 2, 0, 0, 0, 2, 2, 2, 0, 2, 2, 2, 0, 0, 0, 2, 2, 2, 0, 2, 2, 2, 0, 0, 0, 2, 2, 2, 0, 2, 2, 2, 0, 0, 0, 2, 2, 2, 0, 2, 2, 2, 0, 0, 0, 2, 2, 2, 0, 2, 2, 2, 0, 0, 0, 2, 2, 2, 0, 2, 2, 2, 0, 2, 2, 2, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 1, 2, 2, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 1, 2, 2, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 1, 2, 1, 2, 1, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 1, 2, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 1, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 1, 1, 2, 2, 2, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 1, 2, 2, 2, 1, 2, 1, 2, 1, 2, 0, 2, 1, 2, 2, 1, 2, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 1, 1, 1, 2, 1, 0, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 1, 2, 0, 2, 1, 2, 2, 1, 2, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 1, 2, 2, 2, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 1, 1, 2, 1, 0, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 3 1 1 1 1 3 3 1 1 1 1 3 3 1 3 1 1 1 3 3 1 3 3 1 1
+ 1 3 3 1 3 3 3 1 1 1 3 3 3 1 3 3 3 1 1 1 3 3 3 1 3 3 3 1 1 1 3 3 3 1 3 3 3
+ 1 1 1 3 3 3 1 3 3 3 1 1 1 3 3 3 1 3 3 3 1 1 1 3 3 3 1 3 3 3 1 1 1 3 3 3 1
+ 3 3 3 1 1 1 3 3 3 1 3 3 3 1 1 1 3 3 3 1 3 3 3 1 1 1 3 3 3 1 3 3 3 1 1 1 3
+ 3 3 1 3 3 3 1 3 3 3 3 1 3 2 3 2 3 2 3 2 3 3 3 2 2 3 3 3 3 2 3 2 3 2 3 2 3
+ 2 3 3 3 2 3 3 3 3 2 3 2 3 2 3 2 3 2 3 3 3 2 2 3 3 3 3 2 3 2 3 2 3 2 3 2 3
+ 3 3 2 3 3 3 3 1 3 2 3 2 3 2 3 2 3 3 3 2 3 3 3 3 2 3 2 3 2 3 2 3 2 3 3 3 2
+ 3 3 3 3 3 2 3 2 3 2 3 2 3 3 3 2 3 3 3 3 2 3 2 3 2 3 2 3 2 3 3 3 2 3 3 3 3
+ 1 3 2 3 2 3 2 3 2 3 3 3 2 3 3 2 3 2 3 2 2 3 2 3 3 3 2 3 3 3 3 2 3 2 3 2 3
+ 2 3 2 3 3 3 2 3 3 3 3 1 3 2 3 2 3 2 3 2 3 3 3 2 2 3 3 3 2 3 2 3 2 3 2 3 2
+ 3 3 3 2 3 3 3 3 2 3 2 3 2 3 2 3 2 3 3 3 2 3 3 3 3 1 3 2 3 2 3 2 3 2 3 3 3
+ 2 3 2 3 3 2 3 2 3 2 3 2 3 2 3 3 3 2 3 3 3 3 2 3 2 2 2 3 2 3 2 3 3 3 2 3 3
+ 3 3 1 3 2 3 2 3 2 3 2 3 3 3 2 3 3 3 3 2 3 2 3 2 3 2 3 2 3 3 2 2 3 3 3 3 1
+ 3 2 3 2 3 2 3 2 3 3 3 2 2 3 3 3 2 3 2 3 2 3 1 3 2 3 3 2 3 3 3 2 3 2 3 2 3
+ 2 3 2 3 2 3 2 3 3 3 3 1 3 2 3 2 3 2 3 2 3 3 3 2 3 3 3 2 2 2 3 2 1 3 2 3 3
+ 3 2 3 3 3 3 2 3 2 2 2 3 1 3 2 3 3 2 3 3 3 2 3 2 3 2 3 2 3 2 3 3 2 3 3 3 3
+ 1 3 2 3 2 3 2 3 2 3 3 3 2 3 3 3 2 2 3 2 1 3 2 3 3 3 2 3 3 3 3 1 3 2 3 2 3
+ 2 3 2 3 3 3 2 3 3 3 3 1 3 2 3 2 3 2 3 2 3 3 3 2 3 3 3 3 1 3 2 3 2 3 2 3 2
+ 3 3 3 2 3 3 3 3 1 3 2 3 2 3 2 3 2 3 3 3 2 3 3 3 3 1 3 2 3 2 3 2 3 2 3 3 3
+ 2 3 3 3 3 1 3 2 3 2 3 2 3 2 3 3 3 2 3 3 3 3 1 3 2 3 2 3 2 3 2 3 3 3 2 3 3
+ 3 3 1 3 2 3 2 3 2 3 2 3 3 3 2 3 3 3 3 1 3 2 3 2 3 2 3 2 3 3 3 2]
+predicted label:tf.Tensor(
+[ 6.43412352e+00  1.13877354e+01  4.12740564e+00  2.90827107e+00
+  3.80659342e-01  2.71877980e+00  1.33559752e+00  3.45021129e-01
+  1.52396345e+00  2.11317778e+00  1.84862244e+00  2.17038631e+00
+  2.83540654e+00  1.71130276e+00  2.22962618e-01  1.26964068e+00
+  2.28457594e+00  1.49864864e+00  2.08993912e+00  1.36808431e+00
+  9.94555056e-01  9.21892643e-01  9.04364586e-01  2.80421734e-01
+  1.03726387e+00  1.06098115e+00  2.66236162e+00  1.03391778e+00
+  1.28012419e+00  1.30067444e+00  2.53581357e+00  1.85947323e+00
+  1.38985646e+00  1.12838233e+00  2.40301871e+00  2.00930524e+00
+  1.16509795e+00  1.21224117e+00  3.92318606e-01 -4.58326578e-01
+  9.39288214e-02  1.02366280e+02  2.66362743e+01  2.14033947e+01
+  3.92836952e+01  2.65642166e-01  2.23363785e+02  3.22945833e-01
+ -3.12972546e-01  1.17522526e+00  2.55645800e+00  5.77441573e-01
+  6.33322632e+02 -9.51673910e-02  1.03278613e+00 -7.33936310e-01
+  1.32752299e+00  3.69711208e+00  2.37149954e+00  1.11002007e+02
+  7.74502575e-01  1.84059334e+00  3.37969685e+00  1.68256834e-02
+ -4.47506830e-02  4.27753925e-01  4.69278908e+00 -1.49982095e-01
+ -1.03439355e+00  1.01885326e-01 -2.19433784e-01  1.11009486e-01
+ -3.54870176e+00  6.08261704e-01 -2.95305490e+00  8.85566548e-02
+  7.08336334e+01  8.99833441e-01  2.65653777e+00  4.79223013e-01
+  2.25870252e-01  5.13619781e-01 -1.12833214e+00  7.55996779e-02
+  3.21283691e+02 -1.09632421e+00  9.90717292e-01  5.87380007e-02
+  1.31058456e+02 -3.24976826e+00 -3.42277050e-01  2.84534335e-01
+  6.03848534e+01  4.49033976e-01 -6.33433342e-01  1.91643280e+02
+  2.41312729e+02 -3.72860909e-01  5.37949829e+02  1.18419850e+00
+  1.09623230e+00 -3.19540858e-01 -7.60399625e-02  2.68910074e+00
+ -1.06039238e+00 -3.88642907e-01  9.15711288e+01 -3.36802244e-01
+  1.11598902e+01  5.27115417e+02  1.27834404e+00  5.78219354e-01
+  9.10599113e-01 -2.47921848e+00  1.14811373e+00 -1.35203886e+00
+  6.80093842e+01  1.80206894e+02  7.50283194e+00  4.54423904e-01
+  6.27058625e-01  5.62207520e+02 -4.22483325e-01 -4.33803082e-01
+  4.94963646e+01  3.68401957e+00  1.26839972e+01  3.06601000e+00
+  9.38956916e-01  8.01394701e-01  1.12543845e+00  3.33943033e+00
+  4.85457954e+01  2.26675079e+02  3.69364381e-01  1.68546951e+02
+  1.35194378e+01 -5.58473587e-01  2.54500461e+00  7.93963089e+01
+  5.49643755e-01  1.82779236e+01 -4.64048311e-02  4.77049805e+02
+  3.62684204e+02  8.19496155e-01 -2.48283073e-02  3.92541008e+01
+  1.17162275e+00  1.01094449e+00  3.04071289e+02  2.68062353e-01
+  6.94493890e-01  4.44002226e-02  1.14709442e+02 -9.93055344e-01
+ -3.65908146e-01 -2.05863404e+00 -1.68916059e+00  1.56473529e+00
+ -1.03650212e+00 -1.18826556e+00 -4.29828501e+00  4.21341370e+02
+ -8.02712083e-01 -2.36858034e+00 -2.98068762e-01 -1.16586626e+00
+  1.34376083e+02  7.89993286e-01  9.22816277e-01 -1.17826891e+00
+  1.20712990e+02 -3.67430210e+00 -7.87620878e+00 -4.37997532e+00
+ -1.54280806e+00 -2.60602689e+00 -3.79591751e+00 -3.22279930e+00
+ -3.27462149e+00 -3.86066008e+00 -4.64834833e+00 -2.34893513e+00
+  1.81034031e+01 -5.08688211e+00 -5.64092255e+00 -2.28350425e+00
+ -4.09102440e+00 -4.00327063e+00  1.32189832e+03  1.10506773e+01
+ -2.42696190e+00 -2.43347502e+00  8.58997742e+02 -1.18289328e+00
+ -9.25997257e-01  9.28311035e+02 -1.92019558e+00 -1.07482195e+00
+ -7.77497530e-01 -4.78067923e+00  8.43797607e+02 -1.91016483e+00
+ -2.23003364e+00 -1.95649028e+00 -9.28484440e-01  8.52835159e+01
+ -5.14540529e+00  1.47811755e+03  1.38395813e+03 -5.05672979e+00
+  2.13817163e+03  9.81425762e-01 -4.78355837e+00 -5.53643465e+00
+ -5.21650553e+00  8.80665588e+02 -5.21595478e+00 -1.64311619e+01
+ -5.19924212e+00 -5.39458704e+00  7.53308960e+02 -5.46994352e+00
+ -4.94132423e+00  6.62967163e+02  1.12785769e+00  6.41039124e+02
+  1.02036414e+03 -1.42311975e-02  5.06444052e-02  9.73922363e+02
+  7.88439989e-01  1.69874239e+00  2.69463062e+00  6.85187378e+02
+  9.40316650e+02 -8.32366705e-01  3.41373016e+02  6.70458008e+02
+  1.15411806e+00  9.08972656e+02 -2.07461977e+00  1.40060022e+03
+  1.86948950e+03 -7.79056883e+00 -1.98082972e+00  1.26514893e+02
+  1.99489868e+03 -7.52213335e+00 -1.25414801e+00 -2.50616789e+00
+  9.45072266e+02 -3.62104225e+00 -4.75055838e+00 -2.97235417e+00
+  1.35998767e+03 -7.70201635e+00 -4.43319893e+00  5.70458130e+02
+  3.20795654e+02  4.09003693e+02  5.50361145e+02  4.96345825e+02
+  2.17171884e+00  3.30007782e+02  2.21552292e+02  2.91114777e+02
+  4.23483856e+02  6.08478149e+02  7.23846579e+00  1.60477982e+02
+  6.08680664e+02  2.90579590e+02  6.13369019e+02  2.13794571e+02
+ -4.17180967e+00 -3.38119984e-01  1.28431287e+03  7.94422241e+02
+ -1.84469738e+01  9.95927334e-01  2.23719458e+03 -4.56344271e+00
+ -1.82632828e+01 -7.28072119e+00  1.66049487e+03  2.32779297e+03
+  1.79886414e+03  2.77735327e+03 -2.13788128e+01 -5.09547472e+00
+  4.82716644e+02  1.67352097e+02  1.75428593e+00 -3.41116965e-01
+  8.42822266e+02  9.87659988e+01  8.37184387e+02  1.02311450e+03
+  8.67026550e+02  9.28346863e+02  6.01773254e+02  7.84574646e+02
+  7.66769836e+02  8.74324036e+02 -9.21366930e-01 -6.28976297e+00
+ -9.52960730e-01  6.03020508e+02  5.33121216e+02  5.66417969e+02
+  3.42945496e+02  2.73985962e+02  3.40712677e+02  5.86069214e+02
+  3.53595703e+02  3.20208496e+02  4.10461273e+02  5.73530151e+02
+  2.23179214e+02  2.37799072e+00  2.61488037e+02  1.28931848e+03
+  1.88126843e+03  1.36235925e+03  1.24181389e+02  1.45635269e+02
+ -2.07077837e+00 -3.23824453e+00  1.78959998e+03  1.14671143e+03
+  2.08325781e+03  3.20207634e+01 -1.01970835e+01 -2.43329382e+00
+  1.99526172e+03 -1.09829512e+01  3.37521791e-01  1.47222244e+02
+  7.37702942e+02  5.24083374e+02  2.23384766e+02  7.26595703e+02
+  9.54327942e+02 -1.76334715e+00  3.99214700e-02  7.88062744e+02
+  5.65779236e+02  1.01610138e+03  4.65594727e+02  8.08946899e+02
+ -6.37054443e-01  5.80268677e+02  8.41091431e+02  8.55177994e+01
+  2.11458325e+00  8.38381042e+02  6.97136658e+02  9.14370117e+02
+  3.77633781e+01  1.65155685e+02  8.47750610e+02  9.45190796e+02
+  3.32519379e+02  7.54533752e+02  5.73309448e+02  6.30073975e+02
+  1.59265182e+02  6.74196601e-01  5.76159058e+02  6.75106445e+02
+  2.22688583e+02  1.45137863e+02  7.45083130e+02  1.17292395e+03
+ -1.08396273e+01  8.07505615e+02  1.51135583e+03 -1.47306528e+01
+  5.01794672e+00  8.75543579e+02  1.14785144e+03  1.25290842e+01
+  3.26067322e+02  1.05144019e+03  1.31102063e+03 -2.94532728e+00
+ -1.18820467e+01 -1.53572822e+00  1.28073572e+03  5.68510498e+02
+  1.70432358e+02  6.84567627e+02  2.42697479e+02  6.50464600e+02
+  4.02465851e+02  8.99447510e+02  1.84215912e+02  7.50577820e+02
+  4.61454926e+02  3.37738586e+02  9.61986877e+02 -5.44696760e+00
+  5.10512299e+02  1.42241226e+02  7.69058838e+02  8.25750305e+02
+  1.77130020e+02 -8.39198399e+00  1.02460193e+03  1.28087463e+03
+  1.37472131e+03  3.24915171e-01 -1.63360739e+00 -3.00662398e-01
+  1.15256445e+03  6.59299316e+02 -6.41614556e-01 -8.14251900e-01
+  6.84091553e+02 -4.33623838e+00 -3.59880400e+00  1.14046350e+03
+  5.98939026e+02  1.00860400e+03  2.42869675e+02 -3.53067875e-01
+  3.09879333e+02  6.36767944e+02  6.18418335e+02 -1.07463264e+00
+  8.85340820e+02  7.25135071e+02 -5.04899740e+00  6.25354492e+02
+  2.47628372e+02 -2.43360949e+00  3.19917816e+02  2.09755234e+02
+  4.07376801e+02  5.67565063e+02  1.06041765e+00  6.33587891e+02
+ -2.34360576e-01  5.65868139e-01  2.13414526e+00  2.05374889e+01
+  1.62258244e+01  4.68089600e+02  7.27132080e+02  4.61424622e+02
+  7.20912659e+02  9.60695496e+02  3.49853973e+02  1.00710278e+03
+  7.46443481e+02  9.43669434e+02  9.79504944e+02  9.06685486e+02
+ -2.88954782e+00  7.00103394e+02  3.72845825e+02  8.65210083e+02
+  6.90581177e+02  1.66208237e+02  5.96929565e+02  5.78110718e+02
+  5.02647461e+02  7.14551636e+02  9.22672729e+02  4.17055115e+02
+  8.48499634e+02  4.49482544e+02  8.28962280e+02  6.22330688e+02
+ -8.03383446e+00 -1.82232428e+00  6.10019958e+02  5.06567001e-01
+  9.24254028e+02  7.73542664e+02  1.26316736e+03  3.40400055e+02
+  1.00058105e+03  7.26666260e+02  8.36310547e+02  6.24871941e+01
+  6.01284790e+02 -2.26814032e+00  4.72144127e-01 -1.09307232e+01
+  1.16210645e+03 -7.63649866e-02  1.34617996e+02  9.37015076e+01
+  5.64412537e+02  7.77419052e+01  6.23987961e+00  6.05454834e+02
+  5.73709534e+02  5.56658691e+02  1.85658463e+02  5.91356934e+02
+  3.10536621e+02  5.92747620e+02  3.20539001e+02  3.23620117e+02
+  1.78573196e+02 -1.95042133e-01  6.06558594e+02 -1.86401272e+00
+ -5.71660280e-01  1.01778296e+03  1.29658655e+03 -3.50167322e+00
+  1.42302490e+03  1.02596716e+03  7.35065491e+02  9.34136597e+02
+ -6.20742559e-01 -2.02405310e+00  7.91942993e+02  5.58809509e+02
+  1.32516858e+03  1.21468921e+03  8.60468262e+02  9.54937561e+02
+  1.54182291e+01  1.10421436e+03 -8.94813463e-02  1.12862952e+03
+ -7.15680048e-02  5.60292721e-01 -1.67626068e-02  5.64584351e+02
+  1.10277307e+03 -3.27718019e+00  2.07641556e+02  8.47417908e+02
+  1.30846395e+01  8.47552429e+02  1.06422852e+03  1.19664172e+03
+  9.58768066e+02  1.05004272e+03  8.61134949e+02 -6.98454332e+00
+ -3.68602514e-01  5.33922434e-01 -6.98652792e+00  9.34969116e+02
+  8.51189392e+02  1.39335281e+02  4.28407431e-01  1.05410217e+03
+  1.24673914e+03  1.00688797e+02  5.59192017e+02  5.83950928e+02
+  1.65187526e+00  8.61568680e+01  5.01660919e+02  3.36560272e+02
+  2.68825043e+02  2.30799222e+00  3.61165222e+02  2.84121094e+02
+  2.52442001e+02  1.17747288e+01  1.25783165e+02  2.35973724e+02
+  5.97265137e+02  1.83448700e+02  5.32192566e+02  1.15540054e+02
+  2.10239883e+02  3.17881226e+02  3.85649506e+02  1.20956337e+02
+  3.44026489e+01  5.99352295e+02  3.66779297e+02  4.22143860e+02
+  3.32092762e+00  5.51359375e+02  5.81761841e+02  3.05819946e+02
+  1.32325159e+03  9.93840332e+02 -1.13348532e+00  1.10841565e+03
+ -3.56409502e+00  1.15152722e+03 -1.35210705e+00  8.83634460e+02
+  1.66277370e+01  9.54438293e+02 -6.27506971e+00  1.12999402e+03
+  3.40439789e+02  9.27856628e+02  1.35684338e+03  1.38032312e+03
+ -3.20831919e+00  2.23091507e+02  5.68837158e+02  2.97697388e+02
+  5.93679810e+02  3.15914673e+02  3.45242143e-01  2.23915543e+02
+  5.90036438e+02  4.55678009e+02  2.21212326e+02  4.48941406e+02
+  5.24978638e+02  5.33197510e+02  5.19209839e+02 -5.14860106e+00
+  3.53572723e+02  2.66961121e+02  3.66934433e+01  2.66751289e-01
+  4.62574585e+02 -8.22278142e-01  2.31327393e+02  3.80152588e+02
+ -5.09142160e-01 -4.28843784e+00 -1.88517690e+00  6.78261169e+02
+  1.06128088e+03 -8.21771622e-01  1.01815748e+00 -4.95416641e-01
+  5.18140259e+01  1.09093762e+03  4.52249115e+02 -3.48387289e+00
+ -8.66973877e-01  3.16773865e+02  2.78190582e+02 -7.94520259e-01
+ -1.26258206e+00 -4.59401608e+00 -3.10017490e+00  8.89957703e+02
+ -6.71370149e-01 -6.83898091e-01 -4.34694433e+00  1.87296867e-01
+  1.12424622e+03 -7.34810114e-01 -7.38958120e-01  1.75253797e+00
+  8.15053821e-01  5.55345947e+02 -4.58632994e+00 -1.69616103e+00
+  4.87473086e-02  1.17697807e+02 -4.93052530e+00  7.92733643e+02
+  6.54854980e+02  3.58631630e+01  3.62887573e+02  6.62669495e+02
+  4.57538757e+02  5.14999634e+02  9.57894775e+02 -3.75060892e+00
+  4.29598206e+02  3.25767403e+01  9.09174728e+01  9.74606934e+02
+  4.33459435e+01  2.36852783e+02  4.92462015e+00 -4.23803663e+00
+  9.91859619e+02  1.01922247e+03  1.80991220e+00 -1.23895550e+00
+  2.10604525e+00  9.97257080e+02  1.20764196e+00  2.16392183e+00
+ -1.20866053e-01  6.90834351e+02  7.82904625e-01 -1.96480942e+00
+  1.94247389e+00 -3.18415499e+00  8.32496582e+02  1.00715564e+03
+  4.06316528e+02 -3.03259468e+00  8.87386719e+02  8.83717712e+02
+  7.33286743e+02  9.60791687e+02  8.25082153e+02  1.12274389e+01
+  8.19494009e-01 -1.12030089e+00 -4.34917974e+00  6.24328852e-01
+  1.61539246e+02  7.51360962e+02 -2.22348070e+00  6.02942261e+02
+ -5.24811670e-02  3.39905090e+02  5.17066479e-01  3.08389893e+02
+  9.46937012e+02  3.47368530e+02  4.76245728e+02  5.57586975e+02
+ -4.17659044e+00 -1.96191621e+00  2.45861554e+00  6.16025391e+02
+ -1.98934293e+00  9.30587097e+02  9.05666113e-01  8.11756592e+02
+  9.88731140e+02  3.51878937e+02 -2.34030104e+00  8.07866638e+02
+  1.71113610e+00  1.01450281e+03  9.68478333e+02  4.68809052e+02
+ -3.87041640e+00  9.29277100e+02 -3.36053896e+00  8.01312790e+01
+  7.71836166e+01  6.23196167e+02  8.72791992e+02  6.40868774e+02
+ -4.79485369e+00  6.67712708e+02  1.43075485e+02  3.83015533e+02
+  5.85203369e+02 -3.91924143e+00  6.63709534e+02  7.09085266e+02
+  2.97248554e+00  2.14588356e+00 -2.85082817e-01 -2.39119220e+00
+ -3.87046909e+00 -1.55464830e+01 -1.51371431e+01 -1.25103140e+01
+ -3.35131073e+00 -2.80983281e+00  1.43521130e+03 -2.79090023e+00
+ -1.11076824e-01 -8.56741428e+00 -1.56195574e+01  3.27530273e+02
+  1.22607214e+03  4.43806946e+02  1.29397668e+03 -2.82771873e+00], shape=(772,), dtype=float32)
+rounded label:tf.Tensor(
+[ 6.000e+00  1.100e+01  4.000e+00  3.000e+00  0.000e+00  3.000e+00
+  1.000e+00  0.000e+00  2.000e+00  2.000e+00  2.000e+00  2.000e+00
+  3.000e+00  2.000e+00  0.000e+00  1.000e+00  2.000e+00  1.000e+00
+  2.000e+00  1.000e+00  1.000e+00  1.000e+00  1.000e+00  0.000e+00
+  1.000e+00  1.000e+00  3.000e+00  1.000e+00  1.000e+00  1.000e+00
+  3.000e+00  2.000e+00  1.000e+00  1.000e+00  2.000e+00  2.000e+00
+  1.000e+00  1.000e+00  0.000e+00 -0.000e+00  0.000e+00  1.020e+02
+  2.700e+01  2.100e+01  3.900e+01  0.000e+00  2.230e+02  0.000e+00
+ -0.000e+00  1.000e+00  3.000e+00  1.000e+00  6.330e+02 -0.000e+00
+  1.000e+00 -1.000e+00  1.000e+00  4.000e+00  2.000e+00  1.110e+02
+  1.000e+00  2.000e+00  3.000e+00  0.000e+00 -0.000e+00  0.000e+00
+  5.000e+00 -0.000e+00 -1.000e+00  0.000e+00 -0.000e+00  0.000e+00
+ -4.000e+00  1.000e+00 -3.000e+00  0.000e+00  7.100e+01  1.000e+00
+  3.000e+00  0.000e+00  0.000e+00  1.000e+00 -1.000e+00  0.000e+00
+  3.210e+02 -1.000e+00  1.000e+00  0.000e+00  1.310e+02 -3.000e+00
+ -0.000e+00  0.000e+00  6.000e+01  0.000e+00 -1.000e+00  1.920e+02
+  2.410e+02 -0.000e+00  5.380e+02  1.000e+00  1.000e+00 -0.000e+00
+ -0.000e+00  3.000e+00 -1.000e+00 -0.000e+00  9.200e+01 -0.000e+00
+  1.100e+01  5.270e+02  1.000e+00  1.000e+00  1.000e+00 -2.000e+00
+  1.000e+00 -1.000e+00  6.800e+01  1.800e+02  8.000e+00  0.000e+00
+  1.000e+00  5.620e+02 -0.000e+00 -0.000e+00  4.900e+01  4.000e+00
+  1.300e+01  3.000e+00  1.000e+00  1.000e+00  1.000e+00  3.000e+00
+  4.900e+01  2.270e+02  0.000e+00  1.690e+02  1.400e+01 -1.000e+00
+  3.000e+00  7.900e+01  1.000e+00  1.800e+01 -0.000e+00  4.770e+02
+  3.630e+02  1.000e+00 -0.000e+00  3.900e+01  1.000e+00  1.000e+00
+  3.040e+02  0.000e+00  1.000e+00  0.000e+00  1.150e+02 -1.000e+00
+ -0.000e+00 -2.000e+00 -2.000e+00  2.000e+00 -1.000e+00 -1.000e+00
+ -4.000e+00  4.210e+02 -1.000e+00 -2.000e+00 -0.000e+00 -1.000e+00
+  1.340e+02  1.000e+00  1.000e+00 -1.000e+00  1.210e+02 -4.000e+00
+ -8.000e+00 -4.000e+00 -2.000e+00 -3.000e+00 -4.000e+00 -3.000e+00
+ -3.000e+00 -4.000e+00 -5.000e+00 -2.000e+00  1.800e+01 -5.000e+00
+ -6.000e+00 -2.000e+00 -4.000e+00 -4.000e+00  1.322e+03  1.100e+01
+ -2.000e+00 -2.000e+00  8.590e+02 -1.000e+00 -1.000e+00  9.280e+02
+ -2.000e+00 -1.000e+00 -1.000e+00 -5.000e+00  8.440e+02 -2.000e+00
+ -2.000e+00 -2.000e+00 -1.000e+00  8.500e+01 -5.000e+00  1.478e+03
+  1.384e+03 -5.000e+00  2.138e+03  1.000e+00 -5.000e+00 -6.000e+00
+ -5.000e+00  8.810e+02 -5.000e+00 -1.600e+01 -5.000e+00 -5.000e+00
+  7.530e+02 -5.000e+00 -5.000e+00  6.630e+02  1.000e+00  6.410e+02
+  1.020e+03 -0.000e+00  0.000e+00  9.740e+02  1.000e+00  2.000e+00
+  3.000e+00  6.850e+02  9.400e+02 -1.000e+00  3.410e+02  6.700e+02
+  1.000e+00  9.090e+02 -2.000e+00  1.401e+03  1.869e+03 -8.000e+00
+ -2.000e+00  1.270e+02  1.995e+03 -8.000e+00 -1.000e+00 -3.000e+00
+  9.450e+02 -4.000e+00 -5.000e+00 -3.000e+00  1.360e+03 -8.000e+00
+ -4.000e+00  5.700e+02  3.210e+02  4.090e+02  5.500e+02  4.960e+02
+  2.000e+00  3.300e+02  2.220e+02  2.910e+02  4.230e+02  6.080e+02
+  7.000e+00  1.600e+02  6.090e+02  2.910e+02  6.130e+02  2.140e+02
+ -4.000e+00 -0.000e+00  1.284e+03  7.940e+02 -1.800e+01  1.000e+00
+  2.237e+03 -5.000e+00 -1.800e+01 -7.000e+00  1.660e+03  2.328e+03
+  1.799e+03  2.777e+03 -2.100e+01 -5.000e+00  4.830e+02  1.670e+02
+  2.000e+00 -0.000e+00  8.430e+02  9.900e+01  8.370e+02  1.023e+03
+  8.670e+02  9.280e+02  6.020e+02  7.850e+02  7.670e+02  8.740e+02
+ -1.000e+00 -6.000e+00 -1.000e+00  6.030e+02  5.330e+02  5.660e+02
+  3.430e+02  2.740e+02  3.410e+02  5.860e+02  3.540e+02  3.200e+02
+  4.100e+02  5.740e+02  2.230e+02  2.000e+00  2.610e+02  1.289e+03
+  1.881e+03  1.362e+03  1.240e+02  1.460e+02 -2.000e+00 -3.000e+00
+  1.790e+03  1.147e+03  2.083e+03  3.200e+01 -1.000e+01 -2.000e+00
+  1.995e+03 -1.100e+01  0.000e+00  1.470e+02  7.380e+02  5.240e+02
+  2.230e+02  7.270e+02  9.540e+02 -2.000e+00  0.000e+00  7.880e+02
+  5.660e+02  1.016e+03  4.660e+02  8.090e+02 -1.000e+00  5.800e+02
+  8.410e+02  8.600e+01  2.000e+00  8.380e+02  6.970e+02  9.140e+02
+  3.800e+01  1.650e+02  8.480e+02  9.450e+02  3.330e+02  7.550e+02
+  5.730e+02  6.300e+02  1.590e+02  1.000e+00  5.760e+02  6.750e+02
+  2.230e+02  1.450e+02  7.450e+02  1.173e+03 -1.100e+01  8.080e+02
+  1.511e+03 -1.500e+01  5.000e+00  8.760e+02  1.148e+03  1.300e+01
+  3.260e+02  1.051e+03  1.311e+03 -3.000e+00 -1.200e+01 -2.000e+00
+  1.281e+03  5.690e+02  1.700e+02  6.850e+02  2.430e+02  6.500e+02
+  4.020e+02  8.990e+02  1.840e+02  7.510e+02  4.610e+02  3.380e+02
+  9.620e+02 -5.000e+00  5.110e+02  1.420e+02  7.690e+02  8.260e+02
+  1.770e+02 -8.000e+00  1.025e+03  1.281e+03  1.375e+03  0.000e+00
+ -2.000e+00 -0.000e+00  1.153e+03  6.590e+02 -1.000e+00 -1.000e+00
+  6.840e+02 -4.000e+00 -4.000e+00  1.140e+03  5.990e+02  1.009e+03
+  2.430e+02 -0.000e+00  3.100e+02  6.370e+02  6.180e+02 -1.000e+00
+  8.850e+02  7.250e+02 -5.000e+00  6.250e+02  2.480e+02 -2.000e+00
+  3.200e+02  2.100e+02  4.070e+02  5.680e+02  1.000e+00  6.340e+02
+ -0.000e+00  1.000e+00  2.000e+00  2.100e+01  1.600e+01  4.680e+02
+  7.270e+02  4.610e+02  7.210e+02  9.610e+02  3.500e+02  1.007e+03
+  7.460e+02  9.440e+02  9.800e+02  9.070e+02 -3.000e+00  7.000e+02
+  3.730e+02  8.650e+02  6.910e+02  1.660e+02  5.970e+02  5.780e+02
+  5.030e+02  7.150e+02  9.230e+02  4.170e+02  8.480e+02  4.490e+02
+  8.290e+02  6.220e+02 -8.000e+00 -2.000e+00  6.100e+02  1.000e+00
+  9.240e+02  7.740e+02  1.263e+03  3.400e+02  1.001e+03  7.270e+02
+  8.360e+02  6.200e+01  6.010e+02 -2.000e+00  0.000e+00 -1.100e+01
+  1.162e+03 -0.000e+00  1.350e+02  9.400e+01  5.640e+02  7.800e+01
+  6.000e+00  6.050e+02  5.740e+02  5.570e+02  1.860e+02  5.910e+02
+  3.110e+02  5.930e+02  3.210e+02  3.240e+02  1.790e+02 -0.000e+00
+  6.070e+02 -2.000e+00 -1.000e+00  1.018e+03  1.297e+03 -4.000e+00
+  1.423e+03  1.026e+03  7.350e+02  9.340e+02 -1.000e+00 -2.000e+00
+  7.920e+02  5.590e+02  1.325e+03  1.215e+03  8.600e+02  9.550e+02
+  1.500e+01  1.104e+03 -0.000e+00  1.129e+03 -0.000e+00  1.000e+00
+ -0.000e+00  5.650e+02  1.103e+03 -3.000e+00  2.080e+02  8.470e+02
+  1.300e+01  8.480e+02  1.064e+03  1.197e+03  9.590e+02  1.050e+03
+  8.610e+02 -7.000e+00 -0.000e+00  1.000e+00 -7.000e+00  9.350e+02
+  8.510e+02  1.390e+02  0.000e+00  1.054e+03  1.247e+03  1.010e+02
+  5.590e+02  5.840e+02  2.000e+00  8.600e+01  5.020e+02  3.370e+02
+  2.690e+02  2.000e+00  3.610e+02  2.840e+02  2.520e+02  1.200e+01
+  1.260e+02  2.360e+02  5.970e+02  1.830e+02  5.320e+02  1.160e+02
+  2.100e+02  3.180e+02  3.860e+02  1.210e+02  3.400e+01  5.990e+02
+  3.670e+02  4.220e+02  3.000e+00  5.510e+02  5.820e+02  3.060e+02
+  1.323e+03  9.940e+02 -1.000e+00  1.108e+03 -4.000e+00  1.152e+03
+ -1.000e+00  8.840e+02  1.700e+01  9.540e+02 -6.000e+00  1.130e+03
+  3.400e+02  9.280e+02  1.357e+03  1.380e+03 -3.000e+00  2.230e+02
+  5.690e+02  2.980e+02  5.940e+02  3.160e+02  0.000e+00  2.240e+02
+  5.900e+02  4.560e+02  2.210e+02  4.490e+02  5.250e+02  5.330e+02
+  5.190e+02 -5.000e+00  3.540e+02  2.670e+02  3.700e+01  0.000e+00
+  4.630e+02 -1.000e+00  2.310e+02  3.800e+02 -1.000e+00 -4.000e+00
+ -2.000e+00  6.780e+02  1.061e+03 -1.000e+00  1.000e+00 -0.000e+00
+  5.200e+01  1.091e+03  4.520e+02 -3.000e+00 -1.000e+00  3.170e+02
+  2.780e+02 -1.000e+00 -1.000e+00 -5.000e+00 -3.000e+00  8.900e+02
+ -1.000e+00 -1.000e+00 -4.000e+00  0.000e+00  1.124e+03 -1.000e+00
+ -1.000e+00  2.000e+00  1.000e+00  5.550e+02 -5.000e+00 -2.000e+00
+  0.000e+00  1.180e+02 -5.000e+00  7.930e+02  6.550e+02  3.600e+01
+  3.630e+02  6.630e+02  4.580e+02  5.150e+02  9.580e+02 -4.000e+00
+  4.300e+02  3.300e+01  9.100e+01  9.750e+02  4.300e+01  2.370e+02
+  5.000e+00 -4.000e+00  9.920e+02  1.019e+03  2.000e+00 -1.000e+00
+  2.000e+00  9.970e+02  1.000e+00  2.000e+00 -0.000e+00  6.910e+02
+  1.000e+00 -2.000e+00  2.000e+00 -3.000e+00  8.320e+02  1.007e+03
+  4.060e+02 -3.000e+00  8.870e+02  8.840e+02  7.330e+02  9.610e+02
+  8.250e+02  1.100e+01  1.000e+00 -1.000e+00 -4.000e+00  1.000e+00
+  1.620e+02  7.510e+02 -2.000e+00  6.030e+02 -0.000e+00  3.400e+02
+  1.000e+00  3.080e+02  9.470e+02  3.470e+02  4.760e+02  5.580e+02
+ -4.000e+00 -2.000e+00  2.000e+00  6.160e+02 -2.000e+00  9.310e+02
+  1.000e+00  8.120e+02  9.890e+02  3.520e+02 -2.000e+00  8.080e+02
+  2.000e+00  1.015e+03  9.680e+02  4.690e+02 -4.000e+00  9.290e+02
+ -3.000e+00  8.000e+01  7.700e+01  6.230e+02  8.730e+02  6.410e+02
+ -5.000e+00  6.680e+02  1.430e+02  3.830e+02  5.850e+02 -4.000e+00
+  6.640e+02  7.090e+02  3.000e+00  2.000e+00 -0.000e+00 -2.000e+00
+ -4.000e+00 -1.600e+01 -1.500e+01 -1.300e+01 -3.000e+00 -3.000e+00
+  1.435e+03 -3.000e+00 -0.000e+00 -9.000e+00 -1.600e+01  3.280e+02
+  1.226e+03  4.440e+02  1.294e+03 -3.000e+00], shape=(772,), dtype=float32)
+predicted label rank:[ 24  27  22  21  18  21  19  18  20  20  20  20  21  20  18  19  20  19
+  20  19  19  19  19  18  19  19  21  19  19  19  21  20  19  19  20  20
+  19  19  18  18  18  62  36  35  43  18 100  18  18  19  21  19 227  18
+  19  17  19  22  20  63  19  20  21  18  18  18  23  18  17  18  18  18
+  14  19  15  18  50  19  21  18  18  19  17  18 127  17  19  18  71  15
+  18  18  47  18  17  94 106  18 183  19  19  18  18  21  17  18  58  18
+  27 180  19  19  19  16  19  17  49  90  26  18  19 190  18  18  45  22
+  29  21  19  19  19  21  45 102  18  86  30  17  21  53  19  34  18 170
+ 143  19  18  43  19  19 118  18  19  18  64  17  18  16  16  20  17  17
+  14 155  17  16  18  17  72  19  19  17  67  14  10  14  16  15  14  15
+  15  14  13  16  34  13  12  16  14  14 365  27  16  16 282  17  17 301
+  16  17  17  13 278  16  16  16  17  55  13 377 373  13 386  19  13  12
+  13 290  13   3  13  13 256  13  13 234  19 230 331  18  18 317  19  20
+  21 241 306  17 136 237  19 297  16 374 382  10  16  70 384  10  17  15
+ 308  14  13  15 369  10  14 196 127 152 184 172  20 131  99 116 157 217
+  25  81 218 116 220  97  14  18 360 265   2  19 387  13   2  11 379 388
+ 381 389   1  13 171  85  20  18 277  60 274 332 286 301 213 261 258 288
+  17  12  17 214 182 193 137 113 136 205 141 126 153 198 100  20 110 361
+ 383 370  68  78  16  15 380 348 385  37   8  16 384   7  18  79 252 178
+ 100 249 310  16  18 262 193 328 166 267  17 201 276  56  20 275 243 298
+  42  83 280 308 132 257 197 226  80  19 199 238 100  77 253 353   7 266
+ 378   4  23 289 349  29 129 336 364  15   6  16 359 195  87 241 107 231
+ 149 295  92 255 164 134 315  13 175  75 259 270  88  10 333 359 371  18
+  16  18 351 233  17  17 240  14  14 347 211 326 107  18 121 229 222  17
+ 292 248  13 225 108  16 126  96 151 194  19 228  18  19  20  35  32 167
+ 249 164 247 314 139 325 254 307 319 296  15 244 145 285 242  84 210 200
+ 174 246 299 154 280 160 271 223  10  16 219  19 300 260 358 135 324 249
+ 273  48 212  16  18   7 352  18  73  59 191  52  24 215 198 187  93 207
+ 122 208 127 128  89  18 216  16  17 329 363  14 375 334 251 304  17  16
+ 263 189 367 355 283 311  31 342  18 345  18  19  18 192 341  15  95 279
+  29 280 339 354 313 335 284  11  18  19  11 305 281  74  18 337 357  61
+ 189 203  20  56 173 133 112  20 142 115 109  28  69 104 210  91 181  65
+  96 125 148  67  39 211 144 156  21 185 202 119 366 322  17 343  14 350
+  17 291  33 310  12 346 135 301 368 372  15 100 195 117 209 123  18 101
+ 206 162  98 160 179 182 177  13 141 111  41  18 165  17 103 146  17  14
+  16 239 338  17  19  18  46 340 161  15  17 124 114  17  17  13  15 294
+  17  17  14  18 344  17  17  20  19 186  13  16  18  66  13 264 232  40
+ 143 234 163 176 312  14 158  38  57 318  44 105  23  14 321 330  20  17
+  20 323  19  20  18 242  19  16  20  15 272 325 150  15 293 291 250 314
+ 269  27  19  17  14  19  82 255  16 214  18 135  19 120 309 138 169 188
+  14  16  20 221  16 303  19 268 320 140  16 266  20 327 316 168  14 302
+  15  54  51 224 287 230  13 236  76 147 204  14 235 245  21  20  18  16
+  14   3   4   5  15  15 376  15  18   9   3 130 356 159 362  15]
+mse:tf.Tensor(315153.12, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/minepump_spec2_product58_true-unreach-call.cil.c.flat_000.smt2
+true label:[1, 1, 1, 2]
+true label rank:[1 1 1 2]
+predicted label:tf.Tensor([-30.039415 -53.69424  -43.13992  -34.297302], shape=(4,), dtype=float32)
+rounded label:tf.Tensor([-30. -54. -43. -34.], shape=(4,), dtype=float32)
+predicted label rank:[4 1 2 3]
+mse:tf.Tensor(1805.183, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/chc-lia-lin-0303_000.smt2
+true label:[2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 1, 1, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483648, 1, 1, 1, 1, 1, 2147483647, 24576, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 24576, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 24576, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 24576, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8481, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 1, 2147483647, 2147483647, 8673, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8466, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 2147483647, 2147483647, 8673, 2147483647, 2147483647, 0, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8466, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8497, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8497, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8513, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 8656, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8497, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 1, 2147483647, 2147483647, 8513, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8529, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8529, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 1, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8545, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8529, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8545, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8561, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 1, 2147483647, 2147483647, 8529, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8545, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8448, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8577, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 1024, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8529, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8593, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8609, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8641, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8657, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 8656, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8641, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8673, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 4, 2147483647, 2147483647, 2147483647, 2147483648, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8657, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 8448, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 3, 2147483647, 2147483647, 2147483647, 2147483648, 8640, 2147483647, 2147483647, 1, 2147483647, 2147483647, 0, 2147483647, 2147483647, 8673, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2147483648]
+true label rank:[23 23 23 23 23 23 23 23 23 23 23 23 23 23 23 23 23 23 23 23 23 23 23 23
+ 23 23 23 23 23 23 23 23 23 23 23 23 24 23 23 23 23 23 23 23 23 23 23 23
+ 23 23  2  2 23 23 23 23 23 23 23  4 23 23 23 24 23 23  2 23 23  1 23 23
+ 23 23 23 23 23 23 23 23 24  2  2  2  2  2 23 22 23 23 23 23 23 23  4 23
+ 23 23 24 23 23  2 23 23  1 23 23 22 23 23 23 23 23 23 23 23 22 23 23 23
+ 23 23 23  4 23 23 23 24 23 23  2 23 23  1 23 23 22 23 23 23 23 23 23 23
+ 23 23 23 23 23 23 23  4 23 23 23 24 23 23  2 23 23  1 23 23  8 23 23 23
+ 23 23 23 23 23 23 23 23 23 23  4 23 23 23 24 23 23  2 23 23  2 23 23 21
+ 23 23 23 23 23 23 23 23 23 23 23 23 23 23  4 23 23 23 24 23 23  2 23 23
+ 23 23 23 23 23 23 23 23 23 23 23 23 23 23 23 23  4 23 23 23 24 23 23 23
+ 23  1 23 23  7 23 23 23 23 23 23 23 23 23 23 23 23 23  4 23 23 23 24 23
+ 23  2 23 23 23 23 21 23 23  1 23 23 23 23 23 23 23 23 23 23 23  4 23 23
+ 23 24 23 23 23 23  1 23 23  7 23 23 23 23 23 23 23 23 23 23 23 23 23 23
+  4 23 23 23 24 23 23  2 23 23  1 23 23  9 23 23 23 23 23 23 23 23 23 23
+ 23 23 23  4 23 23 23 24 23 23  2 23 23  1 23 23  9 23 23 23 23 23 23 23
+ 23 23 23 23 23 23 23  4 23 23 23 24 23 23  2 23 23  1 23 23 10 23 23 23
+ 23 23 23 23 23 19 23 23 23 23 23 23  4 23 23 23 24 23 23  2 23 23  1 23
+ 23  9 23 23 23 23 23 23 23 23 23 23 23 23 23 23  4 23 23 23 24 23 23  2
+ 23 23  2 23 23 10 23 23 23 23 23 23 23 23 23 23 23 23 23 23  4 23 23 23
+ 24 23 23  2 23 23  1 23 23 11 23 23 23 23 23 23 23 23 23 23 23 23 23 23
+  4 23 23 23 24 23 23  2 23 23  1 23 23 11 23 23 23 23 23 23 23 23  2 23
+ 23 23 23 23 23 23  4 23 23 23 24 23 23  2 23 23  1 23 23 12 23 23 23 23
+ 23 23 23 23 23 23 23 23 23 23  4 23 23 23 24 23 23  2 23 23  1 23 23 11
+ 23 23 23 23 23 23 23 23 23 23 23 23 23  4 23 23 23 24 23 23  2 23 23  1
+ 23 23 12 23 23 23 23 23 23 23 23 23 23 23 23 23 23  4 23 23 23 24 23 23
+  2 23 23  1 23 23 13 23 23 23 23 23 23 23 23 23 23 23 23 23  4 23 23 23
+ 24 23 23  2 23 23  2 23 23 11 23 23 23 23 23 23 23 23 23 23 23 23 23 23
+  4 23 23 23 24 23 23  2 23 23  1 23 23 12 23 23 23 23 23 23 23 23 23 23
+ 23 23 23  4 23 23 23 24 23 23  2 23 23 23  1 23 23  6 23 23 23 23 23 23
+ 23 23 23 23 23 23 23 23  4 23 23 23 24 23 23  2 23 23  1 23 23 14 23 23
+ 23 23 23 23 23 23 23 23 23 23 23  4  5 23 23 23 24 23 23  2 23 23  1 23
+ 23 11 23 23 23 23 23 23 23 23 23 23 23 23 23 23  4 23 23 23 24 23 23  2
+ 23 23  1 23 23 15 23 23 23 23 23 23 23 23 23 23 23 23 23  4 23 23 23 24
+ 23 23  2 23 23  1 23 23 16 23 23 23 23 23 23 23 23 23 23 23 23 23  4 23
+ 23 23 24 23 23  2 23 23  1 23 23 18 23 23 23 23 23 23 23 23 23 23 23 23
+ 23  4 23 23 23 24 23 23  2 23 23  1 23 23 20 23 23 23 23 23 23 23 19 23
+ 23 23 23 23 23  4 23 23 23 24 23 23  2 23 23  1 23 23 18 23 23 23 23 23
+ 23 23 23 23 23 23 23 23 23  4 23 23 23 24 23 23  2 23 23  1 23 23 21 23
+ 23 23 23 23 23 23 23 23 23 23 23 23  4 23 23 23 24 23 23  2 23 23  1 23
+ 23 20 23 23 23 23 23 23 23 23  6 23 23 23 23 23 23  3 23 23 23 24 17 23
+ 23  2 23 23  1 23 23 21 23 23 23 23 23 23 23 23 24]
+predicted label:tf.Tensor(
+[ 4.53784698e+02  4.05997437e+02  4.59930267e+02  1.11187227e-01
+  3.79307861e+02  3.40150696e+02  4.50607422e+02  4.56340515e+02
+  4.26829285e+02  3.92853943e+02  1.74374710e+02  3.71276245e+02
+  5.30284912e+02  5.20499939e+02  5.34704529e+02  5.19522949e+02
+ -3.91888857e-01  5.05535461e+02  1.70639420e+02  7.89544144e+01
+  4.30656036e+02  4.38183899e+02  3.08590088e+02  4.81994080e+02
+  1.76514999e+02  2.43404419e+02  1.13782310e+02 -2.92417002e+00
+  8.11491251e-01  3.74805450e-01  2.00592209e+02  1.35245788e+00
+  6.00248575e-01  3.46478943e+02  2.92477894e+00  1.51597047e+00
+  3.24782715e+02  3.92513394e-01  6.64219618e-01  2.57525519e-02
+  7.30311945e-02  1.50900245e-01  3.71002136e+02  1.11533666e+00
+  1.72181747e+02  9.98358011e-01  2.00109589e+02  3.29467621e+02
+  1.71069870e+02  8.01007032e-01  4.80436039e+00  4.73277569e-01
+  5.35674121e+03  5.89101465e+03  5.91068604e+03 -2.01563015e+01
+  6.95155713e+03 -3.18157101e+01 -1.91163273e+01 -9.64382267e+00
+ -1.21778097e+01 -2.84085827e+01 -5.13383369e+01 -7.22041016e+01
+ -2.51371708e+01 -1.36653757e+01 -1.29319296e+01  6.75338623e+03
+ -7.52955627e+01 -2.19892254e+01 -1.93510628e+01  7.76433838e+03
+ -1.94763279e+01 -2.45580444e+01 -1.82120342e+01  3.45980151e+03
+ -2.10064793e+01  3.90913477e+03 -6.56535797e+01  5.82080566e+02
+  3.59880035e+02  2.37215090e+00  2.66645575e+00  1.15899706e+01
+  5.62976301e-01  4.65965390e-01  1.89082098e+00  2.02148605e+02
+  3.47766228e+01  2.35961166e+02  4.03178345e+02  3.69666199e+02
+  1.30277344e+02  1.27206650e+02  5.78378558e-01  1.00539122e+01
+ -6.70643210e-01 -3.15367460e-01  4.96456027e-01  2.30086207e-01
+  3.53888184e+02 -4.74940538e-01  2.48766537e+01  5.98937569e+01
+  3.30320001e-01  4.93225193e+00  4.29573631e+01  7.17897654e-01
+  2.20115542e-01  8.39438558e-01  5.41931076e+01  2.30264902e-01
+  3.49557698e-01  3.71476196e+02  1.06848383e+00  5.60167908e+02
+ -1.07885289e+00 -5.63508272e-01  4.98705566e+02  8.86234253e+02
+  1.18611865e+03 -1.10279679e+00  1.15385437e+00 -9.99487162e-01
+ -1.19425738e+00  5.17519409e+02  8.74348389e+02  1.42026091e+00
+  7.37266479e+02  1.09630676e+03 -1.58907425e+00  9.31154480e+02
+  4.88774200e+02 -3.87528181e-01  1.00401831e+03  9.64948730e+02
+  1.00353711e+03  9.46846008e+02  1.16728870e+03  1.09245227e+03
+ -5.19212246e+00  7.63345093e+02 -5.77091265e+00  7.87012695e+02
+  1.55078971e+00  1.62636995e-01  9.05016780e-01  3.29029679e-01
+  3.35083588e+02  3.43683624e+02  1.34371603e+00  2.28384808e-02
+  2.23127556e+00  1.76645577e+00  2.29803348e+00  6.49215817e-01
+  4.83707520e+02  3.98752563e+02  1.02527308e+00  4.34778015e+02
+  3.65072571e+02  1.28387690e+00  1.61064133e+02  4.89417908e+02
+  2.87621643e+02  1.76200607e+02  4.76407745e+02  1.69895264e+02
+  2.38440231e+02  5.84673729e+01  3.92427711e+01  1.24483118e+03
+  1.07143713e+03  1.20203699e+03  1.17408240e+03  8.64777283e+02
+  1.32121841e+02  9.84054565e+02 -3.73958540e+00  1.14512585e+03
+  1.16703162e+03  8.92686646e+02  8.95836426e+02  9.30325867e+02
+  1.27260036e+01 -1.00016487e+00  7.00580688e+02  1.21494519e+03
+ -6.06217003e+00  1.06561340e+03  1.23390735e+03  1.22073022e+03
+  1.19846814e+03  1.02741907e+03  1.21310608e+03  1.08160278e+03
+  1.07462598e+03  1.22541125e+03  1.21406580e+03  2.32071945e+02
+  2.87951231e-01  5.56491566e+00  2.42026733e+02  2.26251419e+02
+  1.56408262e+01  2.12478180e+02  3.92385292e+01  2.57180389e+02
+  2.67317352e+02  7.33089447e+01  2.36485825e+02  2.78696655e+02
+  5.98687935e+01  7.50264120e+00  1.49153275e+02  2.31468491e+02
+  7.15329409e+00  7.36091843e+01  7.38420916e+00  5.64846635e-01
+  2.91528778e+02  6.75784225e+01 -3.20759773e-01  2.41701298e+01
+  1.21291361e+01  2.03606248e+00  4.03184662e+02 -1.35428691e+00
+  1.80749741e+02  4.28359039e+02  4.79804932e+02  4.27195801e+02
+  9.45081635e+01  3.52240967e+02  3.66938362e+01  3.68354553e+02
+  4.05900269e+02  3.46165009e+02  4.16000854e+02  4.88361938e+02
+  4.32092407e+02  4.06863022e+01  3.39751556e+02  8.46537857e+01
+  4.65790283e+02  3.83788208e+02  4.84486847e+02  3.98389893e+02
+  3.97230743e+02  3.95211029e+02  4.35869263e+02  6.90132568e+02
+  7.62014526e+02  7.94682739e+02  7.34119812e+02  8.19476807e+02
+  7.79732971e+02  8.14518555e+02  1.55897598e+02  7.88258301e+02
+  8.18767578e+02  8.16970703e+02  7.03261719e+02  5.19152100e+02
+  6.58108521e+02  3.59327316e-01  8.01602051e+02  7.92215088e+02
+  8.20359985e+02  6.76763550e+02  7.27765381e+02  8.03638062e+02
+  8.13835449e+02  2.15149570e+00  7.46226074e+02  6.68249878e+02
+  7.33424866e+02  7.95041931e+02  4.54079895e+02  4.24766113e+02
+  5.54453735e+02  2.77077393e+02  5.56115967e+02  5.46463745e+02
+  5.92906006e+02  8.35709095e-01  4.85741333e+02  5.87511780e+02
+  4.44091309e+02  4.56268097e+02  4.80650574e+02  4.05968872e+02
+  6.02934448e+02  6.04141602e+02  3.92847061e+00  5.63064880e+02
+  5.76591064e+02  4.09786682e+02  3.11888428e+02  5.74687744e+02
+  5.13430847e+02  3.31738708e+02  4.75318787e+02  4.92006042e+02
+  4.53083923e+02  7.01351807e+02  8.27340637e+02  8.21463135e+02
+  8.26406006e+02  4.47752289e+02  8.29457397e+02  6.90764282e+02
+  5.50048340e+02  6.67660767e+02  2.70439362e+02  1.48455154e+02
+  4.41452576e+02  7.14610962e+02  7.22247192e+02  1.38495386e+00
+  4.64548889e+02  8.07444946e+02  3.61891235e+02  6.47711670e+02
+  7.93289185e+02  8.26561218e+02  7.82788635e+02  8.04128662e+02
+  5.57380737e+02  6.22178955e+02 -5.54809237e+00  6.57022522e+02
+  7.96282625e+00 -1.38349724e+00  9.53773975e-01  7.90751099e+02
+ -2.41155767e+00  1.92686142e+02  7.46854004e+02  1.06888647e+01
+  3.97965698e+02  9.68191624e-01  3.16498327e+00  3.06090355e+01
+  2.02777076e+00  4.43525024e+02  7.86019653e+02  8.97462234e+01
+  3.69636059e-01  1.99642777e-01  4.99317017e+02  7.55066223e+02
+  2.96593567e+02  3.30897003e+02  1.19417580e+02  5.74308708e-02
+  9.42767143e-01  8.25133667e+02  8.27787354e+02  7.01517883e+02
+  7.70448267e-01 -2.92133594e+00  2.07117057e+00  2.18610001e+02
+  2.01569550e+02 -5.06315708e+00  3.07948303e+02  5.38784912e+02
+  3.58149628e+02  1.08864903e+00 -3.32804871e+00 -1.91932440e+00
+  3.04757118e+00  7.60905823e+02  1.71048798e+02  3.20844436e+00
+  5.17548828e+02 -3.22933102e+00  7.20196899e+02 -3.22621393e+00
+  5.81245766e+01  7.91586548e+02  7.66071655e+02  7.23880432e+02
+  6.11504555e+01  7.70186829e+02  5.18967529e+02  7.32620422e+02
+  3.60142456e+02  7.94259501e+00  1.34674057e+02  3.32243134e+02
+  3.87114075e+02  3.71330322e+02  3.35469971e+02  3.69096619e+02
+  3.72133606e+02  3.85468506e+02  2.58778334e+00  3.76301727e+02
+  3.44766052e+02  3.47474487e+02  3.67334961e+02  3.79993561e+02
+  1.56841309e+02  8.50104523e+01  1.71449070e+01  2.35120087e+02
+  1.24888506e+01  2.92471863e+02  2.70848480e+02  1.44530487e+02
+  6.02161646e+00  1.07358315e+02  1.18223619e+01  3.64616394e+02
+  2.89431580e+02  3.29596313e+02  3.87829468e+02  3.78937836e+02
+  3.67971069e+02  2.74848328e+02  1.25794151e+02  3.82763916e+02
+  6.88039494e+00  3.24123474e+02  3.77213440e+02  3.61094910e+02
+  3.78159729e+02  3.54108765e+02  2.26631424e+02  2.71000610e+02
+  1.08974266e+02  3.48959747e+02  3.47477295e+02  3.79742523e+02
+  3.06344727e+02  3.20865845e+02  4.61078148e+01  6.16849632e+01
+  1.54780533e+02  3.90418434e+00  3.25171631e+02  3.70342194e+02
+  2.01560303e+02  3.34466003e+02  5.78485718e+02  6.06471680e+02
+  5.42038391e+02  6.12222656e+02  5.73464661e+02  5.96115112e+02
+  4.16791199e+02  5.97698853e+02  4.69982361e+02  1.39577347e+02
+  6.10509338e+02  6.23284936e-01  4.23246582e+02 -3.50010872e-01
+  1.51954041e+02  6.13149338e+01  4.95231232e+02  4.16642944e+02
+  1.55623932e+02  6.01202759e+02  5.91918701e+02  5.92992188e+02
+  6.11520264e+02  2.00042038e+01  4.50915894e+02  5.63712158e+02
+  6.10961487e+02 -1.92936325e+00  1.40176270e+03  1.50727673e+03
+ -8.09834576e+00  9.32895020e+02  1.65606116e+03  1.52718787e+03
+  1.48796301e+03  1.47450305e+03 -7.09010553e+00  1.04902673e+03
+ -2.60579634e+00  1.38459969e+00  1.07368970e+03 -1.62486911e+00
+ -1.66572571e-01 -2.58648205e+00 -4.36415005e+00 -5.63793373e+00
+ -3.42519617e+00  1.91501755e+02  1.62590881e+03  1.66628284e+03
+  1.33974036e+03  1.37228625e+03  1.49461853e+03  1.39549146e+03
+  1.44051685e+03  1.50004602e+03  1.62611597e+03  4.95196104e-01
+  7.69484131e+02  9.83616577e+02  1.02687085e+03  1.03612463e+03
+  1.01240063e+03  9.77431763e+02  9.32041138e+02  8.19958618e+02
+  8.81153748e+02  9.82616699e+02  9.13076538e+02  9.81536987e+02
+  8.83465088e+02  5.80993530e+02  9.56223389e+02  1.02513513e+03
+ -2.12921190e+00  1.04488208e+03  9.63293884e+02  1.03743127e+03
+  9.36755249e+02  1.03525183e+03  4.82263184e+02  6.22473999e+02
+  1.01430933e+03  8.69485352e+02  9.07102600e+02  6.15696655e+02
+  6.13532043e+02  5.97691467e+02  5.90211426e+02  6.05982910e+02
+  6.16560120e+02  6.05448425e+02  5.37106812e+02  5.66143188e+02
+  6.16872437e+02  6.13776123e+02  5.40129395e+02  6.13823242e+02
+  5.85221191e+02  4.27033730e+01  6.13581055e+02  5.75518250e+02
+  3.88333344e+02  5.27366333e+02  5.89349487e+02  5.27003418e+02
+  6.07462830e+02  6.07818481e+02  5.30253906e+02  6.09341064e+02
+  6.06403198e+02  5.34151123e+02 -8.72490883e-01  8.28576660e+02
+  7.85049438e+02  8.34378418e+02  8.11268921e+02  7.73494568e+02
+  7.87066345e+02  5.50623474e+02  7.87301331e+02  3.25919678e+02
+  3.79358704e+02  6.50825439e+02  7.94924927e+02  6.95742065e+02
+  7.49598877e+02  7.31216492e+02  7.62743347e+02  7.82204651e+02
+  7.60748535e+02  7.56213745e+02  8.10378052e+02  3.84868591e+02
+  3.23631500e+02  8.25471558e+02  7.93606201e+02  8.02666382e+02
+  8.25145020e+02  8.26843384e+02  6.07962524e+02  2.17009754e+01
+  6.11508972e+02  5.97324707e+02  2.59101318e+02  5.52662903e+02
+  2.38488907e+02  6.04765381e+02  6.05547241e+02  6.07434875e+02
+  4.39944397e+02  5.93181824e+02  6.06256592e+02  5.97055542e+02
+  4.35318909e+02  5.56892578e+02  5.85304626e+02  8.33322372e+01
+  4.30566345e+02  5.20070435e+02  6.07794434e+02  5.40088684e+02
+  1.51620438e+02  5.77816284e+02  6.06360596e+02  6.06954895e+02
+  5.96084229e+02  3.92089050e+02  3.95293854e+02  3.90375793e+02
+  3.82745422e+02  3.86382385e+02  3.95276886e+02  3.94365662e+02
+  3.75250793e+02  3.81723755e+02  3.95382416e+02  3.93233643e+02
+  3.73434021e+02  3.95513702e+02  3.79406982e+02  2.69378540e+02
+  3.95229553e+02  3.92691345e+02  3.95009766e+02  3.89163025e+02
+  3.92050385e+02  3.92645264e+02  3.84504669e+02  3.93623322e+02
+  3.75611511e+02  3.94386780e+02  3.85217834e+02  3.90821899e+02
+  3.86894470e+02  6.13144409e+02  6.03166382e+02  5.85920776e+02
+  6.06495117e+02  5.95090942e+02  6.16040649e+02  6.08892456e+02
+  6.05994263e+02  6.07249268e+02  5.91281555e+02  5.97209229e+02
+  6.10228394e+02  6.15166748e+02  3.09973145e+02  1.20107124e+02
+  2.81944672e+02  6.00112183e+02  7.27419510e+01  5.73676025e+02
+  5.14549438e+02  6.02002197e+02  3.03867950e+02  1.53377365e+02
+  5.78971680e+02  3.29919891e+02  3.19939087e+02  1.49760147e+02
+  3.92789124e+02  3.85287994e+02  3.87858551e+02  3.62339752e+02
+  3.68964691e+02  3.90380493e+02  3.90384857e+02  3.80388275e+02
+  3.95002319e+02  7.07741928e+00  3.89274963e+02  3.87156219e+02
+  3.62956909e+02  3.90431641e+02  3.88062805e+02  3.79973724e+02
+  3.83106781e+02  3.88821228e+02  2.66904266e+02  3.60514496e+02
+  3.89227539e+02  3.92142273e+02  3.85654510e+02  3.87715454e+02
+  3.90821411e+02  3.83251831e+02  3.19939453e+02  3.94524017e+02
+  3.91562866e+02  8.97501404e+02  9.83371094e+02  1.01543250e+03
+  1.03036047e+03  5.63176147e+02  1.02363062e+03  1.04294958e+03
+  6.80196810e+00  7.24627197e+02  8.62857544e+02  9.45571045e+02
+  5.34050476e+02  1.04330310e+03  9.98924072e+02 -1.28037882e+00
+  2.34188194e+01  9.21895142e+02  6.15983367e-01  7.95836182e+02
+  6.54519531e+02  2.04571793e+02  3.38916107e+02  2.68066711e+02
+  1.00801880e+03  1.01199823e+03  1.01782642e+03  9.23556396e+02
+  5.97004578e+02  6.09187378e+02  5.91235229e+02  6.08420166e+02
+  6.13682739e+02  6.04600037e+02  6.06596130e+02  6.08879517e+02
+  5.35567871e+02  5.91696106e+02  6.11785095e+02  6.09565613e+02
+  6.13454712e+02  6.01504944e+02  4.69702942e+02  5.27551758e+02
+  2.99070862e+02  5.72458496e+02  6.15401978e+02  6.09704773e+02
+  5.17727173e+02  6.16424316e+02  6.13817017e+02  4.87194946e+02
+  6.15434692e+02  5.22533569e+02  4.33665741e+02  6.13077576e+02
+  6.10750366e+02  5.87896484e+02  3.21347839e+02  5.96084595e+02
+  6.10299255e+02  6.05667725e+02  5.97763916e+02  3.84755951e+02
+  6.13929932e+02  5.52467712e+02  3.32349609e+02  6.10502319e+02
+  6.10362427e+02  6.11367493e+02  6.02926819e+02  6.02659180e+02
+  6.05858704e+02  6.13534912e+02  2.91786682e+02  6.14125977e+02
+  6.13195801e+02  5.64621704e+02  6.09450989e+02  3.68134491e+02
+  6.01842773e+02  6.06684021e+02  6.15960205e+02  6.15329346e+02
+  6.01554871e+02  5.58205200e+02  4.84019226e+02  5.97345886e+02
+  6.14695312e+02  6.13588745e+02  6.06054260e+02  4.06201355e+02
+  5.63361755e+02  6.09506592e+02  6.17033813e+02  6.11364624e+02
+  6.12614014e+02  6.12644287e+02  6.10789185e+02  2.29292374e+02
+  6.08961609e+02  3.51776062e+02  5.91944702e+02  5.90234619e+02
+  5.79563904e+02  6.17145386e+02  5.84234131e+02  3.53587463e+02
+  6.13168579e+02  6.12463989e+02  6.17257202e+02  7.12259277e+02
+  7.68160645e+02  5.91411133e+02  7.54882812e+02  7.68456543e+02
+  6.79095764e+02  8.04877563e+02  4.16496429e+02  7.17710815e+02
+  8.09130615e+02  5.42176147e+02  6.43859375e+02  8.01706177e+02
+  6.95156250e+02  5.30502563e+02  7.13540527e+02  7.07071411e+02
+  9.92944002e-01  7.16057495e+02  7.98231812e+02  6.70625732e+02
+ -3.41494989e+00  5.54639465e+02  8.22926331e+02  8.34729736e+02
+  8.29768311e+02  8.18885620e+02  7.47228577e+02  6.06276989e+00
+  5.37959862e+01  5.69562866e+02  6.19095703e+02  7.74310059e+02
+  7.75261963e+02  6.32048706e+02  5.81362549e+02  1.48564978e+01
+  2.69438873e+02  7.06431152e+02  8.06981201e+02  7.73526001e+02
+  5.26471191e+02  6.15598389e+02  5.77959961e+02  7.04774231e+02
+  7.92296143e+02  6.78447876e+02  5.55642273e+02  8.11612122e+02
+  4.46645691e+02  7.57131165e+02  3.85080109e+02  6.64651489e+02
+  7.25634827e+02  5.82305565e+01  3.94832886e+02  3.91798157e+02
+  3.90851318e+02  3.90714661e+02  3.91554749e+02  3.89716583e+02
+  3.91394287e+02  3.66577148e+02  3.88808472e+02  3.91257446e+02
+  3.89420380e+02  3.86588898e+02  3.90176575e+02  3.58583740e+02
+  3.40916557e+01  3.90648041e+02  3.84966248e+02  3.45652252e+02
+  3.92764038e+02  3.91366577e+02  2.79332886e+02  3.81252625e+02
+  3.85894836e+02  2.03017166e+02  3.89515625e+02  3.91052887e+02
+  2.74689209e+02  3.90938751e+02  1.15395667e+03  1.20357227e+03
+  1.19239270e+03  1.24720203e+03 -4.60109949e-01  2.81824310e+02
+  1.16133093e+03  9.46756363e-01  4.17706757e+02  3.07126587e+02
+  9.04540161e+02  4.03208344e+02  3.23967457e-01  6.01523254e+02
+  5.96810791e+02  5.06854980e+02  4.87578308e+02  4.90324982e+02
+  9.41720581e+02  5.94683289e+02  7.97395859e+01  5.91518677e+02
+ -5.14402437e+00  5.46135498e+02  1.35752153e+00  9.65179932e+02
+  5.20529687e-01  8.08350403e+02  7.50750610e+02  2.93221466e+02
+  7.97239319e+02  7.18824951e+02  3.70093107e-01  7.78304443e+02
+  5.14832878e+01  5.50238770e+02  5.22833138e+01  5.40050232e+02
+  4.15112976e+02  2.17774582e+02  2.36198990e+02  2.32171951e+02
+  2.75713825e+00  5.45056824e+02  9.19692874e-01  7.27989380e+02
+  8.23521137e-01  7.72926758e+02  2.29148884e+01  8.03872925e+02
+  4.29368652e+02  7.29878601e+02  2.86606140e+02  4.16696228e+02
+  7.85055664e+02  1.82877029e+02  3.56750092e+02  3.90411133e+02
+  8.66342068e+00  1.01246376e+01  3.74313171e+02  3.91206238e+02
+  3.46527222e+02  3.61035889e+02  3.49607483e+02  2.90368378e+02
+  3.56464996e+02  3.29947319e+01  3.91466492e+02  3.83618126e+01
+  2.04813004e+02  3.79355812e+01  3.53211670e+02  1.76617615e+02
+  1.15571404e+01  3.70733429e+02  3.45278168e+02  3.26901428e+02
+  3.71923248e+02  3.48333069e+02  3.58479675e+02  3.89116241e+02
+  3.87460541e+02  3.14808136e+02  3.55664154e+02  2.18397385e+02
+  2.79934845e+02], shape=(977,), dtype=float32)
+rounded label:tf.Tensor(
+[ 4.540e+02  4.060e+02  4.600e+02  0.000e+00  3.790e+02  3.400e+02
+  4.510e+02  4.560e+02  4.270e+02  3.930e+02  1.740e+02  3.710e+02
+  5.300e+02  5.200e+02  5.350e+02  5.200e+02 -0.000e+00  5.060e+02
+  1.710e+02  7.900e+01  4.310e+02  4.380e+02  3.090e+02  4.820e+02
+  1.770e+02  2.430e+02  1.140e+02 -3.000e+00  1.000e+00  0.000e+00
+  2.010e+02  1.000e+00  1.000e+00  3.460e+02  3.000e+00  2.000e+00
+  3.250e+02  0.000e+00  1.000e+00  0.000e+00  0.000e+00  0.000e+00
+  3.710e+02  1.000e+00  1.720e+02  1.000e+00  2.000e+02  3.290e+02
+  1.710e+02  1.000e+00  5.000e+00  0.000e+00  5.357e+03  5.891e+03
+  5.911e+03 -2.000e+01  6.952e+03 -3.200e+01 -1.900e+01 -1.000e+01
+ -1.200e+01 -2.800e+01 -5.100e+01 -7.200e+01 -2.500e+01 -1.400e+01
+ -1.300e+01  6.753e+03 -7.500e+01 -2.200e+01 -1.900e+01  7.764e+03
+ -1.900e+01 -2.500e+01 -1.800e+01  3.460e+03 -2.100e+01  3.909e+03
+ -6.600e+01  5.820e+02  3.600e+02  2.000e+00  3.000e+00  1.200e+01
+  1.000e+00  0.000e+00  2.000e+00  2.020e+02  3.500e+01  2.360e+02
+  4.030e+02  3.700e+02  1.300e+02  1.270e+02  1.000e+00  1.000e+01
+ -1.000e+00 -0.000e+00  0.000e+00  0.000e+00  3.540e+02 -0.000e+00
+  2.500e+01  6.000e+01  0.000e+00  5.000e+00  4.300e+01  1.000e+00
+  0.000e+00  1.000e+00  5.400e+01  0.000e+00  0.000e+00  3.710e+02
+  1.000e+00  5.600e+02 -1.000e+00 -1.000e+00  4.990e+02  8.860e+02
+  1.186e+03 -1.000e+00  1.000e+00 -1.000e+00 -1.000e+00  5.180e+02
+  8.740e+02  1.000e+00  7.370e+02  1.096e+03 -2.000e+00  9.310e+02
+  4.890e+02 -0.000e+00  1.004e+03  9.650e+02  1.004e+03  9.470e+02
+  1.167e+03  1.092e+03 -5.000e+00  7.630e+02 -6.000e+00  7.870e+02
+  2.000e+00  0.000e+00  1.000e+00  0.000e+00  3.350e+02  3.440e+02
+  1.000e+00  0.000e+00  2.000e+00  2.000e+00  2.000e+00  1.000e+00
+  4.840e+02  3.990e+02  1.000e+00  4.350e+02  3.650e+02  1.000e+00
+  1.610e+02  4.890e+02  2.880e+02  1.760e+02  4.760e+02  1.700e+02
+  2.380e+02  5.800e+01  3.900e+01  1.245e+03  1.071e+03  1.202e+03
+  1.174e+03  8.650e+02  1.320e+02  9.840e+02 -4.000e+00  1.145e+03
+  1.167e+03  8.930e+02  8.960e+02  9.300e+02  1.300e+01 -1.000e+00
+  7.010e+02  1.215e+03 -6.000e+00  1.066e+03  1.234e+03  1.221e+03
+  1.198e+03  1.027e+03  1.213e+03  1.082e+03  1.075e+03  1.225e+03
+  1.214e+03  2.320e+02  0.000e+00  6.000e+00  2.420e+02  2.260e+02
+  1.600e+01  2.120e+02  3.900e+01  2.570e+02  2.670e+02  7.300e+01
+  2.360e+02  2.790e+02  6.000e+01  8.000e+00  1.490e+02  2.310e+02
+  7.000e+00  7.400e+01  7.000e+00  1.000e+00  2.920e+02  6.800e+01
+ -0.000e+00  2.400e+01  1.200e+01  2.000e+00  4.030e+02 -1.000e+00
+  1.810e+02  4.280e+02  4.800e+02  4.270e+02  9.500e+01  3.520e+02
+  3.700e+01  3.680e+02  4.060e+02  3.460e+02  4.160e+02  4.880e+02
+  4.320e+02  4.100e+01  3.400e+02  8.500e+01  4.660e+02  3.840e+02
+  4.840e+02  3.980e+02  3.970e+02  3.950e+02  4.360e+02  6.900e+02
+  7.620e+02  7.950e+02  7.340e+02  8.190e+02  7.800e+02  8.150e+02
+  1.560e+02  7.880e+02  8.190e+02  8.170e+02  7.030e+02  5.190e+02
+  6.580e+02  0.000e+00  8.020e+02  7.920e+02  8.200e+02  6.770e+02
+  7.280e+02  8.040e+02  8.140e+02  2.000e+00  7.460e+02  6.680e+02
+  7.330e+02  7.950e+02  4.540e+02  4.250e+02  5.540e+02  2.770e+02
+  5.560e+02  5.460e+02  5.930e+02  1.000e+00  4.860e+02  5.880e+02
+  4.440e+02  4.560e+02  4.810e+02  4.060e+02  6.030e+02  6.040e+02
+  4.000e+00  5.630e+02  5.770e+02  4.100e+02  3.120e+02  5.750e+02
+  5.130e+02  3.320e+02  4.750e+02  4.920e+02  4.530e+02  7.010e+02
+  8.270e+02  8.210e+02  8.260e+02  4.480e+02  8.290e+02  6.910e+02
+  5.500e+02  6.680e+02  2.700e+02  1.480e+02  4.410e+02  7.150e+02
+  7.220e+02  1.000e+00  4.650e+02  8.070e+02  3.620e+02  6.480e+02
+  7.930e+02  8.270e+02  7.830e+02  8.040e+02  5.570e+02  6.220e+02
+ -6.000e+00  6.570e+02  8.000e+00 -1.000e+00  1.000e+00  7.910e+02
+ -2.000e+00  1.930e+02  7.470e+02  1.100e+01  3.980e+02  1.000e+00
+  3.000e+00  3.100e+01  2.000e+00  4.440e+02  7.860e+02  9.000e+01
+  0.000e+00  0.000e+00  4.990e+02  7.550e+02  2.970e+02  3.310e+02
+  1.190e+02  0.000e+00  1.000e+00  8.250e+02  8.280e+02  7.020e+02
+  1.000e+00 -3.000e+00  2.000e+00  2.190e+02  2.020e+02 -5.000e+00
+  3.080e+02  5.390e+02  3.580e+02  1.000e+00 -3.000e+00 -2.000e+00
+  3.000e+00  7.610e+02  1.710e+02  3.000e+00  5.180e+02 -3.000e+00
+  7.200e+02 -3.000e+00  5.800e+01  7.920e+02  7.660e+02  7.240e+02
+  6.100e+01  7.700e+02  5.190e+02  7.330e+02  3.600e+02  8.000e+00
+  1.350e+02  3.320e+02  3.870e+02  3.710e+02  3.350e+02  3.690e+02
+  3.720e+02  3.850e+02  3.000e+00  3.760e+02  3.450e+02  3.470e+02
+  3.670e+02  3.800e+02  1.570e+02  8.500e+01  1.700e+01  2.350e+02
+  1.200e+01  2.920e+02  2.710e+02  1.450e+02  6.000e+00  1.070e+02
+  1.200e+01  3.650e+02  2.890e+02  3.300e+02  3.880e+02  3.790e+02
+  3.680e+02  2.750e+02  1.260e+02  3.830e+02  7.000e+00  3.240e+02
+  3.770e+02  3.610e+02  3.780e+02  3.540e+02  2.270e+02  2.710e+02
+  1.090e+02  3.490e+02  3.470e+02  3.800e+02  3.060e+02  3.210e+02
+  4.600e+01  6.200e+01  1.550e+02  4.000e+00  3.250e+02  3.700e+02
+  2.020e+02  3.340e+02  5.780e+02  6.060e+02  5.420e+02  6.120e+02
+  5.730e+02  5.960e+02  4.170e+02  5.980e+02  4.700e+02  1.400e+02
+  6.110e+02  1.000e+00  4.230e+02 -0.000e+00  1.520e+02  6.100e+01
+  4.950e+02  4.170e+02  1.560e+02  6.010e+02  5.920e+02  5.930e+02
+  6.120e+02  2.000e+01  4.510e+02  5.640e+02  6.110e+02 -2.000e+00
+  1.402e+03  1.507e+03 -8.000e+00  9.330e+02  1.656e+03  1.527e+03
+  1.488e+03  1.475e+03 -7.000e+00  1.049e+03 -3.000e+00  1.000e+00
+  1.074e+03 -2.000e+00 -0.000e+00 -3.000e+00 -4.000e+00 -6.000e+00
+ -3.000e+00  1.920e+02  1.626e+03  1.666e+03  1.340e+03  1.372e+03
+  1.495e+03  1.395e+03  1.441e+03  1.500e+03  1.626e+03  0.000e+00
+  7.690e+02  9.840e+02  1.027e+03  1.036e+03  1.012e+03  9.770e+02
+  9.320e+02  8.200e+02  8.810e+02  9.830e+02  9.130e+02  9.820e+02
+  8.830e+02  5.810e+02  9.560e+02  1.025e+03 -2.000e+00  1.045e+03
+  9.630e+02  1.037e+03  9.370e+02  1.035e+03  4.820e+02  6.220e+02
+  1.014e+03  8.690e+02  9.070e+02  6.160e+02  6.140e+02  5.980e+02
+  5.900e+02  6.060e+02  6.170e+02  6.050e+02  5.370e+02  5.660e+02
+  6.170e+02  6.140e+02  5.400e+02  6.140e+02  5.850e+02  4.300e+01
+  6.140e+02  5.760e+02  3.880e+02  5.270e+02  5.890e+02  5.270e+02
+  6.070e+02  6.080e+02  5.300e+02  6.090e+02  6.060e+02  5.340e+02
+ -1.000e+00  8.290e+02  7.850e+02  8.340e+02  8.110e+02  7.730e+02
+  7.870e+02  5.510e+02  7.870e+02  3.260e+02  3.790e+02  6.510e+02
+  7.950e+02  6.960e+02  7.500e+02  7.310e+02  7.630e+02  7.820e+02
+  7.610e+02  7.560e+02  8.100e+02  3.850e+02  3.240e+02  8.250e+02
+  7.940e+02  8.030e+02  8.250e+02  8.270e+02  6.080e+02  2.200e+01
+  6.120e+02  5.970e+02  2.590e+02  5.530e+02  2.380e+02  6.050e+02
+  6.060e+02  6.070e+02  4.400e+02  5.930e+02  6.060e+02  5.970e+02
+  4.350e+02  5.570e+02  5.850e+02  8.300e+01  4.310e+02  5.200e+02
+  6.080e+02  5.400e+02  1.520e+02  5.780e+02  6.060e+02  6.070e+02
+  5.960e+02  3.920e+02  3.950e+02  3.900e+02  3.830e+02  3.860e+02
+  3.950e+02  3.940e+02  3.750e+02  3.820e+02  3.950e+02  3.930e+02
+  3.730e+02  3.960e+02  3.790e+02  2.690e+02  3.950e+02  3.930e+02
+  3.950e+02  3.890e+02  3.920e+02  3.930e+02  3.850e+02  3.940e+02
+  3.760e+02  3.940e+02  3.850e+02  3.910e+02  3.870e+02  6.130e+02
+  6.030e+02  5.860e+02  6.060e+02  5.950e+02  6.160e+02  6.090e+02
+  6.060e+02  6.070e+02  5.910e+02  5.970e+02  6.100e+02  6.150e+02
+  3.100e+02  1.200e+02  2.820e+02  6.000e+02  7.300e+01  5.740e+02
+  5.150e+02  6.020e+02  3.040e+02  1.530e+02  5.790e+02  3.300e+02
+  3.200e+02  1.500e+02  3.930e+02  3.850e+02  3.880e+02  3.620e+02
+  3.690e+02  3.900e+02  3.900e+02  3.800e+02  3.950e+02  7.000e+00
+  3.890e+02  3.870e+02  3.630e+02  3.900e+02  3.880e+02  3.800e+02
+  3.830e+02  3.890e+02  2.670e+02  3.610e+02  3.890e+02  3.920e+02
+  3.860e+02  3.880e+02  3.910e+02  3.830e+02  3.200e+02  3.950e+02
+  3.920e+02  8.980e+02  9.830e+02  1.015e+03  1.030e+03  5.630e+02
+  1.024e+03  1.043e+03  7.000e+00  7.250e+02  8.630e+02  9.460e+02
+  5.340e+02  1.043e+03  9.990e+02 -1.000e+00  2.300e+01  9.220e+02
+  1.000e+00  7.960e+02  6.550e+02  2.050e+02  3.390e+02  2.680e+02
+  1.008e+03  1.012e+03  1.018e+03  9.240e+02  5.970e+02  6.090e+02
+  5.910e+02  6.080e+02  6.140e+02  6.050e+02  6.070e+02  6.090e+02
+  5.360e+02  5.920e+02  6.120e+02  6.100e+02  6.130e+02  6.020e+02
+  4.700e+02  5.280e+02  2.990e+02  5.720e+02  6.150e+02  6.100e+02
+  5.180e+02  6.160e+02  6.140e+02  4.870e+02  6.150e+02  5.230e+02
+  4.340e+02  6.130e+02  6.110e+02  5.880e+02  3.210e+02  5.960e+02
+  6.100e+02  6.060e+02  5.980e+02  3.850e+02  6.140e+02  5.520e+02
+  3.320e+02  6.110e+02  6.100e+02  6.110e+02  6.030e+02  6.030e+02
+  6.060e+02  6.140e+02  2.920e+02  6.140e+02  6.130e+02  5.650e+02
+  6.090e+02  3.680e+02  6.020e+02  6.070e+02  6.160e+02  6.150e+02
+  6.020e+02  5.580e+02  4.840e+02  5.970e+02  6.150e+02  6.140e+02
+  6.060e+02  4.060e+02  5.630e+02  6.100e+02  6.170e+02  6.110e+02
+  6.130e+02  6.130e+02  6.110e+02  2.290e+02  6.090e+02  3.520e+02
+  5.920e+02  5.900e+02  5.800e+02  6.170e+02  5.840e+02  3.540e+02
+  6.130e+02  6.120e+02  6.170e+02  7.120e+02  7.680e+02  5.910e+02
+  7.550e+02  7.680e+02  6.790e+02  8.050e+02  4.160e+02  7.180e+02
+  8.090e+02  5.420e+02  6.440e+02  8.020e+02  6.950e+02  5.310e+02
+  7.140e+02  7.070e+02  1.000e+00  7.160e+02  7.980e+02  6.710e+02
+ -3.000e+00  5.550e+02  8.230e+02  8.350e+02  8.300e+02  8.190e+02
+  7.470e+02  6.000e+00  5.400e+01  5.700e+02  6.190e+02  7.740e+02
+  7.750e+02  6.320e+02  5.810e+02  1.500e+01  2.690e+02  7.060e+02
+  8.070e+02  7.740e+02  5.260e+02  6.160e+02  5.780e+02  7.050e+02
+  7.920e+02  6.780e+02  5.560e+02  8.120e+02  4.470e+02  7.570e+02
+  3.850e+02  6.650e+02  7.260e+02  5.800e+01  3.950e+02  3.920e+02
+  3.910e+02  3.910e+02  3.920e+02  3.900e+02  3.910e+02  3.670e+02
+  3.890e+02  3.910e+02  3.890e+02  3.870e+02  3.900e+02  3.590e+02
+  3.400e+01  3.910e+02  3.850e+02  3.460e+02  3.930e+02  3.910e+02
+  2.790e+02  3.810e+02  3.860e+02  2.030e+02  3.900e+02  3.910e+02
+  2.750e+02  3.910e+02  1.154e+03  1.204e+03  1.192e+03  1.247e+03
+ -0.000e+00  2.820e+02  1.161e+03  1.000e+00  4.180e+02  3.070e+02
+  9.050e+02  4.030e+02  0.000e+00  6.020e+02  5.970e+02  5.070e+02
+  4.880e+02  4.900e+02  9.420e+02  5.950e+02  8.000e+01  5.920e+02
+ -5.000e+00  5.460e+02  1.000e+00  9.650e+02  1.000e+00  8.080e+02
+  7.510e+02  2.930e+02  7.970e+02  7.190e+02  0.000e+00  7.780e+02
+  5.100e+01  5.500e+02  5.200e+01  5.400e+02  4.150e+02  2.180e+02
+  2.360e+02  2.320e+02  3.000e+00  5.450e+02  1.000e+00  7.280e+02
+  1.000e+00  7.730e+02  2.300e+01  8.040e+02  4.290e+02  7.300e+02
+  2.870e+02  4.170e+02  7.850e+02  1.830e+02  3.570e+02  3.900e+02
+  9.000e+00  1.000e+01  3.740e+02  3.910e+02  3.470e+02  3.610e+02
+  3.500e+02  2.900e+02  3.560e+02  3.300e+01  3.910e+02  3.800e+01
+  2.050e+02  3.800e+01  3.530e+02  1.770e+02  1.200e+01  3.710e+02
+  3.450e+02  3.270e+02  3.720e+02  3.480e+02  3.580e+02  3.890e+02
+  3.870e+02  3.150e+02  3.560e+02  2.180e+02  2.800e+02], shape=(977,), dtype=float32)
+predicted label rank:[241 217 243  25 195 163 239 242 225 209  97 187 272 267 275 267  25 261
+  95  67 228 233 146 251  99 121  75  22  26  25 105  26  26 166  28  27
+ 153  25  26  25  25  25 187  26  96  26 104 156  95  26  30  25 528 529
+ 530  10 532   5  11  16  15   6   4   2   7  13  14 531   1   8  11 533
+  11   7  12 526   9 527   3 308 178  27  28  37  26  25  27 106  50 118
+ 216 186  80  79  26  35  24  25  25  25 173  25  46  61  25  30  55  26
+  25  26  59  25  25 187  26 292  24  24 260 446 499  24  26  24  24 265
+ 443  26 381 493  23 456 256  25 471 465 471 462 497 492  20 391  19 405
+  27  25  26  25 161 164  26  25  27  27  27  26 252 215  26 231 182  26
+  93 256 135  98 248  94 119  60  53 510 488 502 498 441  81 469  21 494
+ 497 447 448 455  38  24 359 506  19 487 509 507 501 479 504 491 490 508
+ 505 116  25  31 120 112  40 109  53 122 124  65 118 131  61  33  86 115
+  32  66  32  26 138  64  25  45  37  27 216  24 100 226 249 225  72 171
+  51 184 217 166 220 255 229  54 163  70 245 200 252 214 213 211 232 355
+ 390 411 380 428 400 426  91 406 428 427 361 266 348  25 415 408 429 352
+ 376 417 425  27 382 350 379 411 241 224 287 130 289 282 317  26 253 312
+ 236 242 250 217 325 326  29 293 303 218 148 301 263 159 247 258 240 359
+ 434 430 433 238 436 356 283 350 127  85 235 367 372  26 244 419 180 344
+ 409 434 402 417 290 341  19 347  33  24  26 407  23 103 383  36 214  26
+  28  47  27 236 404  71  25  25 260 386 140 158  76  25  26 432 435 360
+  26  22  27 111 106  20 145 278 176  26  22  23  28 389  95  28 265  22
+ 371  22  60 408 392 373  62 395 266 379 178  33  82 159 203 187 161 185
+ 188 201  28 192 165 167 183 196  92  70  41 117  37 138 128  84  31  73
+  37 182 136 157 204 195 184 129  78 199  32 152 193 179 194 173 113 128
+  74 169 167 196 143 151  56  63  90  29 153 186 106 160 304 328 280 334
+ 299 319 221 321 246  83 333  26 223  25  88  62 259 221  91 323 316 317
+ 334  42 239 294 333  23 515 521  17 458 524 522 518 517  18 486  22  26
+ 489  23  25  22  21  19  22 102 523 525 512 513 519 514 516 520 523  25
+ 394 469 479 482 473 466 457 429 444 468 452 467 445 307 463 478  23 485
+ 464 483 459 481 251 341 474 442 451 338 336 321 314 328 339 327 277 296
+ 339 336 279 336 310  55 336 302 204 270 313 270 329 330 272 331 328 274
+  24 436 403 438 423 396 405 284 405 154 195 345 411 358 384 378 391 401
+ 389 387 422 201 152 432 410 416 432 434 330  43 334 320 123 286 119 327
+ 328 329 234 317 328 320 231 290 310  69 228 267 330 279  88 304 328 329
+ 319 208 211 206 199 202 211 210 191 198 211 209 189 212 195 126 211 209
+ 211 205 208 209 201 210 192 210 201 207 203 335 325 311 328 318 338 331
+ 328 329 315 320 332 337 147  77 133 322  65 300 264 324 142  89 305 157
+ 150  87 209 201 204 180 185 206 206 196 211  32 205 203 181 206 204 196
+ 199 205 124 179 205 208 202 204 207 199 150 211 208 449 468 475 480 293
+ 477 484  32 374 440 461 274 484 470  24  44 453  26 412 346 108 162 125
+ 472 473 476 454 320 331 315 330 336 327 329 331 276 316 334 332 335 324
+ 246 271 141 298 337 332 265 338 336 254 337 268 230 335 333 312 151 319
+ 332 328 321 201 336 285 159 333 332 333 325 325 328 336 138 336 335 295
+ 331 184 324 329 338 337 324 291 252 320 337 336 328 217 293 332 339 333
+ 335 335 333 114 331 171 316 314 306 339 309 173 335 334 339 365 393 315
+ 386 393 354 418 220 369 421 280 343 415 357 273 366 364  26 368 414 351
+  22 288 431 439 437 428 383  31  59 297 340 397 398 342 307  39 126 363
+ 419 397 269 338 304 362 408 353 289 424 237 388 201 349 375  60 211 208
+ 207 207 208 206 207 183 205 207 205 203 206 177  49 207 201 166 209 207
+ 131 197 202 107 206 207 129 207 495 503 500 511  25 133 496  26 222 144
+ 450 216  25 324 320 262 255 257 460 318  68 316  20 282  26 465  26 420
+ 385 139 413 370  25 399  57 283  58 279 219 110 118 116  28 281  26 376
+  26 396  44 417 227 377 134 221 403 101 175 206  34  35 190 207 167 179
+ 170 137 174  48 207  52 108  52 172  99  37 187 165 155 188 168 176 205
+ 203 149 174 110 132]
+mse:tf.Tensor(3.9414094e+18, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/bandec.smt2-0181_000.smt2
+true label:[1, 2, 3, 3, 1, 1, 2, 2, 3, 3, 1, 1, 3, 3]
+true label rank:[1 2 3 3 1 1 2 2 3 3 1 1 3 3]
+predicted label:tf.Tensor(
+[ 1.2882285   1.1512516   1.7450299   0.9904705   0.31505322 -1.0013468
+  1.1206379   2.247531    1.8555646   1.3258097   2.007415    1.2644641
+ -0.04468261  1.5059834 ], shape=(14,), dtype=float32)
+rounded label:tf.Tensor([ 1.  1.  2.  1.  0. -1.  1.  2.  2.  1.  2.  1. -0.  2.], shape=(14,), dtype=float32)
+predicted label rank:[3 3 4 3 2 1 3 4 4 3 4 3 2 4]
+mse:tf.Tensor(2.0303822, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/count_by_2_m_nest_000.smt2
+true label:[272, 255, 17]
+true label rank:[3 2 1]
+predicted label:tf.Tensor([49.162457  4.210584  4.348856], shape=(3,), dtype=float32)
+rounded label:tf.Tensor([49.  4.  4.], shape=(3,), dtype=float32)
+predicted label rank:[2 1 1]
+mse:tf.Tensor(37570.652, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/SYNAPSE_2_e8_1118_e7_1043_000.smt2
+true label:[0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1]
+predicted label:tf.Tensor([  0.5527023  -3.0112014  -7.229505  478.9454     -1.3529365], shape=(5,), dtype=float32)
+rounded label:tf.Tensor([  1.  -3.  -7. 479.  -1.], shape=(5,), dtype=float32)
+predicted label rank:[4 2 1 5 3]
+mse:tf.Tensor(45890.434, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/test_locks_8.c-1_000.smt2
+true label:[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[-2.8573928e+00 -3.5669150e+00 -3.2066441e-01  3.0739737e-01
+ -5.3314996e-01  4.3640113e-01 -4.5880723e-01  2.7718538e+01
+  7.3085308e+00  2.6904379e+02  3.5634217e+00  1.3542281e+00
+  5.6157160e-01 -4.6728723e-02  8.7056684e-01  2.0668132e+00
+  5.1826739e+00  1.2166836e+02  4.9375269e+02 -3.7269673e+00
+ -4.0968719e+00 -3.5111966e+00  3.1444452e+00  5.6422675e-01
+  2.7060711e-01 -9.0712631e-01  3.0024562e+00  1.0517574e-01
+  1.8772331e+02 -1.1313000e+00  6.9176090e-01  4.9575690e+02
+ -3.8116300e-01  1.9546675e+02  6.6891503e+00  3.9397824e-01
+  9.5107536e+01 -3.0601759e+00  7.6281452e-01 -2.8449435e+00
+ -1.7184732e+00 -2.1008394e+00  4.5411945e+02 -6.3117707e-01
+  9.1081512e-01  4.0370032e+02  1.8487982e+00  4.1147227e+00], shape=(48,), dtype=float32)
+rounded label:tf.Tensor(
+[ -3.  -4.  -0.   0.  -1.   0.  -0.  28.   7. 269.   4.   1.   1.  -0.
+   1.   2.   5. 122. 494.  -4.  -4.  -4.   3.   1.   0.  -1.   3.   0.
+ 188.  -1.   1. 496.  -0. 195.   7.   0.  95.  -3.   1.  -3.  -2.  -2.
+ 454.  -1.   1. 404.   2.   4.], shape=(48,), dtype=float32)
+predicted label rank:[ 2  1  5  5  4  5  5 12 11 17  9  6  6  5  6  7 10 14 20  1  1  1  8  6
+  5  4  8  5 15  4  6 21  5 16 11  5 13  2  6  2  3  3 19  4  6 18  7  9]
+mse:tf.Tensor(21333.92, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/bandec.smt2-0178_000.smt2
+true label:[1, 2, 3, 3, 1, 1, 2, 2, 3, 3, 1, 1, 3, 3]
+true label rank:[1 2 3 3 1 1 2 2 3 3 1 1 3 3]
+predicted label:tf.Tensor(
+[ 1.5180454   1.1512516   1.8104019   0.9883133   0.31505322 -1.0013468
+  1.1206379   2.247531    1.8555646   1.3258097   2.007415    1.2644641
+ -0.04468261  1.5059834 ], shape=(14,), dtype=float32)
+rounded label:tf.Tensor([ 2.  1.  2.  1.  0. -1.  1.  2.  2.  1.  2.  1. -0.  2.], shape=(14,), dtype=float32)
+predicted label rank:[4 3 4 3 2 1 3 4 4 3 4 3 2 4]
+mse:tf.Tensor(2.0328224, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/metros_3_e3_1275_e2_454_000.smt2
+true label:[0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 9, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1]
+true label rank:[2 2 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 2 2 2 3 2 2 2 2 3 2 2 2
+ 2 3 2 2 2 3 2 2 2 2 2 2 2 2 2 3 2 2 2 3 2 2 1 3 2 2 2 3 2 2 2 3 3 4 2 2 3
+ 3 2 2 2 3 3 3]
+predicted label:tf.Tensor(
+[-3.8953018e+00  2.4052550e+02 -3.7361560e+00  1.4023320e+03
+ -5.8536954e+00 -5.3779249e+00 -4.4062233e-01 -3.9249907e+00
+ -1.0832660e+00 -2.0944679e-01 -1.7116928e-01  7.4217949e+01
+ -9.2603874e-01 -3.4204168e+00 -8.3966875e-01 -2.2666473e+00
+ -3.5498023e-01  1.7746647e+03 -1.6658611e+00  1.1681233e+01
+ -2.4586051e+00  1.2519948e+01  1.7663600e+00 -1.3060758e+01
+  1.3046858e+03  1.2785988e+00 -2.5872350e-01 -9.2063999e-01
+  2.9127924e+01 -2.1899366e-01  7.3010333e-02 -1.8906815e+00
+ -1.8561769e-01 -1.6008569e+00 -2.4011588e+00 -1.1551150e+00
+ -1.5290072e+00  5.6328894e+02  2.3306820e+00  2.4103260e+00
+ -1.6337538e-01  1.2722486e+02  1.0788052e+00 -1.3562488e+01
+  2.1209764e-01 -3.0322077e+00 -3.5679553e+00 -4.4937301e+00
+ -2.2579417e+00  5.0202319e+02  3.7020444e+02  1.9716206e+02
+  3.3282291e+01  1.2649944e+02 -1.1762070e-01  1.6403890e-01
+  1.2489082e+00  3.1966103e+01  5.4328365e+00  6.6505273e+02
+  5.0877301e+02  2.2837839e+00  5.1875610e+02  1.5250896e+02
+  2.6028986e+02  3.2052010e+01 -1.0446977e-01 -1.4414591e+00
+  9.1776848e+00 -1.1980348e+00  5.1162312e+01 -3.7110887e+00
+  6.6228778e+02  7.7685070e-01 -1.0937920e+00  9.0106628e+02
+ -3.7481637e+00  7.7441669e+02  1.0066551e+00  1.5278718e+00
+ -4.7474706e-01], shape=(81,), dtype=float32)
+rounded label:tf.Tensor(
+[-4.000e+00  2.410e+02 -4.000e+00  1.402e+03 -6.000e+00 -5.000e+00
+ -0.000e+00 -4.000e+00 -1.000e+00 -0.000e+00 -0.000e+00  7.400e+01
+ -1.000e+00 -3.000e+00 -1.000e+00 -2.000e+00 -0.000e+00  1.775e+03
+ -2.000e+00  1.200e+01 -2.000e+00  1.300e+01  2.000e+00 -1.300e+01
+  1.305e+03  1.000e+00 -0.000e+00 -1.000e+00  2.900e+01 -0.000e+00
+  0.000e+00 -2.000e+00 -0.000e+00 -2.000e+00 -2.000e+00 -1.000e+00
+ -2.000e+00  5.630e+02  2.000e+00  2.000e+00 -0.000e+00  1.270e+02
+  1.000e+00 -1.400e+01  0.000e+00 -3.000e+00 -4.000e+00 -4.000e+00
+ -2.000e+00  5.020e+02  3.700e+02  1.970e+02  3.300e+01  1.260e+02
+ -0.000e+00  0.000e+00  1.000e+00  3.200e+01  5.000e+00  6.650e+02
+  5.090e+02  2.000e+00  5.190e+02  1.530e+02  2.600e+02  3.200e+01
+ -0.000e+00 -1.000e+00  9.000e+00 -1.000e+00  5.100e+01 -4.000e+00
+  6.620e+02  1.000e+00 -1.000e+00  9.010e+02 -4.000e+00  7.740e+02
+  1.000e+00  2.000e+00 -0.000e+00], shape=(81,), dtype=float32)
+predicted label rank:[ 5 25  5 37  3  4  9  5  8  9  9 20  8  6  8  7  9 38  7 14  7 15 11  2
+ 36 10  9  8 16  9  9  7  9  7  7  8  7 31 11 11  9 22 10  1  9  6  5  5
+  7 28 27 24 18 21  9  9 10 17 12 33 29 11 30 23 26 17  9  8 13  8 19  5
+ 32 10  8 35  5 34 10 11  9]
+mse:tf.Tensor(130547.68, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/minepump_spec5_product56_true-unreach-call.cil.c.flat_000.smt2
+true label:[1, 1, 1, 2]
+true label rank:[1 1 1 2]
+predicted label:tf.Tensor([-28.14205  -59.14118  -71.085045 -35.641464], shape=(4,), dtype=float32)
+rounded label:tf.Tensor([-28. -59. -71. -36.], shape=(4,), dtype=float32)
+predicted label rank:[4 2 1 3]
+mse:tf.Tensor(2769.8386, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/21.c_000.smt2
+true label:[9, 9, 9, 9, 9, 1, 9, 9, 9]
+true label rank:[2 2 2 2 2 1 2 2 2]
+predicted label:tf.Tensor(
+[ 2.766933    1.4400198  39.00478     0.21346968  3.1479807   2.3154373
+  3.577025    1.2098738   1.4639504 ], shape=(9,), dtype=float32)
+rounded label:tf.Tensor([ 3.  1. 39.  0.  3.  2.  4.  1.  1.], shape=(9,), dtype=float32)
+predicted label rank:[4 2 6 1 4 3 5 2 2]
+mse:tf.Tensor(139.59528, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/minepump_spec5_product59_true-unreach-call.cil.c.flat_000.smt2
+true label:[1, 1, 1, 2]
+true label rank:[1 1 1 2]
+predicted label:tf.Tensor([ -35.07995 -127.61088  -95.38604  -82.06698], shape=(4,), dtype=float32)
+rounded label:tf.Tensor([ -35. -128.  -95.  -82.], shape=(4,), dtype=float32)
+predicted label rank:[4 1 2 3]
+mse:tf.Tensor(8550.012, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/hysteresis_2_000.smt2
+true label:[1, 0, 0, -1, 0, 1, 0]
+true label rank:[3 2 2 1 2 3 2]
+predicted label:tf.Tensor(
+[  -56.882908  -447.47357   3070.3398   11411.088     -138.40569
+  -146.26529   2763.7417  ], shape=(7,), dtype=float32)
+rounded label:tf.Tensor([  -57.  -447.  3070. 11411.  -138.  -146.  2764.], shape=(7,), dtype=float32)
+predicted label rank:[4 1 6 7 3 2 5]
+mse:tf.Tensor(21077918.0, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/amebsa.smt2-0078_000.smt2
+true label:[3, 5, 2, 4, 4, 3, 4, 2, 4, 4, 3, 2, 4, 4, 3, 5, 4, 4, 3, 4, 4, 4, 3, 4, 4]
+true label rank:[2 4 1 3 3 2 3 1 3 3 2 1 3 3 2 4 3 3 2 3 3 3 2 3 3]
+predicted label:tf.Tensor(
+[22.906164    1.1530672   0.8582419   0.40185714  0.66265833  2.7989054
+  1.1215154  -1.005398    1.5435715   4.709034   -0.39767933 -1.7235403
+ -0.2259252  -0.6479409   2.3781638   1.802031    1.409487    0.9522204
+  8.596293    1.2183409  -0.12595534  0.88391614  0.84409845 -0.0380237
+ -1.0629377 ], shape=(25,), dtype=float32)
+rounded label:tf.Tensor(
+[23.  1.  1.  0.  1.  3.  1. -1.  2.  5. -0. -2. -0. -1.  2.  2.  1.  1.
+  9.  1. -0.  1.  1. -0. -1.], shape=(25,), dtype=float32)
+predicted label rank:[9 4 4 3 4 6 4 2 5 7 3 1 3 2 5 5 4 4 8 4 3 4 4 3 2]
+mse:tf.Tensor(26.567934, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/chc-lia-lin-0102_000.smt2
+true label:[1, 1]
+true label rank:[1 1]
+predicted label:tf.Tensor([151.27725     4.8959737], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([151.   5.], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(11299.215, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/chc-lia-lin-0259_000.smt2
+true label:[0, 0, 0, 0, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 2147483647, 2, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 1, 2147483647, 2, 2, 2, 1, 0, 1, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 2, 2, 2, 1, 0, 1, 2, 2, 2147483647, 1, 2, 2, 1, 1, 1, 2147483647, 2, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 2, 2, 2, 1, 0, 1, 2, 2, 2147483647, 1, 2, 2, 1, 1, 1, 2147483647, 2, 2, 2, 1, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 2, 2, 2, 1, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 2, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 2, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 2, 2, 2, 1, 0, 1, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 2, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 2, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 1, 2147483647, 2, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 2, 2, 2, 1, 0, 1, 2, 1, 2147483647, 1, 2, 2, 1, 1, 2147483647, 2, 2, 1, 1, 0, 1, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2, 2, 2, 1, 0, 2, 1, 2, 2, 1, 1, 2147483647, 2, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 2, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 2, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 0, 1, 2147483647, 2, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 2, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 2, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 2, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 2, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 1, 2147483647, 2, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 1, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 2, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 1, 2147483647, 1, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 1, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 1, 2147483647, 1, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 2, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 1, 2147483647, 1, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 1, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 1, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 1, 2147483647, 1, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 1, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1, 2147483647, 2, 2, 2, 1, 0, 0, 2, 2, 2147483647, 1, 2, 2, 1, 1]
+true label rank:[1 1 1 1 1 3 1 3 1 3 1 3 1 3 1 3 1 3 1 1 3 1 3 1 3 1 3 1 3 1 3 1 3 1 3 1 1
+ 3 1 3 1 3 1 3 1 3 1 3 4 3 3 3 2 1 1 3 3 4 2 3 3 2 2 2 4 3 3 3 2 1 2 3 3 4
+ 2 3 3 2 2 4 3 3 3 2 1 2 3 3 4 2 3 3 2 2 2 4 3 3 3 2 1 1 3 3 4 2 3 3 2 2 4
+ 3 3 3 2 1 2 3 3 4 2 3 3 2 2 2 4 3 3 3 2 1 3 3 4 2 3 3 2 2 4 3 3 3 2 1 3 3
+ 4 2 3 3 2 2 4 3 3 3 2 1 1 3 3 4 2 3 3 2 2 4 3 3 3 2 1 1 3 3 4 2 3 3 2 2 4
+ 3 3 3 2 1 2 3 3 4 2 3 3 2 2 4 3 3 3 2 1 1 3 3 4 2 3 3 2 2 4 3 3 3 2 1 1 3
+ 3 4 2 3 3 2 2 2 4 3 3 3 2 1 1 3 3 4 2 3 3 2 2 4 3 3 3 2 1 2 3 2 4 2 3 3 2
+ 2 4 3 3 2 2 1 2 3 3 4 2 3 3 2 2 3 3 3 2 1 3 2 3 3 2 2 4 3 3 3 2 1 1 3 3 4
+ 2 3 3 2 2 4 3 3 3 2 1 1 3 3 4 2 3 3 2 2 4 3 3 3 2 1 1 3 3 4 2 3 3 2 1 2 4
+ 3 3 3 2 1 1 3 3 4 2 3 3 2 2 4 3 3 3 2 1 1 3 3 4 2 3 3 2 2 4 3 3 3 2 1 1 3
+ 3 4 2 3 3 2 2 4 3 3 3 2 1 1 3 3 4 2 3 3 2 2 4 3 3 3 2 1 1 3 3 4 2 3 3 2 2
+ 2 4 3 3 3 2 1 1 3 3 4 2 3 3 2 2 4 2 3 3 2 1 1 3 3 4 2 3 3 2 2 4 3 3 3 2 1
+ 1 3 3 4 2 3 3 2 2 2 4 2 3 3 2 1 1 3 3 4 2 3 3 2 2 4 2 3 3 2 1 1 3 3 4 2 3
+ 3 2 2 2 4 2 3 3 2 1 1 3 3 4 2 3 3 2 2 4 3 3 3 2 1 1 3 3 4 2 3 3 2 2 2 4 2
+ 3 3 2 1 1 3 3 4 2 3 3 2 2 4 2 3 3 2 1 1 3 3 4 2 3 3 2 2 4 2 3 3 2 1 1 3 3
+ 4 2 3 3 2 2 2 4 2 3 3 2 1 1 3 3 4 2 3 3 2 2 4 2 3 3 2 1 1 3 3 4 2 3 3 2 2
+ 4 3 3 3 2 1 1 3 3 4 2 3 3 2 2]
+predicted label:tf.Tensor(
+[ 6.43412352e+00  4.74041176e+00  4.65991259e+00  2.93512726e+00
+  3.84032190e-01  2.62923622e+00  7.45297790e-01  4.23756142e+01
+  9.79333878e-01  2.40431619e+00  1.67092240e+00  4.25252989e-02
+  2.04497671e+00  1.61189675e+00  1.82553828e+00  1.64133155e+00
+  2.05811572e+00  1.96430051e+00  1.84500349e+00  3.71991014e+00
+ -6.49487972e-01  7.26647797e+01  2.80029869e+00  1.23760193e+02
+  2.15258551e+00  2.88045883e+00  5.14055014e-01  6.30137801e-01
+  1.18035245e+00  2.05208778e+00  3.47771025e+00  1.36912338e+02
+  7.23224640e-01  4.41209869e+01  2.03404709e+02  3.13218880e+00
+  2.50454208e+02  2.09624847e+02  5.65400887e+01  4.53346825e+00
+  3.91954041e+02  2.56894946e+00  2.20859671e+00  2.46485794e+02
+  1.18197210e-01  3.15088034e+00  5.62134521e+02  2.80359222e+02
+ -1.31720543e-01 -1.09824765e+00 -3.93587589e-01  9.87960339e-01
+  6.62029147e-01 -1.29515028e+00  1.84798121e-01 -5.59217930e-01
+  1.14203215e+00  1.40089935e+02 -4.47656536e+00 -1.62038729e-02
+ -8.48460913e-01  3.84191155e-01 -1.20344925e+00  3.61406326e-01
+ -3.66544914e+00 -2.72601295e+00 -2.40369701e+00 -4.12992191e+00
+  2.37876144e+02 -4.09900904e+00 -3.61707664e+00 -3.16110992e+00
+ -2.19215512e+00  4.31478214e+00 -2.76407242e+00 -2.28621960e+00
+ -2.82837534e+00 -2.53754926e+00 -4.19635153e+00 -6.07435226e-01
+  6.14761353e+02 -8.23444366e-01 -1.48394394e+00 -8.17515850e-01
+  9.77592651e+02 -1.53600848e+00 -1.81314397e+00 -2.61052656e+00
+ -4.65270638e-01 -3.86829376e-01  9.46658936e+02 -4.31772327e+00
+ -1.39804220e+00 -7.96544075e-01  2.36265039e+00 -1.65388930e+00
+ -1.16411090e+00 -1.70099735e-01 -5.98583460e-01  1.01350677e+00
+  4.03241577e+02  7.43634888e+02  2.26595490e+02  4.59144592e+02
+  8.59159912e+02  3.69469285e-01 -1.16228931e-01  3.02409649e-01
+  1.06355003e+02  7.69661499e+02  4.08397217e+01 -1.55671816e+01
+  1.08037598e+03 -4.39914846e+00 -5.97612143e+00 -9.05182838e+00
+ -4.20336962e+00  2.54154590e+03 -4.97477341e+00 -5.32027483e+00
+ -7.39983368e+00 -1.17264595e+01 -4.23717070e+00 -6.53078413e+00
+  8.61615723e+02 -4.53666830e+00  8.40100098e+02  4.89617798e+02
+  1.10734081e+00  3.23454056e+01  8.38218323e+02  2.37785980e+02
+ -1.25735235e+00 -5.98062754e-01  8.93938599e+02  6.09403320e+02
+  5.17811157e+02 -2.91591287e-01 -9.87170696e-01 -1.55350208e-01
+  3.69034698e+02  1.60310149e-01  2.48380974e-02 -3.85920525e-01
+  5.20632202e+02  4.93788605e+02 -1.61442542e+00 -3.21562767e-01
+  1.89794183e+00  4.21378970e-01  1.29458282e+02  2.29672527e+01
+ -2.20216811e-01  2.29791164e+00  1.54190323e+02  2.16862473e+02
+  6.50997437e+02 -4.05781984e-01  5.84568024e-01  1.02147293e+00
+  4.89929795e-01  2.86627316e+00  1.04812706e+00 -7.34838724e-01
+ -4.02071357e-01  8.43231430e+01 -8.32461044e-02 -8.25037718e-01
+  1.23335028e+00  3.16569702e+02  1.21111951e+03  1.20542993e+03
+  2.52361417e-01  1.28515955e+03  1.63374435e+02 -1.02870059e+00
+  6.75680054e+02  5.62901733e+02  9.25377441e+02 -1.92628813e+00
+ -8.37279320e-01 -3.73253584e-01  1.27241370e+03  8.77642944e+02
+ -3.80018377e+00 -5.20636272e+00 -1.16630816e+00  3.17541168e+02
+ -3.87561083e+00 -4.12572432e+00 -4.44075727e+00  1.51530685e+02
+ -3.42378759e+00 -2.01179180e+01 -3.16083670e+00 -4.78418922e+00
+ -6.43242121e+00 -3.97069025e+00 -5.61109781e+00 -1.18980932e+00
+ -2.61006188e+00 -2.04373813e+00 -1.06662846e+00 -1.01152611e+00
+ -1.89768267e+00 -7.03055620e-01 -6.89376593e-01 -1.61660671e+00
+  3.82212097e+02 -1.33763599e+00 -1.74374151e+00 -1.26482010e-01
+  1.17571790e+03  3.67204714e+00 -3.12299013e+00  9.39934969e-01
+  1.59909427e-01  2.40907852e+02  1.51658087e+01  5.12277079e+00
+  8.42522740e-01  3.64457275e+02  8.21973085e-01 -1.49536058e-02
+  3.92558098e+00 -4.46678162e-01  3.37573486e+02 -3.19069862e+00
+ -9.05741379e-02  7.97996569e+00  7.39567995e-01  4.55507019e+02
+  5.97648804e+02  5.48166626e+02  1.10289406e+02  2.29917297e+01
+  5.11041992e+02  5.60656982e+02  2.68473053e+02  9.46772933e-01
+  4.48808479e+01  3.04788470e+00  4.85382172e+02  2.98510098e+00
+  1.12318626e+02  4.18968384e+02  9.03988419e+01 -4.28569984e+00
+  9.30048584e+02  9.84838379e+02  3.58063555e+00  6.15751099e+02
+  7.24913696e+02  6.57293274e+02 -9.19798851e-01 -1.45730686e+00
+  4.88297180e+02 -3.35077524e-01  3.35540649e+02  1.28126192e+00
+  1.41110969e+00 -1.74078703e+00  9.10378296e+02  1.77109848e+02
+  1.01380164e+03  8.76650269e+02  1.89879227e+02  6.74106079e+02
+  2.51520691e+02 -3.64283180e+00  8.16511475e+02 -2.77376270e+00
+  3.34135132e+02  6.44075928e+02  2.20385313e-01  1.70904282e+02
+  1.91837021e+02  5.99732666e+02  2.67768219e+02  4.58962402e+02
+  4.78738365e+01  3.03153276e-01  3.36136047e+02  3.37533203e+02
+  2.39629288e+01  3.41962158e+02  7.26349365e+02  1.03486853e+03
+ -7.41484499e+00  9.84402100e+02  3.55686523e+02  8.17254272e+02
+ -6.45618796e-01  1.15524634e+03 -1.55759358e+00  7.93531418e-01
+  2.87716846e+01 -1.19144194e-01 -6.22195959e-01  5.18186951e+02
+  1.16945752e+03  4.39633131e-01 -5.60209990e+00 -3.18703890e-01
+  1.43833435e+03  6.23568371e-02 -2.33293867e+00  1.24746460e+03
+  9.67157654e+02  1.67372742e+02  7.61370850e+02 -6.48687601e-01
+  1.50497079e-01  9.43726379e+02  1.14903101e+03  5.81588074e+02
+ -7.62326479e-01  8.71141052e+02  9.31079346e+02 -2.43310690e-01
+  7.66267212e+02  5.38022400e+02  1.71677689e+02  7.28013855e+02
+ -3.48646045e-01  7.61822388e+02  9.12541270e-01  9.35266785e+02
+  1.01890820e+03  8.08039185e+02  7.32037842e+02  7.35318054e+02
+  2.09518997e+02  3.32244934e+02  4.72560516e+02  5.38786743e+02
+  5.21535095e+02  5.03107941e+02  4.13395508e+02  7.66238987e-01
+  1.11056465e+02  5.61802063e+02  4.25270294e+02  2.53806259e+02
+  2.87416443e+02  1.14285461e+02  1.71191269e+02  8.42461304e+02
+ -7.05165148e-01  2.00927170e+02  2.76044006e+02  1.59819992e+02
+  9.43796570e+02  9.84099609e+02  6.15730896e+02  9.23095520e+02
+  8.09625610e+02  7.91832092e+02  5.85307312e+02  4.94019348e+02
+  9.14394836e+02  7.48671265e+02  8.66010742e+02  9.76052429e+02
+  1.02494543e+03  4.35782379e+02  6.38313232e+02  8.65499634e+02
+  8.83864380e+02  2.01746655e+01  2.56166668e+01  1.05522972e+02
+  4.90567749e+02  9.54804199e+02  2.99094009e+01 -3.65741014e+00
+  3.49567199e+00 -1.06974745e+00 -5.71909332e+00  2.01841080e+02
+  3.61862976e+02 -1.01019135e+01 -5.50146914e+00  7.64384155e+02
+ -3.65314198e+00 -6.96495533e-01 -6.86776996e-01  1.71411276e-01
+  3.54753017e-01  1.94248947e+02 -9.64157391e+00 -2.91058779e+00
+  3.37616089e+02 -1.81385493e+00  3.22898102e+02 -1.01259127e+01
+  3.54400970e+02  8.89464617e-01  6.35660400e+02  1.03155960e+02
+ -5.90790415e+00  8.43503845e+02  5.05837917e-01  1.47348261e+00
+ -8.39102077e+00  2.44089603e-01  6.00176239e+01 -3.59897375e+00
+ -1.07239380e+01 -6.68965459e-01 -6.87527418e-01 -1.22851324e+00
+ -2.59976912e+00  3.33169699e-01 -2.60292888e-01  1.37265062e+00
+  1.76401615e-01  5.05789795e+02  4.25545454e-01  6.63053467e+02
+  3.05984917e+01  4.02465271e+02  1.44915571e+01 -2.79739046e+00
+  5.16096191e+02  8.00858231e+01  8.41247009e+02  3.29766273e-01
+  1.12654400e+00  6.58442505e+02  8.38666870e+02  6.50247192e+02
+ -3.58594537e-01  6.78424358e-01 -5.02450752e+00  1.06886169e+03
+  4.83236504e+01  9.10163452e+02  1.46616165e+02  9.78102951e+01
+  3.94425751e+02  7.43531494e+02  7.51569702e+02  4.59991425e+02
+  2.10517517e+02  6.43009277e+02  3.25608429e+02  6.73663574e+02
+  6.80907104e+02  1.84775192e+02 -6.68446684e+00  4.90871338e+02
+  5.01933105e+02  3.11750977e+02  2.47993561e+02 -9.67185423e-02
+  1.09152576e+03  4.26850403e+02  9.72115967e+02  7.48220459e+02
+ -2.40389490e+00  5.80196350e+02  8.96442139e+02  8.80348267e+02
+  3.11712311e+02  2.63635925e+02  9.99069288e-02  6.52288818e+02
+  4.82876465e+02  2.66258423e+02  3.06737793e+02  3.58915436e+02
+  8.07976257e+02  8.43491394e+02 -4.92816496e+00 -2.91499519e+00
+  4.75765289e+02  9.48394299e-01  8.22381470e+02 -3.53941202e-01
+  1.42676950e-01  3.83562775e+02  7.43356262e+02  4.27190613e+02
+  3.25078430e+02  8.04069117e-02  3.14766602e+02  3.06190125e+02
+  2.93600647e+02 -1.45174503e-01  9.71902695e+01  1.87069786e+00
+  5.91572227e+01  9.65146899e-01  5.85314514e+02  7.51024783e-01
+ -6.23816967e-01  3.02385998e+00  1.97874165e+00  5.96328674e+02
+ -1.99998331e+00  1.01019539e+02  1.42573425e+02  4.39604998e-01
+  3.78311127e+02  7.74977661e+02  2.03111206e+02 -1.40721560e+00
+ -1.48332596e-01  1.08825081e+02  5.45027710e+02  2.50385178e+02
+ -1.45728111e-01  8.24365973e-01  3.80103350e-01  6.32891357e+02
+  1.11615479e+03  4.95648384e-01  8.12674805e+02 -4.73944426e+00
+ -4.75777268e-01  9.32704102e+02  1.31111462e+03  3.42887024e+02
+  9.84232788e+02 -3.57240915e+00  3.52107361e+02 -5.00941801e+00
+  1.37928455e+03  6.76889404e+02  2.81197968e+02  1.12870886e+03
+  1.41301050e+03  8.68025269e+02  3.63338232e-01 -1.69623518e+00
+ -1.24344778e+00 -5.42174578e-01 -3.43412876e-01  3.91274810e-01
+  3.63862457e+01 -5.78904077e-02 -3.09243584e+00  2.51573715e+02
+  7.97521973e+02 -9.29134369e-01 -3.22024870e+00  3.64133820e+02
+  3.81452759e+02  7.24007130e-01  5.88652588e+02  7.54167603e+02
+  9.44314819e+02  1.74060883e+02  4.42607422e+02  6.86954117e+01
+  4.85718422e+01  4.28125305e+02 -2.63901186e+00  7.06579804e-01
+  1.87691545e+00  7.39551544e-01  2.97956421e+02  5.76482239e+02
+  3.07502380e+02  4.68517792e+02  5.18876221e+02  5.13729614e+02
+  5.40776794e+02  5.04202484e+02  2.20475435e+00  2.71006927e+01
+  3.02241974e+02  4.08985657e+02  5.64286743e+02  3.04736328e+02
+  3.93204071e+02  5.11644562e+02  2.45617867e-01  7.61853933e-01
+  8.76950806e+02  3.62684814e+02  2.70179382e+02  5.06074677e+02
+  7.35602051e+02  4.63656067e+02  7.00386169e+02 -3.96699190e-01
+ -8.92727613e-01  3.52349182e+02  9.58894226e+02 -2.15750575e-01
+ -1.44677401e-01 -1.70914531e-01 -1.78155541e-01  7.29965576e+02
+  7.23716797e+02 -1.82124043e+00  6.39259696e-01  3.00530579e+02
+  7.70285889e+02  4.90187439e+02 -6.12285471e+00 -2.05348253e-01
+  2.70233536e+01 -2.80233717e+00  7.10767944e+02], shape=(607,), dtype=float32)
+rounded label:tf.Tensor(
+[ 6.000e+00  5.000e+00  5.000e+00  3.000e+00  0.000e+00  3.000e+00
+  1.000e+00  4.200e+01  1.000e+00  2.000e+00  2.000e+00  0.000e+00
+  2.000e+00  2.000e+00  2.000e+00  2.000e+00  2.000e+00  2.000e+00
+  2.000e+00  4.000e+00 -1.000e+00  7.300e+01  3.000e+00  1.240e+02
+  2.000e+00  3.000e+00  1.000e+00  1.000e+00  1.000e+00  2.000e+00
+  3.000e+00  1.370e+02  1.000e+00  4.400e+01  2.030e+02  3.000e+00
+  2.500e+02  2.100e+02  5.700e+01  5.000e+00  3.920e+02  3.000e+00
+  2.000e+00  2.460e+02  0.000e+00  3.000e+00  5.620e+02  2.800e+02
+ -0.000e+00 -1.000e+00 -0.000e+00  1.000e+00  1.000e+00 -1.000e+00
+  0.000e+00 -1.000e+00  1.000e+00  1.400e+02 -4.000e+00 -0.000e+00
+ -1.000e+00  0.000e+00 -1.000e+00  0.000e+00 -4.000e+00 -3.000e+00
+ -2.000e+00 -4.000e+00  2.380e+02 -4.000e+00 -4.000e+00 -3.000e+00
+ -2.000e+00  4.000e+00 -3.000e+00 -2.000e+00 -3.000e+00 -3.000e+00
+ -4.000e+00 -1.000e+00  6.150e+02 -1.000e+00 -1.000e+00 -1.000e+00
+  9.780e+02 -2.000e+00 -2.000e+00 -3.000e+00 -0.000e+00 -0.000e+00
+  9.470e+02 -4.000e+00 -1.000e+00 -1.000e+00  2.000e+00 -2.000e+00
+ -1.000e+00 -0.000e+00 -1.000e+00  1.000e+00  4.030e+02  7.440e+02
+  2.270e+02  4.590e+02  8.590e+02  0.000e+00 -0.000e+00  0.000e+00
+  1.060e+02  7.700e+02  4.100e+01 -1.600e+01  1.080e+03 -4.000e+00
+ -6.000e+00 -9.000e+00 -4.000e+00  2.542e+03 -5.000e+00 -5.000e+00
+ -7.000e+00 -1.200e+01 -4.000e+00 -7.000e+00  8.620e+02 -5.000e+00
+  8.400e+02  4.900e+02  1.000e+00  3.200e+01  8.380e+02  2.380e+02
+ -1.000e+00 -1.000e+00  8.940e+02  6.090e+02  5.180e+02 -0.000e+00
+ -1.000e+00 -0.000e+00  3.690e+02  0.000e+00  0.000e+00 -0.000e+00
+  5.210e+02  4.940e+02 -2.000e+00 -0.000e+00  2.000e+00  0.000e+00
+  1.290e+02  2.300e+01 -0.000e+00  2.000e+00  1.540e+02  2.170e+02
+  6.510e+02 -0.000e+00  1.000e+00  1.000e+00  0.000e+00  3.000e+00
+  1.000e+00 -1.000e+00 -0.000e+00  8.400e+01 -0.000e+00 -1.000e+00
+  1.000e+00  3.170e+02  1.211e+03  1.205e+03  0.000e+00  1.285e+03
+  1.630e+02 -1.000e+00  6.760e+02  5.630e+02  9.250e+02 -2.000e+00
+ -1.000e+00 -0.000e+00  1.272e+03  8.780e+02 -4.000e+00 -5.000e+00
+ -1.000e+00  3.180e+02 -4.000e+00 -4.000e+00 -4.000e+00  1.520e+02
+ -3.000e+00 -2.000e+01 -3.000e+00 -5.000e+00 -6.000e+00 -4.000e+00
+ -6.000e+00 -1.000e+00 -3.000e+00 -2.000e+00 -1.000e+00 -1.000e+00
+ -2.000e+00 -1.000e+00 -1.000e+00 -2.000e+00  3.820e+02 -1.000e+00
+ -2.000e+00 -0.000e+00  1.176e+03  4.000e+00 -3.000e+00  1.000e+00
+  0.000e+00  2.410e+02  1.500e+01  5.000e+00  1.000e+00  3.640e+02
+  1.000e+00 -0.000e+00  4.000e+00 -0.000e+00  3.380e+02 -3.000e+00
+ -0.000e+00  8.000e+00  1.000e+00  4.560e+02  5.980e+02  5.480e+02
+  1.100e+02  2.300e+01  5.110e+02  5.610e+02  2.680e+02  1.000e+00
+  4.500e+01  3.000e+00  4.850e+02  3.000e+00  1.120e+02  4.190e+02
+  9.000e+01 -4.000e+00  9.300e+02  9.850e+02  4.000e+00  6.160e+02
+  7.250e+02  6.570e+02 -1.000e+00 -1.000e+00  4.880e+02 -0.000e+00
+  3.360e+02  1.000e+00  1.000e+00 -2.000e+00  9.100e+02  1.770e+02
+  1.014e+03  8.770e+02  1.900e+02  6.740e+02  2.520e+02 -4.000e+00
+  8.170e+02 -3.000e+00  3.340e+02  6.440e+02  0.000e+00  1.710e+02
+  1.920e+02  6.000e+02  2.680e+02  4.590e+02  4.800e+01  0.000e+00
+  3.360e+02  3.380e+02  2.400e+01  3.420e+02  7.260e+02  1.035e+03
+ -7.000e+00  9.840e+02  3.560e+02  8.170e+02 -1.000e+00  1.155e+03
+ -2.000e+00  1.000e+00  2.900e+01 -0.000e+00 -1.000e+00  5.180e+02
+  1.169e+03  0.000e+00 -6.000e+00 -0.000e+00  1.438e+03  0.000e+00
+ -2.000e+00  1.247e+03  9.670e+02  1.670e+02  7.610e+02 -1.000e+00
+  0.000e+00  9.440e+02  1.149e+03  5.820e+02 -1.000e+00  8.710e+02
+  9.310e+02 -0.000e+00  7.660e+02  5.380e+02  1.720e+02  7.280e+02
+ -0.000e+00  7.620e+02  1.000e+00  9.350e+02  1.019e+03  8.080e+02
+  7.320e+02  7.350e+02  2.100e+02  3.320e+02  4.730e+02  5.390e+02
+  5.220e+02  5.030e+02  4.130e+02  1.000e+00  1.110e+02  5.620e+02
+  4.250e+02  2.540e+02  2.870e+02  1.140e+02  1.710e+02  8.420e+02
+ -1.000e+00  2.010e+02  2.760e+02  1.600e+02  9.440e+02  9.840e+02
+  6.160e+02  9.230e+02  8.100e+02  7.920e+02  5.850e+02  4.940e+02
+  9.140e+02  7.490e+02  8.660e+02  9.760e+02  1.025e+03  4.360e+02
+  6.380e+02  8.650e+02  8.840e+02  2.000e+01  2.600e+01  1.060e+02
+  4.910e+02  9.550e+02  3.000e+01 -4.000e+00  3.000e+00 -1.000e+00
+ -6.000e+00  2.020e+02  3.620e+02 -1.000e+01 -6.000e+00  7.640e+02
+ -4.000e+00 -1.000e+00 -1.000e+00  0.000e+00  0.000e+00  1.940e+02
+ -1.000e+01 -3.000e+00  3.380e+02 -2.000e+00  3.230e+02 -1.000e+01
+  3.540e+02  1.000e+00  6.360e+02  1.030e+02 -6.000e+00  8.440e+02
+  1.000e+00  1.000e+00 -8.000e+00  0.000e+00  6.000e+01 -4.000e+00
+ -1.100e+01 -1.000e+00 -1.000e+00 -1.000e+00 -3.000e+00  0.000e+00
+ -0.000e+00  1.000e+00  0.000e+00  5.060e+02  0.000e+00  6.630e+02
+  3.100e+01  4.020e+02  1.400e+01 -3.000e+00  5.160e+02  8.000e+01
+  8.410e+02  0.000e+00  1.000e+00  6.580e+02  8.390e+02  6.500e+02
+ -0.000e+00  1.000e+00 -5.000e+00  1.069e+03  4.800e+01  9.100e+02
+  1.470e+02  9.800e+01  3.940e+02  7.440e+02  7.520e+02  4.600e+02
+  2.110e+02  6.430e+02  3.260e+02  6.740e+02  6.810e+02  1.850e+02
+ -7.000e+00  4.910e+02  5.020e+02  3.120e+02  2.480e+02 -0.000e+00
+  1.092e+03  4.270e+02  9.720e+02  7.480e+02 -2.000e+00  5.800e+02
+  8.960e+02  8.800e+02  3.120e+02  2.640e+02  0.000e+00  6.520e+02
+  4.830e+02  2.660e+02  3.070e+02  3.590e+02  8.080e+02  8.430e+02
+ -5.000e+00 -3.000e+00  4.760e+02  1.000e+00  8.220e+02 -0.000e+00
+  0.000e+00  3.840e+02  7.430e+02  4.270e+02  3.250e+02  0.000e+00
+  3.150e+02  3.060e+02  2.940e+02 -0.000e+00  9.700e+01  2.000e+00
+  5.900e+01  1.000e+00  5.850e+02  1.000e+00 -1.000e+00  3.000e+00
+  2.000e+00  5.960e+02 -2.000e+00  1.010e+02  1.430e+02  0.000e+00
+  3.780e+02  7.750e+02  2.030e+02 -1.000e+00 -0.000e+00  1.090e+02
+  5.450e+02  2.500e+02 -0.000e+00  1.000e+00  0.000e+00  6.330e+02
+  1.116e+03  0.000e+00  8.130e+02 -5.000e+00 -0.000e+00  9.330e+02
+  1.311e+03  3.430e+02  9.840e+02 -4.000e+00  3.520e+02 -5.000e+00
+  1.379e+03  6.770e+02  2.810e+02  1.129e+03  1.413e+03  8.680e+02
+  0.000e+00 -2.000e+00 -1.000e+00 -1.000e+00 -0.000e+00  0.000e+00
+  3.600e+01 -0.000e+00 -3.000e+00  2.520e+02  7.980e+02 -1.000e+00
+ -3.000e+00  3.640e+02  3.810e+02  1.000e+00  5.890e+02  7.540e+02
+  9.440e+02  1.740e+02  4.430e+02  6.900e+01  4.900e+01  4.280e+02
+ -3.000e+00  1.000e+00  2.000e+00  1.000e+00  2.980e+02  5.760e+02
+  3.080e+02  4.690e+02  5.190e+02  5.140e+02  5.410e+02  5.040e+02
+  2.000e+00  2.700e+01  3.020e+02  4.090e+02  5.640e+02  3.050e+02
+  3.930e+02  5.120e+02  0.000e+00  1.000e+00  8.770e+02  3.630e+02
+  2.700e+02  5.060e+02  7.360e+02  4.640e+02  7.000e+02 -0.000e+00
+ -1.000e+00  3.520e+02  9.590e+02 -0.000e+00 -0.000e+00 -0.000e+00
+ -0.000e+00  7.300e+02  7.240e+02 -2.000e+00  1.000e+00  3.010e+02
+  7.700e+02  4.900e+02 -6.000e+00 -0.000e+00  2.700e+01 -3.000e+00
+  7.110e+02], shape=(607,), dtype=float32)
+predicted label rank:[ 21  20  20  18  15  18  16  36  16  17  17  15  17  17  17  17  17  17
+  17  19  14  45  18  59  17  18  16  16  16  17  18  61  16  37  80  18
+  89  81  41  20 133  18  17  87  15  18 177  97  15  14  15  16  16  14
+  15  14  16  62  11  15  14  15  14  15  11  12  13  11  85  11  11  12
+  13  19  12  13  12  12  11  14 189  14  14  14 269  13  13  12  15  15
+ 263  11  14  14  17  13  14  15  14  16 137 217  84 147 242  15  15  15
+  53 226  35   2 277  11   9   6  11 294  10  10   8   3  11   8 243  10
+ 237 156  16  33 235  85  14  14 252 188 167  15  14  15 128  15  15  15
+ 169 158  13  15  17  15  60  26  15  17  66  83 197  15  16  16  15  18
+  16  14  15  47  15  14  16 110 286 285  15 289  68  14 203 178 257  13
+  14  15 288 249  11  10  14 111  11  11  11  65  12   1  12  10   9  11
+   9  14  12  13  14  14  13  14  14  13 131  14  13  15 284  19  12  16
+  15  86  24  20  16 127  16  15  19  15 118  12  15  22  16 146 186 175
+  55  26 163 176  94  16  38  18 154  18  57 140  48  11 258 271  19 190
+ 209 199  14  14 155  15 117  16  16  13 254  73 272 248  75 202  90  11
+ 233  12 116 195  15  70  76 187  94 147  39  15 117 118  27 119 210 275
+   8 270 123 233  14 282  13  16  30  15  14 167 283  15   9  15 293  15
+  13 287 266  69 222  14  15 262 281 182  14 247 259  15 225 171  71 211
+  15 223  16 261 273 230 213 214  81 115 151 172 170 160 139  16  56 177
+ 141  91  99  58  70 239  14  78  96  67 262 270 190 256 231 228 183 158
+ 255 219 245 268 274 144 193 244 251  25  28  53 157 264  31  11  18  14
+   9  79 125   5   9 224  11  14  14  15  15  77   5  12 118  13 112   5
+ 122  16 192  52   9 241  16  16   7  15  43  11   4  14  14  14  12  15
+  15  16  15 162  15 201  32 136  23  12 166  46 238  15  16 200 236 196
+  15  16  10 276  39 254  64  50 135 217 220 148  82 194 114 202 205  74
+   8 157 159 108  88  15 278 142 267 218  13 181 253 250 108  92  15 198
+ 153  93 106 124 230 240  10  12 152  16 234  15  15 132 216 142 113  15
+ 109 105 100  15  49  17  42  16 183  16  14  18  17 185  13  51  63  15
+ 129 227  80  14  15  54 174  89  15  16  15 191 279  15 232  10  15 260
+ 290 120 270  11 121  10 291 204  98 280 292 246  15  13  14  14  15  15
+  34  15  12  90 229  14  12 127 130  16 184 221 262  72 145  44  40 143
+  12  16  17  16 101 180 107 150 168 165 173 161  17  29 103 138 179 104
+ 134 164  15  16 248 126  95 162 215 149 206  15  14 121 265  15  15  15
+  15 212 208  13  16 102 226 156   9  15  29  12 207]
+mse:tf.Tensor(5.470203e+17, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/durationThm_1_e3_173_000.smt2
+true label:[0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1]
+predicted label:tf.Tensor([-50.279682  -8.262014 -15.150331 -17.049244 -19.31305  -18.031614], shape=(6,), dtype=float32)
+rounded label:tf.Tensor([-50.  -8. -15. -17. -19. -18.], shape=(6,), dtype=float32)
+predicted label rank:[1 6 5 4 2 3]
+mse:tf.Tensor(635.77496, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/bandec.smt2-0036_000.smt2
+true label:[1, 3]
+true label rank:[1 2]
+predicted label:tf.Tensor([1.9638567 1.0692579], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([2. 1.], shape=(2,), dtype=float32)
+predicted label rank:[2 1]
+mse:tf.Tensor(2.3283925, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/SYNAPSE_3_e7_1444_e7_638_000.smt2
+true label:[0, 0, 0, 0]
+true label rank:[1 1 1 1]
+predicted label:tf.Tensor([ 4.3534756e-01 -2.0022693e+00  2.1912029e+03  7.9523059e+02], shape=(4,), dtype=float32)
+rounded label:tf.Tensor([ 0.000e+00 -2.000e+00  2.191e+03  7.950e+02], shape=(4,), dtype=float32)
+predicted label rank:[2 1 4 3]
+mse:tf.Tensor(1358441.4, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/bandec.smt2-0157_000.smt2
+true label:[2, 4, 4]
+true label rank:[1 2 2]
+predicted label:tf.Tensor([1.1448599 1.7270949 1.133087 ], shape=(3,), dtype=float32)
+rounded label:tf.Tensor([1. 2. 1.], shape=(3,), dtype=float32)
+predicted label rank:[1 2 1]
+mse:tf.Tensor(4.7055173, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/s3_clnt_2_true-unreach-call_true-termination.cil.c.flat_000.smt2
+true label:[4560, 4480, 4512, 4560, 4480, 4512, 4512, 4560, 4480, 4512, 4512, 5, 4560, 4480, 4512, 4512, 5, 4560, 4480, 4512, 4512]
+true label rank:[4 2 3 4 2 3 3 4 2 3 3 1 4 2 3 3 1 4 2 3 3]
+predicted label:tf.Tensor(
+[3305.5898   2839.8574   3170.4094   3397.8335   3461.7698   3285.65
+ 3433.458    4644.677    4882.261    4023.9402   4852.7036    -20.059952
+ 5042.439    4551.693       7.414271 5806.1987    -21.371363  544.1758
+  -11.293418 1772.1083    -21.434141], shape=(21,), dtype=float32)
+rounded label:tf.Tensor(
+[3306. 2840. 3170. 3398. 3462. 3286. 3433. 4645. 4882. 4024. 4853.  -20.
+ 5042. 4552.    7. 5806.  -21.  544.  -11. 1772.  -21.], shape=(21,), dtype=float32)
+predicted label rank:[10  7  8 11 13  9 12 16 18 14 17  2 19 15  4 20  1  5  3  6  1]
+mse:tf.Tensor(4676400.0, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/bandec.smt2-0033_000.smt2
+true label:[3]
+true label rank:[1]
+predicted label:tf.Tensor([1.1000943], shape=(1,), dtype=float32)
+rounded label:tf.Tensor([1.], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(3.6096416, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/SYNAPSE_5_e2_1525_000.smt2
+true label:[0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1]
+predicted label:tf.Tensor([ 1.3898848 -3.31633   -2.1696854 -3.1027694 -1.3914094], shape=(5,), dtype=float32)
+rounded label:tf.Tensor([ 1. -3. -2. -3. -1.], shape=(5,), dtype=float32)
+predicted label rank:[4 1 2 1 3]
+mse:tf.Tensor(5.8401117, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/pc_sfifo_2_true-unreach-call_false-termination.cil.c.flat_000.smt2
+true label:[2, 2, 1, 1, 1, 2, 2, 1, 1, 2, 2, 1, 1, 1, 1, 2, 2, 1, 1, 1, 2, 2, 1, 1, 1]
+true label rank:[2 2 1 1 1 2 2 1 1 2 2 1 1 1 1 2 2 1 1 1 2 2 1 1 1]
+predicted label:tf.Tensor(
+[ 1.7025061e+01  1.8371074e+02  2.6060593e+01  5.3305317e+01
+  8.4065557e-01  2.2088007e+01  3.0943203e+00  2.9015522e+00
+  3.6550322e+00 -4.0805187e+01  1.3491849e+03 -6.8754997e+00
+ -1.9090597e+01 -9.7925692e+00  6.5956909e+02 -4.0387276e+01
+ -2.0034456e+02  1.3508978e+03 -9.9806801e+01 -1.3608693e+01
+  5.6115063e+03  1.0521216e+04  3.1270601e+03  4.3904824e+00
+  5.4580835e+03], shape=(25,), dtype=float32)
+rounded label:tf.Tensor(
+[ 1.7000e+01  1.8400e+02  2.6000e+01  5.3000e+01  1.0000e+00  2.2000e+01
+  3.0000e+00  3.0000e+00  4.0000e+00 -4.1000e+01  1.3490e+03 -7.0000e+00
+ -1.9000e+01 -1.0000e+01  6.6000e+02 -4.0000e+01 -2.0000e+02  1.3510e+03
+ -1.0000e+02 -1.4000e+01  5.6120e+03  1.0521e+04  3.1270e+03  4.0000e+00
+  5.4580e+03], shape=(25,), dtype=float32)
+predicted label rank:[12 16 14 15  9 13 10 10 11  3 18  8  5  7 17  4  1 19  2  6 22 23 20 11
+ 21]
+mse:tf.Tensor(7433435.5, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/bandec.smt2-0159_000.smt2
+true label:[2, 3, 3, 1, 3, 3]
+true label rank:[2 3 3 1 3 3]
+predicted label:tf.Tensor([ 1.1639947   1.161658   46.562687   -2.3115964   3.3954604  -0.24964428], shape=(6,), dtype=float32)
+rounded label:tf.Tensor([ 1.  1. 47. -2.  3. -0.], shape=(6,), dtype=float32)
+predicted label rank:[3 3 5 1 4 2]
+mse:tf.Tensor(320.57822, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/MOESI_2_e8_101_000.smt2
+true label:[0, 0, 0, 0, 0, 1, 1, 1, 1]
+true label rank:[1 1 1 1 1 2 2 2 2]
+predicted label:tf.Tensor(
+[ 1.2180094e+00  1.2412686e+00  6.2060195e-01  8.9650804e-01
+  8.5683060e-01 -9.8857395e-02 -3.2963705e+00  4.8784363e+02
+  1.1652198e+00], shape=(9,), dtype=float32)
+rounded label:tf.Tensor([  1.   1.   1.   1.   1.  -0.  -3. 488.   1.], shape=(9,), dtype=float32)
+predicted label rank:[3 3 3 3 3 2 1 4 3]
+mse:tf.Tensor(26337.93, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/car_4_e3_57_e4_1047_000.smt2
+true label:[2, 3, 2, 3]
+true label rank:[1 2 1 2]
+predicted label:tf.Tensor([-11.639629 -11.29606   -5.106076 -14.097872], shape=(4,), dtype=float32)
+rounded label:tf.Tensor([-12. -11.  -5. -14.], shape=(4,), dtype=float32)
+predicted label rank:[2 3 4 1]
+mse:tf.Tensor(183.31259, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/nest-if3_true-unreach-call.c.flat_000.smt2
+true label:[999999, 999999, 999998, 999998, 999999, 999998]
+true label rank:[2 2 1 1 2 1]
+predicted label:tf.Tensor(
+[  4.2991033  167.92442     34.314552     4.196145     0.67088604
+   0.7421448 ], shape=(6,), dtype=float32)
+rounded label:tf.Tensor([  4. 168.  34.   4.   1.   1.], shape=(6,), dtype=float32)
+predicted label rank:[2 4 3 2 1 1]
+mse:tf.Tensor(999926300000.0, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/test_locks_10.c-1_000.smt2
+true label:[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1]
+predicted label:tf.Tensor(
+[-1.00584185e+00 -4.10247087e-01 -1.04118511e-02  6.61376419e+01
+ -5.87809610e+00  1.37723297e+02  7.08557068e+02 -2.25402832e+00
+  1.10032701e+00  4.67622876e-01  2.65560627e-01  1.99887991e-01
+  5.00336647e-01 -9.08503532e-01 -5.87837744e+00 -2.14277625e-01
+  3.67305040e-01 -4.18640852e-01  2.02196622e+00  1.12933469e+00
+  3.09407949e-01  4.33418512e-01  1.44419503e+00  3.04189920e-01
+  8.91629333e+01 -8.24465990e-01  1.23280835e+00  1.93255663e-01
+  2.64071584e+00  2.80546427e-01  9.22015667e-01  2.80077910e+00
+ -1.31423664e+00  6.53486729e-01 -1.60370991e-02  6.11789301e-02
+  1.31815326e+00  2.46252131e+00  3.82416010e-01  7.17920721e-01
+  1.57079506e+00  2.03791142e+00  2.13367020e+02  1.19081020e+00
+ -5.83300352e-01  4.69434500e-01 -6.40177652e-02  1.17530155e+00
+  2.36319113e+00  5.75591326e-01 -1.01450956e+00 -1.22225785e+00
+  1.65327191e+00  1.46416840e+02 -1.44798136e+00 -1.18094675e-01
+  7.07939327e-01  2.16007385e+02 -9.92628336e-01  6.83666945e-01
+  5.55763304e-01  5.58460083e+02 -2.15162802e+00 -4.43805695e-01
+  3.07091732e+01  5.57503395e+01  3.88263794e+02  1.95385730e+00
+  6.70681074e-02  1.14633568e-01 -2.86479831e-01 -9.34198141e-01
+ -3.31998467e-01  1.59280539e-01 -5.56211233e-01], shape=(75,), dtype=float32)
+rounded label:tf.Tensor(
+[ -1.  -0.  -0.  66.  -6. 138. 709.  -2.   1.   0.   0.   0.   1.  -1.
+  -6.  -0.   0.  -0.   2.   1.   0.   0.   1.   0.  89.  -1.   1.   0.
+   3.   0.   1.   3.  -1.   1.  -0.   0.   1.   2.   0.   1.   2.   2.
+ 213.   1.  -1.   0.  -0.   1.   2.   1.  -1.  -1.   2. 146.  -1.  -0.
+   1. 216.  -1.   1.   1. 558.  -2.  -0.  31.  56. 388.   2.   0.   0.
+  -0.  -1.  -0.   0.  -1.], shape=(75,), dtype=float32)
+predicted label rank:[ 3  4  4 10  1 12 18  2  5  4  4  4  5  3  1  4  4  4  6  5  4  4  5  4
+ 11  3  5  4  7  4  5  7  3  5  4  4  5  6  4  5  6  6 14  5  3  4  4  5
+  6  5  3  3  6 13  3  4  5 15  3  5  5 17  2  4  8  9 16  6  4  4  4  3
+  4  4  3]
+mse:tf.Tensor(14781.773, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/bandec.smt2-0210_000.smt2
+true label:[3, 1, 2, 3, 3, 1, 2, 3, 3, 1, 3, 3]
+true label rank:[3 1 2 3 3 1 2 3 3 1 3 3]
+predicted label:tf.Tensor(
+[ 3.233304    2.967868    4.342074    2.2421331   3.1796303   0.82809126
+  0.7880523   1.6156036   1.169111   93.48626     3.866232   41.37725   ], shape=(12,), dtype=float32)
+rounded label:tf.Tensor([ 3.  3.  4.  2.  3.  1.  1.  2.  1. 93.  4. 41.], shape=(12,), dtype=float32)
+predicted label rank:[3 3 4 2 3 1 1 2 1 6 4 5]
+mse:tf.Tensor(837.0048, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/destroy_test_dangling_unsafe.c_000.smt2
+true label:[9, 3, 7, 2, 11, 4, 9, 1, 3, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 13, 5, 11, 1, 3, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 15, 6, 13, 1, 3, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 7, 15, 1, 3, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[ 9  4  8  3 10  5  9  2  4  1  1  1  1  1  1  3  3  3  3  3  3 11  6 10
+  2  4  1  1  1  1  1  1  3  3  3  3  3  3 12  7 11  2  4  1  1  1  1  1
+  1  3  3  3  3  3  3  8 12  2  4  1  1  1  1  1  1  3  3  3  3  3  3  1
+  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1]
+predicted label:tf.Tensor(
+[ 2.2519337e+02 -1.1333203e+00 -3.3354440e+00  1.0564723e+00
+  1.1056732e+00  9.4882631e-01  3.2819331e-01  6.4913452e-01
+  1.3299339e+00  9.5561469e-01  1.1188855e+00 -3.3321023e+00
+  1.4929180e+00  1.1584129e+00  1.4070665e+00  1.0099639e+00
+  6.4664912e-01  8.8056815e-01  8.6820829e-01  7.1837330e-01
+ -1.1196005e+00  1.0365108e+00  9.3006873e-01  8.1892002e-01
+  5.2980101e-01  1.1043311e+00  4.2079473e-01  4.6089709e-01
+  3.1994832e-01  8.2918442e+01  2.6725924e-01  7.1049225e-01
+  1.5186530e+02 -1.7874992e-01  1.2644889e+00  2.2997887e+00
+  8.1994736e-01  8.6250067e-01  1.3739091e+00  7.1894026e-01
+  2.3457699e+00  1.4024453e+00 -1.7175322e+00  3.6018276e-01
+  5.0575340e-01  3.7610435e-01  7.4985886e+00  2.3663938e+00
+  2.6452265e+01  1.7583122e+00 -1.2805421e+00  1.8417085e+00
+  2.4268332e+00 -2.3608327e-01 -1.8884621e+00  1.3134632e+00
+  1.2779520e+00  1.6153636e+00  1.5092351e+00  1.4158196e+00
+  1.2497931e+00  4.0831783e+01 -1.0563635e-01  1.4409320e+00
+  1.6423810e+00  1.4158180e+00  1.6629775e+00  1.0933207e+00
+  2.0329754e+00  1.4344063e+00  4.5163560e-01  1.1408427e+00
+ -2.1068907e-01  7.1350968e-01  7.2376561e-01  8.4025073e-01
+  1.8799956e+00  1.7688001e+00  2.1775639e-01  1.0481085e+01
+  1.1161808e+00  1.0307884e+00  9.4031733e-01  1.3006430e+00
+  1.4192293e+00  9.8970091e-01  1.8119242e+00  1.1362503e+00
+  1.5969549e+00  1.1117954e+00  1.4827641e+00], shape=(91,), dtype=float32)
+rounded label:tf.Tensor(
+[225.  -1.  -3.   1.   1.   1.   0.   1.   1.   1.   1.  -3.   1.   1.
+   1.   1.   1.   1.   1.   1.  -1.   1.   1.   1.   1.   1.   0.   0.
+   0.  83.   0.   1. 152.  -0.   1.   2.   1.   1.   1.   1.   2.   1.
+  -2.   0.   1.   0.   7.   2.  26.   2.  -1.   2.   2.  -0.  -2.   1.
+   1.   2.   2.   1.   1.  41.  -0.   1.   2.   1.   2.   1.   2.   1.
+   0.   1.  -0.   1.   1.   1.   2.   2.   0.  10.   1.   1.   1.   1.
+   1.   1.   2.   1.   2.   1.   1.], shape=(91,), dtype=float32)
+predicted label rank:[13  3  1  5  5  5  4  5  5  5  5  1  5  5  5  5  5  5  5  5  3  5  5  5
+  5  5  4  4  4 11  4  5 12  4  5  6  5  5  5  5  6  5  2  4  5  4  7  6
+  9  6  3  6  6  4  2  5  5  6  6  5  5 10  4  5  6  5  6  5  6  5  4  5
+  4  5  5  5  6  6  4  8  5  5  5  5  5  5  6  5  6  5  5]
+mse:tf.Tensor(877.80444, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/id_build.i.p+sep-reducer.c-1_000.smt2
+true label:[8]
+true label rank:[1]
+predicted label:tf.Tensor([8.305009], shape=(1,), dtype=float32)
+rounded label:tf.Tensor([8.], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.09303042, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/MOESI_2_e3_1523_000.smt2
+true label:[0, 0, 0, 1, 1, 1]
+true label rank:[1 1 1 2 2 2]
+predicted label:tf.Tensor([0.5929275  0.46795917 0.92620945 0.4149816  1.1314833  0.6545794 ], shape=(6,), dtype=float32)
+rounded label:tf.Tensor([1. 0. 1. 0. 1. 1.], shape=(6,), dtype=float32)
+predicted label rank:[2 1 2 1 2 2]
+mse:tf.Tensor(0.31787708, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/minepump_spec1_product58_true-unreach-call.cil.c.flat_000.smt2
+true label:[1, 1, 2]
+true label rank:[1 1 2]
+predicted label:tf.Tensor([-46.156807 -34.45597  -41.721294], shape=(3,), dtype=float32)
+rounded label:tf.Tensor([-46. -34. -42.], shape=(3,), dtype=float32)
+predicted label rank:[1 3 2]
+mse:tf.Tensor(1797.4806, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/s3_srvr_1a.cil.c-1_000.smt2
+true label:[8672, 5, 5]
+true label rank:[2 1 1]
+predicted label:tf.Tensor([-11.411737    0.5769086 415.87335  ], shape=(3,), dtype=float32)
+rounded label:tf.Tensor([-11.   1. 416.], shape=(3,), dtype=float32)
+predicted label rank:[1 2 3]
+mse:tf.Tensor(25190160.0, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/minepump_spec2_product60_true-unreach-call.cil.c.flat_000.smt2
+true label:[1, 1, 1, 1, 2]
+true label rank:[1 1 1 1 2]
+predicted label:tf.Tensor([-214.19527  -101.345406  -63.05221   -73.94273   -82.702   ], shape=(5,), dtype=float32)
+rounded label:tf.Tensor([-214. -101.  -63.  -74.  -83.], shape=(5,), dtype=float32)
+predicted label rank:[1 2 5 4 3]
+mse:tf.Tensor(14735.424, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/metros_1_e2_1102_000.smt2
+true label:[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 9, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, 1, 0, 1, 1, 1, 9, 1]
+true label rank:[3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3 3 3
+ 3 3 3 3 3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3 2 3 3 3 4 3]
+predicted label:tf.Tensor(
+[-3.0354357e-01  3.7090921e+02  9.5996177e-01 -2.5978785e+00
+  3.3714716e+02 -2.5652373e-01 -4.4045441e-02 -6.0398769e-01
+ -1.0880963e+01  5.1554478e+03 -1.3927581e+01 -3.3138699e+01
+  2.1050291e+02  2.5431685e+00  1.5395906e+01  1.3934588e-01
+  8.2302899e+02 -5.0765657e-01  3.4341589e+02 -9.7362447e-01
+ -5.9201205e-01 -3.0157828e-01  1.5807530e+02  8.3426398e+02
+ -9.2602282e+00 -1.5736825e+00 -1.4038954e+00 -1.0289085e+00
+ -8.1430578e-01 -1.9582200e+00  2.2116697e+00  9.4564667e+02
+ -2.3664775e+00 -4.1707959e+00  8.2156866e+02  7.9700256e+02
+ -4.8449111e+00  5.1458862e+02 -1.4743236e+00  1.6010675e+00
+  6.9060675e+02  8.3481384e+02  6.7248352e-02 -6.6296802e+00
+ -6.3322592e-01 -1.0687478e+00  1.8259567e+03 -2.1554618e+00
+  3.1343086e+03  7.3289465e+02  1.4545521e+03  2.5471785e+02
+  4.3149876e+01  1.5551186e+02  1.9468616e+02  1.8310142e-01
+  2.3233699e+02  3.7724005e+02  3.8609824e+00  6.5124631e-01
+  7.9811890e+02  1.7713350e+02  4.8809399e+02  7.3141846e+02
+  3.8805637e+00  2.5360398e+00  3.5707312e+02], shape=(67,), dtype=float32)
+rounded label:tf.Tensor(
+[-0.000e+00  3.710e+02  1.000e+00 -3.000e+00  3.370e+02 -0.000e+00
+ -0.000e+00 -1.000e+00 -1.100e+01  5.155e+03 -1.400e+01 -3.300e+01
+  2.110e+02  3.000e+00  1.500e+01  0.000e+00  8.230e+02 -1.000e+00
+  3.430e+02 -1.000e+00 -1.000e+00 -0.000e+00  1.580e+02  8.340e+02
+ -9.000e+00 -2.000e+00 -1.000e+00 -1.000e+00 -1.000e+00 -2.000e+00
+  2.000e+00  9.460e+02 -2.000e+00 -4.000e+00  8.220e+02  7.970e+02
+ -5.000e+00  5.150e+02 -1.000e+00  2.000e+00  6.910e+02  8.350e+02
+  0.000e+00 -7.000e+00 -1.000e+00 -1.000e+00  1.826e+03 -2.000e+00
+  3.134e+03  7.330e+02  1.455e+03  2.550e+02  4.300e+01  1.560e+02
+  1.950e+02  0.000e+00  2.320e+02  3.770e+02  4.000e+00  1.000e+00
+  7.980e+02  1.770e+02  4.880e+02  7.310e+02  4.000e+00  3.000e+00
+  3.570e+02], shape=(67,), dtype=float32)
+predicted label rank:[11 28 12  8 25 11 11 10  3 45  2  1 22 14 16 11 38 10 26 10 10 11 19 39
+  4  9 10 10 10  9 13 41  9  7 37 35  6 31 10 13 32 40 11  5 10 10 43  9
+ 44 34 42 24 17 18 21 11 23 29 15 12 36 20 30 33 15 14 27]
+mse:tf.Tensor(741695.9, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/SYNAPSE_6_e3_1666_e5_1558_000.smt2
+true label:[0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1]
+predicted label:tf.Tensor([ 1.3898848 -3.31633   -2.1696854 -3.1027694 -1.3914094], shape=(5,), dtype=float32)
+rounded label:tf.Tensor([ 1. -3. -2. -3. -1.], shape=(5,), dtype=float32)
+predicted label rank:[4 1 2 1 3]
+mse:tf.Tensor(5.8401117, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/MOESI_1_e3_1884_e7_1875_000.smt2
+true label:[0, 0, 0]
+true label rank:[1 1 1]
+predicted label:tf.Tensor([  3.9883416 142.21295   187.54369  ], shape=(3,), dtype=float32)
+rounded label:tf.Tensor([  4. 142. 188.], shape=(3,), dtype=float32)
+predicted label rank:[1 2 3]
+mse:tf.Tensor(18471.021, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/test_data/four1.smt2-0044_000.smt2
+true label:[3]
+true label rank:[1]
+predicted label:tf.Tensor([1.9949219], shape=(1,), dtype=float32)
+rounded label:tf.Tensor([2.], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(1.0101819, shape=(), dtype=float32)
+-------
+mean(mse_list):5.68156e+16
