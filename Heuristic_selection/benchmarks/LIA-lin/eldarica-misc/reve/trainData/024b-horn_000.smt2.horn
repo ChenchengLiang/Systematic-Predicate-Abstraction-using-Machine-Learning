@@ -1,9 +1,0 @@
-rec_g_g(A,B,C,D,E) :- (B = 0),(C = (1 + F)),(A =< 0),\+((C =< 0)),((C + D) = G),rec__g(F,G,E).
-rec_g_g(A,B,C,D,E) :- (C =< 0),(A =< 0),(B = 0),(E = D).
-rec_g_g(A,B,C,D,E) :- ((C + D) = F),(A = (1 + G)),(C = (1 + H)),\+((A =< 0)),\+((C =< 0)),((A + I) = B),rec_g_g(G,I,H,F,E).
-rec_g_g(A,B,C,D,E) :- (A = (1 + F)),\+((A =< 0)),(C =< 0),((A + G) = B),(E = D),rec_g_(F,G).
-rec_g_(A,B) :- (A =< 0),(B = 0).
-rec_g_(A,B) :- (A = (1 + C)),\+((A =< 0)),((A + D) = B),rec_g_(C,D).
-rec__g(A,B,C) :- (A =< 0),(C = B).
-rec__g(A,B,C) :- (A = (1 + D)),\+((A =< 0)),((A + B) = E),rec__g(D,E,C).
-false :- (A = 0),\+((B = C)),(D = E),rec_g_g(D,B,E,A,C).
