@@ -485,10 +485,8 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
       val result =
         predAbs.result
 
-      //todo: form clause occurrence in counter example label
       //todo: add clause in hyperedge graph
       if (GlobalParameters.get.getLabelFromCounterExample == true) {
-        println("debug---------")
         val clausesInCE=getClausesInCounterExamples(result,simplifiedClauses)
 
         val argumentList = (for (p <- HornClauses.allPredicates(simplifiedClauses)) yield (p, p.arity)).toList
@@ -496,22 +494,13 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
         //val argumentInfo = HintsSelection.getArgumentBoundForSmt(argumentList,disjunctive,simplifiedClauses,simpHints,predGenerator)
         val hintsCollection=new VerificationHintsInfo(VerificationHints(Map()),VerificationHints(Map()),VerificationHints(Map()))
         val clauseCollection = new ClauseInfo(simplifiedClauses,clausesInCE)
-        GlobalParameters.get.hornGraphType=HornGraphType.hyperEdgeGraph
-        val hyperedgeHornGraph = new DrawHyperEdgeHornGraph(GlobalParameters.get.fileName, clauseCollection, hintsCollection,argumentInfo)
-        GlobalParameters.get.hornGraphType=HornGraphType.hybridDirectionLayerGraph
-        val layerHornGraph= new DrawLayerHornGraph(GlobalParameters.get.fileName, clauseCollection, hintsCollection,argumentInfo)
-        GlobalParameters.get.hornGraphType=HornGraphType.monoDirectionLayerGraph
-        new DrawLayerHornGraph(GlobalParameters.get.fileName, clauseCollection, hintsCollection,argumentInfo)
-        GlobalParameters.get.hornGraphType=HornGraphType.biDirectionLayerGraph
-        new DrawLayerHornGraph(GlobalParameters.get.fileName, clauseCollection, hintsCollection,argumentInfo)
-//        GlobalParameters.get.hornGraphType match {
-//          case HornGraphType.hyperEdgeGraph=>{
-//            val hyperedgeHornGraph = new DrawHyperEdgeHornGraph(GlobalParameters.get.fileName, clauseCollection, hintsCollection,argumentInfo)
-//          }
-//          case _=>{
-//            val layerHornGraph= new DrawLayerHornGraph(GlobalParameters.get.fileName, clauseCollection, hintsCollection,argumentInfo)
-//          }
-//        }
+        for(graphType<-HornGraphType.values){
+          GlobalParameters.get.hornGraphType=graphType
+          GlobalParameters.get.hornGraphType match {
+            case HornGraphType.hyperEdgeGraph =>new DrawHyperEdgeHornGraph(GlobalParameters.get.fileName, clauseCollection, hintsCollection,argumentInfo)
+            case _=>new DrawLayerHornGraph(GlobalParameters.get.fileName, clauseCollection, hintsCollection,argumentInfo)
+          }
+        }
         sys.exit()
       }
 

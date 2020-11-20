@@ -292,7 +292,7 @@ object Main {
 
   val greeting =
 
-    "Eldarica v2.0.4.\n(C) Copyright 2012-2020 Hossein Hojjat and Philipp Ruemmer"
+    "Eldarica v2.0.5.\n(C) Copyright 2012-2020 Hossein Hojjat and Philipp Ruemmer"
 
   def doMain(args: Array[String],
              stoppingCond : => Boolean) : Unit = try {
@@ -334,6 +334,11 @@ object Main {
       case "-getHornGraph:hybridDirectionLayerGraph" :: rest => {
         getHornGraph = true
         hornGraphType = HornGraphType.hybridDirectionLayerGraph
+        arguments(rest)
+      }
+      case "-getHornGraph:clauseRelatedTaskLayerGraph" :: rest => {
+        getHornGraph = true
+        hornGraphType = HornGraphType.clauseRelatedTaskLayerGraph
         arguments(rest)
       }
       case "-getHornGraph:hyperEdgeGraph" :: rest => {
@@ -544,7 +549,7 @@ object Main {
           " -rank:n\t use top n or score above n ranked hints read from file\n"+
           " -getSMT2\t get SMT2 file\n"+
           " -getHornGraph\t get horn graph file and GNN input\n"+
-          " -getHornGraph:t\t Interp. getHornGraph: monoDirectionLayerGraph, biDirectionLayerGraph, hybridDirectionLayerGraph, hyperEdgeGraph\n" +
+          " -getHornGraph:t\t Interp. getHornGraph: monoDirectionLayerGraph, biDirectionLayerGraph, hybridDirectionLayerGraph,clauseRelatedTaskLayerGraph, hyperEdgeGraph\n" +
           " -getLabelFromCE \t get label from counter example\n" +
           " -hornGraphWithHints\t get horn graph file with hints\n"
 

@@ -467,7 +467,7 @@ def main():
     #                          eldarica_parameters=parameter_for_JSON.eldarica_parameters)
 
 
-    extract_train_data_templates_pool("../benchmarks/LIA-lin-noInterval-trainData-datafold-templates")
+    extract_train_data_templates_pool("../benchmarks/temp")
 
 
 

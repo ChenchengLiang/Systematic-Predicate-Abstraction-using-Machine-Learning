@@ -4,7 +4,7 @@ from numba import cuda
 import tensorflow as tf
 def main():
     parameter_list = []
-    #label = "occurrence"
+    label = "occurrence"
     #label = "rank"
     #label = "argument_identify"
     #label = "argument_identify_no_batchs"
@@ -18,7 +18,7 @@ def main():
     # label = "argument_upper_bound"
     label = "argument_occurrence_binary"
     label = "template_relevance"
-    label = "clause_occurrence_in_counter_examples_binary"
+    #label = "clause_occurrence_in_counter_examples_binary"
     # json_type = ".hyperEdgeHornGraph.JSON"
     # json_type = ".layerHornGraph.JSON"
     force_read = True
@@ -27,41 +27,24 @@ def main():
     file_type = ".smt2"
     GPU=False
     pickle = True
-    benchmar_name="LIA-lin-noInterval-trainData-datafold-graphs/"
+    benchmar_name="LIA-lin-noInterval-trainData-datafold-templates/"
+
+
     parameter_list.append(
         parameters("../benchmarks/"+benchmar_name,
                    "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmar_name,
                    json_type=".hyperEdgeHornGraph.JSON", label="clause_occurrence_in_counter_examples_binary"))
-
-    # parameter_list.append(
-    #     parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/",
-    #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph/",
-    #                json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_clauses"))
-    # parameter_list.append(
-    #     parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/",
-    #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph/",
-    #                json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_SCG"))
-    #
-    # parameter_list.append(
-    #     parameters("../benchmarks/LIA-lin-noInterval-trainData-datafold-mono-direction-layer-graph/",
-    #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-noInterval-trainData-datafold-mono-direction-layer-graph/",
-    #                json_type=".layerHornGraph.JSON", label="predicate_occurrence_in_SCG"))
-
-    # parameter_list.append(
-    #     parameters("../benchmarks/LIA-lin-unsat-datafold/",
-    #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-unsat-datafold/",
-    #                json_type=".hyperEdgeHornGraph.JSON", label="clause_occurrence_in_counter_examples_binary"))
-    # parameter_list.append(
-    #     parameters("../benchmarks/LIA-lin-unsat-datafold/",
-    #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-unsat-datafold/",
-    #                json_type=".layerHornGraph.JSON", label="clause_occurrence_in_counter_examples_binary"))
     parameter_list.append(
-        parameters("../benchmarks/LIA-lin-unsat-datafold/",
-                   "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-unsat-datafold/",
+        parameters("../benchmarks/"+benchmar_name,
+                   "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmar_name,
+                   json_type=".layerHornGraph.JSON", label="clause_occurrence_in_counter_examples_binary"))
+    parameter_list.append(
+        parameters("../benchmarks/"+benchmar_name,
+                   "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/+benchmar_name",
                    json_type=".bi-layerHornGraph.JSON", label="clause_occurrence_in_counter_examples_binary"))
     parameter_list.append(
-        parameters("../benchmarks/LIA-lin-unsat-datafold/",
-                   "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/LIA-lin-unsat-datafold/",
+        parameters("../benchmarks/"+benchmar_name,
+                   "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmar_name,
                    json_type=".mono-layerHornGraph.JSON", label="clause_occurrence_in_counter_examples_binary"))
 
 

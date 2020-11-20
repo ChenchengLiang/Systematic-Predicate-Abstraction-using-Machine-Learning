@@ -50,7 +50,7 @@ def separateDatasetToFold(path):
 
 def extract_train_data_unsat(file):
     print("extracting",file)
-    eld = subprocess.Popen(["../eldarica-graph-generation/eld",file,"-getLabelFromCE"], stdout=subprocess.DEVNULL,shell=False)
+    eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-getLabelFromCE"], stdout=subprocess.DEVNULL,shell=False)
     eld.wait()
 def extract_bi_layer_graph(file):
     print("extracting",file)
