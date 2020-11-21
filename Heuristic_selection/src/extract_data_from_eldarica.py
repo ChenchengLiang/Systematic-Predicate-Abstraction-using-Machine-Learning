@@ -83,6 +83,7 @@ def extract_train_data_pool(filePath,fun):
 
 
 def main():
-    extract_train_data_pool("../benchmarks/LIA-lin-datafold/",extract_all_graph)
+    #todo: extract unsat dataset
+    extract_train_data_pool("../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/",extract_all_graph)
 
 main()

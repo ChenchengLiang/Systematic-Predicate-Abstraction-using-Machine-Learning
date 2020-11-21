@@ -27,26 +27,29 @@ def main():
     file_type = ".smt2"
     GPU=False
     pickle = True
-    benchmar_name="small-dataset-sat-datafold-same-train-valid-test/"
+    benchmar_name="LIA-lin-unsat-datafold/"
 
     #todo:verify no dataflow problem
 
+    #todo: verify train-valid-test dataset occurrence training results
+
+
     parameter_list.append(
         parameters("../benchmarks/"+benchmar_name,
                    "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmar_name,
-                   json_type=".hyperEdgeHornGraph.JSON", label="occurrence"))
-    parameter_list.append(
-        parameters("../benchmarks/"+benchmar_name,
-                   "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmar_name,
-                   json_type=".hybrid-layerHornGraph.JSON", label="occurrence"))
-    parameter_list.append(
-        parameters("../benchmarks/"+benchmar_name,
-                   "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/+benchmar_name",
-                   json_type=".bi-layerHornGraph.JSON", label="occurrence"))
-    parameter_list.append(
-        parameters("../benchmarks/"+benchmar_name,
-                   "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmar_name,
-                   json_type=".mono-layerHornGraph.JSON", label="occurrence"))
+                   json_type=".hyperEdgeHornGraph.JSON", label="predicate_occurrence_in_SCG"))
+    # parameter_list.append(
+    #     parameters("../benchmarks/"+benchmar_name,
+    #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmar_name,
+    #                json_type=".hybrid-layerHornGraph.JSON", label="occurrence"))
+    # parameter_list.append(
+    #     parameters("../benchmarks/"+benchmar_name,
+    #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/+benchmar_name",
+    #                json_type=".bi-layerHornGraph.JSON", label="occurrence"))
+    # parameter_list.append(
+    #     parameters("../benchmarks/"+benchmar_name,
+    #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmar_name,
+    #                json_type=".mono-layerHornGraph.JSON", label="occurrence"))
     # parameter_list.append(
     #     parameters("../benchmarks/" + benchmar_name,
     #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmar_name,
