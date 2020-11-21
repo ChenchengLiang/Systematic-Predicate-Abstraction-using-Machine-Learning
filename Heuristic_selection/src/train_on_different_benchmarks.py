@@ -4,7 +4,7 @@ from numba import cuda
 import tensorflow as tf
 def main():
     parameter_list = []
-    label = "occurrence"
+    #label = "occurrence"
     #label = "rank"
     #label = "argument_identify"
     #label = "argument_identify_no_batchs"
@@ -16,8 +16,8 @@ def main():
     # label = "argument_upper_bound_existence"
     # label = "argument_lower_bound"
     # label = "argument_upper_bound"
-    label = "argument_occurrence_binary"
-    label = "template_relevance"
+    #label = "argument_occurrence_binary"
+    #label = "template_relevance"
     #label = "clause_occurrence_in_counter_examples_binary"
     # json_type = ".hyperEdgeHornGraph.JSON"
     # json_type = ".layerHornGraph.JSON"
@@ -27,25 +27,30 @@ def main():
     file_type = ".smt2"
     GPU=False
     pickle = True
-    benchmar_name="LIA-lin-noInterval-trainData-datafold-templates/"
+    benchmar_name="small-dataset-sat-datafold-same-train-valid-test/"
 
+    #todo:verify no dataflow problem
 
     parameter_list.append(
         parameters("../benchmarks/"+benchmar_name,
                    "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmar_name,
-                   json_type=".hyperEdgeHornGraph.JSON", label="clause_occurrence_in_counter_examples_binary"))
+                   json_type=".hyperEdgeHornGraph.JSON", label="occurrence"))
     parameter_list.append(
         parameters("../benchmarks/"+benchmar_name,
                    "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmar_name,
-                   json_type=".layerHornGraph.JSON", label="clause_occurrence_in_counter_examples_binary"))
+                   json_type=".hybrid-layerHornGraph.JSON", label="occurrence"))
     parameter_list.append(
         parameters("../benchmarks/"+benchmar_name,
                    "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/+benchmar_name",
-                   json_type=".bi-layerHornGraph.JSON", label="clause_occurrence_in_counter_examples_binary"))
+                   json_type=".bi-layerHornGraph.JSON", label="occurrence"))
     parameter_list.append(
         parameters("../benchmarks/"+benchmar_name,
                    "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmar_name,
-                   json_type=".mono-layerHornGraph.JSON", label="clause_occurrence_in_counter_examples_binary"))
+                   json_type=".mono-layerHornGraph.JSON", label="occurrence"))
+    # parameter_list.append(
+    #     parameters("../benchmarks/" + benchmar_name,
+    #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmar_name,
+    #                json_type=".clause-related-task-layerHornGraph.JSON", label="occurrence"))
 
 
 

@@ -35,8 +35,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
     parameters ["gathered_nodes_binary_classification_task"]=gathered_nodes_binary_classification_task
-    max_epochs = 200
-    patience = 20
+    max_epochs = 500
+    patience = 100
     # parameters["add_self_loop_edges"]=False
     # parameters["tie_fwd_bkwd_edges"]=True
 
@@ -466,6 +466,7 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                                 np.array(loaded_graph["argumentInstanceEdges"]),
                                 np.array(loaded_graph["controlHeadEdges"]),
                                 np.array(loaded_graph["controlBodyEdges"]),
+                                np.array(loaded_graph["controlEdge"]),
                                 np.array(loaded_graph["controlArgumentEdges"]),
                                 np.array(loaded_graph["guardEdges"]),
                                 np.array(loaded_graph["dataEdges"])
@@ -510,7 +511,11 @@ def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "
                                     parsed_dot_file.graphs_predicate_indices, parsed_dot_file.graphs_learning_labels,
                                     label, parsed_dot_file.vocabulary_set, parsed_dot_file.token_map, benchmark, df,graph_type)
 def get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,vocabulary_set,token_map):
-    raw_data_graph = raw_graph_inputs(len(graphs_adjacency_lists[0]),
+    number_of_edge_type= 0
+    for edge in graphs_adjacency_lists[0]:
+        if len(edge)!=0:
+            number_of_edge_type+=1
+    raw_data_graph = raw_graph_inputs(number_of_edge_type,
                                       total_number_of_node)  # graphs_adjacency_lists[0] means the first graph's adjacency_list
     temp_graph_index = 0
     for i, graphs_adjacency in enumerate(graphs_adjacency_lists):
@@ -520,9 +525,10 @@ def get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,voca
                 temp_count = temp_count + 1
         if temp_count == len(graphs_adjacency):
             temp_graph_index = i
+
     for edge_type in graphs_adjacency_lists[temp_graph_index]:
-        # if len(edge_type)!=0:
-        raw_data_graph._node_number_per_edge_type.append(len(edge_type[0]))
+        if len(edge_type)!=0:
+            raw_data_graph._node_number_per_edge_type.append(len(edge_type[0]))
 
     raw_data_graph.vocabulary_set = vocabulary_set
     raw_data_graph.token_map = token_map

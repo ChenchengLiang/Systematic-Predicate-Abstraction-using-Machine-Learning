@@ -52,6 +52,10 @@ def extract_train_data_unsat(file):
     print("extracting",file)
     eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-getLabelFromCE"], stdout=subprocess.DEVNULL,shell=False)
     eld.wait()
+def extract_all_graph(file):
+    print("extracting",file)
+    eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-getHornGraph"], stdout=subprocess.DEVNULL,shell=False)
+    eld.wait()
 def extract_bi_layer_graph(file):
     print("extracting",file)
     eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-getHornGraph:biDirectionLayerGraph"], stdout=subprocess.DEVNULL,shell=False)
@@ -79,6 +83,6 @@ def extract_train_data_pool(filePath,fun):
 
 
 def main():
-    extract_train_data_pool("../benchmarks/LIA-lin-unsat-datafold/",extract_train_data_unsat)
+    extract_train_data_pool("../benchmarks/LIA-lin-datafold/",extract_all_graph)
 
 main()

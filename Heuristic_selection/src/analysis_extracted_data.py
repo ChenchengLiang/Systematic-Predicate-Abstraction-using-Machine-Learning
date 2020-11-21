@@ -467,7 +467,7 @@ def main():
     #                          eldarica_parameters=parameter_for_JSON.eldarica_parameters)
 
 
-    extract_train_data_templates_pool("../benchmarks/temp")
+    extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
 
 
 
