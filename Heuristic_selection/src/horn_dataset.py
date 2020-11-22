@@ -1,11 +1,7 @@
 from typing import Any, Dict,Optional
 import tensorflow as tf
 from dotToGraphInfo import parseArgumentsFromJson
-import tf2_gnn
-from tf2_gnn.models import InvariantArgumentSelectionTask,InvariantNodeIdentifyTask
-from tf2_gnn.data import DataFold,HornGraphSample,HornGraphDataset
 import numpy as np
-from tf2_gnn.cli_utils.training_utils import train,log_line,make_run_id
 from Miscellaneous import pickleWrite,pickleRead
 import os
 import matplotlib.pyplot as plt
@@ -14,12 +10,18 @@ import scipy.stats as ss
 import json
 import glob
 import shutil
+import tf2_gnn
+from tf2_gnn.models import InvariantArgumentSelectionTask, InvariantNodeIdentifyTask
+from tf2_gnn.data import DataFold, HornGraphSample, HornGraphDataset
+from tf2_gnn.cli_utils.training_utils import train, log_line, make_run_id
 
-def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",
-                    split_flag=False,buckets=10,from_json=False,json_type=".JSON",form_label=False,GPU=False,pickle=True):
+
+
+def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",from_json=False,json_type=".JSON",form_label=False,GPU=False,pickle=True):
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
                                                  "argument_upper_bound_existence", "argument_occurrence_binary",
                                                  "template_relevance", "clause_occurrence_in_counter_examples_binary"]
+
     graph_type=json_type[1:json_type.find(".JSON")]
     print("graph_type",graph_type)
     nodeFeatureDim = 64 #64
@@ -35,8 +37,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
     parameters ["gathered_nodes_binary_classification_task"]=gathered_nodes_binary_classification_task
-    max_epochs = 500
-    patience = 100
+    max_epochs = 200
+    patience = 20
     # parameters["add_self_loop_edges"]=False
     # parameters["tie_fwd_bkwd_edges"]=True
 
@@ -54,7 +56,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     dataset._read_from_pickle = pickle
     if pickle==True:
         if force_read==True:
-            write_graph_to_pickle(benchmark_name,  data_fold=["train", "valid", "test"],
+            write_graph_to_pickle(benchmark=benchmark_name,  data_fold=["train", "valid", "test"],
                                   label=label,path=path,from_json=from_json,
                                   file_type=file_type,json_type=json_type,max_nodes_per_batch=parameters['max_nodes_per_batch'],graph_type=graph_type)
         else:
@@ -84,8 +86,6 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     test_loss_average = []
     best_valid_epoch_average = []
     accuracy_average=[]
-    model=None
-
 
     for n in range(train_n_times): # train n time to get average performance, default is one
         # initial different models by different training task
@@ -112,7 +112,6 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         # process_train = multiprocessing.Process(train, args=(model,dataset,log,run_id,200,20,save_dir,quiet,None))
         # process_train.start()
         # process_train.join()
-
         trained_model_path,train_loss_list,valid_loss_list,best_valid_epoch,train_metric_list,valid_metric_list = train(
             model=model,
             dataset=dataset,
@@ -197,6 +196,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
                                valid_loss_average, mse_loaded_model, mean_loss_list, accuracy_average,
                                best_valid_epoch_average,
                                benchmark=benchmark_name, label=label, graph_type=graph_type)
+
+
 
 
 def write_accuracy_to_log(label, benchmark, accuracy_list, best_valid_epoch_list, graph_type):
@@ -460,7 +461,6 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                         else:
                             #for layer horn graph
                             graphs_adjacency_lists.append([
-                                #np.array(loaded_graph["binaryAdjacentList"]),
                                 np.array(loaded_graph["predicateArgumentEdges"]),
                                 np.array(loaded_graph["predicateInstanceEdges"]),
                                 np.array(loaded_graph["argumentInstanceEdges"]),
@@ -471,6 +471,7 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                                 np.array(loaded_graph["subTermEdges"]),
                                 np.array(loaded_graph["guardEdges"]),
                                 np.array(loaded_graph["dataEdges"])
+                                #np.array(loaded_graph["binaryAdjacentList"]),
                                 #np.array(loaded_graph["unknownEdges"])
                             ])
                         total_number_of_node += len(loaded_graph["nodeIds"])
@@ -492,7 +493,7 @@ def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "
     benchmark_name = benchmark.replace("/", "-")
     for df in datafold:
         parsed_dot_file = pickleRead("train-" +label+"-"+ graph_type +"-"+benchmark_name + "-gnnInput_" + df + "_data")
-        if label in gathered_nodes_binary_classification_task:
+        if label in gathered_nodes_binary_classification_task or label=="predicate_occurrence_in_clauses":
             form_predicate_occurrence_related_label_graph_sample(parsed_dot_file.graphs_node_label_ids,
                                                                     parsed_dot_file.graphs_node_symbols,
                                                                     parsed_dot_file.graphs_adjacency_lists,
@@ -617,20 +618,20 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
         #     print("\n node_indices ", len(node_indices))
         #     print("learning_labels", len(learning_labels))
 
-        temp_count=0
-        for edge_type in adjacency_lists:
-            if len(edge_type)==0 :#and len(tokenized_node_label_ids)<50
-                temp_count+=1
-
-        if temp_count==2:
-            print("------debug------")
-            print("file_name", file_name)
-            print("number of node", len(tokenized_node_label_ids))
-            print("number of edges per edge type")
-            for edge_type in adjacency_lists:
-                print(len(edge_type), end=" ")
-            print("\n node_indices ", len(node_indices))
-            print("learning_labels", len(learning_labels))
+        # temp_count=0
+        # for edge_type in adjacency_lists:
+        #     if len(edge_type)==0 :#and len(tokenized_node_label_ids)<50
+        #         temp_count+=1
+        #
+        # if temp_count==2:
+        #     print("------debug------")
+        #     print("file_name", file_name)
+        #     print("number of node", len(tokenized_node_label_ids))
+        #     print("number of edges per edge type")
+        #     for edge_type in adjacency_lists:
+        #         print(len(edge_type), end=" ")
+        #     print("\n node_indices ", len(node_indices))
+        #     print("learning_labels", len(learning_labels))
 
         final_graphs.append(
             HornGraphSample(

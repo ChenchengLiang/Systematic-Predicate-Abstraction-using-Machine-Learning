@@ -48,6 +48,11 @@ def separateDatasetToFold(path):
         for file in file_fold:
             copy(file,fold_folder)
 
+def extract_train_data_templates(file):
+    print("extracting",file)
+    eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-extractPredicates","-noIntervals","-absTimeout:120"], stdout=subprocess.DEVNULL,
+                           shell=False)
+    eld.wait()
 def extract_train_data_unsat(file):
     print("extracting",file)
     eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-getLabelFromCE"], stdout=subprocess.DEVNULL,shell=False)
@@ -83,7 +88,7 @@ def extract_train_data_pool(filePath,fun):
 
 
 def main():
-    #todo: extract unsat dataset
+    #todo: extract unsat dataset [processing in laptop]
     extract_train_data_pool("../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/",extract_all_graph)
 
 main()

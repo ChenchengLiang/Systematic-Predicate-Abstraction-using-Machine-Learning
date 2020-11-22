@@ -25,35 +25,32 @@ def main():
     form_label = True
     from_json = True
     file_type = ".smt2"
-    GPU=False
+    GPU=True
     pickle = True
-    benchmar_name="LIA-lin-unsat-datafold/"
-
-    #todo:verify no dataflow problem
+    benchmark_name="small-dataset-sat-datafold-same-train-valid-test/"
 
     #todo: verify train-valid-test dataset occurrence training results
 
-
     parameter_list.append(
-        parameters("../benchmarks/"+benchmar_name,
-                   "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmar_name,
-                   json_type=".hyperEdgeHornGraph.JSON", label="predicate_occurrence_in_SCG"))
-    # parameter_list.append(
-    #     parameters("../benchmarks/"+benchmar_name,
-    #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmar_name,
-    #                json_type=".hybrid-layerHornGraph.JSON", label="occurrence"))
-    # parameter_list.append(
-    #     parameters("../benchmarks/"+benchmar_name,
-    #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/+benchmar_name",
-    #                json_type=".bi-layerHornGraph.JSON", label="occurrence"))
-    # parameter_list.append(
-    #     parameters("../benchmarks/"+benchmar_name,
-    #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmar_name,
-    #                json_type=".mono-layerHornGraph.JSON", label="occurrence"))
-    # parameter_list.append(
-    #     parameters("../benchmarks/" + benchmar_name,
-    #                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmar_name,
-    #                json_type=".clause-related-task-layerHornGraph.JSON", label="occurrence"))
+        parameters(relative_path="../benchmarks/"+benchmark_name,
+                   absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
+                   json_type=".hyperEdgeHornGraph.JSON", label="predicate_occurrence_in_clauses"))
+    parameter_list.append(
+        parameters(relative_path="../benchmarks/"+benchmark_name,
+                   absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
+                   json_type=".hybrid-layerHornGraph.JSON", label="predicate_occurrence_in_clauses"))
+    parameter_list.append(
+        parameters(relative_path="../benchmarks/"+benchmark_name,
+                   absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
+                   json_type=".bi-layerHornGraph.JSON", label="predicate_occurrence_in_clauses"))
+    parameter_list.append(
+        parameters(relative_path="../benchmarks/"+benchmark_name,
+                   absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
+                   json_type=".mono-layerHornGraph.JSON", label="predicate_occurrence_in_clauses"))
+    parameter_list.append(
+        parameters(relative_path="../benchmarks/" + benchmark_name,
+                   absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+                   json_type=".clause-related-task-layerHornGraph.JSON", label="predicate_occurrence_in_clauses"))
 
 
 
@@ -70,17 +67,20 @@ def main():
             tf.config.experimental.set_memory_growth(gpu, True)
 
 
-
     for param in parameter_list:
         if pickle==False:
             train_on_graphs(benchmark_name=param.absolute_path[param.absolute_path.find("/benchmarks/")+len("/benchmarks/"):-1], label=param.label, force_read=force_read,
                             train_n_times=1,path=param.absolute_path, file_type=file_type, form_label=form_label, from_json=from_json,
                             json_type=param.json_type,GPU=GPU,pickle=pickle)
         else:
-            train_on_graphs(benchmark_name=param.absolute_path[param.absolute_path.find("/benchmarks/")+len("/benchmarks/"):-1],
+            train_on_graphs(benchmark_name=param.benchmark_name(),
                             label=param.label, force_read=force_read,
                             train_n_times=1, path=param.relative_path, file_type=file_type, form_label=form_label,from_json=from_json,
                             json_type=param.json_type, GPU=GPU, pickle=pickle)
+            tf.keras.backend.clear_session()
+
+
+
 
 
 class parameters():
@@ -89,4 +89,6 @@ class parameters():
         self.absolute_path=absolute_path
         self.json_type=json_type
         self.label=label
+    def benchmark_name(self):
+        return self.absolute_path[self.absolute_path.find("/benchmarks/") + len("/benchmarks/"):-1]
 main()
