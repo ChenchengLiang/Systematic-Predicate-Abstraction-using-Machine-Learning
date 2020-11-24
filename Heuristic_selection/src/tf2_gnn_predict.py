@@ -3,9 +3,8 @@ from horn_dataset import HornGraphDataset
 from tf2_gnn.data import DataFold
 from horn_dataset import write_graph_to_pickle,form_GNN_inputs_and_labels,get_predicted_argument_list_divided_by_file
 from Miscellaneous import clear_file,add_JSON_field
-from dotToGraphInfo import parseArguments
-import json
-import numpy as np
+from archived.dotToGraphInfo import parseArguments
+
 
 def write_predicted_argument_score_to_file(dataset,predicted_Y_loaded_model):
     #write predicted results to .predicted_argument file

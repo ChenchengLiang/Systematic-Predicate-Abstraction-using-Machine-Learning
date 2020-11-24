@@ -29,8 +29,6 @@ def main():
     pickle = True
     benchmark_name="small-dataset-sat-datafold-same-train-valid-test/"
 
-    #todo: verify train-valid-test dataset occurrence training results
-
     parameter_list.append(
         parameters(relative_path="../benchmarks/"+benchmark_name,
                    absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
@@ -68,6 +66,7 @@ def main():
 
 
     for param in parameter_list:
+        tf.keras.backend.clear_session()
         if pickle==False:
             train_on_graphs(benchmark_name=param.absolute_path[param.absolute_path.find("/benchmarks/")+len("/benchmarks/"):-1], label=param.label, force_read=force_read,
                             train_n_times=1,path=param.absolute_path, file_type=file_type, form_label=form_label, from_json=from_json,
@@ -77,7 +76,7 @@ def main():
                             label=param.label, force_read=force_read,
                             train_n_times=1, path=param.relative_path, file_type=file_type, form_label=form_label,from_json=from_json,
                             json_type=param.json_type, GPU=GPU, pickle=pickle)
-            tf.keras.backend.clear_session()
+
 
 
 

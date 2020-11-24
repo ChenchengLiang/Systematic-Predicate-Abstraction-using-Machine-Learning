@@ -1,13 +1,12 @@
 import random
 import os
-from shutil import copyfile,copy,rmtree,copytree,copy2
+from shutil import copy,rmtree,copytree
 import glob
-from dotToGraphInfo import DotToGraphInfo
+from archived.dotToGraphInfo import DotToGraphInfo
 import numpy as np
 import matplotlib.pyplot as plt
-import errno
 from distutils.dir_util import copy_tree
-from Miscellaneous import pickleRead,pickleWrite,clear_directory,clear_file
+from Miscellaneous import pickleRead, clear_directory,clear_file
 import subprocess
 import json
 from multiprocessing import Pool

@@ -48,47 +48,35 @@ def separateDatasetToFold(path):
         for file in file_fold:
             copy(file,fold_folder)
 
-def extract_train_data_templates(file):
+
+def extract_graph_from_eldarica(parameters):
+    file=parameters[0]
+    popen_parameter=["../eldarica-graph-generation/eld",file]
+    for eldarica_parameter in parameters[1]:
+        popen_parameter.append(eldarica_parameter)
     print("extracting",file)
-    eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-extractPredicates","-noIntervals","-absTimeout:120"], stdout=subprocess.DEVNULL,
-                           shell=False)
+    eld = subprocess.Popen(popen_parameter, stdout=subprocess.DEVNULL,shell=False)
     eld.wait()
-def extract_train_data_unsat(file):
-    print("extracting",file)
-    eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-getLabelFromCE"], stdout=subprocess.DEVNULL,shell=False)
-    eld.wait()
-def extract_all_graph(file):
-    print("extracting",file)
-    eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-getHornGraph"], stdout=subprocess.DEVNULL,shell=False)
-    eld.wait()
-def extract_bi_layer_graph(file):
-    print("extracting",file)
-    eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-getHornGraph:biDirectionLayerGraph"], stdout=subprocess.DEVNULL,shell=False)
-    eld.wait()
-def extract_hyperedge_graph(file):
-    print("extracting",file)
-    eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-getHornGraph:hyperEdgeGraph"], stdout=subprocess.DEVNULL,shell=False)
-    eld.wait()
-def extract_mono_layer_graph(file):
-    print("extracting",file)
-    eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-getHornGraph:monoDirectionLayerGraph"], stdout=subprocess.DEVNULL,shell=False)
-    eld.wait()
-def extract_hybrid_layer_graph(file):
-    print("extracting",file)
-    eld = subprocess.Popen(["../eldarica-graph-generation-temp/eld",file,"-getHornGraph:hybridDirectionLayerGraph"], stdout=subprocess.DEVNULL,shell=False)
-    eld.wait()
-def extract_train_data_pool(filePath,fun):
+    print("extracting finished", file)
+def extract_train_data_pool(filePath,fun,countinous_extract=False,parameterList=[]):
     file_list = []
     for root, subdirs, files in os.walk(filePath):
         if len(subdirs)==0:
-            file_list+=glob.glob(root+"/*.smt2")
-    pool = Pool(processes=3)
+            if countinous_extract==True:
+                for file in glob.glob(root+"/*.smt2"):
+                    if not os.path.exists(file+".circles.gv"):
+                        file_list.append([file,parameterList])
+            else:
+                for file in glob.glob(root + "/*.smt2"):
+                    file_list.append([file,parameterList])
+    pool = Pool(processes=1)
     pool.map(fun, file_list)
-
 
 
 def main():
     #todo: extract unsat dataset [processing in laptop]
-    extract_train_data_pool("../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/",extract_all_graph)
+    #"-extractPredicates","-noIntervals","-absTimeout:120","getLabelFromCE","-getHornGraph","-getHornGraph:biDirectionLayerGraph","-getHornGraph:hyperEdgeGraph","-getHornGraph:monoDirectionLayerGraph","-getHornGraph:hybridDirectionLayerGraph"
+    parameterList = ["-getHornGraph"]
+    extract_train_data_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test/",extract_graph_from_eldarica,parameterList=parameterList)
 
 main()

@@ -1,13 +1,7 @@
-from typing import Any, Dict,Optional
 import tensorflow as tf
-from dotToGraphInfo import GraphInfo,ArgumentInfo,DotToGraphInfo
-from typing import Tuple
+from archived.dotToGraphInfo import DotToGraphInfo
 import tf2_gnn
 from tf2_gnn.models import InvariantArgumentSelectionTask
-from tf2_gnn.data import GraphDataset,GraphSample
-import numpy as np
-from typing import List,Set,Iterator
-from tf2_gnn.data.graph_dataset import DataFold
 from horn_dataset import HornGraphDataset
 '''
 horn graph node IDs

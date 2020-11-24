@@ -1,6 +1,6 @@
 import sys
-from dotToGraphInfo import GraphInfo,ArgumentInfo,DotToGraphInfo
-from Miscellaneous import pickleWrite,pickleRead
+from archived.dotToGraphInfo import DotToGraphInfo
+from Miscellaneous import pickleWrite
 import time
 def main():
     path=sys.argv[1]

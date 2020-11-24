@@ -1,6 +1,6 @@
-from typing import Any, Dict,Optional
+from typing import Any, Dict
 import tensorflow as tf
-from dotToGraphInfo import parseArgumentsFromJson
+from archived.dotToGraphInfo import parseArgumentsFromJson
 import numpy as np
 from Miscellaneous import pickleWrite,pickleRead
 import os
@@ -9,7 +9,6 @@ import matplotlib.patches as mpatches
 import scipy.stats as ss
 import json
 import glob
-import shutil
 import tf2_gnn
 from tf2_gnn.models import InvariantArgumentSelectionTask, InvariantNodeIdentifyTask
 from tf2_gnn.data import DataFold, HornGraphSample, HornGraphDataset
@@ -697,9 +696,9 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
 
     if len(graphs_control_location_indices)==0:
         graphs_control_location_indices=graphs_argument_indices
-    directory_wrong_extracted_cases=file_name_list[0][:file_name_list[0].rfind("/")+1]+"wrong_extracted_cases"
-    if not os.path.exists(directory_wrong_extracted_cases):
-        os.makedirs(directory_wrong_extracted_cases)
+    # directory_wrong_extracted_cases=file_name_list[0][:file_name_list[0].rfind("/")+1]+"wrong_extracted_cases"
+    # if not os.path.exists(directory_wrong_extracted_cases):
+    #     os.makedirs(directory_wrong_extracted_cases)
     for node_label_ids, node_symbols, argument_indices, adjacency_lists, argument_scores,control_location_indices,\
         file_name in zip(graphs_node_label_ids,graphs_node_symbols,graphs_argument_indices,graphs_adjacency_lists,
                          graphs_argument_scores,graphs_control_location_indices,file_name_list):
@@ -708,7 +707,6 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
         argument_identify = np.array([0] * len(node_label_ids))
         argument_identify[argument_indices] = 1
         total_nodes+=len(node_label_ids)
-        #total_label += len(argument_indices)
         control_location_identify = np.array([0] * len(node_label_ids))
         control_location_identify[control_location_indices]=1
 
@@ -718,9 +716,9 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
             print("argument_scores", len(argument_scores))
             print("argument_indices", len(argument_indices))
             print(file_name)
-            shutil.copy(file_name, directory_wrong_extracted_cases)
-            from Miscellaneous import remove_list_of_file
-            remove_list_of_file(file_name)
+            # shutil.copy(file_name, directory_wrong_extracted_cases)
+            # from Miscellaneous import remove_list_of_file
+            # remove_list_of_file(file_name)
         else:
             raw_data_graph.argument_identify.append(argument_identify)
             raw_data_graph.control_location_identify.append(control_location_identify)
