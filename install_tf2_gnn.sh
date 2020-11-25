@@ -10,4 +10,5 @@ pip install gensim
 pip install nltk
 pip install matplotlib
 pip install numba
+pip install seaborn
 
