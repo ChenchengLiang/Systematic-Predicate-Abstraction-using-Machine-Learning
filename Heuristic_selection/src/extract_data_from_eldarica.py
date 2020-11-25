@@ -1,4 +1,3 @@
-import shutil
 import glob
 import subprocess
 import os
@@ -69,14 +68,16 @@ def extract_train_data_pool(filePath,fun,countinous_extract=False,parameterList=
             else:
                 for file in glob.glob(root + "/*.smt2"):
                     file_list.append([file,parameterList])
-    pool = Pool(processes=1)
+    pool = Pool(processes=6)
     pool.map(fun, file_list)
 
 
 def main():
-    #todo: extract unsat dataset [processing in laptop]
+    #todo: extract unsat dataset
+    #todo: extract template dataset
     #"-extractPredicates","-noIntervals","-absTimeout:120","getLabelFromCE","-getHornGraph","-getHornGraph:biDirectionLayerGraph","-getHornGraph:hyperEdgeGraph","-getHornGraph:monoDirectionLayerGraph","-getHornGraph:hybridDirectionLayerGraph"
-    parameterList = ["-getHornGraph"]
-    extract_train_data_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test/",extract_graph_from_eldarica,parameterList=parameterList)
+    parameterList = ["-getHornGraph","-abstract:manual"]
+    #parameterList = ["-extractPredicates","-absTimeout:120","-noIntervals", "-abstract:manual"]
+    extract_train_data_pool("../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/",extract_graph_from_eldarica,countinous_extract=True,parameterList=parameterList)
 
 main()

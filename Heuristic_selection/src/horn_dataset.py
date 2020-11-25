@@ -13,6 +13,7 @@ import tf2_gnn
 from tf2_gnn.models import InvariantArgumentSelectionTask, InvariantNodeIdentifyTask
 from tf2_gnn.data import DataFold, HornGraphSample, HornGraphDataset
 from tf2_gnn.cli_utils.training_utils import train, log_line, make_run_id
+import seaborn
 
 
 
@@ -31,7 +32,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters['hidden_dim'] = 64 #64
     parameters['num_layers'] = 2
     parameters['node_label_embedding_size'] = nodeFeatureDim
-    parameters['max_nodes_per_batch']=50000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
+    parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
     parameters['regression_hidden_layer_size'] = [64,64,64,64]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
@@ -229,38 +230,32 @@ def draw_training_results(train_loss_list_average, valid_loss_list_average, test
     plt.clf()
     # plt.show()
 
-    # scatter on true y and predicted y
-    a = plt.axes(aspect='equal')
-    if label in gathered_nodes_binary_classification_task:
+    if label in gathered_nodes_binary_classification_task: # confusion matrix on true y and predicted y
         predicted_Y_loaded_model = tf.math.round(predicted_Y_loaded_model)
-    plt.scatter(true_Y, predicted_Y_loaded_model)
-    plt.xlabel('True Values')
-    plt.ylabel('Predictions')
-    # if np.max(true_Y)==float("inf") or np.max(predicted_Y_loaded_model)==float("inf"):
-    #     import itertools
-    #     flatten = itertools.chain.from_iterable
-    #     max_true_Y=0
-    #     max_predicted_Y_loaded_model=0
-    #     if np.max(true_Y) == float("inf"):
-    #         true_Y_temp=list(flatten(true_Y))
-    #         max_true_Y=list(set(sorted(true_Y_temp)))[-2]
-    #     else:
-    #         max_true_Y=np.max(true_Y)
-    #
-    #     if np.max(predicted_Y_loaded_model)==float("inf"):
-    #         predicted_Y_loaded_model_temp = list(flatten(true_Y))
-    #         max_predicted_Y_loaded_model = list(set(sorted(predicted_Y_loaded_model_temp)))[-2]
-    #     else:
-    #         max_predicted_Y_loaded_model=np.max(max_predicted_Y_loaded_model)
-    #     lims = [0, np.max([max_true_Y, max_predicted_Y_loaded_model])]
-    #
-    # else:
-    lims = [0, np.max([np.max(true_Y), np.max(predicted_Y_loaded_model)])]
-    plt.xlim(lims)
-    plt.ylim(lims)
-    _ = plt.plot(lims, lims)
-    plt.savefig("trained_model/" + label + "-" + graph_type + "-" + benchmark_name + "-scatter.png")
-    plt.clf()
+        res = tf.math.confusion_matrix(true_Y, predicted_Y_loaded_model)
+        seaborn.set(color_codes=True)
+        plt.figure(1, figsize=(2, 2))
+        plt.title("Confusion Matrix")
+        seaborn.set(font_scale=1.4)
+        ax = seaborn.heatmap(res, annot=True, cmap="YlGnBu", cbar_kws={'label': 'Scale'})
+        ax.set_xticklabels(["1","0"])
+        ax.set_yticklabels(["1","0"])
+        ax.set(ylabel="True Label", xlabel="Predicted Label")
+        plt.savefig("trained_model/" + label + "-" + graph_type + "-" + benchmark_name + "-confusion_matrix.png")
+        plt.clf()
+        seaborn.reset_defaults()
+    else:
+        # scatter on true y and predicted y
+        a = plt.axes(aspect='equal')
+        plt.scatter(true_Y, predicted_Y_loaded_model)
+        plt.xlabel('True Values')
+        plt.ylabel('Predictions')
+        lims = [0, np.max([np.max(true_Y), np.max(predicted_Y_loaded_model)])]
+        plt.xlim(lims)
+        plt.ylim(lims)
+        _ = plt.plot(lims, lims)
+        plt.savefig("trained_model/" + label + "-" + graph_type + "-" + benchmark_name + "-scatter.png")
+        plt.clf()
 
     # error distribution on true y and predicted y
     if np.min(predicted_Y_loaded_model) == float("-inf") or np.max(predicted_Y_loaded_model) == float("inf") or np.min(
@@ -512,11 +507,14 @@ def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "
                                     parsed_dot_file.graphs_predicate_indices, parsed_dot_file.graphs_learning_labels,
                                     label, parsed_dot_file.vocabulary_set, parsed_dot_file.token_map, benchmark, df,graph_type)
 def get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,vocabulary_set,token_map):
-    number_of_edge_type= 0
-    for edge in graphs_adjacency_lists[0]:
-        if len(edge)!=0:
-            number_of_edge_type+=1
-    raw_data_graph = raw_graph_inputs(number_of_edge_type,
+    num_edge_types_list=[]
+    for graph_edges in graphs_adjacency_lists:
+        number_of_edge_type = 0
+        for edge in graph_edges:
+            if len(edge)!=0:
+                number_of_edge_type+=1
+        num_edge_types_list.append(number_of_edge_type)
+    raw_data_graph = raw_graph_inputs(max(num_edge_types_list),
                                       total_number_of_node)  # graphs_adjacency_lists[0] means the first graph's adjacency_list
     temp_graph_index = 0
     for i, graphs_adjacency in enumerate(graphs_adjacency_lists):
@@ -524,7 +522,7 @@ def get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,voca
         for edge_type in graphs_adjacency:
             if len(edge_type) != 0:
                 temp_count = temp_count + 1
-        if temp_count == len(graphs_adjacency):
+        if temp_count == raw_data_graph._num_edge_types:#len(graphs_adjacency):
             temp_graph_index = i
 
     for edge_type in graphs_adjacency_lists[temp_graph_index]:
