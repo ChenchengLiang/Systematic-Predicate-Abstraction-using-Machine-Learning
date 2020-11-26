@@ -1,0 +1,1709 @@
+best_valid_epoch:14.0
+train loss:0.011330696
+valid loss:0.19512734
+test loss list:tf.Tensor(0.15427758, shape=(), dtype=float32)
+mean test loss:0.15427758
+mean loss list:tf.Tensor(0.1405082, shape=(), dtype=float32)
+mean mean loss:0.1405082
+accuracy list:[<tf.Tensor: shape=(), dtype=float64, numpy=0.8244737780948983>]
+mean accuracy:0.8244737780948983
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/chc-lia-lin-0065_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.02682917 0.12185668 0.10369948 0.0697961  0.01148868 0.06650448
+ 0.08602522 0.13353091 0.00804303 0.02986233 0.32017225 0.18998645
+ 0.05417138 0.37231752], shape=(14,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(14,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.02443543, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/NetBSD_glob3_iny.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[2.14954108e-01 1.54416645e-02 7.48379948e-03 1.53232308e-03
+ 1.87317297e-01 9.54248849e-03 3.60659622e-02 2.36743949e-02
+ 7.75609119e-03 2.34119696e-07], shape=(10,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(10,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.008360228, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/nest-if.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.40296173 0.05345151 0.03950404 0.07178032 0.378071   0.0051153
+ 0.00488081 0.00743486], shape=(8,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0.], shape=(8,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.039373897, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/bandec.smt2-0036_000.smt2
+true label:[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]
+true label rank:[1 1 1 2 1 1 1 1 1 1 1 2 1 1]
+predicted label:tf.Tensor(
+[0.3717103  0.21170606 0.32252106 0.4483794  0.45500103 0.32005328
+ 0.172      0.46632177 0.2555527  0.41884103 0.13558072 0.37769952
+ 0.10343033 0.29068878], shape=(14,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(14,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.1349547, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/loop__loop2_000.smt2
+true label:[0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1]
+predicted label:tf.Tensor([0.00178379 0.04945946 0.00429364 0.09002735 0.13526824], shape=(5,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0.], shape=(5,), dtype=float32)
+predicted label rank:[1 1 1 1 1]
+mse:tf.Tensor(0.0057740556, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/inductive5_000.smt2
+true label:[0, 0]
+true label rank:[1 1]
+predicted label:tf.Tensor([0.21652071 0.2985026 ], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([0. 0.], shape=(2,), dtype=float32)
+predicted label rank:[1 1]
+mse:tf.Tensor(0.06799251, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/NetBSD_g_Ctoc.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[2.8517345e-01 4.2081233e-02 2.3834113e-02 3.0432860e-03 2.0810518e-01
+ 1.2565056e-02 4.1736484e-02 3.9271593e-02 5.4940499e-02 3.9747752e-06], shape=(10,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(10,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.013344035, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/bandec.smt2-0238_000.smt2
+true label:[0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1]
+true label rank:[1 2 2 1 2 2 1 2 1 1 2 2 1 2 1 2 1 1 2 2]
+predicted label:tf.Tensor(
+[0.43509063 0.38442308 0.44504046 0.18800676 0.28334117 0.42749763
+ 0.3443004  0.35413834 0.3283575  0.2553138  0.38604057 0.3805585
+ 0.44127    0.47500527 0.0044461  0.4093166  0.25857866 0.0562042
+ 0.36361954 0.2515729 ], shape=(20,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(20,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.25383362, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/chc-lia-lin-0140_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.00153279 0.06042349 0.1290099  0.12743719 0.03813313 0.01849497
+ 0.02017009 0.00582697 0.00274984 0.0091822  0.02358465 0.02808027
+ 0.01333567 0.12029664 0.01359849 0.02379606 0.01335746 0.006595
+ 0.00136898 0.02470936 0.10598359 0.03065312 0.03368832 0.09176001
+ 0.00549192 0.00968919 0.02099956 0.02409401 0.03577706 0.07415543
+ 0.07986181 0.07177725 0.01719248 0.04796077 0.2027048  0.2077866
+ 0.15097056 0.08302198 0.06524824 0.08463275 0.09751584 0.2579276
+ 0.00731449 0.00658433 0.00786217 0.05511455 0.02103216 0.166536
+ 0.01173282 0.33376575 0.17008893 0.08286431 0.01328852 0.08705981], shape=(54,), dtype=float32)
+rounded label:tf.Tensor(
+[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0.], shape=(54,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.009038717, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/durationThm_2_e1_118_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[3.2697138e-01 1.3640319e-01 1.4765149e-01 1.1029418e-01 2.8440437e-01
+ 4.6335910e-02 1.4775522e-01 1.0688419e-01 9.3454204e-02 3.2954707e-04
+ 1.6799266e-03 1.8835028e-04 2.6754795e-03 4.2335233e-03 1.4904882e-01
+ 3.6591911e-01 2.7448137e-04 2.5716090e-01 2.4200311e-01 6.2946953e-02
+ 4.2425534e-01 1.3530516e-03 4.9258806e-06], shape=(23,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(23,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.032578204, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/loop__loop_000.smt2
+true label:[0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1]
+predicted label:tf.Tensor([0.00178379 0.04945946 0.00429364 0.09002729 0.13526818], shape=(5,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0.], shape=(5,), dtype=float32)
+predicted label rank:[1 1 1 1 1]
+mse:tf.Tensor(0.00577405, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/bandec.smt2-0159_000.smt2
+true label:[0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1]
+true label rank:[1 1 1 2 2 1 2 1 2 1 1 2 2]
+predicted label:tf.Tensor(
+[0.39352536 0.37263364 0.39604747 0.18762027 0.4845263  0.36012936
+ 0.11876234 0.27723128 0.3440035  0.35509512 0.29855412 0.07509125
+ 0.04136028], shape=(13,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(13,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.36764467, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/apache-get-tag.i.v+lhb-reducer.c-1_000.smt2
+true label:[0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1]
+predicted label:tf.Tensor([0.3449238  0.29918134 0.18472178 0.16278261 0.0505679  0.00147372], shape=(6,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0.], shape=(6,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1]
+mse:tf.Tensor(0.045276914, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/four1.smt2-0044_000.smt2
+true label:[0, 0, 0, 1, 0, 0]
+true label rank:[1 1 1 2 1 1]
+predicted label:tf.Tensor([0.43216473 0.37900126 0.467035   0.49110433 0.23906216 0.37916332], shape=(6,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0.], shape=(6,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1]
+mse:tf.Tensor(0.16807006, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/tridag.smt2-0024_000.smt2
+true label:[0, 1, 0, 0]
+true label rank:[1 2 1 1]
+predicted label:tf.Tensor([0.24068771 0.13330808 0.4201499  0.15030128], shape=(4,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0.], shape=(4,), dtype=float32)
+predicted label rank:[1 1 1 1]
+mse:tf.Tensor(0.2520505, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/25.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[9.0837158e-04 1.4379626e-02 1.6097905e-02 2.7697917e-02 1.5132244e-01
+ 1.4013651e-02 9.8782226e-02 7.3164478e-02 3.2624740e-02 1.9864233e-02
+ 1.6900353e-02 4.8756942e-02 2.7816229e-02 1.9824782e-02 1.8116605e-04
+ 1.3837999e-01 1.0506215e-02 2.5476664e-03 1.2464441e-02 3.8849223e-02
+ 5.1072996e-02 1.4301811e-02 3.6134653e-02 1.3436514e-02 4.9759693e-02
+ 1.3078508e-01 3.7246380e-02 1.3263287e-01 1.3111725e-01 1.8258120e-01], shape=(30,), dtype=float32)
+rounded label:tf.Tensor(
+[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0.], shape=(30,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.0053015095, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/28.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.00260662 0.02740376 0.02837973 0.07099337 0.07133842 0.05885166
+ 0.22003052 0.23201767 0.03808731 0.06688047], shape=(10,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(10,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.012332519, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/s_multipl_11_000.smt2
+true label:[0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1]
+predicted label:tf.Tensor([0.12112679 0.17935915 0.26867926 0.07392412 0.24794558], shape=(5,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0.], shape=(5,), dtype=float32)
+predicted label rank:[1 1 1 1 1]
+mse:tf.Tensor(0.03719435, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/barthe2_merged_safe.c-1_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.07251985 0.31065756 0.24420068 0.38308275 0.38600704 0.05366186
+ 0.11412543 0.00374728 0.37693205 0.0410324 ], shape=(10,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(10,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.06168347, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/count_by_2_m_nest_000.smt2
+true label:[1, 1, 1]
+true label rank:[1 1 1]
+predicted label:tf.Tensor([0.03253995 0.32488272 0.307893  ], shape=(3,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0.], shape=(3,), dtype=float32)
+predicted label rank:[1 1 1]
+mse:tf.Tensor(0.6235914, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/bound.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[2.7680767e-01 5.7291798e-02 4.3229222e-02 2.2546954e-02 3.4651569e-01
+ 5.1185504e-02 5.0210427e-03 1.1758900e-02 1.0438962e-01 1.3549848e-05], shape=(10,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(10,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.021603573, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/dillig33.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[2.87712276e-01 6.22554719e-02 4.26204503e-02 2.50133034e-02
+ 3.44311774e-01 4.19580676e-02 5.23926644e-03 1.11800656e-02
+ 1.02834426e-01 1.48861182e-05], shape=(10,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(10,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.022013472, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/gulwani_fig1a.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1]
+predicted label:tf.Tensor([0.36048022 0.01221234 0.01552683 0.04649165 0.20289999 0.00513505], shape=(6,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0.], shape=(6,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1]
+mse:tf.Tensor(0.028948745, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/chc-lia-lin-0102_000.smt2
+true label:[1, 1]
+true label rank:[1 1]
+predicted label:tf.Tensor([0.295886   0.32678807], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([0. 0.], shape=(2,), dtype=float32)
+predicted label rank:[1 1]
+mse:tf.Tensor(0.4744954, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/04.c_000.smt2
+true label:[0, 0]
+true label rank:[1 1]
+predicted label:tf.Tensor([0.22282498 0.23276798], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([0. 0.], shape=(2,), dtype=float32)
+predicted label rank:[1 1]
+mse:tf.Tensor(0.05191595, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/minepump_spec1_product58_true-unreach-call.cil.c.flat_000.smt2
+true label:[1, 1, 1]
+true label rank:[1 1 1]
+predicted label:tf.Tensor([0.88851255 0.10533499 0.06267751], shape=(3,), dtype=float32)
+rounded label:tf.Tensor([1. 0. 0.], shape=(3,), dtype=float32)
+predicted label rank:[2 1 1]
+mse:tf.Tensor(0.56380945, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/break_single_merged_safe.c-1_000.smt2
+true label:[0, 1, 0, 0, 1]
+true label rank:[1 2 1 1 2]
+predicted label:tf.Tensor([0.07352637 0.27988175 0.01886686 0.14469151 0.11903288], shape=(5,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0.], shape=(5,), dtype=float32)
+predicted label rank:[1 1 1 1 1]
+mse:tf.Tensor(0.26427424, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/bandec.smt2-0033_000.smt2
+true label:[0, 1, 0]
+true label rank:[1 2 1]
+predicted label:tf.Tensor([0.09753593 0.08135162 0.16779783], shape=(3,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0.], shape=(3,), dtype=float32)
+predicted label rank:[1 1 1]
+mse:tf.Tensor(0.2938614, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/013b-horn_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.3693349  0.3044198  0.25261262 0.40319517 0.05245    0.06575572
+ 0.27686018 0.23710677], shape=(8,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0.], shape=(8,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.074425645, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/minepump_spec3_product49_true-unreach-call.cil.c.flat_000.smt2
+true label:[1, 1, 0, 1, 1]
+true label rank:[2 2 1 2 2]
+predicted label:tf.Tensor([0.51766795 0.18096648 0.09793033 0.12505205 0.32596382], shape=(5,), dtype=float32)
+rounded label:tf.Tensor([1. 0. 0. 0. 0.], shape=(5,), dtype=float32)
+predicted label rank:[2 1 1 1 1]
+mse:tf.Tensor(0.4265818, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/bandec.smt2-0131_000.smt2
+true label:[0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1]
+true label rank:[1 2 1 1 2 2 1 2 1 1 2 2 1 1 1 1 1 2]
+predicted label:tf.Tensor(
+[0.2578815  0.44443431 0.43863162 0.4811792  0.42190483 0.36629564
+ 0.3404455  0.33464572 0.19045393 0.01967686 0.2803342  0.09965429
+ 0.07005943 0.46166393 0.04287408 0.27537936 0.3384354  0.03542005], shape=(18,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(18,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.26662943, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/chc-lia-lin-0017_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.22128546 0.23852988 0.18704547 0.30263934 0.12267706 0.35767865
+ 0.07341069 0.02846362], shape=(8,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0.], shape=(8,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.047702916, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/amebsa.smt2-0078_000.smt2
+true label:[1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1]
+true label rank:[2 1 1 2 2 2 1 1 1 2 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2
+ 1 1 1 2 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 1 1 2 1 1 1 2
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 1 1 2 1 1 1 2 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 1 1 1 2 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 2 1 1 2]
+predicted label:tf.Tensor(
+[3.65062416e-01 3.41326147e-01 4.18231994e-01 4.07835007e-01
+ 3.42966944e-01 3.85110706e-01 2.87245184e-01 2.55745381e-01
+ 3.93192351e-01 1.20331869e-01 2.38122389e-01 5.38772484e-03
+ 7.85143767e-03 1.17809556e-01 2.20403378e-03 9.96735599e-03
+ 1.38087958e-01 1.91671073e-01 2.10303976e-03 3.92639861e-02
+ 5.46749905e-02 8.80825741e-04 6.17003907e-03 1.57853998e-02
+ 3.78395052e-04 1.69709115e-03 1.12044569e-02 4.15998889e-04
+ 2.93552857e-02 1.82496801e-01 5.12283714e-03 6.71504587e-02
+ 2.95927431e-02 1.85638480e-02 6.18645735e-03 1.10988155e-01
+ 1.44330069e-01 6.86306208e-02 6.82959110e-02 5.36502898e-03
+ 9.17023420e-02 9.05039236e-02 2.07098406e-02 2.28738319e-03
+ 4.21794876e-02 3.27391699e-02 7.83829950e-03 6.37867004e-02
+ 4.72743697e-02 7.36150378e-03 1.76012963e-02 4.20401851e-03
+ 2.16122083e-02 1.24772619e-02 2.94788019e-03 4.68981313e-03
+ 2.06105709e-02 1.05001433e-02 2.89237890e-02 1.57237917e-01
+ 8.04065391e-02 1.21262111e-01 1.29352463e-02 3.14046517e-02
+ 2.13280064e-03 1.34025708e-01 4.67227884e-02 4.81253229e-02
+ 3.04458708e-01 2.63697766e-02 2.39265384e-03 2.82874644e-01
+ 6.23837486e-02 1.07002426e-02 4.76202033e-02 4.90527600e-02
+ 3.11985761e-02 3.34578454e-02 1.68002844e-02 9.38867161e-04
+ 5.29933767e-03 8.11953843e-03 6.47989614e-03 1.57617643e-01
+ 8.94796997e-02 1.04386278e-03 5.13570309e-02 5.27124032e-02
+ 3.23074535e-02 5.14545478e-02 1.86417978e-02 1.15992956e-01
+ 1.67087138e-01 2.10085839e-01 7.91238807e-03 1.34704942e-02
+ 4.63294201e-02 1.71287030e-01 2.34705899e-02 5.69315860e-04
+ 1.62958488e-01 4.21322277e-03 2.23966856e-02 2.81590997e-04
+ 2.82476190e-02 1.68132596e-03 9.22567025e-03 1.19758304e-03
+ 2.69109965e-03 9.83085949e-04 5.98309468e-03 4.22507478e-03
+ 7.65601126e-03 2.79670209e-02 7.11312937e-03 3.31692807e-02
+ 6.04336150e-03 1.06620584e-02 7.02329949e-02 3.69881578e-02
+ 3.88528034e-02 1.17419742e-03 2.69824505e-01 1.69946048e-02
+ 2.63802946e-01 2.85208523e-01 7.56332129e-02 5.36912084e-02
+ 3.13862935e-02 5.80835417e-02 9.37408209e-02 2.00311979e-03
+ 1.00636810e-01 2.47991760e-03 1.36435656e-02 3.55504523e-03
+ 3.64787728e-02 4.75826114e-03 2.75533297e-04 2.51628553e-05
+ 3.53285833e-03 7.48904496e-02 2.51852013e-02 4.17446438e-03
+ 1.73064116e-02 1.56058194e-02 1.18147908e-02 1.70420593e-04
+ 6.74678804e-03 1.52392359e-02 6.18191250e-03 2.92576919e-03
+ 2.39433236e-02 7.34758191e-03 3.32274526e-01 4.51471889e-03
+ 2.92909984e-03 1.31987233e-03 2.35294744e-01], shape=(159,), dtype=float32)
+rounded label:tf.Tensor(
+[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(159,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.13057934, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/chc-lia-lin-0016_000.smt2
+true label:[0, 0, 0, 0]
+true label rank:[1 1 1 1]
+predicted label:tf.Tensor([0.04224463 0.00985503 0.11039475 0.11035437], shape=(4,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0.], shape=(4,), dtype=float32)
+predicted label rank:[1 1 1 1]
+mse:tf.Tensor(0.0065617044, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/cyclic.smt2-0007_000.smt2
+true label:[0, 0]
+true label rank:[1 1]
+predicted label:tf.Tensor([0.48953682 0.45206118], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([0. 0.], shape=(2,), dtype=float32)
+predicted label rank:[1 1]
+mse:tf.Tensor(0.2220028, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/durationThm_1_e3_173_000.smt2
+true label:[1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
+true label rank:[2 2 1 1 2 2 2 2 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[3.5537991e-01 1.8973517e-01 8.0441006e-02 8.4389336e-03 2.4248025e-01
+ 1.7227180e-01 1.2235309e-01 3.1740844e-02 3.3672497e-04 3.3857523e-06
+ 4.6285582e-05 4.0986231e-07 2.0057554e-03 2.7298811e-03], shape=(14,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(14,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.28895554, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/spline-fixed.smt2-0008_000.smt2
+true label:[0, 0]
+true label rank:[1 1]
+predicted label:tf.Tensor([0.11218371 0.26082066], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([0. 0.], shape=(2,), dtype=float32)
+predicted label rank:[1 1]
+mse:tf.Tensor(0.0403063, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/count_by_1_variant_true-unreach-call.c.flat_000.smt2
+true label:[1]
+true label rank:[1]
+predicted label:tf.Tensor([0.30889377], shape=(1,), dtype=float32)
+rounded label:tf.Tensor([0.], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.47762778, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/sum3_000.smt2
+true label:[0, 0]
+true label rank:[1 1]
+predicted label:tf.Tensor([0.21391469 0.21373051], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([0. 0.], shape=(2,), dtype=float32)
+predicted label rank:[1 1]
+mse:tf.Tensor(0.045720115, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/chc-lia-lin-0000_000.smt2
+true label:[0, 0]
+true label rank:[1 1]
+predicted label:tf.Tensor([0.21391469 0.21373047], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([0. 0.], shape=(2,), dtype=float32)
+predicted label rank:[1 1]
+mse:tf.Tensor(0.045720104, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/jm2006_variant_true-unreach-call.c.flat_000.smt2
+true label:[0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1]
+predicted label:tf.Tensor([0.0081645  0.04772705 0.00925574 0.04804064 0.05770433], shape=(5,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0.], shape=(5,), dtype=float32)
+predicted label rank:[1 1 1 1 1]
+mse:tf.Tensor(0.0016135784, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/gcd01_true-unreach-call_true-no-overflow_true-termination_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.00586203 0.05320925 0.08198044 0.03595977 0.02377173 0.01891302
+ 0.03866347 0.1158277 ], shape=(8,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0.], shape=(8,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.00333915, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/seesaw.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.27090895 0.09374533 0.02172831 0.2521895  0.22242922 0.00192708
+ 0.05537908 0.03364075], shape=(8,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0.], shape=(8,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.024991065, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/002-horn_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.25879127 0.30020708 0.41457555 0.3297356  0.49448368 0.23672841
+ 0.1976867  0.15261544 0.04204571 0.04809747 0.22534649 0.06768507], shape=(12,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(12,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.0716721, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/bandec.smt2-0157_000.smt2
+true label:[0, 1, 1, 1]
+true label rank:[1 2 2 2]
+predicted label:tf.Tensor([0.02030906 0.09777249 0.10664859 0.07202279], shape=(4,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0.], shape=(4,), dtype=float32)
+predicted label rank:[1 1 1 1]
+mse:tf.Tensor(0.61841136, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/rotation_vc.correct.1.nts_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1]
+predicted label:tf.Tensor(
+[3.55084479e-01 1.73849255e-01 2.10548639e-01 2.35341325e-01
+ 4.52972531e-01 4.53993352e-03 7.72268549e-02 1.31605521e-01
+ 6.14253245e-03 1.53215555e-02 2.32702661e-02 3.10511030e-02
+ 2.21173614e-02 2.79548634e-02 1.06708385e-01 3.41676623e-01
+ 3.25775504e-01 2.24017035e-02 2.52009579e-03 3.89745981e-02
+ 3.70585531e-01 8.93685669e-02 2.64025992e-03 6.39270293e-04
+ 1.01869283e-02 3.26020905e-04 1.27518680e-02 2.46466056e-01
+ 1.11939810e-01 6.56071603e-02 2.43221503e-03 8.33706856e-02
+ 4.58858460e-01 1.03831487e-02 3.26401740e-03 1.44576415e-01
+ 1.31310122e-02 4.83284354e-01 5.02688289e-01 4.82592821e-01
+ 4.87127870e-01 4.83545661e-01 4.14187282e-01 1.41404882e-01
+ 2.57517874e-01 4.73403633e-01 3.83020014e-01 3.89509946e-01
+ 9.75863412e-02 2.63718545e-01 4.96265382e-01 4.62748826e-01
+ 5.03195107e-01 4.85509843e-01 4.65408951e-01 5.07215202e-01
+ 4.98166174e-01 4.00082797e-01 4.97937649e-01 5.08325934e-01
+ 1.52651342e-02 2.03695404e-03 4.12038267e-02 3.81541438e-03
+ 3.35339573e-04 4.81356680e-02 1.75531767e-03 2.45147813e-02
+ 4.85607833e-01 7.84785599e-02 3.63152241e-03 2.35706940e-01
+ 1.41471624e-03 5.00670135e-01 4.94052529e-01 4.90904242e-01
+ 4.88921851e-01 4.99471992e-01 4.77066904e-01], shape=(79,), dtype=float32)
+rounded label:tf.Tensor(
+[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 1. 0. 0. 1. 0. 0. 0. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 1. 0. 0. 0. 0. 0.], shape=(79,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 2 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 2
+ 1 1 1 1 1]
+mse:tf.Tensor(0.09275335, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/spline-fixed.smt2-0003_000.smt2
+true label:[0, 0, 0]
+true label rank:[1 1 1]
+predicted label:tf.Tensor([0.09753594 0.08135162 0.16779783], shape=(3,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0.], shape=(3,), dtype=float32)
+predicted label rank:[1 1 1]
+mse:tf.Tensor(0.014762486, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/chc-lia-lin-0036_000.smt2
+true label:[0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1]
+predicted label:tf.Tensor([0.32230204 0.01297124 0.01541036 0.039095   0.18154046 0.0039912 ], shape=(6,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0.], shape=(6,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1]
+mse:tf.Tensor(0.023130938, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/inf6.correct.nts.horn-0001_000.smt2
+true label:[1, 1, 0, 0, 1, 0, 0, 0, 0, 1]
+true label rank:[2 2 1 1 2 1 1 1 1 2]
+predicted label:tf.Tensor(
+[0.39953196 0.45559746 0.34180516 0.3663606  0.09948102 0.24814631
+ 0.3163898  0.01368307 0.31662476 0.03992631], shape=(10,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(10,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.29027805, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/chc-lia-lin-0091_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.0062307  0.06723867 0.00912309 0.08669952 0.01938586 0.00576128
+ 0.18077019 0.0468145  0.08174803 0.01693812 0.24970601 0.10447806
+ 0.09764576 0.36173752 0.07114381 0.05535714 0.04653879 0.09652869
+ 0.2580568  0.24621269 0.3059965  0.03216129 0.0369519 ], shape=(23,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(23,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.022214027, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/dillig17.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.50225013 0.01573154 0.02632837 0.00455653 0.4210659  0.01455357
+ 0.20382245 0.04126455 0.04315372], shape=(9,), dtype=float32)
+rounded label:tf.Tensor([1. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(9,), dtype=float32)
+predicted label rank:[2 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.052870393, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/spline-fixed.smt2-0001_000.smt2
+true label:[0, 0]
+true label rank:[1 1]
+predicted label:tf.Tensor([0.11218371 0.26082066], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([0. 0.], shape=(2,), dtype=float32)
+predicted label rank:[1 1]
+mse:tf.Tensor(0.0403063, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/apache-get-tag.i.v+nlh-reducer.c-1_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.15229297 0.29049936 0.06062452 0.12230667 0.13001584 0.04153608
+ 0.06870223 0.04051849], shape=(8,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0.], shape=(8,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.01890105, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/chc-lia-lin-0031_000.smt2
+true label:[0, 0, 0]
+true label rank:[1 1 1]
+predicted label:tf.Tensor([0.07109541 0.06634235 0.19853298], shape=(3,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0.], shape=(3,), dtype=float32)
+predicted label rank:[1 1 1]
+mse:tf.Tensor(0.016290404, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/tridag.smt2-0014_000.smt2
+true label:[0]
+true label rank:[1]
+predicted label:tf.Tensor([0.21753533], shape=(1,), dtype=float32)
+rounded label:tf.Tensor([0.], shape=(1,), dtype=float32)
+predicted label rank:[1]
+mse:tf.Tensor(0.04732162, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/s3_srvr_8.cil.c-1_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[8.07510037e-03 7.22395582e-03 3.83002795e-02 2.84507703e-02
+ 5.22535527e-03 1.00661386e-02 1.27059249e-02 1.93295479e-02
+ 6.75911503e-03 1.82989461e-03 3.78342834e-03 1.68041920e-03
+ 2.14833370e-03 6.04447238e-02 3.98846809e-04 3.57239973e-03
+ 1.42234343e-03 4.38749499e-04 2.80134293e-04 1.82586405e-02
+ 1.60409752e-02 9.97220865e-04 3.62587132e-04 1.35625034e-26
+ 4.61788564e-24 4.08297218e-09 5.59572875e-02 4.35096553e-07
+ 7.11562519e-04 7.32991202e-06 3.76135886e-01 1.53428246e-03
+ 1.75702075e-06 2.54845922e-09 6.74576931e-13 1.28746096e-05
+ 2.92205194e-04 1.13733113e-01 4.48292594e-05 2.16556634e-12
+ 3.78690511e-01 7.90093281e-07 1.32544869e-06 3.78759968e-10
+ 4.43146817e-08 2.80601392e-03 3.07657540e-01 2.24450216e-01
+ 2.34557621e-12 1.33436054e-01 3.58538928e-11 5.73619008e-02
+ 3.08000240e-02 4.55697745e-01 3.90840292e-01 4.62334782e-01
+ 2.24845792e-07 4.43188194e-03 4.42889892e-02 2.13174652e-02
+ 5.21471441e-01 5.00230134e-01 3.46776605e-01 1.18625753e-01
+ 3.72122794e-01 4.69057858e-01 1.22289985e-01 5.88331148e-02
+ 4.47430134e-01 1.75090075e-01 3.45737040e-02 4.70338672e-01
+ 2.52335221e-02 1.68172885e-02 2.66210991e-04 1.36375278e-02
+ 5.22482488e-03 7.59179797e-03 2.47979462e-02 8.61859706e-04
+ 2.15142136e-04 2.43247999e-03 7.45968288e-03 9.73178819e-03
+ 4.79759555e-03 6.27582078e-04 2.45459508e-02 2.99475598e-03
+ 1.04454011e-02 3.48183070e-03 1.25432953e-01 4.51835841e-01
+ 4.36951332e-02 7.41809011e-02 1.84351224e-02 1.07722487e-02
+ 2.89933383e-02 2.39662245e-01 3.52702639e-03 4.15199378e-04
+ 4.78904098e-02 3.72756901e-03 5.13483621e-02 1.46086672e-02
+ 2.88808346e-02 4.24804864e-03 6.02144049e-03 4.89576138e-04
+ 2.66080629e-03 1.23901432e-03 5.22253057e-03 7.42335757e-03
+ 1.09152263e-02 5.88004594e-04 4.89041617e-04 1.75157748e-02
+ 6.73372124e-04 1.43540883e-02 1.97782796e-02 9.54220130e-04
+ 2.67991493e-03 9.74162249e-04 2.53170550e-01 8.03925544e-02
+ 2.27536917e-01 1.48929274e-02 8.03343486e-03 9.57211778e-02
+ 6.59504756e-02 4.92351269e-03 2.56801426e-01 2.43259177e-01
+ 1.36633113e-01 1.90313242e-03 1.51462644e-01 5.73118916e-03
+ 8.73492006e-03 3.03534814e-03 2.50893109e-03 5.41701738e-04
+ 4.92837355e-02 4.41120803e-01 5.94136491e-03 6.37870003e-03
+ 2.26346054e-03 2.32708245e-03 2.92185019e-03 7.59178773e-03
+ 1.31863705e-03 1.34426653e-02 2.15368420e-02 1.13201141e-02
+ 5.32112755e-02 2.08372861e-01 2.87170202e-01 2.87032453e-03
+ 4.86600399e-03 1.90878175e-02 3.46805722e-01 1.28163316e-03
+ 1.02909585e-03 5.83369769e-02 1.81906465e-02 1.82512635e-03
+ 1.75345468e-03 3.19947467e-05 2.18076690e-04 7.40250514e-04
+ 7.81480223e-03 1.51549128e-03 2.68704351e-03 2.26317104e-02
+ 1.86154572e-03 2.66784756e-03 2.41774190e-02 2.16811004e-05
+ 6.54862598e-02 6.80516809e-02 1.29433849e-03 1.12054981e-02
+ 1.46601563e-02 3.94569665e-01 1.55213231e-03 1.12455197e-01
+ 1.06039129e-01 6.57837791e-03 1.27408898e-03 2.79067853e-03
+ 1.87133495e-02 3.71552375e-03 4.03730851e-03 1.31718935e-02
+ 2.00585723e-02 7.96113089e-02 1.02018146e-03 8.85339919e-03
+ 4.54922818e-04 8.98307934e-02 5.86339098e-04 2.65310868e-03
+ 7.21246377e-02 7.42247852e-04 1.42415147e-03 2.75060773e-01
+ 2.12007850e-01 6.45616604e-03 1.95480868e-01 6.22023689e-03
+ 1.25363590e-02 3.48613001e-02 1.27255946e-04 4.31855097e-02
+ 1.05563295e-03 3.22899129e-03 3.62966545e-02 1.51512760e-03
+ 2.51566438e-04 1.62265019e-03 8.16773099e-04 2.01535571e-04
+ 1.76331727e-04 2.84813484e-03 2.24384916e-04 1.18449936e-03
+ 1.85866642e-03 2.57385313e-04 2.92027798e-05 5.11885213e-04
+ 2.24829954e-03 1.29827764e-03 1.48128560e-02 2.81919260e-04
+ 7.80302100e-04 1.16452044e-02 8.03627132e-04 5.92045137e-04
+ 4.88165642e-05 2.53353181e-04 4.79866378e-03 4.78696404e-03
+ 3.38312268e-04 1.59378833e-04 3.82127389e-02 3.36197112e-03
+ 4.55841981e-03 1.35471171e-04 3.23041901e-03 2.49695376e-01
+ 6.50978088e-02 1.63671037e-03 1.04882102e-02 1.33903429e-01
+ 5.73992869e-03 8.50939323e-05 3.37352464e-03 9.28477020e-05
+ 3.02675442e-04 5.66922575e-02 2.22959012e-01 1.09870005e-02
+ 2.39667818e-02 5.74329519e-04 5.80801722e-03 2.85104066e-02
+ 4.45511052e-03 1.49414772e-02 5.19425608e-02 1.78218931e-01
+ 3.33645171e-03 4.87433048e-03 2.18455447e-03 3.07951700e-02
+ 1.97826609e-01 1.81094021e-01 6.47094548e-02 1.56273767e-01
+ 4.93523059e-03 1.38647305e-02 3.55166905e-02 6.99828565e-03
+ 4.54537347e-02 4.72109169e-02 8.44127790e-04 3.14815156e-02
+ 3.31718801e-03 4.09033010e-03 1.64136142e-02 1.81530770e-02
+ 8.49422254e-03 4.32636822e-03 1.86300103e-03 1.68031524e-03
+ 1.91802174e-01 2.45625097e-02 4.80832392e-03 8.63859802e-03
+ 1.21778082e-02 2.78963521e-02 3.48924892e-03 4.53961641e-02
+ 4.42295521e-02 2.21958891e-01 1.80055946e-02 1.12134695e-01
+ 5.11928403e-04 5.88556938e-03 1.97759713e-03 1.21609857e-02
+ 9.13080852e-03 2.76121553e-02 1.06096892e-02 9.20775160e-03
+ 4.88840183e-03 1.08780181e-02 2.06601759e-03 2.24572304e-03
+ 1.98819079e-02 2.00759232e-01 1.88680500e-01 2.37316132e-01
+ 1.94540005e-02 3.41776252e-01 1.45866349e-02 4.95603234e-01
+ 2.77271867e-03 1.39380491e-03 1.06243372e-01], shape=(327,), dtype=float32)
+rounded label:tf.Tensor(
+[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(327,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.0462482, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/large_const_true-unreach-call.c.flat_000.smt2
+true label:[1, 0, 1, 0, 1, 0, 1]
+true label rank:[2 1 2 1 2 1 2]
+predicted label:tf.Tensor(
+[0.0688818  0.07943562 0.11521333 0.01763497 0.09502937 0.13054772
+ 0.28999588], shape=(7,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0.], shape=(7,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1]
+mse:tf.Tensor(0.42808142, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/jm2006_true-unreach-call.c.flat_000.smt2
+true label:[0, 0, 0, 0]
+true label rank:[1 1 1 1]
+predicted label:tf.Tensor([0.00659712 0.08710477 0.15424883 0.05869432], shape=(4,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0.], shape=(4,), dtype=float32)
+predicted label rank:[1 1 1 1]
+mse:tf.Tensor(0.0087171225, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/xy10.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[2.1821102e-01 9.6827876e-03 1.0714840e-02 1.4403041e-02 4.0393195e-01
+ 4.2921074e-05 1.1535688e-02], shape=(7,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0.], shape=(7,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1]
+mse:tf.Tensor(0.030189449, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/bandec.smt2-0188_000.smt2
+true label:[0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1]
+true label rank:[1 1 1 2 2 2 1 2 1 1 2 2]
+predicted label:tf.Tensor(
+[0.37740588 0.33316794 0.11801861 0.45383146 0.39105767 0.30727586
+ 0.40202296 0.22714362 0.38508335 0.27879453 0.47237048 0.38007414], shape=(12,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(12,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.25533232, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/nested6.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.46788588 0.03802653 0.07087012 0.00501874 0.41487786 0.02028975
+ 0.16281575 0.08801865 0.05079029], shape=(9,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(9,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.048309132, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/nested4.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.25939852 0.02975537 0.02061277 0.03307516 0.3692709  0.00198019
+ 0.00298906 0.00442551], shape=(8,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0.], shape=(8,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.025760658, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/nest-if1.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.5027655  0.01598511 0.0271511  0.00437813 0.41716927 0.02224578
+ 0.22958879 0.04298975 0.04282442], shape=(9,), dtype=float32)
+rounded label:tf.Tensor([1. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(9,), dtype=float32)
+predicted label rank:[2 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.053855907, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/counter.correct.nts_000.smt2
+true label:[0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1]
+predicted label:tf.Tensor([0.3759526  0.28831145 0.00825939 0.00765024 0.35773638 0.05210611], shape=(6,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0.], shape=(6,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1]
+mse:tf.Tensor(0.059213493, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/nest-len.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.26157594 0.06943542 0.02122991 0.00122902 0.23571949 0.0028088
+ 0.06405184 0.03978837 0.00591258], shape=(9,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(9,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.014998638, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/03.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.04719884 0.0797853  0.07875995 0.07129794 0.05988715 0.01948578
+ 0.0443451  0.01274331 0.03887357 0.01219766 0.03871042], shape=(11,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(11,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.0026484937, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/test_locks_8.c-1_000.smt2
+true label:[0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0]
+true label rank:[1 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 2 1 2 1 2 1 2 1 2 1 1 1 2 1 2 1 2 1 2 1 2 1
+ 2 1 1 1 1 1 1 1 2 1 2 1 1 1 1 1 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 1 1 1 1 2 1
+ 2 1 1 1 1 1 1 1 1 1 1 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 1]
+predicted label:tf.Tensor(
+[6.96230447e-03 8.06558412e-03 9.36791487e-03 3.22316587e-02
+ 2.07432155e-02 3.66312340e-02 1.54016847e-02 1.31288795e-02
+ 3.93844582e-03 6.42011035e-03 1.78897288e-03 1.45941349e-02
+ 1.12388842e-02 3.95517200e-02 3.04204645e-03 4.41049486e-01
+ 1.99157387e-01 8.34918767e-02 1.43446792e-02 1.50006101e-01
+ 2.74910092e-01 7.56870732e-02 9.05605778e-02 9.17286128e-02
+ 3.29077680e-04 8.21128115e-03 3.23359013e-01 1.65762559e-01
+ 1.90277278e-01 2.68255860e-01 7.00527476e-03 1.09509021e-01
+ 4.60778952e-01 2.26273313e-02 7.41445944e-02 3.30894679e-01
+ 2.87925035e-01 2.97143906e-01 1.35738729e-02 2.22274765e-01
+ 2.05158144e-01 4.89865869e-01 3.08257997e-01 4.97555993e-02
+ 5.28458655e-02 2.98235953e-01 6.67608948e-03 1.92104056e-01
+ 8.72791279e-03 6.50619194e-02 8.55565129e-04 8.82807840e-03
+ 7.48675084e-03 5.82032502e-02 1.01826405e-02 7.02441707e-02
+ 2.47173989e-03 7.19003938e-03 7.81542435e-02 2.07962736e-01
+ 1.04139261e-01 2.54709926e-02 3.59889641e-02 3.77413742e-02
+ 8.22647475e-03 2.14676727e-02 3.18214856e-02 2.83346266e-01
+ 2.11793661e-01 2.48160735e-02 2.74999253e-02 8.73610899e-02
+ 8.17089714e-03 1.50868623e-02 2.05836371e-02 6.01666793e-03
+ 6.38210727e-03 8.02897103e-03 2.53548250e-02 4.18374926e-04
+ 5.15587721e-03 5.06467943e-04 6.84464024e-03 5.24266995e-03
+ 1.02372305e-03 1.78937558e-02 9.79326740e-02 1.30481245e-02
+ 4.17413376e-02 2.19090521e-01 8.91150534e-03 1.94449663e-01
+ 1.27758533e-01 2.27885768e-01 1.44941792e-01 2.89495915e-01
+ 2.28237249e-02 3.91668350e-01 7.57019967e-02 6.61163067e-05
+ 2.19200598e-03 5.58528043e-02 4.19519663e-01 2.09137890e-03
+ 2.40442753e-02 1.62625480e-02 3.76071423e-01 4.43359697e-03
+ 3.75522533e-04 2.72765581e-04 2.37519354e-01 1.41140982e-03
+ 7.56993541e-04 3.58231366e-03 1.39695294e-02 2.53164619e-01
+ 6.64078537e-03 1.90570927e-03 4.76387590e-01 4.03146893e-01
+ 2.29557738e-01 4.73063022e-01 4.96276468e-01 1.72595412e-01
+ 4.88088042e-01 2.25240394e-01 4.95029539e-01 4.97841179e-01
+ 4.96331394e-01 4.98885334e-01 2.34944060e-01 3.93815964e-01
+ 3.60203683e-02 1.00412453e-03 3.54443163e-01 2.57817805e-01
+ 1.61751658e-01 8.36814661e-03 2.86131661e-04 5.13912200e-05
+ 3.80956441e-01 4.50556934e-01 1.96501926e-01 4.47260767e-01], shape=(144,), dtype=float32)
+rounded label:tf.Tensor(
+[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(144,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.29797164, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/06.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.00312737 0.00799477 0.01112232 0.04143376 0.01667136 0.06387143
+ 0.14586471 0.02358366 0.00169888 0.01293046 0.10098472 0.27796972
+ 0.02435163 0.03073638 0.01146216 0.34372804 0.22461715 0.00577344
+ 0.06131114 0.03632626], shape=(20,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(20,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.014556122, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/id_build.i.p+sep-reducer.c-1_000.smt2
+true label:[0, 0, 1]
+true label rank:[1 1 2]
+predicted label:tf.Tensor([0.0375967  0.15115784 0.21210726], shape=(3,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0.], shape=(3,), dtype=float32)
+predicted label rank:[1 1 1]
+mse:tf.Tensor(0.21501239, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/loop__barthe2_000.smt2
+true label:[0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1]
+predicted label:tf.Tensor([0.00178379 0.04945944 0.00429364 0.09002732 0.13526818], shape=(5,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0.], shape=(5,), dtype=float32)
+predicted label rank:[1 1 1 1 1]
+mse:tf.Tensor(0.0057740505, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/PRODUCER_CONSUMER_3_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[3.35401893e-01 1.01110660e-01 9.81444865e-02 6.25166222e-02
+ 4.43853915e-01 2.04846896e-02 1.00977898e-01 6.83728233e-02
+ 1.38626456e-06 4.15548828e-04 5.69138365e-06 9.42180995e-05
+ 2.10835226e-02 6.94887266e-02 5.54579347e-02 4.53959465e-01
+ 5.15122294e-01 3.60529870e-01 3.57556552e-01 1.06323086e-01
+ 3.44817162e-01 7.50638064e-05 8.09302001e-05 3.85844618e-32
+ 8.47988194e-35 2.27605365e-11 7.34988833e-04 4.51856249e-05
+ 3.55082341e-02 4.92654532e-01 5.09784639e-01 2.59524316e-01
+ 5.99988922e-03 2.40631312e-01 6.26379065e-03 1.51802099e-03
+ 4.23994195e-03 3.27303410e-01 4.81926471e-01 2.72084922e-01
+ 3.83385599e-01 4.96078730e-01 5.03782153e-01 4.90731180e-01
+ 4.93359953e-01 4.81565773e-01 4.89382535e-01 5.00409782e-01
+ 4.97577310e-01 8.37282389e-02 1.12776961e-02 3.54359858e-02
+ 2.35242806e-02 4.51586604e-01 4.25797641e-01 4.05317485e-01
+ 2.52004787e-02 1.48817256e-01 2.80820727e-01 2.65809238e-01
+ 3.13061148e-01 4.10684869e-02 9.62149501e-02 1.95892826e-01
+ 9.82060656e-02 2.54673988e-01 2.70480275e-01 3.35364938e-01
+ 1.72393844e-02 8.09888467e-02 4.49118428e-02 2.58294612e-01
+ 7.66349509e-02 2.12531593e-02 8.70585218e-02 1.57037616e-01
+ 1.66897196e-02 7.80430390e-04 6.53006360e-02 2.37629656e-02
+ 1.48546323e-01 3.14891833e-04 8.02603143e-04 4.19095159e-03
+ 2.60843635e-02 3.46746924e-03 4.39425325e-03 6.62005087e-03
+ 1.30677479e-03 7.05056032e-03 1.29614156e-02 9.39117093e-03
+ 2.48337016e-02 4.29968953e-01 3.51927400e-01 4.93882922e-04
+ 3.86175852e-05 5.09986057e-05 4.15730208e-01 8.64108801e-02
+ 1.92146027e-03 4.00122441e-02 3.95532101e-01 6.85280375e-03
+ 9.36177745e-02 4.99297172e-01 1.96899205e-01 1.00127771e-03
+ 5.07237390e-03 2.41851266e-02 4.15529683e-03 2.50197249e-04
+ 1.57001279e-02 4.13992219e-02 6.63309917e-03 2.11458682e-04
+ 2.64108647e-04 1.92840016e-05 6.85055507e-03 4.94059592e-01
+ 2.67640948e-01 4.95364936e-03 7.69400224e-02 7.80758040e-04
+ 4.94116135e-02 5.27466461e-03 8.54636356e-03 4.94957328e-01
+ 4.95790005e-01 4.95198071e-01 4.99010742e-01 4.93893772e-01
+ 5.10433614e-01 4.92303640e-01 5.00403106e-01 4.91608441e-01
+ 4.93482292e-01 4.98099178e-01 5.02039850e-01 4.99532312e-01
+ 4.89892930e-01 4.91313845e-01 4.91600394e-01 5.33643598e-03
+ 4.81051415e-01 4.95329827e-01 5.04861057e-01 4.10473466e-01
+ 5.04428484e-02 2.01299525e-04 4.90120023e-01 4.75390404e-01
+ 4.34731163e-07 2.79001702e-13 4.72880393e-01 4.77724165e-01
+ 1.40170656e-07 3.14922808e-08 1.10688507e-10 5.45636594e-01
+ 1.16026831e-05 7.31122636e-05 1.96302586e-04 1.17764517e-03
+ 1.09658033e-01 4.17467386e-01 8.05111974e-03 7.73149964e-07], shape=(168,), dtype=float32)
+rounded label:tf.Tensor(
+[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0. 1.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 1. 0. 0. 0. 1. 0. 0. 0. 0. 0.
+ 0. 0. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(168,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1
+ 1 1 1 1 1 2 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 2 1 1 1 2 1 1 1 1 1 1 1 2 1
+ 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.08868649, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/nest-if3_true-unreach-call.c.flat_000.smt2
+true label:[0, 1, 1, 1, 1, 1, 1]
+true label rank:[1 2 2 2 2 2 2]
+predicted label:tf.Tensor(
+[0.20242393 0.14840907 0.37098905 0.02470366 0.08292338 0.12259645
+ 0.21682364], shape=(7,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0.], shape=(7,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1]
+mse:tf.Tensor(0.61961025, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/listcounter.correct.nts_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.01542193 0.10433201 0.03479912 0.17314486 0.01807442 0.3207898
+ 0.07704534 0.13739511 0.30520126 0.09906715], shape=(10,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(10,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.027332146, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/loop__while_after_while_if_000.smt2
+true label:[0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 2 2 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.024669   0.0238257  0.04172783 0.07768388 0.08716049 0.12890035
+ 0.02704334 0.14762807 0.12174047 0.00339451 0.03896323 0.03945617
+ 0.0180039  0.00289115], shape=(14,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(14,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.13107902, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/12.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.01781815 0.06634659 0.1819155  0.13842157 0.2586114  0.01070725
+ 0.14854257 0.05897984 0.0039486  0.01267705 0.02358467 0.02808027
+ 0.01333567 0.12029669 0.01359849 0.02379606 0.01335746 0.006595
+ 0.00136898 0.02470936 0.10598361 0.03065313 0.03368832 0.09176005
+ 0.00549192 0.0096892  0.02099957 0.02409402 0.03577706 0.07415543
+ 0.22152534 0.03690129 0.04977223 0.0538111  0.12594022 0.17108811
+ 0.01268424 0.18579693 0.00133892 0.3561916  0.03451436 0.16294852
+ 0.01481133 0.02147951], shape=(44,), dtype=float32)
+rounded label:tf.Tensor(
+[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(44,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.011087236, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/minepump_spec4_product57_true-unreach-call.cil.c.flat_000.smt2
+true label:[1, 1, 1]
+true label rank:[1 1 1]
+predicted label:tf.Tensor([0.7892591  0.11507833 0.09077655], shape=(3,), dtype=float32)
+rounded label:tf.Tensor([1. 0. 0.], shape=(3,), dtype=float32)
+predicted label rank:[2 1 1]
+mse:tf.Tensor(0.5513951, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/four1.smt2-0046_000.smt2
+true label:[0, 0, 0, 1, 0, 0]
+true label rank:[1 1 1 2 1 1]
+predicted label:tf.Tensor([0.43216473 0.37900126 0.467035   0.49110433 0.23906213 0.37916332], shape=(6,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0.], shape=(6,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1]
+mse:tf.Tensor(0.16807006, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/SpamAssassin-loop.i.v+cfa-reducer.c-1_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.0017037  0.0303493  0.02292666 0.06284716 0.47518402 0.07998987
+ 0.1819851  0.11633286 0.02731262 0.007265  ], shape=(10,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(10,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.028504828, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/apache-get-tag.i.p+nlh-reducer.c-1_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.43446973 0.22586009 0.18847097 0.19940338 0.43625796 0.10279916
+ 0.09380765 0.14343068 0.47177368 0.0876165 ], shape=(10,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(10,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.07755677, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/nested-while_merged_safe.c-1_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.07869592 0.11164846 0.06882861 0.26470572 0.25651935 0.34724134
+ 0.1669818  0.324896   0.15309316 0.03422263 0.3332428  0.04217057
+ 0.42755777 0.43432325 0.03175511 0.4993301  0.06145335 0.02713557
+ 0.01117633 0.0788094  0.14962876 0.05737584 0.01879556 0.04055848
+ 0.00106574], shape=(25,), dtype=float32)
+rounded label:tf.Tensor(
+[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0.], shape=(25,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.048441272, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/chc-lia-lin-0028_000.smt2
+true label:[0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1]
+predicted label:tf.Tensor([0.00919074 0.09215424 0.01870487 0.16252115 0.14095113], shape=(5,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0.], shape=(5,), dtype=float32)
+predicted label rank:[1 1 1 1 1]
+mse:tf.Tensor(0.01104142, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/heapsort_true-unreach-call.c.flat_000.smt2
+true label:[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.4826087  0.38651308 0.4594725  0.03909848 0.0613069  0.05319815
+ 0.35377604 0.37232423 0.438634   0.15879002 0.00474167 0.00149973
+ 0.00336056 0.3841616 ], shape=(14,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(14,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.63082695, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/s3_clnt_1.cil-1.c-1_000.smt2
+true label:[0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]
+true label rank:[1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 1 1 1 1 1 1 1 2 1 1 1 1 1 2
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 2 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 2 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 2 1 1 1 1 1 1 1 2 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1
+ 2 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 2 1 1 1 1 2 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 2 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 2 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 2 1 1]
+predicted label:tf.Tensor(
+[4.50200915e-01 2.99434423e-01 2.64294863e-01 2.60400206e-01
+ 4.67276275e-01 6.27247170e-02 2.96164602e-01 1.50363326e-01
+ 1.78109277e-02 9.47594736e-03 3.98314238e-04 2.16867998e-02
+ 1.45707503e-01 1.13957398e-01 1.70788337e-02 5.79802632e-01
+ 5.52158177e-01 9.37769562e-02 4.82176572e-01 2.27244526e-01
+ 3.44138563e-01 4.98881303e-02 8.37871805e-02 1.72136130e-19
+ 3.83064240e-12 5.81706763e-06 2.01753810e-01 2.14526540e-06
+ 2.98343093e-05 9.37863905e-03 3.86287987e-01 1.12268250e-11
+ 5.41717931e-15 1.29840838e-22 3.40549770e-23 1.92956804e-07
+ 5.79818510e-16 2.99231976e-01 5.23773866e-18 5.95787474e-15
+ 3.91344756e-01 1.04438036e-09 1.43365141e-17 4.40401573e-16
+ 3.44378192e-19 8.80412459e-02 6.60092829e-16 2.56677333e-04
+ 2.74736489e-24 3.07373224e-11 3.28695304e-29 5.08264520e-22
+ 6.45149678e-13 4.18628077e-14 1.46394938e-15 9.45518230e-15
+ 1.11232698e-20 1.69005619e-29 1.75759542e-05 4.51047111e-14
+ 4.44108814e-01 1.58528581e-01 1.67639583e-01 4.24366981e-01
+ 3.03878244e-02 1.35377303e-01 4.97514278e-01 3.90261829e-01
+ 4.85455662e-01 1.53949589e-01 3.59504968e-02 4.98235881e-01
+ 7.46438652e-02 1.63852125e-01 4.06866401e-01 7.80714899e-02
+ 2.17795700e-01 3.77514422e-01 3.37334782e-01 4.90750372e-01
+ 6.83023483e-02 3.38169634e-02 3.03746849e-01 3.21860641e-01
+ 2.66312242e-01 1.15721691e-02 3.99313688e-01 4.74634528e-01
+ 4.18130755e-02 2.10784990e-02 3.44388753e-01 1.30101696e-01
+ 2.19020203e-01 4.13837761e-01 4.64370608e-01 1.03254244e-01
+ 3.21628451e-01 3.67257953e-01 2.12405948e-03 1.03487237e-03
+ 3.11903745e-01 1.79728912e-03 4.01781529e-01 1.95562746e-02
+ 1.16521101e-02 1.43996079e-03 2.79486587e-04 2.66617659e-04
+ 4.17911913e-03 8.33641738e-03 5.82415191e-03 5.22073507e-02
+ 2.24648155e-02 9.68180306e-04 2.40424322e-03 5.93357831e-02
+ 8.29034019e-04 1.16482133e-03 4.38351231e-03 6.17205049e-04
+ 1.44151021e-02 2.04609931e-02 1.28940763e-02 5.46343401e-02
+ 7.43853301e-02 9.89751816e-02 1.80326719e-02 8.51950422e-02
+ 1.89550575e-02 5.18762600e-03 3.30115901e-04 2.65281592e-02
+ 1.10576458e-01 2.85933638e-04 4.80069295e-02 2.32911054e-02
+ 4.49645184e-02 2.40098257e-02 2.98490748e-04 9.48258748e-05
+ 3.98136256e-03 4.75866199e-02 4.84107481e-03 1.11471422e-01
+ 5.91831934e-03 6.16203807e-03 1.47530604e-02 3.25289816e-02
+ 2.08913535e-02 3.52221191e-01 1.34846285e-01 8.86432081e-02
+ 2.07311302e-01 4.94218975e-01 3.88477743e-01 1.41462862e-01
+ 3.94602031e-01 5.03513888e-02 3.89400303e-01 5.16319601e-03
+ 4.30987775e-01 3.47305015e-02 9.92634371e-02 7.10420832e-02
+ 4.22976255e-01 1.33883918e-03 7.62544125e-02 3.62766355e-01
+ 4.77026477e-02 2.64976062e-02 1.33411556e-01 2.15173900e-01
+ 4.07856643e-01 3.77303421e-01 1.32155538e-01 3.65710212e-03
+ 4.86122638e-01 4.84274238e-01 1.17277995e-01 6.17446552e-04
+ 3.38664307e-04 1.67639390e-01 7.27379136e-03 2.62013194e-03
+ 6.72192918e-03 3.30122560e-02 4.34801541e-02 3.13769877e-02
+ 5.62679507e-02 5.68927499e-03 6.11475436e-03 1.95911620e-02
+ 6.07914105e-03 5.48666948e-03 2.17383713e-04 1.78744481e-03
+ 1.01046741e-03 2.41120741e-01 1.88590458e-03 1.72382779e-02
+ 9.03494097e-03 5.01501467e-03 6.94357464e-03 4.89143701e-03
+ 2.09067762e-02 1.85237341e-02 3.60107864e-03 6.49168389e-04
+ 8.29932196e-06 2.08076672e-03 2.33960054e-05 3.62707198e-01
+ 3.70920025e-05 5.25417563e-04 2.95682997e-03 5.24247997e-04
+ 5.95423671e-06 3.62661593e-02 2.53433382e-06 1.53063156e-05
+ 1.04281407e-05 4.42853889e-06 2.61954629e-05 6.08247763e-04
+ 1.31178953e-04 4.70878949e-05 4.19552907e-06 1.43675616e-05
+ 9.47546773e-03 3.30943095e-07 1.04024669e-03 9.57764286e-08
+ 1.81275982e-06 1.33542653e-06 7.40337896e-07 8.50348533e-06
+ 8.94843106e-06 2.42595474e-04 2.67198338e-04 8.90999043e-04
+ 3.23286513e-05 1.19601097e-03 3.07405032e-02 8.52451310e-04
+ 1.23366466e-04 4.92111030e-05 8.47189454e-04 9.59170610e-03
+ 1.70903595e-03 8.42589245e-04 4.16688900e-03 1.73735004e-02
+ 4.43893048e-04 2.09094669e-05 6.62247039e-05 5.70894685e-04
+ 2.75887502e-03 4.88957507e-04 1.81182642e-02 2.33730334e-05
+ 4.94053575e-06 5.17793524e-05 2.07142602e-03 1.13542401e-03
+ 3.49381962e-03 8.14148283e-04 9.36942699e-04 6.22708127e-02
+ 5.81047032e-04 1.10032344e-02 1.09982640e-04 4.23882331e-04
+ 5.97282953e-04 9.57541575e-04 1.03702873e-03 2.29196600e-03
+ 9.15029814e-05 2.80675158e-04 1.08070939e-03 3.02696222e-04
+ 4.21448145e-03 4.15093638e-03 2.53554696e-04 3.03222507e-04
+ 3.72233655e-04 2.58473738e-04 1.36876153e-03 1.71129836e-03
+ 1.37239433e-04 3.68314068e-04 7.82848510e-05 1.45245865e-02
+ 2.76534073e-03 1.11992855e-03 6.74898103e-02 2.05331109e-02], shape=(296,), dtype=float32)
+rounded label:tf.Tensor(
+[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 1. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0.], shape=(296,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.1046107, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/break_safe.c-1_000.smt2
+true label:[0, 0, 1, 0, 1, 0, 1]
+true label rank:[1 1 2 1 2 1 2]
+predicted label:tf.Tensor(
+[0.0017377  0.11244995 0.27822915 0.01917398 0.09784572 0.05738209
+ 0.23591046], shape=(7,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0.], shape=(7,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1]
+mse:tf.Tensor(0.27642524, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/21.c_000.smt2
+true label:[0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0]
+true label rank:[1 2 1 1 2 1 1 2 1 1 2 1 1 2 1 1 2 2 1 1 2 1 1 2 1]
+predicted label:tf.Tensor(
+[0.00540838 0.08725443 0.17559366 0.00829017 0.27151132 0.00933491
+ 0.13103852 0.0979182  0.01008511 0.01684124 0.02658633 0.02172023
+ 0.03190174 0.25925744 0.00057118 0.1802051  0.16100669 0.20284928
+ 0.00199704 0.08396974 0.34099045 0.14644907 0.09333445 0.39353278
+ 0.01268957], shape=(25,), dtype=float32)
+rounded label:tf.Tensor(
+[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0.], shape=(25,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.23740613, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/four1.smt2-0027_000.smt2
+true label:[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.16572219 0.41821662 0.30955195 0.1437167  0.16722147 0.0574105
+ 0.25829327 0.09779316 0.05186705 0.02760364 0.11201109 0.35351673
+ 0.11548925 0.19581847 0.21023738 0.01089108 0.24222052], shape=(17,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(17,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.05209383, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/chc-lia-lin-0018_000.smt2
+true label:[0, 0]
+true label rank:[1 1]
+predicted label:tf.Tensor([0.25919142 0.27845752], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([0. 0.], shape=(2,), dtype=float32)
+predicted label rank:[1 1]
+mse:tf.Tensor(0.0723594, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/bandec.smt2-0260_000.smt2
+true label:[0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1]
+true label rank:[1 2 2 2 1 2 1 1 2 2 1 2 1 2 1 1 2 2]
+predicted label:tf.Tensor(
+[0.08741916 0.39930916 0.4753458  0.4743182  0.2840868  0.18568955
+ 0.35855258 0.29856026 0.2783272  0.1061054  0.1262063  0.30691302
+ 0.35950416 0.39587167 0.33134103 0.31608438 0.20894831 0.15890066], shape=(18,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(18,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.31860322, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/chc-lia-lin-0002_000.smt2
+true label:[0, 0]
+true label rank:[1 1]
+predicted label:tf.Tensor([0.21391469 0.21373047], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([0. 0.], shape=(2,), dtype=float32)
+predicted label rank:[1 1]
+mse:tf.Tensor(0.045720104, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/test_locks_12.c-1_000.smt2
+true label:[0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2
+ 1 2 1 2 1 2 1 2 1 2 1 1 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 1 1 1 2
+ 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 1 1 1 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1
+ 1 1 1 1 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 1 1 1 1 1 1 2 1 2 1 2 1 2 1 2 1 2 1
+ 1 1 1 1 1 1 1 2 1 2 1 2 1 2 1 2 1 1 1 1 1 1 1 1 1 2 1 2 1 2 1 2 1 1 1 1 1
+ 1 1 1 1 1 2 1 2 1 2 1 1 1 1 1 1 1 1 1 1 1 2 1 2 1 1 1 1 1 1 1 1 1 1 1 1 2
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 1 1 2 1
+ 2 1 2 1 2 1 2 1 2 1 1 1 1 1 1 1 2 1 2 1 2 1 2 1 1 1 1 1 1 1 1 1 2 1 2 1 2
+ 1 2 1 2 1 2 1 2 1 2 1 1 1 1 1 2 1 2 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[1.78064045e-03 3.66564421e-03 1.83271840e-02 1.07479766e-02
+ 2.08353195e-02 6.51710015e-03 6.33656420e-03 4.55506286e-03
+ 1.27279537e-03 6.13104785e-04 1.61138491e-03 1.39641371e-02
+ 3.34521080e-03 2.64320020e-02 7.22655750e-05 1.61602674e-03
+ 2.88563385e-03 1.38118368e-04 6.26804132e-04 3.04387324e-02
+ 1.36458948e-02 8.78683204e-05 6.16513717e-05 3.96823823e-01
+ 2.17226706e-03 1.61830746e-02 4.82259840e-01 1.34061962e-01
+ 3.45571697e-01 2.04738453e-01 9.42867622e-02 3.50562125e-01
+ 2.26742759e-01 1.89595729e-01 1.83707461e-01 3.93796533e-01
+ 3.72413695e-01 3.07773173e-01 1.19389044e-02 3.36367860e-02
+ 3.01317811e-01 1.92432180e-01 4.62538563e-02 8.03893954e-02
+ 2.18361422e-01 4.26534414e-01 4.14222181e-02 9.28624198e-02
+ 4.05867130e-01 1.57896534e-01 1.85384937e-02 8.19257572e-02
+ 1.85386196e-01 3.65323693e-01 5.70212156e-02 1.73122972e-01
+ 8.22660699e-03 6.11976683e-02 6.90436885e-02 3.94644171e-01
+ 1.37119010e-01 2.31846318e-01 1.76649950e-02 2.67072171e-01
+ 3.32062505e-02 4.19798255e-01 4.60771561e-01 3.66987765e-01
+ 4.76388335e-01 1.93607792e-01 1.97953582e-02 3.72666836e-01
+ 9.74105299e-03 1.59373209e-02 7.54135707e-03 1.66867435e-01
+ 1.54881284e-01 2.13483647e-02 2.67777015e-02 3.59383319e-03
+ 1.57716908e-02 4.51257871e-03 7.86233321e-02 9.63695496e-02
+ 2.87118912e-01 4.14214469e-03 4.21284102e-02 4.16575931e-02
+ 1.68810189e-01 2.14948088e-01 4.47541356e-01 4.80181187e-01
+ 1.44139156e-01 4.83336031e-01 4.12264615e-01 1.02275461e-01
+ 4.35814917e-01 4.57346827e-01 1.89763218e-01 4.30068709e-02
+ 2.92768002e-01 2.16974691e-01 2.97343493e-01 1.05711304e-01
+ 5.76864518e-02 8.49170890e-03 2.34885737e-01 7.37663507e-02
+ 2.86257714e-01 1.49761990e-01 4.79579065e-03 2.65791193e-02
+ 1.69824045e-02 9.66393482e-03 8.07446335e-03 1.98520616e-01
+ 1.75318420e-02 3.20331901e-02 6.24851789e-03 3.89279909e-02
+ 5.61700650e-02 1.07149258e-02 2.35946812e-02 1.90462619e-02
+ 2.07070008e-01 1.00505754e-01 5.37125058e-02 2.81540304e-01
+ 4.54789102e-02 2.56435215e-01 9.80686471e-02 2.06083834e-01
+ 1.11171238e-01 1.66284554e-02 1.69910103e-01 2.98369005e-02
+ 7.15089366e-02 3.01314960e-03 7.12703075e-03 1.29466457e-03
+ 5.96699640e-02 8.24574828e-02 2.22795188e-01 3.81800272e-02
+ 1.13556199e-01 2.41070371e-02 1.30197421e-01 2.81654038e-02
+ 1.19264293e-02 3.51190194e-02 2.11591534e-02 5.62963774e-03
+ 7.37123266e-02 3.45680937e-02 4.78528708e-01 1.12794094e-01
+ 7.08947927e-02 5.63183753e-03 4.03791428e-01 1.27885081e-02
+ 2.89049055e-02 2.37527788e-02 7.45629147e-03 3.76036786e-03
+ 1.16055151e-02 1.03709826e-04 1.12765026e-03 2.17381259e-03
+ 2.40308437e-02 1.46707594e-02 4.05117311e-02 8.17131437e-03
+ 1.49949025e-02 8.94165598e-03 1.03144227e-02 2.55897117e-04
+ 1.76463239e-02 1.64306983e-02 1.03809303e-02 2.96854903e-03
+ 7.45239947e-03 4.14268374e-02 9.98688396e-03 1.55941630e-02
+ 3.62586207e-03 8.59933207e-04 1.69935799e-03 1.52868601e-02
+ 1.02942124e-01 1.53001212e-03 6.96603965e-04 3.79756466e-02
+ 1.77331292e-03 1.86410430e-03 3.65022244e-03 1.04314432e-01
+ 4.11074087e-02 2.48660505e-01 2.89475918e-02 1.25145003e-01
+ 1.28901914e-01 3.12177688e-02 1.60741992e-02 3.21738213e-01
+ 7.85890371e-02 9.92383137e-02 2.11263761e-01 6.43972531e-02
+ 9.39228535e-02 1.35655671e-01 4.48314846e-03 6.67713210e-02
+ 1.64487469e-03 4.01635282e-03 3.37678380e-03 5.19652814e-02
+ 8.70456919e-04 2.49696840e-02 3.25816660e-03 8.93451739e-03
+ 8.74807301e-04 2.63406243e-02 3.65973979e-01 2.92332292e-01
+ 4.15360630e-02 2.75254453e-04 1.68765837e-04 1.12937801e-02
+ 4.52820957e-01 3.62331251e-04 4.54547077e-01 3.14767542e-03
+ 5.49380854e-03 8.78259242e-02 4.53254700e-01 1.11143747e-02
+ 1.38630217e-03 1.95049904e-02 3.22839129e-04 1.54447686e-02
+ 1.45818656e-02 5.23523008e-03 4.87179637e-01 1.08442176e-02
+ 1.18033951e-02 1.37062743e-04 9.87172946e-02 3.67563933e-01
+ 4.39095795e-01 6.13663532e-03 1.82340890e-01 1.68660328e-01
+ 3.77738357e-01 1.99967704e-04 1.80510253e-01 2.00936478e-03
+ 1.09715119e-01 4.63819295e-01 4.92896527e-01 1.11586750e-01
+ 5.68667240e-03 2.79932196e-04 5.60149376e-04 3.57183814e-02
+ 3.60156962e-04 2.60866076e-01 6.04942143e-02 3.82771760e-01
+ 6.31903473e-04 3.23421836e-01 2.32950115e-04 2.60946035e-01
+ 1.03807971e-02 2.98963219e-01 4.98320162e-01 5.05081058e-01
+ 5.40932873e-03 4.93113250e-01 9.91093814e-02 5.06713688e-01
+ 5.07182002e-01 4.99844611e-01 9.90644190e-03 4.47401404e-01
+ 5.00105858e-01 4.83323663e-01 5.00584185e-01 4.98594671e-01
+ 3.81510407e-01 5.89661784e-02 4.44170740e-03 1.03512523e-03
+ 4.99206722e-01 4.98807549e-01 2.78639048e-01 5.11267543e-01
+ 5.02911210e-01 4.80573028e-01 3.36925639e-03 4.54643577e-01
+ 4.92044032e-01 5.01628935e-01 4.34471548e-01 2.90214717e-01
+ 8.09769437e-04 2.32451726e-02 4.43642996e-02 5.04602313e-01
+ 4.86167431e-01 5.06686807e-01 5.03365159e-01 4.71588671e-01
+ 4.80337471e-01 4.98972148e-01 4.95267212e-01 4.98549283e-01
+ 4.44138736e-01 3.18457782e-01 4.98739094e-01 8.16465076e-03
+ 4.87824470e-01 4.75369394e-01 4.59967017e-01 4.17128921e-01], shape=(324,), dtype=float32)
+rounded label:tf.Tensor(
+[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 1. 1. 0. 0. 0. 1. 0. 1. 0.
+ 0. 0. 0. 0. 0. 0. 0. 1. 1. 0. 0. 0. 0. 1. 0. 0. 0. 0. 0. 1. 0. 1. 1. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(324,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 2 2 1 1 1 2 1 2 1 1 1 1 1 1 1 1 2
+ 2 1 1 1 1 2 1 1 1 1 1 2 1 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.29715014, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/bouncy_two_counters_equality_000.smt2
+true label:[0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1]
+predicted label:tf.Tensor([0.12112679 0.17935915 0.26867926 0.07392412 0.24794558], shape=(5,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0.], shape=(5,), dtype=float32)
+predicted label rank:[1 1 1 1 1]
+mse:tf.Tensor(0.03719435, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/bandec.smt2-0148_000.smt2
+true label:[0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1]
+true label rank:[1 1 2 2 1 1 1 1 1 2 2 1 2 1 1 2 2 1 1 1 1 1 2]
+predicted label:tf.Tensor(
+[0.14234905 0.06038408 0.31214225 0.32077765 0.1365851  0.14374997
+ 0.02647865 0.04833428 0.06070174 0.16623402 0.20317417 0.1711894
+ 0.44794276 0.1290024  0.3700763  0.43010536 0.37488043 0.4850629
+ 0.47204465 0.34292826 0.0617763  0.05903035 0.19822326], shape=(23,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(23,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.2071141, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/underapprox_2-2.c-1_000.smt2
+true label:[1, 0]
+true label rank:[2 1]
+predicted label:tf.Tensor([0.22282498 0.23276798], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([0. 0.], shape=(2,), dtype=float32)
+predicted label rank:[1 1]
+mse:tf.Tensor(0.32909095, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/gj2007_m_3_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.01339761 0.11560396 0.25351676 0.13279064 0.016442   0.04229043
+ 0.02576077 0.1251277  0.31250334 0.12101623 0.43507066 0.3001472
+ 0.05810871 0.09475201 0.03593234 0.44820035 0.01733239 0.01638659
+ 0.00714229 0.0330793 ], shape=(20,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(20,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.03608744, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/four1.smt2-0033_000.smt2
+true label:[0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.32543737 0.43392208 0.4163233  0.48418757 0.06931854 0.20923124
+ 0.23814002 0.15214173 0.32390708 0.01853594 0.08705665 0.1576233
+ 0.01991238 0.20315772 0.22302948 0.372467   0.02641447 0.00440603
+ 0.10125273 0.18497562], shape=(20,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(20,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.072119564, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/dillig01.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.1760097  0.02700975 0.01433177 0.03304232 0.21414334 0.00199539
+ 0.0045411  0.00377425], shape=(8,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0.], shape=(8,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.009862794, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/diamond_1-1.c-1_000.smt2
+true label:[1, 0]
+true label rank:[2 1]
+predicted label:tf.Tensor([0.43284678 0.3263929 ], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([0. 0.], shape=(2,), dtype=float32)
+predicted label rank:[1 1]
+mse:tf.Tensor(0.21409756, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/16.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.00278322 0.01460948 0.00182895 0.03897576 0.02884222 0.04779288
+ 0.11465764 0.02369316 0.06735368 0.04617059], shape=(10,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(10,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.0025235654, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/test_locks_10.c-1_000.smt2
+true label:[0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
+true label rank:[1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 1 1 2 1 2 1 2 1 2 1 2 1 2 1 1 1 1 1 1 1
+ 1 1 1 1 2 1 2 1 2 1 2 1 1 1 1 1 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 1 1
+ 1 1 1 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 1 1 1 1 1 1 1 2 1 2 1 2 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 2 1 2 1 2 1 2 1 2 1 2 1
+ 1 1 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 1 1 1 1 1 1 1 1 1 2 1 2 1 2 1 2
+ 1 2 1 2 1 2 1 2 1 2 1 1 1 1 1 1 1 1 1 2 1 2 1 1 1 2 1 2 1 2 1 2 1 2 1 2 1
+ 2 1 2]
+predicted label:tf.Tensor(
+[1.06447143e-02 3.22040659e-03 4.36284840e-02 4.22856361e-02
+ 3.43047343e-02 1.17928926e-02 2.98509710e-02 4.05891892e-03
+ 1.32841757e-03 7.49433937e-04 5.44155063e-03 1.23203755e-03
+ 3.05396132e-03 2.83127348e-03 5.02223731e-04 1.30084055e-02
+ 1.27792335e-03 1.26662617e-05 3.31348710e-04 5.97272292e-02
+ 7.46056885e-02 3.63940489e-04 2.26579359e-05 7.80604722e-04
+ 5.04640571e-04 3.34743620e-03 1.64772302e-01 1.36736939e-02
+ 6.24765083e-03 1.59051158e-02 2.03293763e-04 2.40808912e-02
+ 6.59794267e-03 9.20022000e-03 3.82521033e-01 4.00204569e-01
+ 3.92483026e-01 2.55192429e-01 6.00311868e-02 1.42414257e-01
+ 1.00256748e-01 4.70762163e-01 6.63859844e-02 5.19457310e-02
+ 1.69807792e-01 1.15729332e-01 2.02818826e-01 4.24973935e-01
+ 5.45509420e-02 1.14397056e-01 1.66557357e-02 5.30134588e-02
+ 1.24130264e-01 3.55305612e-01 3.98754478e-02 9.08956304e-02
+ 2.70856395e-02 5.17039783e-02 8.77720416e-02 6.96563497e-02
+ 4.26202267e-02 2.74799049e-01 1.38256671e-02 1.59557298e-01
+ 2.47237943e-02 4.65651155e-01 4.47992712e-01 4.82184261e-01
+ 4.91572440e-01 3.51345420e-01 1.02054819e-01 4.61993843e-01
+ 4.47634399e-01 4.39751685e-01 3.63957852e-01 2.31957510e-01
+ 4.17205065e-01 2.06175130e-02 1.70868468e-02 1.06350565e-02
+ 4.49802057e-04 4.33023972e-03 1.84410736e-01 8.88843015e-02
+ 4.02637534e-02 7.18642405e-05 5.29274391e-03 1.32311194e-03
+ 1.48370047e-03 5.81914443e-04 5.54515421e-02 1.19799459e-02
+ 1.64360777e-02 3.43435705e-01 2.88457107e-02 1.57812831e-03
+ 7.79608265e-03 1.61870435e-01 1.12852165e-02 1.79140829e-04
+ 1.70753114e-02 3.93037871e-03 2.26847380e-02 1.12785120e-03
+ 8.16290174e-03 4.84917033e-03 3.30655724e-02 1.23651919e-03
+ 3.04578268e-03 1.36193749e-03 6.89406320e-02 1.69354863e-02
+ 7.66949542e-03 6.29025698e-03 1.54238064e-02 7.56919086e-02
+ 2.05511376e-02 1.17280744e-02 3.92780483e-01 5.55511750e-02
+ 2.17248157e-01 2.15222798e-02 4.91989434e-01 1.08651064e-01
+ 4.75508660e-01 1.08250596e-01 1.20826654e-01 3.89742911e-01
+ 3.37720156e-01 9.37830731e-02 3.08177501e-01 2.60358769e-03
+ 9.66675654e-02 2.14710855e-03 1.57840587e-02 1.68360863e-02
+ 1.64640285e-02 4.38981515e-04 9.46102547e-04 2.83864152e-04
+ 8.67919400e-02 4.31474507e-01 1.48604102e-02 5.31417020e-02
+ 1.32125869e-01 2.01950353e-02 7.90559687e-03 1.21648416e-01
+ 1.67351831e-02 1.12898357e-03 3.78353219e-03 2.32416354e-02
+ 4.11911383e-02 5.76528311e-02 9.89402011e-02 4.38435748e-03
+ 2.29668319e-02 5.62099880e-03 1.89606529e-02 2.54242634e-03
+ 1.26284622e-02 7.65231031e-04 9.94138699e-03 1.53122405e-02
+ 4.75730330e-01 1.72895994e-02 4.75122869e-01 4.98009831e-01
+ 4.88170922e-01 4.96569365e-01 5.00378311e-01 4.94783551e-01
+ 4.87087876e-01 3.33845854e-01 5.06967723e-01 2.55653914e-02
+ 4.35685664e-01 4.16403592e-01 4.94251512e-02 3.69517133e-02
+ 2.61582304e-02 4.75237161e-01 3.19931358e-02 2.56561697e-01
+ 1.88623473e-01 1.49773121e-01 3.48219760e-02 1.79325521e-01
+ 3.86047214e-01 9.78210270e-02 3.76797989e-02 1.09775141e-01
+ 4.02267426e-01 1.23871766e-01 1.48312533e-02 1.09741390e-01
+ 2.40292400e-02 3.57860565e-01 3.65006924e-02 1.95641384e-01
+ 1.00846581e-01 4.69222516e-02 2.81373765e-02 2.28418961e-01
+ 1.77693382e-01 1.36146665e-01 8.65383670e-02 2.17810988e-01
+ 5.78227825e-02 4.21906471e-01 2.61723362e-02 4.20928776e-01
+ 3.17825943e-01 3.00221711e-01 6.49897680e-02 3.07802081e-01
+ 6.06176909e-03 4.13688809e-01 3.93183678e-02 6.84076399e-02
+ 5.79083618e-03 4.04813886e-02 1.55759398e-02 4.74363238e-01
+ 1.55743942e-01], shape=(225,), dtype=float32)
+rounded label:tf.Tensor(
+[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 1. 0. 0. 0. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(225,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 2 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1]
+mse:tf.Tensor(0.32205957, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/stalmark_000.smt2
+true label:[0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1]
+predicted label:tf.Tensor([0.17585771 0.04762911 0.08037116 0.09661938 0.21991773 0.02416362], shape=(6,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0.], shape=(6,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1]
+mse:tf.Tensor(0.01632283, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/08.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.00623069 0.0672387  0.00912309 0.08669948 0.01938584 0.00576128
+ 0.18077017 0.0468145  0.08174799 0.01693813 0.24970601 0.10447808
+ 0.09764576 0.36173752 0.07114386 0.05535715 0.04653877 0.09652869
+ 0.25805676 0.24621269 0.3059965  0.0321613  0.03695188], shape=(23,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(23,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.022214027, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/loop__upcount_000.smt2
+true label:[0, 0, 0, 0]
+true label rank:[1 1 1 1]
+predicted label:tf.Tensor([0.00411336 0.02183667 0.06020272 0.07669254], shape=(4,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0.], shape=(4,), dtype=float32)
+predicted label rank:[1 1 1 1]
+mse:tf.Tensor(0.0024999685, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/bandec.smt2-0181_000.smt2
+true label:[0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1]
+true label rank:[1 2 2 2 2 1 1 2 2 1 1 1 1 1 2 2 2 1 2 1 1 2 2 1 1 1 1 1 2 2]
+predicted label:tf.Tensor(
+[0.19727582 0.30479184 0.33814502 0.42436072 0.37495443 0.1675141
+ 0.08691838 0.10364112 0.18267958 0.09012355 0.06212787 0.08270921
+ 0.24411197 0.33789167 0.11037068 0.40412292 0.25726482 0.01259093
+ 0.0526818  0.26622897 0.436326   0.4619302  0.44013876 0.23995352
+ 0.35219237 0.2983634  0.45048136 0.2430058  0.18906991 0.08168026], shape=(30,), dtype=float32)
+rounded label:tf.Tensor(
+[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0.], shape=(30,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.29584992, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/bandec.smt2-0210_000.smt2
+true label:[0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1]
+true label rank:[1 2 1 2 2 2 2 1 2 1 1 2 2 1 2 1 2 1 1 2 2]
+predicted label:tf.Tensor(
+[0.43146092 0.40753222 0.47506723 0.3534778  0.41251913 0.17774178
+ 0.4803115  0.29380885 0.3434365  0.23708479 0.4723591  0.43635613
+ 0.45078483 0.4865837  0.03855428 0.03594835 0.16010101 0.12787145
+ 0.11292265 0.11855187 0.46491298], shape=(21,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(21,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.32611784, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/const_1-1.c-1_000.smt2
+true label:[1, 1]
+true label rank:[1 1]
+predicted label:tf.Tensor([0.22282502 0.23276803], shape=(2,), dtype=float32)
+rounded label:tf.Tensor([0. 0.], shape=(2,), dtype=float32)
+predicted label rank:[1 1]
+mse:tf.Tensor(0.5963229, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/durationThm_3_e2_63_e7_21_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.46472162 0.08323849 0.15738392 0.04268957 0.40486982 0.28955382
+ 0.07739988], shape=(7,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0.], shape=(7,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1]
+mse:tf.Tensor(0.07189124, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/02.c_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.00153879 0.02453112 0.03088178 0.01315553 0.10245639 0.02294286
+ 0.10256982 0.02444773 0.00547044 0.00758812 0.00214468 0.00791545
+ 0.04443379 0.19774543 0.0045203  0.02314897 0.16519834 0.00610543], shape=(18,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(18,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.0051660724, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/s3_srvr_1a.cil.c-1_000.smt2
+true label:[0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+true label rank:[1 2 1 1 1 1 2 1 1 1 1 2]
+predicted label:tf.Tensor(
+[0.35113135 0.02191155 0.03233866 0.12430906 0.4038866  0.00238205
+ 0.00513606 0.4699255  0.49171963 0.3276568  0.44553578 0.47777852], shape=(12,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(12,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.2742106, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/bouncy_one_counter_000.smt2
+true label:[0, 0, 1, 0, 0, 0]
+true label rank:[1 1 2 1 1 1]
+predicted label:tf.Tensor([0.03563114 0.08474494 0.23013423 0.0360608  0.04110479 0.01005102], shape=(6,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0.], shape=(6,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1]
+mse:tf.Tensor(0.10070593, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/while_after_while_if_merged_safe.c-1_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.29272333 0.32920513 0.23099048 0.44152763 0.35731947 0.35226926
+ 0.36693928 0.21772857 0.33507624 0.0427622  0.2772715  0.29260904
+ 0.29292482 0.46639425 0.19042732 0.07702329 0.01460271 0.00524432], shape=(18,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(18,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.0832531, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/bandec.smt2-0178_000.smt2
+true label:[0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1]
+true label rank:[1 2 2 2 2 1 1 2 2 1 1 1 1 1 2 2 2 1 2 1 1 2 2 1 1 1 1 1 2 2]
+predicted label:tf.Tensor(
+[0.19727585 0.30479178 0.33814502 0.42436072 0.37495443 0.16751407
+ 0.08691838 0.10364112 0.18267949 0.09012353 0.06212787 0.08270923
+ 0.244112   0.3378916  0.1103707  0.40412286 0.25726482 0.01259092
+ 0.05268178 0.26622897 0.436326   0.4619302  0.44013876 0.23995358
+ 0.35219228 0.2983634  0.45048136 0.2430058  0.18906991 0.08168028], shape=(30,), dtype=float32)
+rounded label:tf.Tensor(
+[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0.], shape=(30,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.29584995, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/chc-lia-lin-0115_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[4.37455982e-01 9.60688367e-02 4.64794040e-02 1.48491543e-02
+ 3.80926073e-01 6.75440282e-02 1.78465154e-02 1.16219781e-02
+ 1.07103568e-02 8.34400242e-04 1.13864414e-01 9.69909306e-05], shape=(12,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(12,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.030514894, shape=(), dtype=float32)
+-------
+../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs/test_data/barthe2-big2_merged_safe.c-1_000.smt2
+true label:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+true label rank:[1 1 1 1 1 1 1 1 1 1 1 1]
+predicted label:tf.Tensor(
+[0.3738517  0.29722103 0.00182648 0.13320617 0.05166404 0.01142723
+ 0.09202924 0.03485715 0.02300658 0.01098092 0.0094925  0.00714015], shape=(12,), dtype=float32)
+rounded label:tf.Tensor([0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.], shape=(12,), dtype=float32)
+predicted label rank:[1 1 1 1 1 1 1 1 1 1 1 1]
+mse:tf.Tensor(0.021593982, shape=(), dtype=float32)
+-------
+mean(mse_list):0.14140292

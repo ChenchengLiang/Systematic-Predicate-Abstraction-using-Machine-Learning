@@ -37,8 +37,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
     parameters ["gathered_nodes_binary_classification_task"]=gathered_nodes_binary_classification_task
-    max_epochs = 200
-    patience = 20
+    max_epochs = 500
+    patience = 50
     # parameters["add_self_loop_edges"]=False
     # parameters["tie_fwd_bkwd_edges"]=True
 
@@ -455,17 +455,17 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                         else:
                             #for layer horn graph
                             graphs_adjacency_lists.append([
-                                np.array(loaded_graph["predicateArgumentEdges"]),
-                                np.array(loaded_graph["predicateInstanceEdges"]),
-                                np.array(loaded_graph["argumentInstanceEdges"]),
-                                np.array(loaded_graph["controlHeadEdges"]),
-                                np.array(loaded_graph["controlBodyEdges"]),
-                                np.array(loaded_graph["controlEdges"]),
-                                np.array(loaded_graph["controlArgumentEdges"]),
-                                np.array(loaded_graph["subTermEdges"]),
-                                np.array(loaded_graph["guardEdges"]),
-                                np.array(loaded_graph["dataEdges"])
-                                #np.array(loaded_graph["binaryAdjacentList"]),
+                                # np.array(loaded_graph["predicateArgumentEdges"]),
+                                # np.array(loaded_graph["predicateInstanceEdges"]),
+                                # np.array(loaded_graph["argumentInstanceEdges"]),
+                                # np.array(loaded_graph["controlHeadEdges"]),
+                                # np.array(loaded_graph["controlBodyEdges"]),
+                                # np.array(loaded_graph["controlEdges"]),
+                                # np.array(loaded_graph["controlArgumentEdges"]),
+                                # np.array(loaded_graph["subTermEdges"]),
+                                # np.array(loaded_graph["guardEdges"]),
+                                # np.array(loaded_graph["dataEdges"])
+                                np.array(loaded_graph["binaryAdjacentList"]),
                                 #np.array(loaded_graph["unknownEdges"])
                             ])
                         total_number_of_node += len(loaded_graph["nodeIds"])
@@ -487,7 +487,7 @@ def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "
     benchmark_name = benchmark.replace("/", "-")
     for df in datafold:
         parsed_dot_file = pickleRead("train-" +label+"-"+ graph_type +"-"+benchmark_name + "-gnnInput_" + df + "_data")
-        if label in gathered_nodes_binary_classification_task or label=="predicate_occurrence_in_clauses":
+        if label in gathered_nodes_binary_classification_task or label=="predicate_occurrence_in_clauses" or label=="argument_lower_bound" or label=="argument_upper_bound":
             form_predicate_occurrence_related_label_graph_sample(parsed_dot_file.graphs_node_label_ids,
                                                                     parsed_dot_file.graphs_node_symbols,
                                                                     parsed_dot_file.graphs_adjacency_lists,
