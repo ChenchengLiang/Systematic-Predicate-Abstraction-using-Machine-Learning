@@ -343,9 +343,19 @@ object Main {
         hornGraphType = HornGraphType.clauseRelatedTaskLayerGraph
         arguments(rest)
       }
+      case "-getHornGraph:fineGrainedEdgeTypeLayerGraph" :: rest => {
+        getHornGraph = true
+        hornGraphType = HornGraphType.fineGrainedEdgeTypeLayerGraph
+        arguments(rest)
+      }
       case "-getHornGraph:hyperEdgeGraph" :: rest => {
         getHornGraph = true
         hornGraphType = HornGraphType.hyperEdgeGraph
+        arguments(rest)
+      }
+      case "-getHornGraph:equivalentHyperedgeGraph" :: rest => {
+        getHornGraph = true
+        hornGraphType = HornGraphType.equivalentHyperedgeGraph
         arguments(rest)
       }
       case "-hornGraphWithHints" :: rest => hornGraphWithHints = true; arguments(rest)
@@ -551,7 +561,7 @@ object Main {
           " -rank:n\t use top n or score above n ranked hints read from file\n"+
           " -getSMT2\t get SMT2 file\n"+
           " -getHornGraph\t get all types of horn graph file and GNN input\n"+
-          " -getHornGraph:t\t Interp. getHornGraph: monoDirectionLayerGraph, biDirectionLayerGraph, hybridDirectionLayerGraph,clauseRelatedTaskLayerGraph, hyperEdgeGraph\n" +
+          " -getHornGraph:t\t Interp. getHornGraph: monoDirectionLayerGraph, biDirectionLayerGraph, hybridDirectionLayerGraph,clauseRelatedTaskLayerGraph, fineGrainedEdgeTypeLayerGraph, hyperEdgeGraph\n" +
           " -getLabelFromCE \t get label from counter example\n" +
           " -hornGraphWithHints\t get horn graph file with hints\n"
 

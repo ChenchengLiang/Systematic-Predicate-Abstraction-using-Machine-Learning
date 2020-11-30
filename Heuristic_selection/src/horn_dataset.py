@@ -2,7 +2,7 @@ from typing import Any, Dict
 import tensorflow as tf
 from archived.dotToGraphInfo import parseArgumentsFromJson
 import numpy as np
-from Miscellaneous import pickleWrite,pickleRead
+from Miscellaneous import pickleWrite,pickleRead,drawBinaryLabelPieChart
 import os
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -14,7 +14,6 @@ from tf2_gnn.models import InvariantArgumentSelectionTask, InvariantNodeIdentify
 from tf2_gnn.data import DataFold, HornGraphSample, HornGraphDataset
 from tf2_gnn.cli_utils.training_utils import train, log_line, make_run_id
 import seaborn
-
 
 
 def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",from_json=False,json_type=".JSON",form_label=False,GPU=False,pickle=True):
@@ -30,6 +29,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     #parameters["message_calculation_class"]="rgcn"#rgcn,ggnn,rgat
     #parameters['num_heads'] = 2
     parameters['hidden_dim'] = 64 #64
+    #parameters["num_edge_MLP_hidden_layers"]
     parameters['num_layers'] = 2
     parameters['node_label_embedding_size'] = nodeFeatureDim
     parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
@@ -444,29 +444,43 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                         if json_type==".hyperEdgeHornGraph.JSON": #read adjacency_lists
                             #for hyperedge horn graph
                             graphs_adjacency_lists.append([
-                                np.array(loaded_graph["argumentEdges"]),
-                                np.array(loaded_graph["guardASTEdges"]),
-                                np.array(loaded_graph["dataFlowASTEdges"]),
+                                # np.array(loaded_graph["argumentEdges"]),
+                                # np.array(loaded_graph["guardASTEdges"]),
+                                # np.array(loaded_graph["dataFlowASTEdges"]),
                                 np.array(loaded_graph["binaryAdjacentList"]),
-                                np.array(loaded_graph["controlFlowHyperEdges"]),
-                                np.array(loaded_graph["dataFlowHyperEdges"]),
+                                # np.array(loaded_graph["controlFlowHyperEdges"]),
+                                # np.array(loaded_graph["dataFlowHyperEdges"]),
                                 np.array(loaded_graph["ternaryAdjacencyList"])
                             ])
                         else:
                             #for layer horn graph
                             graphs_adjacency_lists.append([
-                                # np.array(loaded_graph["predicateArgumentEdges"]),
-                                # np.array(loaded_graph["predicateInstanceEdges"]),
-                                # np.array(loaded_graph["argumentInstanceEdges"]),
-                                # np.array(loaded_graph["controlHeadEdges"]),
-                                # np.array(loaded_graph["controlBodyEdges"]),
-                                # np.array(loaded_graph["controlEdges"]),
-                                # np.array(loaded_graph["controlArgumentEdges"]),
-                                # np.array(loaded_graph["subTermEdges"]),
-                                # np.array(loaded_graph["guardEdges"]),
-                                # np.array(loaded_graph["dataEdges"])
+                                np.array(loaded_graph["predicateArgumentEdges"]),
+                                np.array(loaded_graph["predicateInstanceEdges"]),
+                                np.array(loaded_graph["argumentInstanceEdges"]),
+                                np.array(loaded_graph["controlHeadEdges"]),
+                                np.array(loaded_graph["controlBodyEdges"]),
+                                np.array(loaded_graph["controlEdges"]),
+                                np.array(loaded_graph["controlArgumentEdges"]),
+                                np.array(loaded_graph["subTermEdges"]),
+                                np.array(loaded_graph["guardEdges"]),
+                                np.array(loaded_graph["dataEdges"]),
+                                np.array(loaded_graph["predicateInstanceHeadEdges"]),
+                                np.array(loaded_graph["predicateInstanceBodyEdges"]),
+                                np.array(loaded_graph["controlArgumentHeadEdges"]),
+                                np.array(loaded_graph["controlArgumentBodyEdges"]),
+                                np.array(loaded_graph["guardConstantEdges"]),
+                                np.array(loaded_graph["guardOperatorEdges"]),
+                                np.array(loaded_graph["guardScEdges"]),
+                                np.array(loaded_graph["dataConstantEdges"]),
+                                np.array(loaded_graph["dataOperatorEdges"]),
+                                np.array(loaded_graph["dataScEdges"]),
+                                np.array(loaded_graph["subTermConstantOperatorEdges"]),
+                                np.array(loaded_graph["subTermOperatorOperatorEdges"]),
+                                np.array(loaded_graph["subTermScOperatorEdges"]),
                                 np.array(loaded_graph["binaryAdjacentList"]),
                                 #np.array(loaded_graph["unknownEdges"])
+
                             ])
                         total_number_of_node += len(loaded_graph["nodeIds"])
 
@@ -497,7 +511,7 @@ def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "
                                                                     parsed_dot_file.file_name_list, benchmark, df,
                                                                     parsed_dot_file.graphs_argument_indices,
                                                                     parsed_dot_file.graphs_predicate_indices,
-                                                                    parsed_dot_file.graphs_learning_labels,label,graph_type)
+                                                                    parsed_dot_file.graphs_learning_labels,label,graph_type,gathered_nodes_binary_classification_task)
 
         else:
             form_horn_graph_samples(parsed_dot_file.graphs_node_label_ids, parsed_dot_file.graphs_node_symbols,
@@ -536,7 +550,7 @@ def get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,voca
 def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,graphs_node_symbols,
                                                             graphs_adjacency_lists,total_number_of_node,
                                                             vocabulary_set,token_map,file_name_list,benchmark,df,
-                                                            graphs_argument_indices,graphs_predicate_indices,graphs_learning_labels,label,graph_type,pickle=True):
+                                                            graphs_argument_indices,graphs_predicate_indices,graphs_learning_labels,label,graph_type,gathered_nodes_binary_classification_task,pickle=True):
     final_graphs=[]
     raw_data_graph=get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,vocabulary_set,token_map)
     if label=="predicate_occurrence_in_SCG" or label=="predicate_occurrence_in_clauses" or label=="template_relevance" or label=="clause_occurrence_in_counter_examples_binary":
@@ -593,6 +607,8 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
                                                                                                 graphs_node_symbols,
                                                                                                 graphs_adjacency_lists,
                                                                                                 file_name_list, label)
+    if label in gathered_nodes_binary_classification_task:
+        drawBinaryLabelPieChart(graphs_learning_labels, label, graph_type, benchmark)
     for node_label_ids, node_symbols, adjacency_lists,file_name,node_indices,learning_labels in zip(graphs_node_label_ids,graphs_node_symbols,
                                                                                                          graphs_adjacency_lists,
                                                                                                          file_name_list,

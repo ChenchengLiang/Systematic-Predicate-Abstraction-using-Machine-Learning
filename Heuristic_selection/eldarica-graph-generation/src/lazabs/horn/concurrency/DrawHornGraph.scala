@@ -30,6 +30,7 @@ package lazabs.horn.concurrency
 
 import java.io.{File, PrintWriter}
 
+import ap.basetypes.IdealInt
 import ap.parser.IExpression._
 import ap.parser.{IExpression, _}
 import lazabs.GlobalParameters
@@ -44,7 +45,7 @@ object DrawHornGraph {
 
   object HornGraphType extends Enumeration {
     //type HornGraphType = Value
-    val hyperEdgeGraph, monoDirectionLayerGraph,biDirectionLayerGraph, hybridDirectionLayerGraph, clauseRelatedTaskLayerGraph= Value
+    val hyperEdgeGraph,equivalentHyperedgeGraph, monoDirectionLayerGraph,biDirectionLayerGraph, hybridDirectionLayerGraph, clauseRelatedTaskLayerGraph, fineGrainedEdgeTypeLayerGraph= Value
   }
 
   def addQuotes(str: String): String = {
@@ -134,6 +135,20 @@ class GNNInput(clauseCollection:ClauseInfo) {
   val subTermEdges = new Adjacency("subTerm", 2)
   val unknownEdges = new Adjacency("unknownEdges", 2)
 
+  val predicateInstanceHeadEdges = new Adjacency("predicateInstanceHead", 2)
+  val predicateInstanceBodyEdges = new Adjacency("predicateInstanceBody", 2)
+  val controlArgumentHeadEdges = new Adjacency("controlArgumentHead", 2)
+  val controlArgumentBodyEdges = new Adjacency("controlArgumentBody", 2)
+  val guardConstantEdges = new Adjacency("guardConstant", 2)
+  val guardOperatorEdges = new Adjacency("guardOperator", 2)
+  val guardScEdges = new Adjacency("guardSc", 2)
+  val dataConstantEdges = new Adjacency("dataConstant", 2)
+  val dataOperatorEdges = new Adjacency("dataOperator", 2)
+  val dataScEdges = new Adjacency("dataSc", 2)
+  val subTermConstantOperatorEdges = new Adjacency("subTermConstantOperator", 2)
+  val subTermOperatorOperatorEdges = new Adjacency("subTermOperatorOperator", 2)
+  val subTermScOperatorEdges = new Adjacency("subTermScOperator", 2)
+
   var controlLocationIndices = Array[Int]()
   var falseIndices = Array[Int]()
   var argumentIndices = Array[Int]()
@@ -155,7 +170,7 @@ class GNNInput(clauseCollection:ClauseInfo) {
     val fromID = nodeNameToIDMap(from)
     val toID = nodeNameToIDMap(to)
     GlobalParameters.get.hornGraphType match {
-      case HornGraphType.hyperEdgeGraph => {
+      case HornGraphType.hyperEdgeGraph | HornGraphType.equivalentHyperedgeGraph=> {
         label match {
           // hyperedge graph
           case "dataFlowAST" => dataFlowASTEdges.incrementBinaryEdge(fromID, toID)
@@ -164,6 +179,8 @@ class GNNInput(clauseCollection:ClauseInfo) {
           case "template" => templateEdges.incrementBinaryEdge(fromID, toID)
           case "argument" => argumentEdges.incrementBinaryEdge(fromID, toID)
           case "clause" => clauseEdges.incrementBinaryEdge(fromID,toID)
+          case "controlFlowHyperEdge"=> controlFlowHyperEdges.incrementBinaryEdge(fromID,toID)
+          case "dataFlowHyperEdge" => dataFlowHyperEdges.incrementBinaryEdge(fromID,toID)
           case _ => unknownEdges.incrementBinaryEdge(fromID, toID)
         }
       }
@@ -182,6 +199,19 @@ class GNNInput(clauseCollection:ClauseInfo) {
           case "subTerm" => subTermEdges.incrementBinaryEdge(fromID, toID)
           case "templateAST" => templateASTEdges.incrementBinaryEdge(fromID, toID)
           case "template" => templateEdges.incrementBinaryEdge(fromID, toID)
+          case "predicateInstanceHead"=> predicateInstanceHeadEdges.incrementBinaryEdge(fromID, toID)
+          case "predicateInstanceBody"=> predicateInstanceBodyEdges.incrementBinaryEdge(fromID, toID)
+          case "controlArgumentHead"=> controlArgumentHeadEdges.incrementBinaryEdge(fromID, toID)
+          case "controlArgumentBody"=>controlArgumentBodyEdges.incrementBinaryEdge(fromID, toID)
+          case "guardConstant"=>guardConstantEdges.incrementBinaryEdge(fromID, toID)
+          case "guardOperator"=>guardOperatorEdges.incrementBinaryEdge(fromID, toID)
+          case "guardSc"=>guardScEdges.incrementBinaryEdge(fromID, toID)
+          case "dataConstant"=>dataConstantEdges.incrementBinaryEdge(fromID, toID)
+          case "dataOperator"=>dataOperatorEdges.incrementBinaryEdge(fromID, toID)
+          case "dataSc"=>dataScEdges.incrementBinaryEdge(fromID, toID)
+          case "subTermConstantOperator"=>subTermConstantOperatorEdges.incrementBinaryEdge(fromID, toID)
+          case "subTermOperatorOperator"=>subTermOperatorOperatorEdges.incrementBinaryEdge(fromID, toID)
+          case "subTermScOperator"=>subTermScOperatorEdges.incrementBinaryEdge(fromID, toID)
 
         }
       }
@@ -342,11 +372,14 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
     case DrawHornGraph.HornGraphType.biDirectionLayerGraph => "bi-layerHornGraph"
     case DrawHornGraph.HornGraphType.monoDirectionLayerGraph => "mono-layerHornGraph"
     case DrawHornGraph.HornGraphType.clauseRelatedTaskLayerGraph => "clause-related-task-layerHornGraph"
+    case DrawHornGraph.HornGraphType.fineGrainedEdgeTypeLayerGraph => "fine-grained-edge-type-layerHornGraph"
+    case DrawHornGraph.HornGraphType.equivalentHyperedgeGraph => "equivalent-hyperedgeGraph"
   }
   val templateNodePrefix = "template_"
   var edgeNameMap: Map[String, String] = Map()
   var edgeDirectionMap: scala.collection.immutable.Map[String,Boolean] = Map()
   var nodeShapeMap: Map[String, String] = Map()
+  val constantNodeSetCrossGraph = scala.collection.mutable.Map[String, String]() //map[constantName->constantNameWithCanonicalNumber]
   val constantNodeSetInOneClause = scala.collection.mutable.Map[String, String]() //map[constantName->constantNameWithCanonicalNumber]
   val argumentNodeSetInPredicates = scala.collection.mutable.Map[String, String]() //map[argumentConstantName->argumentNameWithCanonicalNumber]
   val controlFlowNodeSetInOneClause = scala.collection.mutable.Map[String, String]()// predicate.name -> canonical name
@@ -402,12 +435,10 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
     gnn_input.incrementTernaryEdge(from, guard, to, label)
   }
 
-  def addEdgeInSubTerm(from: String, to: String): Unit = {
+  def addEdgeInSubTerm(from: String, to: String, fromNodeLabel:String = ""): Unit = {
     if (!to.isEmpty) {
       GlobalParameters.get.hornGraphType match {
-        case HornGraphType.hyperEdgeGraph => {
-          addBinaryEdge(from, to, astEdgeType,edgeDirectionMap(astEdgeType))
-        }
+        case HornGraphType.hyperEdgeGraph | HornGraphType.equivalentHyperedgeGraph => addBinaryEdge(from, to, astEdgeType,edgeDirectionMap(astEdgeType))
         case HornGraphType.clauseRelatedTaskLayerGraph=>{
           astEdgeType match {
             case "templateAST"=>addBinaryEdge(from, to, "templateAST",edgeDirectionMap("templateAST"))
@@ -415,7 +446,54 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
             case "guard"=>addBinaryEdge(from, to, "guard",edgeDirectionMap("guard"))
           }
         }
-        case _ => {
+        case HornGraphType.fineGrainedEdgeTypeLayerGraph => {
+          val toNodeClass = to.substring(0, to.indexOf("_"))
+          toNodeClass match {
+            case "clause" => {
+              fromNodeLabel match {
+                case "operator"=>addBinaryEdge(from, to, "guardOperator",edgeDirectionMap("guardOperator"))
+                case "constant"=>addBinaryEdge(from, to, "guardConstant",edgeDirectionMap("guardConstant"))
+                case "symbolicConstant"=>addBinaryEdge(from, to, "guardSc",edgeDirectionMap("guardSc"))
+                case _=>addBinaryEdge(from, to, "guard",edgeDirectionMap("guard"))
+              }
+            }
+            case "clauseArgument" => {
+              //addBinaryEdge(from, to, "data",edgeDirectionMap("data"))
+              astEndNodeType match {
+                case "clauseHead"=> {
+                  fromNodeLabel match {
+                    case "constant"=>addBinaryEdge(to, from, "dataConstant",edgeDirectionMap("dataConstant"))
+                    case "operator"=>addBinaryEdge(to, from, "dataOperator",edgeDirectionMap("dataOperator"))
+                    case "symbolicConstant"=>addBinaryEdge(to, from, "dataSc",edgeDirectionMap("dataSc"))
+                    case _ => addBinaryEdge(to, from, "data",edgeDirectionMap("data"))
+                  }
+                }
+                case "clauseBody"=> {
+                  fromNodeLabel match {
+                    case "constant"=>addBinaryEdge(from, to, "dataConstant",edgeDirectionMap("dataConstant"))
+                    case "operator"=>addBinaryEdge(from, to, "dataOperator",edgeDirectionMap("dataOperator"))
+                    case "symbolicConstant"=>addBinaryEdge(from, to, "dataSc",edgeDirectionMap("dataSc"))
+                    case _ => addBinaryEdge(from, to, "data",edgeDirectionMap("data"))
+                  }
+                }
+              }
+            }
+            case _ => {
+              astEdgeType match {
+                case "templateAST"=>{addBinaryEdge(from, to, "templateAST",edgeDirectionMap("templateAST"))}
+                case _=>{
+                  fromNodeLabel match {
+                    case "constant"=>addBinaryEdge(from, to, "subTermConstantOperator",edgeDirectionMap("subTermConstantOperator"))
+                    case "operator"=>addBinaryEdge(from, to, "subTermOperatorOperator",edgeDirectionMap("subTermOperatorOperator"))
+                    case "symbolicConstant"=>addBinaryEdge(from, to, "subTermScOperator",edgeDirectionMap("subTermScOperator"))
+                    case _ => addBinaryEdge(from, to, "subTerm",edgeDirectionMap("subTerm"))
+                  }
+                }
+              }
+            }
+          }
+        }
+        case _ => { //mono, hybrid layer graph
           val toNodeClass = to.substring(0, to.indexOf("_"))
           toNodeClass match {
             case "clause" => addBinaryEdge(from, to, "guard",edgeDirectionMap("guard"))
@@ -441,7 +519,7 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
   def drawASTBinaryRelation(op: String, previousNodeName: String, e1: IExpression, e2: IExpression): String = {
     val condName = op + "_" + gnn_input.GNNNodeID
     createNode(condName, op, "operator", nodeShapeMap("operator"))
-    if (previousNodeName != "") addEdgeInSubTerm(condName, previousNodeName)
+    if (previousNodeName != "") addEdgeInSubTerm(condName, previousNodeName,"operator")
     drawAST(e1, condName)
     drawAST(e2, condName)
     condName
@@ -450,37 +528,41 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
   def drawASTUnaryRelation(op: String, previousNodeName: String, e: IExpression): String = {
     val opName = op + "_" + gnn_input.GNNNodeID
     createNode(opName, op, "operator", nodeShapeMap("operator"))
-    if (previousNodeName != "") addEdgeInSubTerm(opName, previousNodeName)
+    if (previousNodeName != "") addEdgeInSubTerm(opName, previousNodeName,"operator")
     drawAST(e, opName)
     opName
   }
 
   def drawASTEndNode(constantStr: String, previousNodeName: String, className: String): String = {
-    if (argumentNodeSetInPredicates.isEmpty){ //argument merging node is included in constantNodeSetInOneClause
+    //println("constantStr",constantStr,"className",className)
+    if (argumentNodeSetInPredicates.isEmpty){ //not drawing templates
       drawAndMergeConstantNode(constantStr,previousNodeName,className)
     }else{ //when create template nodes, argumentNodeSetInPredicates store argument node name
       if(argumentNodeSetInPredicates.keySet.contains(constantStr)){//if this node is a argument, merge argument
-        addEdgeInSubTerm(argumentNodeSetInPredicates(constantStr), previousNodeName)
+        addEdgeInSubTerm(argumentNodeSetInPredicates(constantStr), previousNodeName,className)
         argumentNodeSetInPredicates(constantStr)
       }else{//if this node is a constant, treat with regular constant. constantNodeSetInOneClause range in one predicate
-//        val constantName = constantStr + "_" + gnn_input.GNNNodeID
-//        createNode(constantName, constantStr, className, nodeShapeMap(className))
-//        addEdgeInSubTerm(constantName, previousNodeName)
-//        constantName
         drawAndMergeConstantNode(constantStr,previousNodeName,className)
       }
     }
   }
 
   def drawAndMergeConstantNode(constantStr:String,previousNodeName:String,className:String): String = {
-    if (constantNodeSetInOneClause.keySet.contains(constantStr)) {
-      addEdgeInSubTerm(constantNodeSetInOneClause(constantStr), previousNodeName)
+    if (constantNodeSetCrossGraph.keySet.contains(constantStr)){ //if a constant is a global constant
+      addEdgeInSubTerm(constantNodeSetCrossGraph(constantStr), previousNodeName,className)
+      constantNodeSetCrossGraph(constantStr)
+    } else if (constantNodeSetInOneClause.keySet.contains(constantStr)) { //if a constant is a local clause constant
+      addEdgeInSubTerm(constantNodeSetInOneClause(constantStr), previousNodeName,className)
       constantNodeSetInOneClause(constantStr)
     } else {
       val constantName = constantStr + "_" + gnn_input.GNNNodeID
       createNode(constantName, constantStr, className, nodeShapeMap(className))
-      addEdgeInSubTerm(constantName, previousNodeName)
-      constantNodeSetInOneClause(constantStr) = constantName
+      addEdgeInSubTerm(constantName, previousNodeName,className)
+      //constantNodeSetInOneClause(constantStr) = constantName
+      className match {
+        case "constant" => constantNodeSetCrossGraph(constantStr) = constantName
+        case _ => constantNodeSetInOneClause(constantStr) = constantName
+      }
       constantName
     }
   }
@@ -510,10 +592,10 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
 
   def drawAST(e: IExpression, previousNodeName: String = ""): String = {
     val rootName = e match {
-      case EqZ(t) =>  drawASTBinaryRelation("=", previousNodeName, t, new ConstantTerm("0"))
+      case EqZ(t) =>  drawASTBinaryRelation("=", previousNodeName, t, IdealInt.ZERO)
       case Eq(t1, t2) => drawASTBinaryRelation("=", previousNodeName, t1, t2)
       case EqLit(term, lit) => drawASTBinaryRelation("=", previousNodeName, term, lit)
-      case GeqZ(t) => drawASTBinaryRelation("=>", previousNodeName, t, new ConstantTerm("0"))
+      case GeqZ(t) => drawASTBinaryRelation("=>", previousNodeName, t, IdealInt.ZERO)
       case Geq(t1, t2) => drawASTBinaryRelation(">=", previousNodeName, t1, t2)
       case Conj(a, b) => drawASTBinaryRelation("&", previousNodeName, a, b)
       case Disj(a, b) => drawASTBinaryRelation("|", previousNodeName, a, b)
@@ -549,9 +631,7 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
         drawAST(left, previousNodeName)
       }
       case ITimes(coeff, subterm) => drawASTBinaryRelation("*", previousNodeName, subterm, coeff)
-      case IVariable(index) => {
-        drawASTEndNode("_"+index.toString(), previousNodeName, "constant") ////add _ to differentiate index with other constants
-      }
+      case IVariable(index) => drawASTEndNode("_"+index.toString(), previousNodeName, "constant") ////add _ to differentiate index with other constants
       case _ => drawASTEndNode("unknown", previousNodeName, "constant")
 
     }
@@ -585,7 +665,7 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
     writeGNNInputFieldToJSONFile("predicateOccurrenceInClause", IntArray(gnn_input.predicateOccurrenceInClause), writer, lastFiledFlag)
     writeGNNInputFieldToJSONFile("predicateStrongConnectedComponent", IntArray(gnn_input.predicateStrongConnectedComponent), writer, lastFiledFlag)
     GlobalParameters.get.hornGraphType match {
-      case DrawHornGraph.HornGraphType.hyperEdgeGraph => {
+      case DrawHornGraph.HornGraphType.hyperEdgeGraph=> {
         writeGNNInputFieldToJSONFile("argumentEdges", PairArray(gnn_input.argumentEdges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("guardASTEdges", PairArray(gnn_input.guardASTEdges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("templateASTEdges", PairArray(gnn_input.templateASTEdges.binaryEdge), writer, lastFiledFlag)
@@ -593,6 +673,15 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
         writeGNNInputFieldToJSONFile("dataFlowASTEdges", PairArray(gnn_input.dataFlowASTEdges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("controlFlowHyperEdges", TripleArray(gnn_input.controlFlowHyperEdges.ternaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("dataFlowHyperEdges", TripleArray(gnn_input.dataFlowHyperEdges.ternaryEdge), writer, lastFiledFlag)
+      }
+      case DrawHornGraph.HornGraphType.equivalentHyperedgeGraph=>{
+        writeGNNInputFieldToJSONFile("argumentEdges", PairArray(gnn_input.argumentEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("guardASTEdges", PairArray(gnn_input.guardASTEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("templateASTEdges", PairArray(gnn_input.templateASTEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("templateEdges", PairArray(gnn_input.templateEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("dataFlowASTEdges", PairArray(gnn_input.dataFlowASTEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("controlFlowHyperEdges", PairArray(gnn_input.controlFlowHyperEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("dataFlowHyperEdges", PairArray(gnn_input.dataFlowHyperEdges.binaryEdge), writer, lastFiledFlag)
       }
       case _ => {
         writeGNNInputFieldToJSONFile("predicateArgumentEdges", PairArray(gnn_input.predicateArgumentEdges.binaryEdge), writer, lastFiledFlag)
@@ -605,6 +694,19 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
         writeGNNInputFieldToJSONFile("subTermEdges", PairArray(gnn_input.subTermEdges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("guardEdges", PairArray(gnn_input.guardEdges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("dataEdges", PairArray(gnn_input.dataEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("predicateInstanceHeadEdges", PairArray(gnn_input.predicateInstanceHeadEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("predicateInstanceBodyEdges", PairArray(gnn_input.predicateInstanceBodyEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("controlArgumentHeadEdges", PairArray(gnn_input.controlArgumentHeadEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("controlArgumentBodyEdges", PairArray(gnn_input.controlArgumentBodyEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("guardConstantEdges", PairArray(gnn_input.guardConstantEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("guardOperatorEdges", PairArray(gnn_input.guardOperatorEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("guardScEdges", PairArray(gnn_input.guardScEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("dataConstantEdges", PairArray(gnn_input.dataConstantEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("dataOperatorEdges", PairArray(gnn_input.dataOperatorEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("dataScEdges", PairArray(gnn_input.dataScEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("subTermConstantOperatorEdges", PairArray(gnn_input.subTermConstantOperatorEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("subTermOperatorOperatorEdges", PairArray(gnn_input.subTermOperatorOperatorEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("subTermScOperatorEdges", PairArray(gnn_input.subTermScOperatorEdges.binaryEdge), writer, lastFiledFlag)
       }
     }
     lastFiledFlag = true

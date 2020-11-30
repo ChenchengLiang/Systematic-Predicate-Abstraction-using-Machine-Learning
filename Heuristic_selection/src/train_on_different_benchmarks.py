@@ -10,13 +10,13 @@ def main():
     #label = "argument_identify"
     #label = "argument_identify_no_batchs"
     #label = "control_location_identify"
-    label_list.append("predicate_occurrence_in_clauses")
-    label_list.append("predicate_occurrence_in_SCG")
+    # label_list.append("predicate_occurrence_in_clauses")
+    # label_list.append("predicate_occurrence_in_SCG")
     # label="argument_bound"
     label_list.append("argument_lower_bound_existence")
     label_list.append("argument_upper_bound_existence")
-    label_list.append("argument_lower_bound")
-    label_list.append("argument_upper_bound")
+    # label_list.append("argument_lower_bound")
+    # label_list.append("argument_upper_bound")
     #label = "argument_occurrence_binary"
     #label = "template_relevance"
     #label = "clause_occurrence_in_counter_examples_binary"
@@ -26,31 +26,34 @@ def main():
     form_label = True
     from_json = True
     file_type = ".smt2"
-    GPU=True
+    GPU=False
     pickle = True
-    benchmark_name="LIA-lin-noInterval-trainData-datafold-graphs/"
+    benchmark_name="small-dataset-sat-datafold-same-train-valid-test/"
     for label in label_list:
+        parameter_list.append(
+            parameters(relative_path="../benchmarks/"+benchmark_name,
+                       absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
+                       json_type=".hyperEdgeHornGraph.JSON", label=label))
+        # parameter_list.append(
+        #     parameters(relative_path="../benchmarks/" + benchmark_name,
+        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+        #                json_type=".mono-layerHornGraph.JSON", label=label))
         # parameter_list.append(
         #     parameters(relative_path="../benchmarks/"+benchmark_name,
         #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
-        #                json_type=".hyperEdgeHornGraph.JSON", label=label))
-        parameter_list.append(
-            parameters(relative_path="../benchmarks/" + benchmark_name,
-                       absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
-                       json_type=".mono-layerHornGraph.JSON", label=label))
-        parameter_list.append(
-            parameters(relative_path="../benchmarks/"+benchmark_name,
-                       absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
-                       json_type=".hybrid-layerHornGraph.JSON", label=label))
-        parameter_list.append(
-            parameters(relative_path="../benchmarks/"+benchmark_name,
-                       absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
-                       json_type=".bi-layerHornGraph.JSON", label=label))
-
-        parameter_list.append(
-            parameters(relative_path="../benchmarks/" + benchmark_name,
-                       absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
-                       json_type=".clause-related-task-layerHornGraph.JSON", label=label))
+        #                json_type=".hybrid-layerHornGraph.JSON", label=label))
+        # parameter_list.append(
+        #     parameters(relative_path="../benchmarks/"+benchmark_name,
+        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
+        #                json_type=".bi-layerHornGraph.JSON", label=label))
+        # parameter_list.append(
+        #     parameters(relative_path="../benchmarks/" + benchmark_name,
+        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+        #                json_type=".clause-related-task-layerHornGraph.JSON", label=label))
+        # parameter_list.append(
+        #     parameters(relative_path="../benchmarks/" + benchmark_name,
+        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+        #                json_type=".fine-grained-edge-type-layerHornGraph.JSON", label=label))
 
 
 
@@ -78,11 +81,6 @@ def main():
                             train_n_times=1, path=param.relative_path, file_type=file_type, form_label=form_label,from_json=from_json,
                             json_type=param.json_type, GPU=GPU, pickle=pickle)
         tf.keras.backend.clear_session()
-
-
-
-
-
 
 class parameters():
     def __init__(self, relative_path,absolute_path,json_type,label):
