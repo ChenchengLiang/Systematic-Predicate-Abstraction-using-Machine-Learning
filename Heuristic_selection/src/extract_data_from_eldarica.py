@@ -68,7 +68,7 @@ def extract_train_data_pool(filePath,fun,countinous_extract=False,parameterList=
             else:
                 for file in glob.glob(root + "/*.smt2"):
                     file_list.append([file,parameterList])
-    pool = Pool(processes=4)
+    pool = Pool(processes=6)
     pool.map(fun, file_list)
 
 
@@ -77,8 +77,9 @@ def main():
     #todo: extract template dataset
     #"-extractPredicates","-noIntervals","-absTimeout:120","getLabelFromCE","-getHornGraph","-getHornGraph:biDirectionLayerGraph","-getHornGraph:hyperEdgeGraph","-getHornGraph:monoDirectionLayerGraph","-getHornGraph:hybridDirectionLayerGraph","fineGrainedEdgeTypeLayerGraph"
     #parameterList = ["-getLabelFromCE", "-abstract:manual"]
-    parameterList = ["-getHornGraph:hyperEdgeGraph","-abstract:manual"]
-    #parameterList = ["-extractPredicates","-absTimeout:120","-noIntervals", "-abstract:manual"]
-    extract_train_data_pool("../benchmarks/LIA-lin-noInterval-trainData-datafold-graphs-temp/",extract_graph_from_eldarica,countinous_extract=False,parameterList=parameterList)
+    #parameterList = ["-getHornGraph","-abstract:manual"]
+    parameterList = ["-generateSimplePredicates","-noIntervals", "-abstract"]
+    #parameterList = ["-noIntervals", "-abstract:off","-generateSimplePredicates"]
+    extract_train_data_pool("../benchmarks/small-dataset-trainData-datafold-test/",extract_graph_from_eldarica,countinous_extract=True,parameterList=parameterList)
 
 main()

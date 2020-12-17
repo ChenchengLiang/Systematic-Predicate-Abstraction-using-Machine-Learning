@@ -23,7 +23,7 @@ def main():
     from_json = True
     file_type = ".smt2"
     GPU = False
-    pickle = False
+    pickle = True
     print("read from ",sys.argv[1])
     path=sys.argv[1]
     param = parameters(path,json_type=".hyperEdgeHornGraph.JSON", label="predicate_occurrence_in_SCG")

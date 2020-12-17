@@ -28,57 +28,35 @@
  */
 
 package lazabs.horn
-
-import java.io.{File, PrintWriter}
 import java.lang.System.currentTimeMillis
-
 import lazabs.ast.ASTree._
-import global._
 import bottomup.{HornTranslator, _}
-import bottomup.HornPredAbs.RelationSymbol
 import abstractions.{AbsLattice, AbsReader, EmptyVerificationHints, VerificationHints}
 import ap.parser._
-import IExpression.{ConstantTerm, Predicate, and, _}
-import ap.types.MonoSortedPredicate
-import lazabs.{GlobalParameters, ParallelComputation}
-import lazabs.horn.bottomup.HornClauses.{Clause, ConstraintClause, IConstraintClause, Literal}
-import lazabs.horn.bottomup.Util.Dag
-import lazabs.horn.preprocessor.{DefaultPreprocessor, HornPreprocessor}
-import lazabs.prover.PrincessWrapper
-import lazabs.prover.PrincessWrapper.{formula2Eldarica, formula2Princess, type2Sort}
-import lazabs.utils.Manip.freeVars
-
-import scala.collection.mutable.LinkedHashMap
+import IExpression.{ConstantTerm, Eq, Geq, Predicate, Quantifier}
+import bottomup.HornClauses.Clause
+import bottomup.Util.Dag
 import ap.parser._
-import ap.SimpleAPI
-import ap.SimpleAPI.ProverStatus
-import ap.types.MonoSortedPredicate
 import lazabs.GlobalParameters
-import lazabs.ParallelComputation
-import lazabs.Main.{StoppedException, TimeoutException}
-import lazabs.horn.preprocessor.{DefaultPreprocessor, HornPreprocessor}
-import HornPreprocessor.BackTranslator
-import lazabs.horn.bottomup.HornClauses._
-import lazabs.horn.global._
-import lazabs.utils.Manip._
-import lazabs.prover.PrincessWrapper
-import PrincessWrapper._
-import lazabs.prover.Tree
-import lazabs.types.Type
-import lazabs.horn.bottomup.Util._
-import HornPredAbs.RelationSymbol
-import lazabs.horn.abstractions._
+import lazabs.Main.TimeoutException
+import preprocessor.{DefaultPreprocessor, HornPreprocessor}
+import bottomup.HornClauses._
+import global._
+import abstractions._
 import AbstractionRecord.AbstractionMap
 import ap.terfor.conjunctions.Conjunction
-import lazabs.horn.concurrency.HintsSelection.{getClausesInCounterExamples, initialIDForHints}
-import lazabs.horn.concurrency._
+import concurrency.HintsSelection.{getClausesInCounterExamples, initialIDForHints}
+import concurrency._
+import ap.basetypes.IdealInt
+import ap.terfor.{ConstantTerm, Formula}
+import ap.theories.TheoryCollector
+import ap.types.TypeTheory
+import bottomup.DisjInterpolator.AndOrNode
+import lazabs.horn.bottomup.HornPredAbs.{RelationSymbol, RelationSymbolPred, SymbolFactory}
+import lazabs.horn.bottomup.PrincessFlataWrappers.MHashMap
 
-import scala.collection.immutable.ListMap
-import scala.collection.mutable.{LinkedHashMap, HashMap => MHashMap, HashSet => MHashSet}
-import lazabs.horn.abstractions.VerificationHints.{VerifHintElement, _}
-import lazabs.horn.bottomup.DisjInterpolator.AndOrNode
-import lazabs.horn.concurrency.DrawHornGraph.HornGraphType
-import lazabs.viewer.HornPrinter
+import scala.collection.mutable.ArrayBuffer
+
 
 object TrainDataGeneratorPredicatesSmt2 {
   def apply(clauseSet: Seq[HornClause],
@@ -242,10 +220,6 @@ object TrainDataGeneratorPredicatesSmt2 {
       //            disjunctive, outStream).result
       //        }
 
-
-
-
-
       val abstractionType =
         lazabs.GlobalParameters.get.templateBasedInterpolationType
 
@@ -296,15 +270,12 @@ object TrainDataGeneratorPredicatesSmt2 {
 
       /////////////////////////predicates extracting begin///////////////////////////////
 
-      val timeOut = GlobalParameters.get.threadTimeout //timeout
-      val solvabilityTimeout=GlobalParameters.get.solvabilityTimeout
-
       println("extract original predicates")
       //check solvability
       val startTimeCEGAR = currentTimeMillis
       val toParamsCEGAR = GlobalParameters.get.clone
       toParamsCEGAR.timeoutChecker = () => {
-        if ((currentTimeMillis - startTimeCEGAR) > solvabilityTimeout * 1000) //timeout milliseconds
+        if ((currentTimeMillis - startTimeCEGAR) > GlobalParameters.get.solvabilityTimeout ) //timeout seconds
           throw lazabs.Main.TimeoutException //Main.TimeoutException
       }
       try{
@@ -316,231 +287,184 @@ object TrainDataGeneratorPredicatesSmt2 {
         }
       catch {
         case lazabs.Main.TimeoutException => {
+          val sourceFilename=GlobalParameters.get.fileName
+          val destinationFilename= "../solvability-timeout/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length)
+          HintsSelection.copyRenameFile(sourceFilename,destinationFilename)
           throw TimeoutException
         }
       }
 
-      val Cegar = new HornPredAbs(simplifiedClauses,
-        simpHints.toInitialPredicates, predGenerator,
-        counterexampleMethod)
+      val simplePredicatesGeneratorClauses = GlobalParameters.get.hornGraphType match {
+        case DrawHornGraph.HornGraphType.hyperEdgeGraph | DrawHornGraph.HornGraphType.equivalentHyperedgeGraph | DrawHornGraph.HornGraphType.concretizedHyperedgeGraph => for(clause<-simplifiedClauses) yield clause.normalize()
+        case _ => simplifiedClauses
+      }
 
-      val lastPredicates = Cegar.predicates
+
+      val originalPredicates =
+        if(GlobalParameters.get.generateSimplePredicates==true) {
+          HintsSelection.getSimplePredicates(simplePredicatesGeneratorClauses)
+        }else{
+          val Cegar = new HornPredAbs(simplePredicatesGeneratorClauses,
+            simpHints.toInitialPredicates, predGenerator,
+            counterexampleMethod)
+          val lastPredicates = Cegar.predicates
+          (if (!Cegar.predicates.isEmpty){
+            var numberOfpredicates = 0
+            for ((head, preds) <- lastPredicates) yield{
+              // transfor Map[relationSymbols.values,ArrayBuffer[RelationSymbolPred]] to Map[Predicate, Seq[IFormula]]
+              val subst = (for ((c, n) <- head.arguments.head.iterator.zipWithIndex) yield (c, IVariable(n))).toMap
+              println(subst)
+              //val headPredicate=new Predicate(head.name,head.arity) //class Predicate(val name : String, val arity : Int)
+              val predicateSequence = for (p <- preds) yield {
+                val simplifiedPredicate = (new Simplifier) (Internal2InputAbsy(p.rawPred, p.rs.sf.getFunctionEnc().predTranslation))
+                val varPred = ConstantSubstVisitor(simplifiedPredicate, subst) //transform variables to _1,_2,_3...
+                numberOfpredicates = numberOfpredicates + 1
+                varPred
+              }
+              (head.pred -> predicateSequence.distinct)
+            }
+          } else Map()).asInstanceOf[Map[Predicate,Seq[IFormula]]]
+        }
+
 
 
       //predicates selection begin
-      val file = GlobalParameters.get.fileName
-      val fileName = file.substring(file.lastIndexOf("/") + 1)
-
-
-      ////////////////////
-      if (lastPredicates.isEmpty) {
-        //return VerificationHints(Map())
-        var originalPredicates: Map[Predicate, Seq[IFormula]] = Map()
-      }
-      else {
-        var originalPredicates: Map[Predicate, Seq[IFormula]] = Map()
-        //show original predicates
-        var numberOfpredicates = 0
-        println("Original predicates:")
-        for ((head, preds) <- lastPredicates) {
-          // transfor Map[relationSymbols.values,ArrayBuffer[RelationSymbolPred]] to Map[Predicate, Seq[IFormula]]
-          println("key:" + head.pred)
-          val subst = (for ((c, n) <- head.arguments.head.iterator.zipWithIndex) yield (c, IVariable(n))).toMap
-          //val headPredicate=new Predicate(head.name,head.arity) //class Predicate(val name : String, val arity : Int)
-          val predicateSequence = for (p <- preds) yield {
-            val simplifiedPredicate = (new Simplifier) (Internal2InputAbsy(p.rawPred, p.rs.sf.getFunctionEnc().predTranslation))
-            //println("value:"+simplifiedPredicate)
-            val varPred = ConstantSubstVisitor(simplifiedPredicate, subst) //transform variables to _1,_2,_3...
-            println("value:" + varPred)
-            numberOfpredicates = numberOfpredicates + 1
-            varPred
-          }
-          originalPredicates = originalPredicates ++ Map(head.pred -> predicateSequence.distinct)
-        }
-
-
+      if (!originalPredicates.isEmpty) {
         //transform Map[Predicate,Seq[IFomula] to VerificationHints:[Predicate,VerifHintElement]
-        var initialPredicates = VerificationHints(Map())
-        for ((head, preds) <- originalPredicates) {
-          var x: Seq[VerifHintElement] = Seq()
-          for (p <- preds) {
-            x = x ++ Seq(VerificationHints.VerifHintInitPred(p))
-          }
-          initialPredicates = initialPredicates.addPredicateHints(Map(head -> x))
-        }
+        val initialPredicates = HintsSelection.transformPredicateMapToVerificationHints(originalPredicates)
 
         val sortedHints = HintsSelection.sortHints(initialPredicates)
-        if (sortedHints.isEmpty) {} else {
-          //write selected hints with IDs to file
-          val InitialHintsWithID =  HintsSelection.initialIDForHints(sortedHints) //ID:head->hint
-          println("---initialHints-----")
-          for (wrappedHint <- InitialHintsWithID) {
-            println(wrappedHint.ID.toString,wrappedHint.head,wrappedHint.hint)
-          }
+        //write selected hints with IDs to file
+        val InitialHintsWithID =  HintsSelection.initialIDForHints(sortedHints) //ID:head->hint
+        println("---initialHints-----")
+        for (wrappedHint <- InitialHintsWithID) {
+          println(wrappedHint.ID.toString,wrappedHint.head,wrappedHint.hint)
+        }
 
 //          println("------------test original predicates-------")
-//          new HornPredAbs(simplifiedClauses,
+//          new HornPredAbs(simplePredicatesGeneratorClauses,
 //            originalPredicates,//need Map[Predicate, Seq[IFormula]]
 //            predGenerator,predicateFlag=false).result
 
-          //Predicate selection begin
-          println("------Predicates selection begin----")
-          val exceptionalPredGen: Dag[AndOrNode[HornPredAbs.NormClause, Unit]] =>
-            Either[Seq[(Predicate, Seq[Conjunction])],
-              Dag[(IAtom, HornPredAbs.NormClause)]] =
-            (x: Dag[AndOrNode[HornPredAbs.NormClause, Unit]]) =>
-              //throw new RuntimeException("interpolator exception")
-              throw lazabs.Main.TimeoutException
+        //Predicate selection begin
+        println("------Predicates selection begin----")
+        val exceptionalPredGen: Dag[AndOrNode[HornPredAbs.NormClause, Unit]] =>  //not generate new predicates
+          Either[Seq[(Predicate, Seq[Conjunction])],
+            Dag[(IAtom, HornPredAbs.NormClause)]] =
+          (x: Dag[AndOrNode[HornPredAbs.NormClause, Unit]]) =>
+            //throw new RuntimeException("interpolator exception")
+            throw lazabs.Main.TimeoutException //if catch Counterexample and generate predicates, throw timeout exception
 
-          var PositiveHintsWithID:Seq[wrappedHintWithID]=Seq()
-          var NegativeHintsWithID:Seq[wrappedHintWithID]=Seq()
-          var optimizedPredicate: Map[Predicate, Seq[IFormula]] = Map()
-          var currentPredicate: Map[Predicate, Seq[IFormula]] = originalPredicates
-          for ((head, preds) <- originalPredicates) {
-            // transfor Map[relationSymbols.values,ArrayBuffer[RelationSymbolPred]] to Map[Predicate, Seq[IFormula]]
-            var criticalPredicatesSeq: Seq[IFormula] = Seq()
-            var redundantPredicatesSeq: Seq[IFormula] = Seq()
+        var PositiveHintsWithID:Seq[wrappedHintWithID]=Seq()
+        var NegativeHintsWithID:Seq[wrappedHintWithID]=Seq()
+        var optimizedPredicate: Map[Predicate, Seq[IFormula]] = Map()
+        var currentPredicate: Map[Predicate, Seq[IFormula]] = originalPredicates
+        for ((head, preds) <- originalPredicates) {
+          var criticalPredicatesSeq: Seq[IFormula] = Seq()
+          var redundantPredicatesSeq: Seq[IFormula] = Seq()
 
-            for (p <- preds) {
-              println("before delete")
-              println("head", head)
-              println("predicates", currentPredicate(head)) //key not found
-              //delete one predicate
-              println("delete predicate", p)
-              val currentPredicateSeq = currentPredicate(head).filter(_ != p) //delete one predicate
-              currentPredicate = currentPredicate.filterKeys(_ != head) //delete original head
-              currentPredicate = currentPredicate ++ Map(head -> currentPredicateSeq) //add the head with deleted predicate
-              println("after delete")
-              println("head", head)
-              println("predicates", currentPredicate(head))
+          for (p <- preds) {
+            println("before delete")
+            println("head", head)
+            println("predicates", currentPredicate(head)) //key not found
+            //delete one predicate
+            println("delete predicate", p)
+            val currentPredicateSeq = currentPredicate(head).filter(_ != p) //delete one predicate
+            currentPredicate = currentPredicate.filterKeys(_ != head) //delete original head
+            currentPredicate = currentPredicate ++ Map(head -> currentPredicateSeq) //add the head with deleted predicate
+            println("after delete")
+            println("head", head)
+            println("predicates", currentPredicate(head))
+            println("currentPredicate",currentPredicate)
 
-              //try cegar
-              val startTime = currentTimeMillis
-              val toParams = GlobalParameters.get.clone
-              toParams.timeoutChecker = () => {
-                if ((currentTimeMillis - startTime) > timeOut * 1000) //timeout milliseconds
-                  throw lazabs.Main.TimeoutException //Main.TimeoutException
-              }
-              try {
-                GlobalParameters.parameters.withValue(toParams) {
-                  println(
-                    "----------------------------------- CEGAR --------------------------------------")
-
-                  new HornPredAbs(simplifiedClauses, // loop
-                    currentPredicate, //emptyHints
-                    exceptionalPredGen).result
-                  //not timeout
-                  redundantPredicatesSeq = redundantPredicatesSeq ++ Seq(p)
-                  //add useless hint to NegativeHintsWithID   //ID:head->hint
-                  for (wrappedHint <- InitialHintsWithID) { //add useless hint to NegativeHintsWithID   //ID:head->hint
-                    val pVerifHintInitPred="VerifHintInitPred("+p.toString+")"
-                    if (head.name.toString == wrappedHint.head && wrappedHint.hint == pVerifHintInitPred) {
-                      NegativeHintsWithID =NegativeHintsWithID++Seq(wrappedHint)
-                    }
+            //try cegar
+            val startTime = System.currentTimeMillis()
+            val toParams = GlobalParameters.get.clone
+            toParams.timeoutChecker = () => {
+              if ((currentTimeMillis - startTime) > GlobalParameters.get.threadTimeout)
+                throw lazabs.Main.TimeoutException //Main.TimeoutException
+            }
+            try {
+              GlobalParameters.parameters.withValue(toParams) {
+                println("----------------------------------- CEGAR --------------------------------------")
+                new HornPredAbs(simplePredicatesGeneratorClauses,
+                  currentPredicate,
+                  exceptionalPredGen).result
+                //not timeout
+                redundantPredicatesSeq = redundantPredicatesSeq ++ Seq(p)
+                //add useless hint to NegativeHintsWithID   //ID:head->hint
+                for (wrappedHint <- InitialHintsWithID) { //add useless hint to NegativeHintsWithID   //ID:head->hint
+                  val pVerifHintInitPred="VerifHintInitPred("+p.toString+")"
+                  if (head.name == wrappedHint.head && wrappedHint.hint == pVerifHintInitPred) {
+                    NegativeHintsWithID =NegativeHintsWithID++Seq(wrappedHint)
                   }
                 }
-              } catch {
-                case lazabs.Main.TimeoutException => {
-                  //catch timeout
-                  criticalPredicatesSeq = criticalPredicatesSeq ++ Seq(p)
-                  //add deleted predicate back to curren predicate
-                  currentPredicate = currentPredicate.filterKeys(_ != head) //delete original head
-                  currentPredicate = currentPredicate ++ Map(head -> (currentPredicateSeq ++ Seq(p))) //add the head with deleted predicate
-                  //add useful hint to PositiveHintsWithID
-                  for(wrappedHint<-InitialHintsWithID){
-                    val pVerifHintInitPred="VerifHintInitPred("+p.toString+")"
-                    if(head.name.toString()==wrappedHint.head && wrappedHint.hint==pVerifHintInitPred){
-                      PositiveHintsWithID=PositiveHintsWithID++Seq(wrappedHint)
-                    }
+              }
+            } catch {
+              case lazabs.Main.TimeoutException => { //need new predicate or timeout
+                criticalPredicatesSeq = criticalPredicatesSeq ++ Seq(p)
+                //add deleted predicate back to curren predicate
+                currentPredicate = currentPredicate.filterKeys(_ != head) //delete original head
+                currentPredicate = currentPredicate ++ Map(head -> (currentPredicateSeq ++ Seq(p))) //add the head with deleted predicate
+                //add useful hint to PositiveHintsWithID
+                for(wrappedHint<-InitialHintsWithID){
+                  val pVerifHintInitPred="VerifHintInitPred("+p.toString+")"
+                  if(head.name.toString()==wrappedHint.head && wrappedHint.hint==pVerifHintInitPred){
+                    PositiveHintsWithID=PositiveHintsWithID++Seq(wrappedHint)
                   }
                 }
               }
             }
-            //store selected predicate
-            if (!criticalPredicatesSeq.isEmpty) {
-              optimizedPredicate = optimizedPredicate ++ Map(head -> criticalPredicatesSeq)
-            }
-            println("current head:", head.toString())
-            println("critical predicates:", criticalPredicatesSeq.toString())
-            println("redundant predicates", redundantPredicatesSeq.toString())
           }
-          //transform Map[Predicate,Seq[IFomula] to VerificationHints:[Predicate,VerifHintElement]
-          var selectedPredicates = VerificationHints(Map())
-          for ((head, fomulas) <- optimizedPredicate) {
-            var x: Seq[VerifHintElement] = Seq()
-            for (f <- fomulas) {
-              x = x ++ Seq(VerificationHints.VerifHintInitPred(f))
-            }
-            selectedPredicates = selectedPredicates.addPredicateHints(Map(head -> x))
+          //store selected predicate
+          if (!criticalPredicatesSeq.isEmpty) {
+            optimizedPredicate = optimizedPredicate ++ Map(head -> criticalPredicatesSeq)
           }
+          println("current head:", head.toString())
+          println("critical predicates:", criticalPredicatesSeq.toString())
+          println("redundant predicates", redundantPredicatesSeq.toString())
+        }
+        //transform Map[Predicate,Seq[IFomula] to VerificationHints:[Predicate,VerifHintElement]
+        val selectedPredicates= HintsSelection.transformPredicateMapToVerificationHints(optimizedPredicate)
 
-          println("\n------------predicates selection end-------------------------")
-          //println("\nsimpHints Hints:")
-          //simpHints.pretyPrintHints()
-          println("\nOptimized Hints:")
-          println("!@@@@")
-          selectedPredicates.pretyPrintHints()
-          println("@@@@!")
-          println("timeout:" + GlobalParameters.get.threadTimeout)
+        println("\n------------predicates selection end-------------------------")
+        println("\nOptimized Hints:")
+        println("!@@@@")
+        selectedPredicates.pretyPrintHints()
+        println("@@@@!")
+        println("timeout:" + GlobalParameters.get.threadTimeout + "ms")
 
+        try{
           println("\n------------test selected predicates-------------------------")
-          val test = new HornPredAbs(simplifiedClauses, // loop
-            selectedPredicates.toInitialPredicates, //emptyHints
+          val test = new HornPredAbs(simplePredicatesGeneratorClauses,
+            optimizedPredicate,
+            //selectedPredicates.toInitialPredicates,
             exceptionalPredGen).result
           println("-----------------test finished-----------------------")
 
-          if (selectedPredicates.isEmpty) {
-
-          } else {
+          if (!selectedPredicates.isEmpty){
             val hintsCollection=new VerificationHintsInfo(initialPredicates,selectedPredicates,initialPredicates.filterPredicates(selectedPredicates.predicateHints.keySet))
-            val clausesInCE=getClausesInCounterExamples(test,simplifiedClauses)
-            val clauseCollection = new ClauseInfo(simplifiedClauses,clausesInCE)
+            val clausesInCE=getClausesInCounterExamples(test,simplePredicatesGeneratorClauses)
+            val clauseCollection = new ClauseInfo(simplePredicatesGeneratorClauses,clausesInCE)
             //Output graphs
-            val argumentList = (for (p <- HornClauses.allPredicates(simplifiedClauses)) yield (p, p.arity)).toList
+            val argumentList = (for (p <- HornClauses.allPredicates(simplePredicatesGeneratorClauses)) yield (p, p.arity)).toList
             val argumentInfo = HintsSelection.writeArgumentOccurrenceInHintsToFile(GlobalParameters.get.fileName, argumentList, selectedPredicates,countOccurrence=true)
-            //val argumentInfo = HintsSelection.getArgumentBoundForSmt(argumentList,disjunctive,simplifiedClauses,simpHints,predGenerator)
-
             GraphTranslator.drawAllHornGraph(clauseCollection,hintsCollection,argumentInfo)
+          }
 
-
-
-            //val filePath=GlobalParameters.get.fileName.substring(0,GlobalParameters.get.fileName.lastIndexOf("/")+1)
-
-            //write initial, positive, negative hints to files
-//            HintsSelection.writeHintsWithIDToFile(InitialHintsWithID, fileName, "initial") //write hints and their ID to file
-//
-//            val writerPositive = new PrintWriter(new File(filePath + fileName+".positiveHints"))
-//            for(wrappedHint<-PositiveHintsWithID){
-//              writerPositive.write(wrappedHint.ID.toString+":"+wrappedHint.head+":"+wrappedHint.hint+"\n")
-//            }
-//            writerPositive.close()
-//            val writerNegative = new PrintWriter(new File(filePath + fileName+".negativeHints"))
-//            for(wrappedHint<-NegativeHintsWithID){
-//              writerNegative.write(wrappedHint.ID.toString+":"+wrappedHint.head+":"+wrappedHint.hint+"\n")
-//            }
-//            writerNegative.close()
-//            HintsSelection.writeHintsWithIDToFile(PositiveHintsWithID, fileName, "positive")
-//            HintsSelection.writeHintsWithIDToFile(NegativeHintsWithID, fileName, "negative")
-            //write horn clauses to file
-//            val writer = new PrintWriter(new File(filePath+fileName+".horn"))
-//            writer.write(HornPrinter(clauseSet))
-//            writer.close()
-            //HintsSelection.writeHornClausesToFile(system,GlobalParameters.get.fileName)
-
-            //write smt2 format to file
-//            if(GlobalParameters.get.fileName.endsWith(".c")){ //if it is a c file
-//              HintsSelection.writeSMTFormatToFile(simplifiedClauses,filePath)  //write smt2 format to file
-//            }
-//            if(GlobalParameters.get.fileName.endsWith(".smt2")){ //if it is a smt2 file
-//              //copy smt2 file
-//              HintsSelection.moveRenameFile(GlobalParameters.get.fileName,filePath+fileName)
-//            }
-            //clauses:Seq[HornClauses.Clause],clauseSet: Seq[HornClause]
-            //HintsSelection.writeHornAndGraphToFiles(selectedPredicates,sortedHints,simplifiedClauses,clauseSet)
+        }catch{
+          case lazabs.Main.TimeoutException =>{
+            println(Console.RED + "--test timeout--")
+            //todo: not include this to training example? because it can only provide negative training data
+            val sourceFilename=GlobalParameters.get.fileName
+            val destinationFilename= "../test-timeout/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length)
+            HintsSelection.copyRenameFile(sourceFilename,destinationFilename)
           }
         }
-      }
 
+
+
+      }
     }
   }
 }

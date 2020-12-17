@@ -28,7 +28,14 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters['graph_type'] = graph_type  # hyperEdgeHornGraph or layerHornGraph
     #parameters["message_calculation_class"]="rgcn"#rgcn,ggnn,rgat
     #parameters['num_heads'] = 2
-    parameters['hidden_dim'] = 64 #64
+    #parameters["global_exchange_dropout_rate"]=0
+    #parameters["layer_input_dropout_rate"]=0
+    #parameters["gnn_layer_input_dropout_rate"]=0
+    #parameters["graph_aggregation_dropout_rate"]=0
+    #parameters["regression_mlp_dropout"]=0
+    #parameters["scoring_mlp_dropout_rate"]=0
+    #parameters["residual_every_num_layers"]=10000000
+    parameters['hidden_dim'] = nodeFeatureDim #64
     #parameters["num_edge_MLP_hidden_layers"]
     parameters['num_layers'] = 2
     parameters['node_label_embedding_size'] = nodeFeatureDim
@@ -47,13 +54,13 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         "learning_rate": 0.001,
         "learning_rate_decay": 0.98,
         "momentum": 0.85,
-        "gradient_clip_value": 1.0,
+        "gradient_clip_value": 1, #1
         "use_intermediate_gnn_results": False,
     }
     parameters.update(these_hypers)
     #get dataset
     dataset=HornGraphDataset(parameters)
-    dataset._read_from_pickle = pickle
+    #dataset._read_from_pickle = pickle
     if pickle==True:
         if force_read==True:
             write_graph_to_pickle(benchmark=benchmark_name,  data_fold=["train", "valid", "test"],
@@ -148,8 +155,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             #print(data[0]) #input
             true_Y.extend(np.array(data[1]["node_labels"]))
 
-        mse_loaded_model = tf.keras.losses.MSE(
-            true_Y, predicted_Y_loaded_model)
+        mse_loaded_model = tf.keras.losses.MSE(true_Y, predicted_Y_loaded_model)
         print("\n mse_loaded_model_predicted_Y_and_True_Y", mse_loaded_model)
 
         print("true_Y", true_Y)
@@ -157,8 +163,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         print("predicted_Y_loaded_model", predicted_Y_loaded_model)
 
 
-        mse_mean = tf.keras.losses.MSE(
-            [np.mean(true_Y)]*len(true_Y), true_Y)
+        mse_mean = tf.keras.losses.MSE([np.mean(true_Y)]*len(true_Y), true_Y)
         print("\n mse_mean_Y_and_True_Y", mse_mean)
         mean_loss_list=mse_mean
         num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, tf.math.round(predicted_Y_loaded_model)),tf.int32))
@@ -219,6 +224,9 @@ def draw_training_results(train_loss_list_average, valid_loss_list_average, test
     plt.plot(valid_loss_list_average, color="green")
     plt.plot([mean_loss_list_average] * len(valid_loss_list), color="red")
     plt.plot([mse_loaded_model_average] * len(valid_loss_list), color="black")
+    y_range=[0,0.5]
+    plt.ylim(y_range)
+    plt.yticks(np.arange(min(y_range), max(y_range), 0.025))
     plt.ylabel('loss')
     plt.xlabel('epochs')
     train_loss_legend = mpatches.Patch(color='blue', label='train_loss')
@@ -337,7 +345,7 @@ class raw_graph_inputs():
 class parsed_graph_data:
     def __init__(self,graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
                  graphs_argument_scores,total_number_of_node,graph_control_location_indices,file_name_list,parsed_arguments,
-                 graphs_node_symbols,graphs_predicate_indices,graphs_learning_labels,vocabulary_set, token_map):
+                 graphs_node_symbols,graphs_label_indices,graphs_learning_labels,vocabulary_set, token_map):
         self.graphs_node_label_ids=graphs_node_label_ids
         self.graphs_argument_indices=graphs_argument_indices
         self.graphs_adjacency_lists=graphs_adjacency_lists
@@ -349,7 +357,7 @@ class parsed_graph_data:
         self.graphs_node_symbols=graphs_node_symbols
         self.vocabulary_set=vocabulary_set
         self.token_map=token_map
-        self.graphs_predicate_indices=graphs_predicate_indices
+        self.graphs_label_indices=graphs_label_indices
         self.graphs_learning_labels=graphs_learning_labels
 
 def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../",from_json=False,file_type=".smt2",json_type=".JSON",max_nodes_per_batch=10000,graph_type="hyperEdgeHornGraph"):
@@ -364,7 +372,7 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
         graphs_argument_scores = []
         parsed_arguments = []
         graphs_control_location_indices = []
-        graphs_predicate_indices = []
+        graphs_label_indices = []
         graphs_learning_labels = []
         total_number_of_node = 0
         file_type = file_type
@@ -412,10 +420,10 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                         graphs_node_symbols.append(loaded_graph["nodeSymbolList"])
                         #read label
                         if label=="predicate_occurrence_in_clauses":
-                            graphs_predicate_indices.append(loaded_graph["predicateIndices"])
+                            graphs_label_indices.append(loaded_graph["predicateIndices"])
                             graphs_learning_labels.append(loaded_graph["predicateOccurrenceInClause"])
                         elif label=="predicate_occurrence_in_SCG":
-                            graphs_predicate_indices.append(loaded_graph["predicateIndices"])
+                            graphs_label_indices.append(loaded_graph["predicateIndices"])
                             graphs_learning_labels.append(loaded_graph["predicateStrongConnectedComponent"])
                         elif label=="argument_bound" or label=="argument_lower_bound_existence" or label=="argument_upper_bound_existence" or label=="argument_lower_bound" or label=="argument_upper_bound":
                             graphs_argument_indices.append(loaded_graph["argumentIndices"])
@@ -426,10 +434,10 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                             graphs_argument_indices.append(loaded_graph["argumentIndices"])
                             graphs_learning_labels.append(loaded_graph["argumentBinaryOccurrenceList"])
                         elif label=="template_relevance":
-                            graphs_predicate_indices.append(loaded_graph["templateIndices"])
+                            graphs_label_indices.append(loaded_graph["templateIndices"])
                             graphs_learning_labels.append(loaded_graph["templateRelevanceLabel"])
                         elif label=="clause_occurrence_in_counter_examples_binary":
-                            graphs_predicate_indices.append(loaded_graph["clauseIndices"])
+                            graphs_label_indices.append(loaded_graph["clauseIndices"])
                             graphs_learning_labels.append(loaded_graph["clauseBinaryOccurrenceInCounterExampleList"])
 
                         else:
@@ -441,15 +449,15 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                             graphs_argument_scores.append([int(argument.score) for argument in parsed_arguments])
                             graphs_control_location_indices.append(loaded_graph["controlLocationIndices"])
 
-                        if json_type==".hyperEdgeHornGraph.JSON": #read adjacency_lists
+                        if json_type==".hyperEdgeHornGraph.JSON" or json_type==".equivalent-hyperedgeGraph.JSON" or json_type==".concretized-hyperedgeGraph.JSON": #read adjacency_lists
                             #for hyperedge horn graph
                             graphs_adjacency_lists.append([
-                                # np.array(loaded_graph["argumentEdges"]),
-                                # np.array(loaded_graph["guardASTEdges"]),
-                                # np.array(loaded_graph["dataFlowASTEdges"]),
+                                np.array(loaded_graph["argumentEdges"]),
+                                np.array(loaded_graph["guardASTEdges"]),
+                                np.array(loaded_graph["dataFlowASTEdges"]),
                                 np.array(loaded_graph["binaryAdjacentList"]),
-                                # np.array(loaded_graph["controlFlowHyperEdges"]),
-                                # np.array(loaded_graph["dataFlowHyperEdges"]),
+                                np.array(loaded_graph["controlFlowHyperEdges"]),
+                                np.array(loaded_graph["dataFlowHyperEdges"]),
                                 np.array(loaded_graph["ternaryAdjacencyList"])
                             ])
                         else:
@@ -480,7 +488,6 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                                 np.array(loaded_graph["subTermScOperatorEdges"]),
                                 np.array(loaded_graph["binaryAdjacentList"]),
                                 #np.array(loaded_graph["unknownEdges"])
-
                             ])
                         total_number_of_node += len(loaded_graph["nodeIds"])
 
@@ -492,7 +499,7 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
 
         pickle_data=parsed_graph_data(graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
                                       graphs_argument_scores,total_number_of_node,graphs_control_location_indices,file_name_list,
-                                      parsed_arguments,graphs_node_symbols,graphs_predicate_indices,graphs_learning_labels,vocabulary_set, token_map)
+                                      parsed_arguments,graphs_node_symbols,graphs_label_indices,graphs_learning_labels,vocabulary_set, token_map)
         pickleWrite(pickle_data, "train-" +label+"-"+ graph_type +"-"+benchmark_name + "-gnnInput_" + df + "_data")
 
 
@@ -510,7 +517,7 @@ def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "
                                                                     parsed_dot_file.token_map,
                                                                     parsed_dot_file.file_name_list, benchmark, df,
                                                                     parsed_dot_file.graphs_argument_indices,
-                                                                    parsed_dot_file.graphs_predicate_indices,
+                                                                    parsed_dot_file.graphs_label_indices,
                                                                     parsed_dot_file.graphs_learning_labels,label,graph_type,gathered_nodes_binary_classification_task)
 
         else:
@@ -518,7 +525,7 @@ def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "
                                     parsed_dot_file.graphs_argument_indices, parsed_dot_file.graphs_adjacency_lists,
                                     parsed_dot_file.graphs_argument_scores, parsed_dot_file.total_number_of_node,
                                     parsed_dot_file.graphs_control_location_indices, parsed_dot_file.file_name_list,
-                                    parsed_dot_file.graphs_predicate_indices, parsed_dot_file.graphs_learning_labels,
+                                    parsed_dot_file.graphs_label_indices, parsed_dot_file.graphs_learning_labels,
                                     label, parsed_dot_file.vocabulary_set, parsed_dot_file.token_map, benchmark, df,graph_type)
 def get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,vocabulary_set,token_map):
     num_edge_types_list=[]
@@ -550,11 +557,11 @@ def get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,voca
 def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,graphs_node_symbols,
                                                             graphs_adjacency_lists,total_number_of_node,
                                                             vocabulary_set,token_map,file_name_list,benchmark,df,
-                                                            graphs_argument_indices,graphs_predicate_indices,graphs_learning_labels,label,graph_type,gathered_nodes_binary_classification_task,pickle=True):
+                                                            graphs_argument_indices,graphs_label_indices,graphs_learning_labels,label,graph_type,gathered_nodes_binary_classification_task,pickle=True):
     final_graphs=[]
     raw_data_graph=get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,vocabulary_set,token_map)
     if label=="predicate_occurrence_in_SCG" or label=="predicate_occurrence_in_clauses" or label=="template_relevance" or label=="clause_occurrence_in_counter_examples_binary":
-        graphs_node_indices=graphs_predicate_indices
+        graphs_node_indices=graphs_label_indices
     elif label=="argument_occurrence_binary":
         graphs_node_indices = graphs_argument_indices
     elif label=="argument_bound":
@@ -700,7 +707,7 @@ def form_argument_bound_label(graphs_argument_indices, graphs_learning_labels, g
 
 def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_argument_indices, graphs_adjacency_lists,
                             graphs_argument_scores, total_number_of_node,graphs_control_location_indices, file_name_list,
-                            graphs_predicate_indices,graphs_learning_labels,
+                            graphs_label_indices,graphs_learning_labels,
                             label,vocabulary_set,token_map,benchmark, df,graph_type,pickle=True,):
     final_graphs_v1 = []
     raw_data_graph = get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,vocabulary_set,token_map)
@@ -855,7 +862,8 @@ def build_vocabulary(datafold=["train", "valid", "test"], path="",json_type=".la
                 vocabulary_set.update(loaded_graph["nodeSymbolList"])
     token_map={}
     token_id=0
-    for word in vocabulary_set:
+
+    for word in sorted(vocabulary_set):
         token_map[word]=token_id
         token_id=token_id+1
     return vocabulary_set,token_map

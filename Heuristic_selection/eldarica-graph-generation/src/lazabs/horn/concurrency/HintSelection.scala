@@ -35,42 +35,91 @@ import lazabs.horn.abstractions.{AbstractionRecord, LoopDetector, StaticAbstract
 import lazabs.horn.bottomup._
 
 import scala.io.Source
-import scala.collection.mutable.{LinkedHashMap, ListBuffer, HashMap => MHashMap, HashSet => MHashSet}
+import scala.collection.mutable.{ArrayBuffer, LinkedHashMap, ListBuffer, HashMap => MHashMap, HashSet => MHashSet}
 import java.io.{File, FileWriter, PrintWriter}
-
 import ap.terfor.conjunctions.Conjunction
 import lazabs.horn.abstractions.AbstractionRecord.AbstractionMap
 import lazabs.horn.abstractions.VerificationHints.{VerifHintElement, _}
 import lazabs.horn.bottomup.DisjInterpolator.AndOrNode
 import lazabs.horn.bottomup.Util.{Dag, DagEmpty}
 import lazabs.horn.preprocessor.HornPreprocessor.{Clauses, VerificationHints}
-import java.nio.file.{Files, Paths, StandardCopyOption}
 
+import java.nio.file.{Files, Paths, StandardCopyOption}
 import ap.parser._
 import IExpression._
 import lazabs.horn.bottomup.HornClauses
-import java.lang.System.currentTimeMillis
 
+import java.lang.System.currentTimeMillis
 import ap.PresburgerTools
+import ap.basetypes.IdealInt
 import ap.theories.TheoryCollector
 import ap.types.TypeTheory
 import lazabs.horn.bottomup.HornClauses.Clause
 import lazabs.horn.bottomup.HornPredAbs.{NormClause, RelationSymbol, SymbolFactory}
+import lazabs.horn.preprocessor.HornPreprocessor
 
-class wrappedHintWithID {
-  var ID: Int = 0
-  var head: String = ""
-  var hint: String = ""
-
-  def this(ID: Int, head: String, hint: String) = {
-    this();
-    this.ID = ID;
-    this.head = head;
-    this.hint = hint;
-  }
-}
+case class wrappedHintWithID(ID:Int,head:String, hint:String)
 
 object HintsSelection {
+
+  def getSimplePredicates( simplePredicatesGeneratorClauses: HornPreprocessor.Clauses):  Map[Predicate, Seq[IFormula]] ={
+    for (clause <- simplePredicatesGeneratorClauses)
+      println(Console.BLUE + clause.toPrologString)
+
+    //todo: two option, predicate share constraints within clause. predicates share constraints cross all clauses
+    //todo: negate constrain for body
+    //todo:SimpleAPI.simplify()
+    val constraintPredicates = (for(clause <- simplePredicatesGeneratorClauses;atom<-clause.allAtoms) yield {
+      val subst=(for(const<-clause.constants;(arg,n)<-atom.args.zipWithIndex; if const.name==arg.toString) yield const->IVariable(n)).toMap
+      val argumentReplacedPredicates= for(constraint <- LineariseVisitor(ConstantSubstVisitor(clause.constraint,subst), IBinJunctor.And)) yield constraint
+      val freeVariableReplacedPredicates= for(p<-argumentReplacedPredicates) yield{
+        val constants=SymbolCollector.constants(p)
+        if(constants.isEmpty)
+          p
+        else
+          IExpression.quanConsts(Quantifier.EX,constants,p)
+      }
+      atom.pred-> freeVariableReplacedPredicates
+    }).groupBy(_._1).mapValues(_.flatMap(_._2).distinct)
+    for(cc<-constraintPredicates; b<-cc._2) println(cc._1,b)
+    println("-----------------")
+
+    //generate arguments =/<=/>= a constant as predicates
+    val eqConstant: IdealInt = IdealInt(42)
+    val argumentConstantEqualPredicate = (for (clause <- simplePredicatesGeneratorClauses; atom <- clause.allAtoms) yield atom.pred ->(for((arg,n) <- atom.args.zipWithIndex) yield Seq(Eq(IVariable(n),eqConstant),Geq(IVariable(n),eqConstant),Geq(eqConstant,IVariable(n)))).flatten).groupBy(_._1).mapValues(_.flatMap(_._2).distinct)
+    for(cc<-argumentConstantEqualPredicate; b<-cc._2) println(cc._1,b)
+
+    //merge constraint and constant predicates
+    val simplelyGeneratedPredicates = for ((cpKey, cpPredicates) <- constraintPredicates; (apKey, apPredicates) <- argumentConstantEqualPredicate; if cpKey.equals(apKey)) yield cpKey -> (cpPredicates ++ apPredicates).distinct
+    for(cc<-simplelyGeneratedPredicates; b<-cc._2) println(Console.RED + cc._1,b)
+    //sys.exit()
+    simplelyGeneratedPredicates
+  }
+
+  def moveRenameFile(sourceFilename: String, destinationFilename: String): Unit = {
+    val path = Files.move(
+      Paths.get(sourceFilename),
+      Paths.get(destinationFilename),
+      StandardCopyOption.REPLACE_EXISTING
+    )
+    if (path != null) {
+      println(s"moved the file $sourceFilename successfully")
+    } else {
+      println(s"could NOT move the file $sourceFilename")
+    }
+  }
+  def copyRenameFile(sourceFilename: String, destinationFilename: String): Unit = {
+    val path = Files.copy(
+      Paths.get(sourceFilename),
+      Paths.get(destinationFilename),
+      StandardCopyOption.REPLACE_EXISTING
+    )
+    if (path != null) {
+      println(s"moved the file $sourceFilename successfully")
+    } else {
+      println(s"could NOT move the file $sourceFilename")
+    }
+  }
 
   def getClausesInCounterExamples(result: Either[Map[Predicate, IFormula], Dag[(IAtom, Clause)]], clauses: Clauses): Clauses = {
     if (result.isRight)
@@ -327,7 +376,7 @@ object HintsSelection {
           val startTime = currentTimeMillis
           val toParams = GlobalParameters.get.clone
           toParams.timeoutChecker = () => {
-            if ((currentTimeMillis - startTime) > timeOut * 1000) //timeout milliseconds
+            if ((currentTimeMillis - startTime) > timeOut ) //timeout milliseconds
               throw lazabs.Main.TimeoutException //Main.TimeoutException
           }
           try {
@@ -451,7 +500,7 @@ object HintsSelection {
           val startTime = currentTimeMillis
           val toParams = GlobalParameters.get.clone
           toParams.timeoutChecker = () => {
-            if ((currentTimeMillis - startTime) > timeOut * 1000) //timeout milliseconds
+            if ((currentTimeMillis - startTime) > timeOut ) //timeout milliseconds
               throw lazabs.Main.TimeoutException //Main.TimeoutException
           }
           try {
@@ -650,7 +699,7 @@ object HintsSelection {
           val startTime = currentTimeMillis
           val toParams = GlobalParameters.get.clone
           toParams.timeoutChecker = () => {
-            if ((currentTimeMillis - startTime) > timeOut * 1000) //timeout milliseconds
+            if ((currentTimeMillis - startTime) > timeOut ) //timeout milliseconds
               throw lazabs.Main.TimeoutException //Main.TimeoutException
           }
 
@@ -1123,28 +1172,23 @@ object HintsSelection {
       }
     }
 
-    return readHints
+    readHints
   }
 
+  def transformPredicateMapToVerificationHints(originalPredicates:Map[Predicate, Seq[IFormula]]):  VerificationHints ={
+    VerificationHints(
+      for ((head, preds) <- originalPredicates) yield
+        head -> (for (p <- preds) yield VerificationHints.VerifHintInitPred(p))
+    )
+  }
 
   def initialIDForHints(simpHints: VerificationHints): Seq[wrappedHintWithID] = {
-    //var HintsIDMap=Map("initialKey"->"")
-    var wrappedHintsList: Seq[wrappedHintWithID] = Seq()
-    var HintsIDMap: Map[String, String] = Map()
     var counter = 0
-
-    for ((head) <- simpHints.getPredicateHints().keys.toList) { //loop for head
-      for (oneHint <- simpHints.getValue(head)) { //loop for every template in the head
-        HintsIDMap ++= Map(counter.toString + ":" + head.name.toString() -> oneHint.toString) //map(ID:head->hint)
-        counter = counter + 1
-        val oneWrappedHint = new wrappedHintWithID(counter, head.name.toString, oneHint.toString)
-        wrappedHintsList = wrappedHintsList ++ Seq(oneWrappedHint)
-      }
+    val wrappedHintsList = for ((head,hints) <- simpHints.getPredicateHints();oneHint <- hints) yield{
+      counter = counter + 1
+      wrappedHintWithID(counter, head.name, oneHint.toString)
     }
-    //HintsIDMap=HintsIDMap-"initialKey"
-
-    return wrappedHintsList
-
+    wrappedHintsList.toSeq
   }
 
 
@@ -1183,14 +1227,6 @@ object HintsSelection {
 
   }
 
-  def moveRenameFile(source: String, destination: String): Unit = {
-    val path = Files.copy(
-      Paths.get(source),
-      Paths.get(destination),
-      StandardCopyOption.REPLACE_EXISTING
-    )
-    // could return `path`
-  }
 
   def getArgumentInfo(argumentList: List[(IExpression.Predicate, Int)]): ListBuffer[argumentInfo] = {
     var argID = 0

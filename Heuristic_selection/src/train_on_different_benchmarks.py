@@ -2,6 +2,8 @@ from horn_dataset import train_on_graphs
 import os
 from numba import cuda
 import tensorflow as tf
+import random
+import numpy as np
 def main():
     parameter_list = []
     label_list=[]
@@ -13,12 +15,12 @@ def main():
     # label_list.append("predicate_occurrence_in_clauses")
     # label_list.append("predicate_occurrence_in_SCG")
     # label="argument_bound"
-    label_list.append("argument_lower_bound_existence")
-    label_list.append("argument_upper_bound_existence")
+    # label_list.append("argument_lower_bound_existence")
+    # label_list.append("argument_upper_bound_existence")
     # label_list.append("argument_lower_bound")
     # label_list.append("argument_upper_bound")
     #label = "argument_occurrence_binary"
-    #label = "template_relevance"
+    label_list.append("template_relevance")
     #label = "clause_occurrence_in_counter_examples_binary"
     # json_type = ".hyperEdgeHornGraph.JSON"
     # json_type = ".layerHornGraph.JSON"
@@ -26,14 +28,29 @@ def main():
     form_label = True
     from_json = True
     file_type = ".smt2"
-    GPU=False
+    GPU=True
     pickle = True
-    benchmark_name="small-dataset-sat-datafold-same-train-valid-test/"
+    benchmark_name = "small-dataset-sat-datafold-same-train-valid-test/"
+
+    # random.seed(0)
+    # np.random.seed(0)
+    # tf.random.set_seed(0)
+
+
+
     for label in label_list:
         parameter_list.append(
             parameters(relative_path="../benchmarks/"+benchmark_name,
                        absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
                        json_type=".hyperEdgeHornGraph.JSON", label=label))
+        # parameter_list.append(
+        #     parameters(relative_path="../benchmarks/" + benchmark_name,
+        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+        #                json_type=".equivalent-hyperedgeGraph.JSON", label=label))
+        # parameter_list.append(
+        #     parameters(relative_path="../benchmarks/" + benchmark_name,
+        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+        #                json_type=".concretized-hyperedgeGraph.JSON", label=label))
         # parameter_list.append(
         #     parameters(relative_path="../benchmarks/" + benchmark_name,
         #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
@@ -54,8 +71,6 @@ def main():
         #     parameters(relative_path="../benchmarks/" + benchmark_name,
         #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
         #                json_type=".fine-grained-edge-type-layerHornGraph.JSON", label=label))
-
-
 
     if GPU==False:
         os.environ["CUDA_VISIBLE_DEVICES"] = "-1"

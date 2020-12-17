@@ -1,31 +1,19 @@
 import tf2_gnn
 from horn_dataset import HornGraphDataset
 from tf2_gnn.data import DataFold
-from horn_dataset import write_graph_to_pickle,form_GNN_inputs_and_labels,get_predicted_argument_list_divided_by_file
+from horn_dataset import write_graph_to_pickle,form_GNN_inputs_and_labels
 from Miscellaneous import clear_file,add_JSON_field
-from archived.dotToGraphInfo import parseArguments
 
-
-def write_predicted_argument_score_to_file(dataset,predicted_Y_loaded_model):
-    #write predicted results to .predicted_argument file
-    predicted_argument_score_list = get_predicted_argument_list_divided_by_file(dataset, predicted_Y_loaded_model)
-    for file,predicted_argument_score in zip(dataset._file_list["test"],predicted_argument_score_list):
-        argument_file=file+".arguments"
-        print("read argument from", argument_file)
-        with open(argument_file) as f:
-            parsed_arguments = parseArguments(f.read())
-            clear_file(file + ".predicted_argument")
-            with open(file + ".predicted_argument", 'w') as out_file:
-                for argument,score in zip(parsed_arguments,predicted_argument_score):
-                    out_file.write(argument.ID+":"+argument.head+":"+argument.arg+":"+str(float(score))+"\n")
 
 def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score_list,graph_type=".layerHornGraph.JSON"):
     # write predicted_argument_score to JSON file
-    old_field = ["nodeIds", "nodeSymbolList", "argumentIndices", "argumentIDList", "argumentNameList",
-                 "argumentOccurrence", "binaryAdjacentList", "predicateArgumentEdges",
-                 "predicateInstanceEdges", "argumentInstanceEdges","controlHeadEdges", "controlBodyEdges", "controlArgumentEdges",
-                 "guardEdges", "dataEdges"]
-    new_field = ["predictedArgumentScores"]
+    old_field = ["nodeIds", "nodeSymbolList","falseIndices", "argumentIndices", "controlLocationIndices",
+                     "binaryAdjacentList", "ternaryAdjacencyList","unknownEdges","argumentIDList", "argumentNameList",
+                     "argumentEdges","guardASTEdges","dataFlowASTEdges","controlFlowHyperEdges","dataFlowHyperEdges",
+                     "argumentOccurrence","predicateIndices","predicateOccurrenceInClause","predicateStrongConnectedComponent",
+                 "argumentBoundList","argumentBinaryOccurrenceList","templateIndices","templateRelevanceLabel","clauseIndices",
+                 "clauseBinaryOccurrenceInCounterExampleList","templateASTEdges","templateEdges","dummyFiled"]
+    new_field = ["predictedLabel"]
     for file, predicted_argument_score in zip(dataset._file_list["test"], predicted_argument_score_list):
         # # read argument id and name from .argument file
         # argument_file = file + ".arguments"
@@ -67,12 +55,44 @@ def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score
         # clear_file(json_file)
         # with open(json_file, 'w') as f:
         #     json.dump(json_obj, f)
+def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_type):
+    current_positon=0
+    for g,file_name in zip(dataset._loaded_data[DataFold.TEST],dataset._file_list["test"]):
+        predicted_label=predicted_Y_loaded_model[current_positon:current_positon+len(g._node_label)]
+        current_positon=current_positon+len(g._node_label)
+        print("file_name",file_name)
+        print("g.node_indices", len(g._node_indices),g._node_indices)
+        print("g.node_label",len(g._node_label), g._node_label)
+        print("predicted_label",predicted_label)
+        #todo: decide threshold later
+        threshold=0.5
+        transfomed_predicted_label=[(lambda l : 1 if l>threshold else 0) (l) for l in predicted_label]
+        print("transfomed_predicted_label",transfomed_predicted_label)
+
+        old_field = ["nodeIds", "nodeSymbolList", "falseIndices", "argumentIndices", "controlLocationIndices",
+                     "binaryAdjacentList", "ternaryAdjacencyList", "unknownEdges", "argumentIDList", "argumentNameList",
+                     "argumentEdges", "guardASTEdges", "dataFlowASTEdges", "controlFlowHyperEdges",
+                     "dataFlowHyperEdges",
+                     "argumentOccurrence", "predicateIndices", "predicateOccurrenceInClause",
+                     "predicateStrongConnectedComponent",
+                     "argumentBoundList", "argumentBinaryOccurrenceList", "templateIndices", "templateRelevanceLabel",
+                     "clauseIndices",
+                     "clauseBinaryOccurrenceInCounterExampleList", "templateASTEdges", "templateEdges", "dummyFiled"]
+        new_field = ["predictedLabel"]
+        new_filed_content=[transfomed_predicted_label]
+
+        add_JSON_field(file_name,graph_type,old_field,new_field,new_filed_content)
+
 
 
 def main():
-    path="../benchmarks/temp-test-1/"
-    trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2020-09-26_16-53-17_best.pkl"
-    json_type=".layerHornGraph.JSON"
+    path="../benchmarks/small-dataset-trainData-datafold-test/"
+    trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2020-12-16_22-44-39_best.pkl"
+    json_type=".hyperEdgeHornGraph.JSON"
+    graph_type = json_type[1:json_type.find(".JSON")]
+    gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
+                                                 "argument_upper_bound_existence", "argument_occurrence_binary",
+                                                 "template_relevance", "clause_occurrence_in_counter_examples_binary"]
 
     benchmark_name = path[len("../benchmarks/"):-1]
     force_read=True
@@ -82,24 +102,29 @@ def main():
     # label = "argument_identify"
     # label = "argument_identify_no_batchs"
     # label = "control_location_identify"
-    label = "predicate_occurrence_in_SCG"
+    #label = "predicate_occurrence_in_SCG"
+    label = "template_relevance"
+
+    parameters = tf2_gnn.GNN.get_default_hyperparameters()
+    parameters["benchmark"] = benchmark_name
+    parameters["label_type"] = label
+    parameters["graph_type"] = graph_type
+    parameters['max_nodes_per_batch'] = 10000
+    parameters["gathered_nodes_binary_classification_task"] = gathered_nodes_binary_classification_task
 
     if force_read==True:
-        write_graph_to_pickle(benchmark_name,  data_fold=["test"], label=label,path=path,from_json=True,file_type="smt2",json_type=json_type)
+        write_graph_to_pickle(benchmark_name,  data_fold=["test"], label=label,path=path,from_json=True,file_type="smt2",json_type=json_type,graph_type=graph_type,max_nodes_per_batch=parameters['max_nodes_per_batch'])
     else:
         print("Use pickle data for training")
     #if form_label == True and not os.path.isfile("../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):
     if form_label == True:
-        form_GNN_inputs_and_labels(label=label, datafold=["test"], benchmark=benchmark_name)
+        form_GNN_inputs_and_labels(label=label, datafold=["test"], benchmark=benchmark_name,graph_type=graph_type,gathered_nodes_binary_classification_task=gathered_nodes_binary_classification_task)
 
 
     quiet=False
 
 
-    parameters = tf2_gnn.GNN.get_default_hyperparameters()
-    parameters["benchmark"] = benchmark_name
-    parameters["label_type"] = label
-    parameters['max_nodes_per_batch'] = 10000
+
     dataset = HornGraphDataset(parameters)
     dataset.load_data([DataFold.TEST])
     test_data = dataset.get_tensorflow_dataset(DataFold.TEST)
@@ -112,13 +137,11 @@ def main():
     print("test_metric",test_metric)
 
 
+    #todo: write predicted results back to JSON file
 
-    predicted_argument_score_list = get_predicted_argument_list_divided_by_file(dataset, predicted_Y_loaded_model)
+    write_predicted_label_to_JSON_file(dataset, predicted_Y_loaded_model,json_type)
 
-    # write predicted results to .predicted_argument file
-    write_predicted_argument_score_to_file(dataset, predicted_Y_loaded_model)
-    #write predicted_argument_score to JSON file
-    write_predicted_argument_score_to_json_file(dataset,predicted_argument_score_list)
+
 
 
 main()
