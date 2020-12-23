@@ -31,7 +31,7 @@ package lazabs.horn.concurrency
 import ap.terfor.preds.Predicate
 import ap.parser.{IExpression, _}
 import lazabs.GlobalParameters
-import lazabs.horn.abstractions.{AbstractionRecord, LoopDetector, StaticAbstractionBuilder, VerificationHints}
+import lazabs.horn.abstractions.{AbsReader, AbstractionRecord, EmptyVerificationHints, LoopDetector, StaticAbstractionBuilder, VerificationHints}
 import lazabs.horn.bottomup._
 
 import scala.io.Source
@@ -46,11 +46,11 @@ import lazabs.horn.preprocessor.HornPreprocessor.{Clauses, VerificationHints}
 
 import java.nio.file.{Files, Paths, StandardCopyOption}
 import ap.parser._
-import IExpression._
+import IExpression.{Predicate, _}
 import lazabs.horn.bottomup.HornClauses
 
 import java.lang.System.currentTimeMillis
-import ap.PresburgerTools
+import ap.{PresburgerTools, SimpleAPI}
 import ap.basetypes.IdealInt
 import ap.theories.TheoryCollector
 import ap.types.TypeTheory
@@ -62,36 +62,82 @@ case class wrappedHintWithID(ID:Int,head:String, hint:String)
 
 object HintsSelection {
 
+  def readHints(filename : String,
+                name2Pred : Map[String, Predicate])
+  : VerificationHints = filename match {
+    case "" =>
+      EmptyVerificationHints
+    case hintsFile => {
+      val reader = new AbsReader (
+        new java.io.BufferedReader (
+          new java.io.FileReader(hintsFile)))
+      val hints =
+        (for ((predName, hints) <- reader.allHints.iterator;
+              pred = name2Pred get predName;
+              if {
+                if (pred.isDefined) {
+                  if (pred.get.arity != reader.predArities(predName))
+                    throw new Exception(
+                      "Hints contain predicate with wrong arity: " +
+                        predName + " (should be " + pred.get.arity + " but is " +
+                        reader.predArities(predName) + ")")
+                } else {
+                  Console.err.println(
+                    "   Ignoring hints for " + predName + "\n")
+                }
+                pred.isDefined
+              }) yield {
+          (pred.get, hints)
+        }).toMap
+      VerificationHints(hints)
+    }
+  }
+
   def getSimplePredicates( simplePredicatesGeneratorClauses: HornPreprocessor.Clauses):  Map[Predicate, Seq[IFormula]] ={
     for (clause <- simplePredicatesGeneratorClauses)
       println(Console.BLUE + clause.toPrologString)
+//    val constraintPredicates = (for(clause <- simplePredicatesGeneratorClauses;atom<-clause.allAtoms) yield {
+//      val subst=(for(const<-clause.constants;(arg,n)<-atom.args.zipWithIndex; if const.name==arg.toString) yield const->IVariable(n)).toMap
+//      val argumentReplacedPredicates= for(constraint <- LineariseVisitor(ConstantSubstVisitor(clause.constraint,subst), IBinJunctor.And)) yield constraint
+//      val freeVariableReplacedPredicates= for(p<-argumentReplacedPredicates) yield{
+//        val constants=SymbolCollector.constants(p)
+//        if(constants.isEmpty)
+//          p
+//        else
+//          IExpression.quanConsts(Quantifier.EX,constants,p)
+//      }
+//      atom.pred-> freeVariableReplacedPredicates
+//    }).groupBy(_._1).mapValues(_.flatMap(_._2).distinct)
 
-    //todo: two option, predicate share constraints within clause. predicates share constraints cross all clauses
-    //todo: negate constrain for body
-    //todo:SimpleAPI.simplify()
-    val constraintPredicates = (for(clause <- simplePredicatesGeneratorClauses;atom<-clause.allAtoms) yield {
+    val constraintPredicates= (for (clause<-simplePredicatesGeneratorClauses;atom<-clause.allAtoms) yield {
       val subst=(for(const<-clause.constants;(arg,n)<-atom.args.zipWithIndex; if const.name==arg.toString) yield const->IVariable(n)).toMap
-      val argumentReplacedPredicates= for(constraint <- LineariseVisitor(ConstantSubstVisitor(clause.constraint,subst), IBinJunctor.And)) yield constraint
-      val freeVariableReplacedPredicates= for(p<-argumentReplacedPredicates) yield{
-        val constants=SymbolCollector.constants(p)
-        if(constants.isEmpty)
-          p
+      val argumentReplacedPredicates= ConstantSubstVisitor(clause.constraint,subst)
+      val constants=SymbolCollector.constants(argumentReplacedPredicates)
+      val freeVariableReplacedPredicates=
+        if(clause.body.contains(atom))
+          SimpleAPI.spawn.simplify(IExpression.quanConsts(Quantifier.EX,constants,argumentReplacedPredicates)).unary_!
         else
-          IExpression.quanConsts(Quantifier.EX,constants,p)
-      }
-      atom.pred-> freeVariableReplacedPredicates
+          SimpleAPI.spawn.simplify(IExpression.quanConsts(Quantifier.EX,constants,argumentReplacedPredicates))
+      //todo: decide negation sequence
+      //atom.pred-> Seq(freeVariableReplacedPredicates)
+      atom.pred-> LineariseVisitor(freeVariableReplacedPredicates,IBinJunctor.And)
     }).groupBy(_._1).mapValues(_.flatMap(_._2).distinct)
-    for(cc<-constraintPredicates; b<-cc._2) println(cc._1,b)
-    println("-----------------")
+
+    println("--------predicates from constrains---------")
+    for((k,v)<-constraintPredicates;p<-v) println(k,p)
 
     //generate arguments =/<=/>= a constant as predicates
     val eqConstant: IdealInt = IdealInt(42)
     val argumentConstantEqualPredicate = (for (clause <- simplePredicatesGeneratorClauses; atom <- clause.allAtoms) yield atom.pred ->(for((arg,n) <- atom.args.zipWithIndex) yield Seq(Eq(IVariable(n),eqConstant),Geq(IVariable(n),eqConstant),Geq(eqConstant,IVariable(n)))).flatten).groupBy(_._1).mapValues(_.flatMap(_._2).distinct)
+    println("--------predicates from constant and argumenteuqation---------")
     for(cc<-argumentConstantEqualPredicate; b<-cc._2) println(cc._1,b)
 
     //merge constraint and constant predicates
     val simplelyGeneratedPredicates = for ((cpKey, cpPredicates) <- constraintPredicates; (apKey, apPredicates) <- argumentConstantEqualPredicate; if cpKey.equals(apKey)) yield cpKey -> (cpPredicates ++ apPredicates).distinct
-    for(cc<-simplelyGeneratedPredicates; b<-cc._2) println(Console.RED + cc._1,b)
+    //for(cc<-simplelyGeneratedPredicates; b<-cc._2) println(Console.RED + cc._1,b)
+    //todo:get rid of true and false
+    println("--------all generated predicates---------")
+    for((k,v)<-simplelyGeneratedPredicates;(p,i)<-v.zipWithIndex) println(k,i,p)
     //sys.exit()
     simplelyGeneratedPredicates
   }

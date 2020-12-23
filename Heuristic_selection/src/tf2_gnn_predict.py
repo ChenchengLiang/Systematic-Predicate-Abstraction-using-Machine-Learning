@@ -87,7 +87,7 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
 
 def main():
     path="../benchmarks/small-dataset-trainData-datafold-test/"
-    trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2020-12-16_22-44-39_best.pkl"
+    trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2020-12-22_20-53-21_best.pkl"
     json_type=".hyperEdgeHornGraph.JSON"
     graph_type = json_type[1:json_type.find(".JSON")]
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
@@ -120,10 +120,7 @@ def main():
     if form_label == True:
         form_GNN_inputs_and_labels(label=label, datafold=["test"], benchmark=benchmark_name,graph_type=graph_type,gathered_nodes_binary_classification_task=gathered_nodes_binary_classification_task)
 
-
     quiet=False
-
-
 
     dataset = HornGraphDataset(parameters)
     dataset.load_data([DataFold.TEST])
@@ -136,11 +133,7 @@ def main():
     print("test_metric_string",test_metric_string)
     print("test_metric",test_metric)
 
-
-    #todo: write predicted results back to JSON file
-
     write_predicted_label_to_JSON_file(dataset, predicted_Y_loaded_model,json_type)
-
 
 
 

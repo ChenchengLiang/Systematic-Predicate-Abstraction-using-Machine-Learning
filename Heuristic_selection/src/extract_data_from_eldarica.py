@@ -74,12 +74,16 @@ def extract_train_data_pool(filePath,fun,countinous_extract=False,parameterList=
 
 def main():
     #todo: extract unsat dataset
-    #todo: extract template dataset
+    #todo: extract predicate dataset
     #"-extractPredicates","-noIntervals","-absTimeout:120","getLabelFromCE","-getHornGraph","-getHornGraph:biDirectionLayerGraph","-getHornGraph:hyperEdgeGraph","-getHornGraph:monoDirectionLayerGraph","-getHornGraph:hybridDirectionLayerGraph","fineGrainedEdgeTypeLayerGraph"
     #parameterList = ["-getLabelFromCE", "-abstract:manual"]
     #parameterList = ["-getHornGraph","-abstract:manual"]
-    parameterList = ["-generateSimplePredicates","-noIntervals", "-abstract"]
-    #parameterList = ["-noIntervals", "-abstract:off","-generateSimplePredicates"]
-    extract_train_data_pool("../benchmarks/small-dataset-trainData-datafold-test/",extract_graph_from_eldarica,countinous_extract=True,parameterList=parameterList)
+    #parameterList = ["-extractPredicates","-solvabilityTimeout:180","-absTimeout:180", "-noIntervals"]
+    parameterList = ["-extractPredicates","-onlySimplePredicates","-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120"] #extract test data, predicates generated from only simple generator
+    #parameterList = ["-extractPredicates","-generateSimplePredicates","-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120"] #extract train and valid data, predicates generated from both cegar and simple generator
+    #parameterList = ["-extractPredicates","-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120"] #extract predicate label only from cegar process
+    extract_train_data_pool("../benchmarks/temp/",extract_graph_from_eldarica,countinous_extract=True,parameterList=parameterList)
 
 main()
+
+

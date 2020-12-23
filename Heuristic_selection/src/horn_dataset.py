@@ -166,6 +166,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         mse_mean = tf.keras.losses.MSE([np.mean(true_Y)]*len(true_Y), true_Y)
         print("\n mse_mean_Y_and_True_Y", mse_mean)
         mean_loss_list=mse_mean
+        #todo: adjust round function with different threshold. threshold could be a rank number or specifict value in [0,1]
         num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, tf.math.round(predicted_Y_loaded_model)),tf.int32))
         accuracy = num_correct / len(predicted_Y_loaded_model)
         accuracy_average.append(accuracy)
@@ -284,7 +285,7 @@ def write_train_results_to_log(dataset, predicted_Y_loaded_model, train_loss, va
     mean_loss_list_average = np.mean(mean_loss_list)
     mse_loaded_model_average = np.mean(mse_loaded_model_list)
     mean_accuracy = np.mean(accuracy_list)
-    with open("trained_model/" + label + "-" + graph_type + "-" + benchmark + ".log", 'w') as out_file:
+    with open("trained_model/" + label + "-" + graph_type + "-" + benchmark + ".log", 'a') as out_file:
         out_file.write("best_valid_epoch:" + str(best_valid_epoch) + "\n")
         out_file.write("train loss:" + str(train_loss) + "\n")
         out_file.write("valid loss:" + str(valid_loss) + "\n")
