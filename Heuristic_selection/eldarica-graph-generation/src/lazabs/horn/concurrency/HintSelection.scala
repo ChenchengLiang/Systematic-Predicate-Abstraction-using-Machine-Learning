@@ -62,6 +62,14 @@ case class wrappedHintWithID(ID:Int,head:String, hint:String)
 
 object HintsSelection {
 
+  def wrappedReadHints(simplifiedClausesForGraph:Seq[Clause]):VerificationHints={
+    val name2Pred =
+      (for (Clause(head, body, _) <- simplifiedClausesForGraph.iterator;
+            IAtom(p, _) <- (head :: body).iterator)
+        yield (p.name -> p)).toMap
+    HintsSelection.readHints(GlobalParameters.get.fileName+".tpl", name2Pred)
+  }
+
   def readHints(filename : String,
                 name2Pred : Map[String, Predicate])
   : VerificationHints = filename match {
@@ -113,19 +121,19 @@ object HintsSelection {
       val subst=(for(const<-clause.constants;(arg,n)<-atom.args.zipWithIndex; if const.name==arg.toString) yield const->IVariable(n)).toMap
       val argumentReplacedPredicates= ConstantSubstVisitor(clause.constraint,subst)
       val constants=SymbolCollector.constants(argumentReplacedPredicates)
-      val freeVariableReplacedPredicates=
+      val freeVariableReplacedPredicates= {
+        val simplifier=SimpleAPI.spawn
+        val simplifiedPredicates = simplifier.simplify(IExpression.quanConsts(Quantifier.EX,constants,argumentReplacedPredicates))
         if(clause.body.contains(atom))
-          SimpleAPI.spawn.simplify(IExpression.quanConsts(Quantifier.EX,constants,argumentReplacedPredicates)).unary_!
+          (for (p<-LineariseVisitor(simplifier.simplify(simplifiedPredicates.unary_!),IBinJunctor.And)) yield p) ++ (for (p<-LineariseVisitor(simplifiedPredicates,IBinJunctor.And)) yield simplifier.simplify(p.unary_!))
         else
-          SimpleAPI.spawn.simplify(IExpression.quanConsts(Quantifier.EX,constants,argumentReplacedPredicates))
-      //todo: decide negation sequence
-      //atom.pred-> Seq(freeVariableReplacedPredicates)
-      atom.pred-> LineariseVisitor(freeVariableReplacedPredicates,IBinJunctor.And)
+          LineariseVisitor(simplifiedPredicates,IBinJunctor.And)
+      }
+      atom.pred-> freeVariableReplacedPredicates.filter(!_.isTrue).filter(!_.isFalse) //get rid of true and false
     }).groupBy(_._1).mapValues(_.flatMap(_._2).distinct)
 
     println("--------predicates from constrains---------")
     for((k,v)<-constraintPredicates;p<-v) println(k,p)
-
     //generate arguments =/<=/>= a constant as predicates
     val eqConstant: IdealInt = IdealInt(42)
     val argumentConstantEqualPredicate = (for (clause <- simplePredicatesGeneratorClauses; atom <- clause.allAtoms) yield atom.pred ->(for((arg,n) <- atom.args.zipWithIndex) yield Seq(Eq(IVariable(n),eqConstant),Geq(IVariable(n),eqConstant),Geq(eqConstant,IVariable(n)))).flatten).groupBy(_._1).mapValues(_.flatMap(_._2).distinct)
@@ -134,11 +142,8 @@ object HintsSelection {
 
     //merge constraint and constant predicates
     val simplelyGeneratedPredicates = for ((cpKey, cpPredicates) <- constraintPredicates; (apKey, apPredicates) <- argumentConstantEqualPredicate; if cpKey.equals(apKey)) yield cpKey -> (cpPredicates ++ apPredicates).distinct
-    //for(cc<-simplelyGeneratedPredicates; b<-cc._2) println(Console.RED + cc._1,b)
-    //todo:get rid of true and false
     println("--------all generated predicates---------")
     for((k,v)<-simplelyGeneratedPredicates;(p,i)<-v.zipWithIndex) println(k,i,p)
-    //sys.exit()
     simplelyGeneratedPredicates
   }
 
