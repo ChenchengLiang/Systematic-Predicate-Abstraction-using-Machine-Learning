@@ -6,6 +6,7 @@ import signal
 import psutil
 import random
 from shutil import copy
+import sys
 
 def separate_sat_unsat_dataset(file):
     print(file)
@@ -68,7 +69,7 @@ def extract_train_data_pool(filePath,fun,countinous_extract=False,parameterList=
             else:
                 for file in glob.glob(root + "/*.smt2"):
                     file_list.append([file,parameterList])
-    pool = Pool(processes=6)
+    pool = Pool(processes=4)
     pool.map(fun, file_list)
 
 
@@ -86,8 +87,8 @@ def main():
 
     #extract_train_data_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test/",extract_graph_from_eldarica,countinous_extract=True,parameterList=parameterList)
 
-    benchmark_name="../benchmarks/LIA-lin-datafold/"
-    parameterList = ["-extractPredicates","-generateSimplePredicates","-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120"] #extract train and valid data, predicates generated from both cegar and simple generator
+    benchmark_name=os.path.join("../benchmarks/",sys.argv[1])#"../benchmarks/LIA-lin-datafold/"
+    parameterList = ["-extractPredicates","-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120"] #extract train and valid data, predicates generated from both cegar and simple generator
     extract_train_data_pool(os.path.join(benchmark_name,"train_data"),extract_graph_from_eldarica,countinous_extract=True,parameterList=parameterList)
     extract_train_data_pool(os.path.join(benchmark_name,"valid_data"),extract_graph_from_eldarica, countinous_extract=True, parameterList=parameterList)
     parameterList = ["-extractPredicates", "-onlySimplePredicates", "-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120"]  # extract test data, predicates generated from only simple generator

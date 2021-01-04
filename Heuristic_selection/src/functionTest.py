@@ -92,9 +92,8 @@ def mnist_example():
 
 def main():
     #mnist_example()
-    pass
-    print(float("inf")+1)
-    print(np.array([1, 2, 3.3]))
+
+    print(sys.argv[1])
 
 
 
