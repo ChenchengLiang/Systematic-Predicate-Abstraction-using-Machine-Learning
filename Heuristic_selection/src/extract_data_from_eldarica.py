@@ -88,10 +88,10 @@ def main():
     #extract_train_data_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test/",extract_graph_from_eldarica,countinous_extract=True,parameterList=parameterList)
 
     benchmark_name=os.path.join("../benchmarks/",sys.argv[1])#"../benchmarks/LIA-lin-datafold/"
-    parameterList = ["-extractPredicates","-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120"] #extract train and valid data, predicates generated from both cegar and simple generator
+    parameterList = ["-extractPredicates","-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120","-t:3600"] #extract train and valid data, predicates generated from both cegar and simple generator
     extract_train_data_pool(os.path.join(benchmark_name,"train_data"),extract_graph_from_eldarica,countinous_extract=True,parameterList=parameterList)
     extract_train_data_pool(os.path.join(benchmark_name,"valid_data"),extract_graph_from_eldarica, countinous_extract=True, parameterList=parameterList)
-    parameterList = ["-extractPredicates", "-onlySimplePredicates", "-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120"]  # extract test data, predicates generated from only simple generator
+    parameterList = ["-extractPredicates", "-onlySimplePredicates", "-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120","-t:3600"]  # extract test data, predicates generated from only simple generator
     extract_train_data_pool(os.path.join(benchmark_name,"test_data"),extract_graph_from_eldarica, countinous_extract=True, parameterList=parameterList)
 
 main()

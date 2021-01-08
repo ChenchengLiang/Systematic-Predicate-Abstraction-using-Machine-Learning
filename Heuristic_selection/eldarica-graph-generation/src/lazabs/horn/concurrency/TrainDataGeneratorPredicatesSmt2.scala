@@ -269,6 +269,10 @@ object TrainDataGeneratorPredicatesSmt2 {
           HornPredAbs.CounterexampleMethod.FirstBestShortest
 
       /////////////////////////predicates extracting begin///////////////////////////////
+      val timeConsumptionBeforePredicateExtractingProcess=(System.currentTimeMillis-timeStart)/1000
+      var generatingInitialPredicatesTime:Long=0
+      var drawingGraphAndFormLabelsTime:Long=0
+      var predicatesExtractingTime:Long=0
       val predicatesExtractingBeginTime=System.currentTimeMillis
       val simplePredicatesGeneratorClauses = GlobalParameters.get.hornGraphType match {
         case DrawHornGraph.HornGraphType.hyperEdgeGraph | DrawHornGraph.HornGraphType.equivalentHyperedgeGraph | DrawHornGraph.HornGraphType.concretizedHyperedgeGraph => for(clause<-simplifiedClauses) yield clause.normalize()
@@ -276,10 +280,37 @@ object TrainDataGeneratorPredicatesSmt2 {
       }
 
 
-      val Cegar = new HornPredAbs(simplePredicatesGeneratorClauses,
-        simpHints.toInitialPredicates, predGenerator,
-        counterexampleMethod)
-      val lastPredicates = Cegar.predicates
+      val startTimePredicateGenerator = currentTimeMillis
+      val toParamsPredicateGenerator= GlobalParameters.get.clone
+      toParamsPredicateGenerator.timeoutChecker = () => {
+        if ((currentTimeMillis - startTimePredicateGenerator) > (GlobalParameters.get.solvabilityTimeout * 5) ) //timeout seconds
+          throw lazabs.Main.TimeoutException //Main.TimeoutException
+      }
+      val lastPredicates=
+        try{
+          GlobalParameters.parameters.withValue(toParamsPredicateGenerator) {
+            val Cegar = new HornPredAbs(simplePredicatesGeneratorClauses,
+              simpHints.toInitialPredicates, predGenerator,
+              counterexampleMethod)
+            Cegar.predicates
+          }
+        }
+        catch {
+          case lazabs.Main.TimeoutException => {
+            val sourceFilename=GlobalParameters.get.fileName
+            val destinationFilename= "../benchmarks/solvability-timeout/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length)
+            HintsSelection.moveRenameFile(sourceFilename,destinationFilename)
+            sys.exit()
+            //throw TimeoutException
+          }
+        }
+
+
+//      val Cegar = new HornPredAbs(simplePredicatesGeneratorClauses,
+//        simpHints.toInitialPredicates, predGenerator,
+//        counterexampleMethod)
+      //val lastPredicates = Cegar.predicates
+
       var numberOfpredicates = 0
       val predicateFromCEGAR = for ((head, preds) <- lastPredicates) yield{
         // transfor Map[relationSymbols.values,ArrayBuffer[RelationSymbolPred]] to Map[Predicate, Seq[IFormula]]
@@ -303,6 +334,8 @@ object TrainDataGeneratorPredicatesSmt2 {
 
       //transform Map[Predicate,Seq[IFomula] to VerificationHints:[Predicate,VerifHintElement]
       val initialPredicates = HintsSelection.transformPredicateMapToVerificationHints(originalPredicates)
+
+      generatingInitialPredicatesTime=(System.currentTimeMillis-predicatesExtractingBeginTime)/1000
 
       println("check solvability using current predicates")
       val startTimeCEGAR = currentTimeMillis
@@ -424,7 +457,7 @@ object TrainDataGeneratorPredicatesSmt2 {
           println("redundant predicates", redundantPredicatesSeq.toString())
         }
 
-        println(Console.BLUE + "predicates extracting time: ",System.currentTimeMillis-predicatesExtractingBeginTime)
+        predicatesExtractingTime=(System.currentTimeMillis-predicatesExtractingBeginTime)/1000
 
         if(!optimizedPredicate.isEmpty){
           //transform Map[Predicate,Seq[IFomula] to VerificationHints:[Predicate,VerifHintElement]
@@ -454,7 +487,7 @@ object TrainDataGeneratorPredicatesSmt2 {
               val clausesInCE=getClausesInCounterExamples(test,simplePredicatesGeneratorClauses)
               val clauseCollection = new ClauseInfo(simplePredicatesGeneratorClauses,clausesInCE)
               //Output graphs
-              val argumentList = (for (p <- HornClauses.allPredicates(simplePredicatesGeneratorClauses)) yield (p, p.arity)).toList
+              val argumentList = (for (p <- HornClauses.allPredicates(simplePredicatesGeneratorClauses)) yield (p, p.arity)).toArray
               val argumentInfo = HintsSelection.writeArgumentOccurrenceInHintsToFile(GlobalParameters.get.fileName, argumentList, selectedPredicates,countOccurrence=true)
               GraphTranslator.drawAllHornGraph(clauseCollection,hintsCollection,argumentInfo)
               //Output selected predicates:
@@ -463,7 +496,7 @@ object TrainDataGeneratorPredicatesSmt2 {
                 AbsReader.printHints(initialPredicates)
               }
             }
-            println(Console.GREEN + "Time for drawing graph and form labels: ", System.currentTimeMillis-drawGraphAndWriteLabelsBegin)
+            drawingGraphAndFormLabelsTime=(System.currentTimeMillis-drawGraphAndWriteLabelsBegin)/1000
           }catch{
             case lazabs.Main.TimeoutException =>{
               println(Console.RED + "--test timeout--")
@@ -490,7 +523,10 @@ object TrainDataGeneratorPredicatesSmt2 {
         val destinationFilename= "../benchmarks/no-predicates-selected/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length)
         HintsSelection.moveRenameFile(sourceFilename,destinationFilename)
       }
-
+      println(Console.GREEN + "time consumption before predicate extracting process: " + timeConsumptionBeforePredicateExtractingProcess + "s")
+      println(Console.GREEN + "time for generating initial predicates: "+ generatingInitialPredicatesTime + "s")
+      println(Console.GREEN + "predicates extracting time: "+ predicatesExtractingTime + "s")
+      println(Console.GREEN + "Time for drawing graph and form labels: "+ drawingGraphAndFormLabelsTime +"s")
     }
   }
 }
