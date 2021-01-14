@@ -4,6 +4,8 @@ from tf2_gnn.data import DataFold
 from horn_dataset import write_graph_to_pickle,form_GNN_inputs_and_labels
 from Miscellaneous import clear_file,add_JSON_field
 import os
+import numpy as np
+import tensorflow as tf
 
 
 def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score_list,graph_type=".layerHornGraph.JSON"):
@@ -85,10 +87,12 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
         add_JSON_field(file_name,graph_type,old_field,new_field,new_filed_content)
 
 
+def my_round_fun(num_list,threshold):
+    return  [float(1) if num>threshold else float(0) for num in num_list]
 
 def main():
-    path="../benchmarks/small-dataset-sat-datafold-same-train-valid-test/"
-    trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2020-12-29_20-43-08_best.pkl"
+    path="../benchmarks/new-full-dataset-test/"
+    trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-01-13_14-41-58_best.pkl"
     json_type=".hyperEdgeHornGraph.JSON"
     graph_type = json_type[1:json_type.find(".JSON")]
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
@@ -131,10 +135,52 @@ def main():
     test_metric, test_metric_string = loaded_model.compute_epoch_metrics(test_results)
     predicted_Y_loaded_model = loaded_model.predict(test_data)
 
+
     print("test_metric_string",test_metric_string)
     print("test_metric",test_metric)
 
-    write_predicted_label_to_JSON_file(dataset, predicted_Y_loaded_model,json_type)
+    #write_predicted_label_to_JSON_file(dataset, predicted_Y_loaded_model,json_type)
+
+
+    #test measurement
+    true_Y = []
+    true_Y_by_file = []
+    for data in iter(test_data):
+        true_Y.extend(np.array(data[1]["node_labels"]))
+    for data in iter(test_data):
+        true_Y_by_file.append(np.array(data[1]["node_labels"]))
+
+    mse_loaded_model = tf.keras.losses.MSE(true_Y, predicted_Y_loaded_model)
+    print("\n mse_loaded_model_predicted_Y_and_True_Y", mse_loaded_model)
+
+    print("true_Y", true_Y)
+    print("predicted_Y_loaded_model", predicted_Y_loaded_model)
+
+    mse_mean = tf.keras.losses.MSE([np.mean(true_Y)] * len(true_Y), true_Y)
+    print("\n mse_mean_Y_and_True_Y", mse_mean)
+    mean_loss_list = mse_mean
+    # todo: adjust round function with different threshold. threshold could be a rank number or specifict value in [0,1]
+    #tf.math.round()
+    #by value
+
+    threshold_list=[0.00001,0.00005,0.0001,0.0005,0.001,0.01,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99,0.999,0.9999,0.99999]
+    for i in threshold_list:
+        num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, my_round_fun(predicted_Y_loaded_model,i)), tf.int32))
+        accuracy = num_correct / len(predicted_Y_loaded_model)
+        print("threshold", i)
+        print("accuracy",float(accuracy))
+        # print(true_Y)
+        # print(list(my_round_fun(predicted_Y_loaded_model,i)))
+    #todo: by rank
+    for y in true_Y_by_file:
+        print("y",len(y))
+    print("total files",len(true_Y_by_file))
+
+
+    positive_label_number = sum(true_Y)
+    negative_label_number = len(true_Y) - positive_label_number
+
+    print("positive_label_percentage",positive_label_number/len(true_Y))
 
 
 

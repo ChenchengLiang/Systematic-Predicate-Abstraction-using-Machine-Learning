@@ -37,10 +37,10 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     #parameters["residual_every_num_layers"]=10000000
     parameters['hidden_dim'] = nodeFeatureDim #64
     #parameters["num_edge_MLP_hidden_layers"]
-    parameters['num_layers'] = 2
+    parameters['num_layers'] = 3
     parameters['node_label_embedding_size'] = nodeFeatureDim
     parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
-    parameters['regression_hidden_layer_size'] = [64,64,64,64]
+    parameters['regression_hidden_layer_size'] = [64,64]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
     parameters ["gathered_nodes_binary_classification_task"]=gathered_nodes_binary_classification_task

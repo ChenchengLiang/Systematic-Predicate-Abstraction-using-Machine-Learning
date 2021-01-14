@@ -30,7 +30,7 @@ def main():
     file_type = ".smt2"
     GPU=True
     pickle = True
-    benchmark_name = "small-dataset-sat-datafold-same-train-valid-test/"
+    benchmark_name = "new-full-dataset/"
 
     # random.seed(0)
     # np.random.seed(0)

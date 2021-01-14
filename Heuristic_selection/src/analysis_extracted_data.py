@@ -10,6 +10,7 @@ from Miscellaneous import pickleRead, clear_directory,clear_file
 import subprocess
 import json
 from multiprocessing import Pool
+
 def separate_dataset_to_train_valid_test_files(source,destination,train_rate=0.6,valid_rate=0.2,test_rate=0.2,remove_src=False):
     print("source file",source)
     total_file_number=len(glob.glob(source+"*.arguments"))
@@ -422,6 +423,24 @@ def extract_train_data_templates_pool(filePath):
     pool = Pool(processes=3)
     pool.map(extract_train_data_templates, file_list)
 
+def shuffle_data(rootdir):
+    file_list=glob.glob(rootdir + "/*.smt2")
+    print(file_list)
+    random.shuffle(file_list)
+    random.shuffle(file_list)
+    print(file_list)
+    train_files=file_list[0:int(len(file_list)*0.8)]
+    valid_files=file_list[int(len(file_list)*0.8):len(file_list)]
+    print("train_files",len(train_files))
+    print("valid_files",len(valid_files))
+    for file in train_files:
+        file_list_ = glob.glob(file+"*")
+        for f in file_list_:
+            copy(f, os.path.join("../benchmarks/temp/", "train_data"))
+    for file in valid_files:
+        file_list_ = glob.glob(file + "*")
+        for f in file_list_:
+            copy(f, os.path.join("../benchmarks/temp/", "valid_data"))
 
 
 
@@ -466,7 +485,9 @@ def main():
     #                          eldarica_parameters=parameter_for_JSON.eldarica_parameters)
 
 
-    extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
+    #extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
+
+    shuffle_data("../benchmarks/temp/tobe_shuffled")
 
 
 
