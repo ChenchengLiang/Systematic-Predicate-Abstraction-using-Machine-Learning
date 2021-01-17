@@ -92,8 +92,11 @@ def mnist_example():
 
 def main():
     #mnist_example()
-
-    print(sys.argv[1])
+    x=[1,2,3,5,3,2,1]
+    sorted_x = sorted(x)
+    print(x)
+    print(sorted_x)
+    print(x)
 
 
 

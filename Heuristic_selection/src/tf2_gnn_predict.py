@@ -90,9 +90,59 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
 def my_round_fun(num_list,threshold):
     return  [float(1) if num>threshold else float(0) for num in num_list]
 
+def set_threshold_by_roundings(true_Y,predicted_Y_loaded_model):
+    #tf.math.round()
+    #by value
+
+    threshold_list=[0.00001,0.00005,0.0001,0.0005,0.001,0.01,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99,0.999,0.9999,0.99999]
+    for i in threshold_list:
+        num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, my_round_fun(predicted_Y_loaded_model,i)), tf.int32))
+        accuracy = num_correct / len(predicted_Y_loaded_model)
+        print("threshold", i,"accuracy",float(accuracy))
+        # print(true_Y)
+        # print(list(my_round_fun(predicted_Y_loaded_model,i)))
+def set_threshold_by_ranks(true_Y,true_Y_by_file,predicted_Y_loaded_model,true_Y_file_list,top_percentage=0.8):
+    rounded_by_top_rank = []
+    top_percentage=top_percentage
+    #top_k = 5
+    predicted_Y_separated_by_file = []
+    last = 0
+    for y in true_Y_by_file:
+        # print("y",len(y))
+        predicted_Y_separated_by_file.append(predicted_Y_loaded_model[last:last + len(y)])
+        last = last + len(y)
+
+    all_one_label=0
+    one_one_label=0
+    other_distribution=0
+    for y, y_hat, file_name in zip(true_Y_by_file, predicted_Y_separated_by_file, true_Y_file_list):
+        # print("file_name", file_name)
+        # print("true y", len(y), y)
+        # print("predicted y", len(y_hat), y_hat)
+        top_k_value=sorted(y_hat)[int(len(y_hat)*top_percentage)]
+        rounded_by_top_rank.extend([ 1 if v>=top_k_value else 0 for v in y_hat ])
+        #statistics
+        # if len(y)==sum(y):
+        #     all_one_label=all_one_label+1
+        # elif sum(y)==1:
+        #     one_one_label=one_one_label+1
+        # else:
+        #     other_distribution=other_distribution+1
+
+    num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, rounded_by_top_rank), tf.int32))
+    accuracy = num_correct / len(predicted_Y_loaded_model)
+    print("top_percentage",top_percentage,"accuracy",float(accuracy))
+
+
+    # print("total files", len(true_Y_by_file))
+    # print("all_one_label", all_one_label,"percentage",all_one_label/len(true_Y_by_file))
+    # print("one_one_label", one_one_label,"percentage",one_one_label/len(true_Y_by_file))
+    # print("other_distribution", other_distribution,"percentage",other_distribution/len(true_Y_by_file))
+
+
 def main():
-    path="../benchmarks/new-full-dataset-test/"
-    trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-01-13_14-41-58_best.pkl"
+    path="../benchmarks/new-full-dataset-valid/"
+    trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-01-15_19-39-16_best.pkl"
     json_type=".hyperEdgeHornGraph.JSON"
     graph_type = json_type[1:json_type.find(".JSON")]
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
@@ -145,10 +195,14 @@ def main():
     #test measurement
     true_Y = []
     true_Y_by_file = []
+    true_Y_file_list=[]
     for data in iter(test_data):
         true_Y.extend(np.array(data[1]["node_labels"]))
-    for data in iter(test_data):
-        true_Y_by_file.append(np.array(data[1]["node_labels"]))
+    for data in dataset._label_list["test"]:
+        true_Y_by_file.append(np.array(data))
+    for file_name in dataset._file_list["test"]:
+        true_Y_file_list.append(file_name)
+
 
     mse_loaded_model = tf.keras.losses.MSE(true_Y, predicted_Y_loaded_model)
     print("\n mse_loaded_model_predicted_Y_and_True_Y", mse_loaded_model)
@@ -159,28 +213,19 @@ def main():
     mse_mean = tf.keras.losses.MSE([np.mean(true_Y)] * len(true_Y), true_Y)
     print("\n mse_mean_Y_and_True_Y", mse_mean)
     mean_loss_list = mse_mean
-    # todo: adjust round function with different threshold. threshold could be a rank number or specifict value in [0,1]
-    #tf.math.round()
-    #by value
-
-    threshold_list=[0.00001,0.00005,0.0001,0.0005,0.001,0.01,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99,0.999,0.9999,0.99999]
-    for i in threshold_list:
-        num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, my_round_fun(predicted_Y_loaded_model,i)), tf.int32))
-        accuracy = num_correct / len(predicted_Y_loaded_model)
-        print("threshold", i)
-        print("accuracy",float(accuracy))
-        # print(true_Y)
-        # print(list(my_round_fun(predicted_Y_loaded_model,i)))
+    # todo: threshold by rounding values [0,1]
+    set_threshold_by_roundings(true_Y,predicted_Y_loaded_model)
     #todo: by rank
-    for y in true_Y_by_file:
-        print("y",len(y))
-    print("total files",len(true_Y_by_file))
+    rank_percentage_list=np.arange(0.0, 1.0, 0.1)
+    for rank_percentage in rank_percentage_list:
+        set_threshold_by_ranks(true_Y,true_Y_by_file, predicted_Y_loaded_model, true_Y_file_list,rank_percentage)
 
 
     positive_label_number = sum(true_Y)
     negative_label_number = len(true_Y) - positive_label_number
 
     print("positive_label_percentage",positive_label_number/len(true_Y))
+    print("negative_label_number", negative_label_number / len(true_Y))
 
 
 

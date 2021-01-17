@@ -37,15 +37,15 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     #parameters["residual_every_num_layers"]=10000000
     parameters['hidden_dim'] = nodeFeatureDim #64
     #parameters["num_edge_MLP_hidden_layers"]
-    parameters['num_layers'] = 3
+    parameters['num_layers'] = 4
     parameters['node_label_embedding_size'] = nodeFeatureDim
     parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
-    parameters['regression_hidden_layer_size'] = [64,64]
+    parameters['regression_hidden_layer_size'] = [64,64,64]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
     parameters ["gathered_nodes_binary_classification_task"]=gathered_nodes_binary_classification_task
     max_epochs = 500
-    patience = 50
+    patience = 100
     # parameters["add_self_loop_edges"]=False
     # parameters["tie_fwd_bkwd_edges"]=True
 
@@ -616,7 +616,11 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
                                                                                                 graphs_adjacency_lists,
                                                                                                 file_name_list, label)
     if label in gathered_nodes_binary_classification_task:
-        drawBinaryLabelPieChart(graphs_learning_labels, label, graph_type, benchmark)
+        drawBinaryLabelPieChart(graphs_learning_labels, label, graph_type, benchmark,df)
+    all_one_label=0
+    one_one_label=0
+    other_distribution=0
+    total_files=len(graphs_node_label_ids)
     for node_label_ids, node_symbols, adjacency_lists,file_name,node_indices,learning_labels in zip(graphs_node_label_ids,graphs_node_symbols,
                                                                                                          graphs_adjacency_lists,
                                                                                                          file_name_list,
@@ -628,6 +632,14 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
         for symbol in node_symbols:
             tokenized_node_label_ids.append(token_map[symbol])
         raw_data_graph.labels.append(learning_labels)
+
+        #catch label distribution
+        if len(learning_labels) == sum(learning_labels):
+            all_one_label = all_one_label + 1
+        elif sum(learning_labels) == 1:
+            one_one_label = one_one_label + 1
+        else:
+            other_distribution = other_distribution + 1
 
         # if(len(tokenized_node_label_ids)>130000):
         #     print("------debug------")
@@ -664,6 +676,14 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
         )
         raw_data_graph.label_size += len(learning_labels)
     raw_data_graph.final_graphs = final_graphs.copy()
+
+    #print label distribution
+    print("-----------label distribution --------- datafold: ",df)
+    print("total files", total_files)
+    print("all_one_label", all_one_label, "percentage", all_one_label / total_files)
+    print("one_one_label", one_one_label, "percentage", one_one_label / total_files)
+    print("other_distribution", other_distribution, "percentage", other_distribution / total_files)
+
     if pickle==True:
         pickleWrite(raw_data_graph, label +"-"+graph_type+ "-" + benchmark + "-gnnInput_" + df + "_data")
     return raw_data_graph

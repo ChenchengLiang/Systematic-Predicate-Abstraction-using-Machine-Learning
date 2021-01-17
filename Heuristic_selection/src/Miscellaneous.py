@@ -5,7 +5,7 @@ from distutils.dir_util import copy_tree
 import json
 import matplotlib.pyplot as plt
 
-def drawBinaryLabelPieChart(learning_label,label,graph_type,benchmark_name):
+def drawBinaryLabelPieChart(learning_label,label,graph_type,benchmark_name,df):
     flat_list = [item for sublist in learning_label for item in sublist]
     positive_label_number =sum(flat_list)
     negative_label_number=len(flat_list)-positive_label_number
@@ -18,7 +18,7 @@ def drawBinaryLabelPieChart(learning_label,label,graph_type,benchmark_name):
             shadow=True, startangle=90)
     ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
     plt.title("Label distribution")
-    plt.savefig("trained_model/" + label + "-" + graph_type + "-" + benchmark_name + "pie_chart.png")
+    plt.savefig("trained_model/" + label + "-" + graph_type +"-" + df + "-" + benchmark_name + "pie_chart.png")
     plt.clf()
 
 def add_JSON_field(fileName="",file_type=".layerHornGraph.JSON",old_field=[],new_field=[],new_field_content=[]):
