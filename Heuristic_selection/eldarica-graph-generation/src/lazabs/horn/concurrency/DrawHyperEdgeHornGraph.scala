@@ -51,6 +51,28 @@ object DrawHyperEdgeHornGraph {
     val controlFlow, dataFlow = Value
   }
 
+  def replaceIntersectArgumentInBody(clause: Clause): Clause = {
+    var f: IFormula = clause.constraint
+    def replaceArgumentInBody(body: IAtom): IAtom = {
+      var argList: Seq[ITerm] = Seq()
+      for (arg <- body.args) {
+        if ((for (a<-clause.head.args) yield a.toString).contains(arg.toString)) {
+          val ic = IConstant(newConstant(arg.toString + "__"))
+          //replace argument
+          argList :+= ic
+          //add equation in constrains
+          f = f &&& (arg === ic)
+        } else
+          argList :+= arg
+      }
+      IAtom(body.pred, argList)
+    }
+
+    Clause(IAtom(clause.head.pred, clause.head.args),
+      for (body <- clause.body) yield replaceArgumentInBody(body),
+      f)
+  }
+
 }
 
 class hyperEdgeInfo(name: String, from: String = "", to: String, nodeType: HyperEdgeType.Value) {
@@ -63,6 +85,7 @@ class hyperEdgeInfo(name: String, from: String = "", to: String, nodeType: Hyper
 
 class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints: VerificationHintsInfo, argumentInfoList: ArrayBuffer[argumentInfo]) extends DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: VerificationHintsInfo, argumentInfoList: ArrayBuffer[argumentInfo]) {
   println("Write " + GlobalParameters.get.hornGraphType.toString + " to file")
+  val withOutAndConnectionToHyperedge=false
   edgeNameMap += ("controlFlowHyperEdge" -> "CFHE")
   edgeNameMap += ("dataFlowHyperEdge" -> "DFHE")
   edgeNameMap += ("dataFlowAST" -> "data")
@@ -99,12 +122,12 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
   nodeShapeMap += ("dataFlowHyperEdge" -> "diamond")
   nodeShapeMap += ("clause" -> "component")
 
-  val sp = new Simplifier()
+  //val sp = new Simplifier()
   val dataFlowInfoWriter = new PrintWriter(new File(file + ".HornGraph"))
   var tempID = 0
   var clauseNumber = 0
   var hyperEdgeList = scala.collection.mutable.ArrayBuffer[hyperEdgeInfo]()
-
+  //for (clause <- Seq(simpClauses.head)) {
   for (clause <- simpClauses) {
     hyperEdgeList.clear()
     constantNodeSetInOneClause.clear()
@@ -180,33 +203,75 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
       drawDataFlow(arg, dataFlowSet)
 
     var guardRootNodeList:Array[String]=Array()
-    if (guardSet.isEmpty) {
-      val trueNodeName = "true_" + gnn_input.GNNNodeID.toString
-      guardRootNodeList:+=trueNodeName
-      createNode(trueNodeName, "true", "constant", nodeShapeMap("constant"))
-      constantNodeSetCrossGraph("true")=trueNodeName
-      constantNodeSetInOneClause("true") = trueNodeName
-      drawHyperEdgeWithTrueGuard(trueNodeName)
-    } else {
-      astEdgeType = "guardAST"
-      for (guard <- guardSet) {
-        val guardRootNodeName = drawAST(guard)
-        guardRootNodeList:+=guardRootNodeName
-        for (hyperEdgeNode <- hyperEdgeList) {
-          hyperEdgeNode.guardName += guardRootNodeName
-          if (hyperEdgeNode.guardName.size <= 1) {
+    if(withOutAndConnectionToHyperedge==true){
+      if (guardSet.isEmpty) {
+        val trueNodeName = "true_" + gnn_input.GNNNodeID.toString
+        guardRootNodeList:+=trueNodeName
+        createNode(trueNodeName, "true", "constant", nodeShapeMap("constant"))
+        constantNodeSetCrossGraph("true")=trueNodeName
+        constantNodeSetInOneClause("true") = trueNodeName
+        drawHyperEdgeWithTrueGuard(trueNodeName)
+      } else {
+        astEdgeType = "guardAST"
+        for (guard <- guardSet) {
+          val guardRootNodeName = drawAST(guard)
+          guardRootNodeList:+=guardRootNodeName
+          for (hyperEdgeNode <- hyperEdgeList) {
+            hyperEdgeNode.guardName += guardRootNodeName
+            if (hyperEdgeNode.guardName.size <= 1) {
+              GlobalParameters.get.hornGraphType match {
+                case HornGraphType.concretizedHyperedgeGraph=> drawHyperEdge(hyperEdgeNode,guardRootNodeName,addConcretinizedTernaryEdge)
+                case HornGraphType.hyperEdgeGraph| HornGraphType.equivalentHyperedgeGraph=> drawHyperEdge(hyperEdgeNode,guardRootNodeName,addTernaryEdge)
+              }
+            } else
+              GlobalParameters.get.hornGraphType match {
+                case HornGraphType.concretizedHyperedgeGraph=> drawHyperEdge(hyperEdgeNode,guardRootNodeName,updateConcretinizedTernaryEdge)
+                case HornGraphType.hyperEdgeGraph| HornGraphType.equivalentHyperedgeGraph=> drawHyperEdge(hyperEdgeNode,guardRootNodeName,updateTernaryEdge)
+              }
+          }
+        }
+      }
+    }else{
+      if (guardSet.isEmpty) {
+        val trueNodeName = "true_" + gnn_input.GNNNodeID.toString
+        guardRootNodeList:+=trueNodeName
+        createNode(trueNodeName, "true", "constant", nodeShapeMap("constant"))
+        constantNodeSetCrossGraph("true")=trueNodeName
+        constantNodeSetInOneClause("true") = trueNodeName
+        drawHyperEdgeWithTrueGuard(trueNodeName)
+      } else if(guardSet.size==1){
+        astEdgeType = "guardAST"
+        for (guard <- guardSet) {
+          val guardRootNodeName = drawAST(guard)
+          for (hyperEdgeNode <- hyperEdgeList) {
+            hyperEdgeNode.guardName += guardRootNodeName
             GlobalParameters.get.hornGraphType match {
               case HornGraphType.concretizedHyperedgeGraph=> drawHyperEdge(hyperEdgeNode,guardRootNodeName,addConcretinizedTernaryEdge)
               case HornGraphType.hyperEdgeGraph| HornGraphType.equivalentHyperedgeGraph=> drawHyperEdge(hyperEdgeNode,guardRootNodeName,addTernaryEdge)
             }
-          } else
-            GlobalParameters.get.hornGraphType match {
-              case HornGraphType.concretizedHyperedgeGraph=> drawHyperEdge(hyperEdgeNode,guardRootNodeName,updateConcretinizedTernaryEdge)
-              case HornGraphType.hyperEdgeGraph| HornGraphType.equivalentHyperedgeGraph=> drawHyperEdge(hyperEdgeNode,guardRootNodeName,updateTernaryEdge)
-            }
+          }
+        }
+      }else{
+        astEdgeType = "guardAST"
+        for (guard <- guardSet) {
+          val guardRootNodeName = drawAST(guard)
+          guardRootNodeList:+=guardRootNodeName
+        }
+        val andName = "&" + "_" + gnn_input.GNNNodeID
+        createNode(andName, labelName="&", "operator", nodeShapeMap("operator"))
+        for(frn<-guardRootNodeList)
+          addBinaryEdge(frn,andName,"guardAST",edgeDirectionMap("guardAST"))
+        for (hyperEdgeNode <- hyperEdgeList) {
+          hyperEdgeNode.guardName += andName
+          GlobalParameters.get.hornGraphType match {
+            case HornGraphType.concretizedHyperedgeGraph=> drawHyperEdge(hyperEdgeNode,andName,addConcretinizedTernaryEdge)
+            case HornGraphType.hyperEdgeGraph| HornGraphType.equivalentHyperedgeGraph=> drawHyperEdge(hyperEdgeNode,andName,addTernaryEdge)
+          }
         }
       }
     }
+
+
     if(GlobalParameters.get.getLabelFromCounterExample==true){
       //create clause node and connect with guards
       val clauseNodeName = clauseNodePrefix + gnn_input.clauseCanonicalID.toString
@@ -221,16 +286,23 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
     }
     clauseNumber += 1
   }
+
+
   //draw templates
   for (argInfo<-gnn_input.argumentInfoHornGraphList){
     argumentNodeSetInPredicates("_"+argInfo.index.toString)=argInfo.canonicalName //add _ to differentiate index with other constants
   }
   astEdgeType = "templateAST"
-  for(p<-HornClauses.allPredicates(simpClauses)){
-    val templateNameList=drawTemplates(p)
-    for (templateNodeName<-templateNameList)
-      addBinaryEdge(controlFlowNodeSetInOneClause(p.name),templateNodeName,"template")
-  }
+  val templateNameList=drawTemplates()
+  for ((head,templateNodeNameList)<-templateNameList;templateNodeName<-templateNodeNameList)
+    addBinaryEdge(controlFlowNodeSetInOneClause(head),templateNodeName,"template")
+//  for(p<-HornClauses.allPredicates(simpClauses)){
+//    //val templateNameList=drawTemplates(p)
+//    //println(Console.GREEN + "hint: "+p)
+//    for (templateNodeName<-templateNameList if templateNodeName._1==p.name)
+//      addBinaryEdge(controlFlowNodeSetInOneClause(p.name),templateNodeName._2,"template")
+//  }
+
 
   writerGraph.write("}" + "\n")
   writerGraph.close()
@@ -339,7 +411,7 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
         val dataFlowHyperedgeName = dataFlowHyperEdgeNodePrefix + gnn_input.dataFlowHyperEdgeCanonicalID.toString
         matchAndCreateHyperEdgeNode(dataFlowHyperedgeName,"guarded DFHE Clause " + clauseNumber.toString,"dataFlowHyperEdge")
         astEdgeType = "dataFlowAST"
-        val dataFlowRoot = drawAST(rhs)
+        val dataFlowRoot = drawAST(coefficient*rhs)
         //store data flow hyperedge connection
         hyperEdgeList :+= new hyperEdgeInfo(dataFlowHyperedgeName, dataFlowRoot, constantNodeSetInOneClause(arg.toString), HyperEdgeType.dataFlow)
       }
@@ -347,27 +419,6 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
     }
   }
 
-  def replaceIntersectArgumentInBody(clause: Clause): Clause = {
-    var f: IFormula = clause.constraint
-    def replaceArgumentInBody(body: IAtom): IAtom = {
-      var argList: Seq[ITerm] = Seq()
-      for (arg <- body.args) {
-        if ((for (a<-clause.head.args) yield a.toString).contains(arg.toString)) {
-          val ic = IConstant(newConstant(arg.toString + "__"))
-          //replace argument
-          argList :+= ic
-          //add equation in constrains
-          f = f &&& (arg === ic)
-        } else
-          argList :+= arg
-      }
-      IAtom(body.pred, argList)
-    }
-
-    Clause(IAtom(clause.head.pred, clause.head.args),
-      for (body <- clause.body) yield replaceArgumentInBody(body),
-      f)
-  }
 
   def getDataFlowAndGuard(clause: Clause, normalizedClause: Clause, dataFlowInfoWriter: PrintWriter): (Set[IExpression], Set[IFormula],Clause) = {
     /*
@@ -376,49 +427,61 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
    (1) x = f(\bar y) s.t.
 
    <1> x is one of the arguments of the clause head
-   <2> \bar y are arguments of the literals in the clause body.
+   <2> every element of y occurs as an argument of an uninterpreted predicate in the body
    <3> any variable assignment (assignment of values to the variables occurring in C) that satisfies the constraint of C also satisfies (1).
    */
     //replace intersect arguments in body and add arg=arg' to constrains
-    val replacedClause=replaceIntersectArgumentInBody(normalizedClause)
+    val replacedClause=DrawHyperEdgeHornGraph.replaceIntersectArgumentInBody(normalizedClause)
     var dataflowList = Set[IExpression]()
-    var dataflowListHeadArgSymbolEquation = Set[IExpression]()
-    //val bodySymbols = for (body <- replacedClause.body; arg <- body.args) yield new ConstantTerm(arg.toString)
-    val bodySymbols = for (body <- replacedClause.body; arg <- body.args) yield arg
-    var bodySymbolsSet = bodySymbols.toSet
+    var dataflowEquationList=Set[IExpression]()
+    var bodySymbolsSet = (for (body <- replacedClause.body; arg <- body.args) yield arg).toSet
+    //var bodySymbolsSet = bodySymbols.toSet
+    //println(Console.GREEN + replacedClause)
     for (x <- replacedClause.head.args) {
+      //println(Console.RED + x)
       val SE = IExpression.SymbolEquation(x)
-      //val constantTermX = new ConstantTerm(x.toString)
       for (f <- LineariseVisitor(replacedClause.constraint, IBinJunctor.And)) f match {
-        case SE(coefficient, rhs) => {
-          //if (!(dataflowList contains f) && !(bodySymbolsSet contains constantTermX) && !SymbolCollector.constants(rhs).isEmpty
-          if (!(dataflowList contains f) && !(bodySymbolsSet contains x) && !SymbolCollector.constants(rhs).isEmpty
-            && !(for (s <- SymbolCollector.constants(rhs)) yield s.name).intersect(for (s <- bodySymbolsSet) yield s.toString).isEmpty
-            && (for (s <- SymbolCollector.constants(f)) yield s.name).contains(x.toString)) {
-            // discovered data-flow from body to x!
+        case SE(coefficient, rhs) => { //<1>
+          //println(Console.YELLOW + rhs)
+          //println(Console.GREEN + bodySymbolsSet)
+          if (!(dataflowList contains f) // f is not in dataflowList
+            //&& !SymbolCollector.constants(rhs).map(_.toString).contains(x.toString) // x is not in y
+            && SymbolCollector.constants(rhs).map(_.toString).subsetOf(bodySymbolsSet.map(_.toString)) // <2>
+            //&& (for (s <- SymbolCollector.constants(f)) yield s.name).contains(x.toString)// because match SE will match f that does not have head' arguments
+          ) {
+            // discovered dataflow from body to x
+            //println(Console.RED + f)
             dataflowList += f //sp(IExpression.Eq(x,rhs))
-            dataflowListHeadArgSymbolEquation += sp(IExpression.Eq(x, rhs))
-            //bodySymbolsSet += constantTermX
-            bodySymbolsSet += x
+            //dataflowEquationList += sp(IExpression.Eq(x,coefficient*rhs))
+            //bodySymbolsSet += x
           }
         }
-        case _ => { //guardList+=f}
+        case _ => { //println(Console.BLUE + f)//guardList+=f}
         }
       }
     }
     val guardList = (for (f <- LineariseVisitor(replacedClause.constraint, IBinJunctor.And)) yield f).toSet.diff(for (df <- dataflowList) yield df.asInstanceOf[IFormula])
+
+    //todo: delete some redundant predicates
+    val redundantFormulas = for(g<-guardList if SymbolCollector.constants(g).map(_.toString).toSet.diff(replacedClause.head.args.map(_.toString).toSet).intersect(bodySymbolsSet.map(_.toString)).isEmpty) yield {
+      g
+    }
+
     dataFlowInfoWriter.write("--------------------\n")
     dataFlowInfoWriter.write("original clause:\n")
     dataFlowInfoWriter.write(clause.toPrologString + "\n")
     dataFlowInfoWriter.write("normalized and replaced clause:\n")
     dataFlowInfoWriter.write(replacedClause.toPrologString + "\n")
     dataFlowInfoWriter.write("dataflow:\n")
-    for (df <- dataflowListHeadArgSymbolEquation)
+    for (df <- dataflowList)
       dataFlowInfoWriter.write(df.toString + "\n")
     dataFlowInfoWriter.write("guard:\n")
     for (g <- guardList)
       dataFlowInfoWriter.write(g.toString + "\n")
-    (dataflowListHeadArgSymbolEquation, guardList,replacedClause)
+//    dataFlowInfoWriter.write("redundant:\n")
+//    for (r <- redundantFormulas)
+//      dataFlowInfoWriter.write(r.toString + "\n")
+    (dataflowList, guardList,replacedClause)
   }
 
 }

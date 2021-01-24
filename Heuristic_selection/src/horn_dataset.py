@@ -679,7 +679,11 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
 
     #print label distribution
     print("-----------label distribution --------- datafold: ",df)
+    all_label=[item for sublist in graphs_learning_labels for item in sublist]
     print("total files", total_files)
+    print("total label size", raw_data_graph.label_size)
+    print("positive label",sum(all_label)/len(all_label))
+    print("negative label",1-(sum(all_label)/len(all_label)))
     print("all_one_label", all_one_label, "percentage", all_one_label / total_files)
     print("one_one_label", one_one_label, "percentage", one_one_label / total_files)
     print("other_distribution", other_distribution, "percentage", other_distribution / total_files)

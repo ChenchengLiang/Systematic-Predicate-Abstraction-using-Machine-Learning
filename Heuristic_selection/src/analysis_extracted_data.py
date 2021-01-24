@@ -10,6 +10,7 @@ from Miscellaneous import pickleRead, clear_directory,clear_file
 import subprocess
 import json
 from multiprocessing import Pool
+import shutil
 
 def separate_dataset_to_train_valid_test_files(source,destination,train_rate=0.6,valid_rate=0.2,test_rate=0.2,remove_src=False):
     print("source file",source)
@@ -423,7 +424,7 @@ def extract_train_data_templates_pool(filePath):
     pool = Pool(processes=3)
     pool.map(extract_train_data_templates, file_list)
 
-def shuffle_data(rootdir):
+def shuffle_data_train_valid(rootdir):
     file_list=glob.glob(rootdir + "/*.smt2")
     print(file_list)
     random.shuffle(file_list)
@@ -441,6 +442,68 @@ def shuffle_data(rootdir):
         file_list_ = glob.glob(file + "*")
         for f in file_list_:
             copy(f, os.path.join("../benchmarks/temp/", "valid_data"))
+
+def shuffle_data(rootdir):
+    '''
+    shuffle files in rootdir to shuffled_files
+    '''
+    file_list=glob.glob(rootdir + "/*.smt2")
+    print("total file ",len(file_list))
+    random.shuffle(file_list)
+    random.shuffle(file_list)
+    print(file_list)
+    train_files=file_list[0:int(len(file_list)*0.6)]
+    valid_files = file_list[int(len(file_list) * 0.6):int(len(file_list) * 0.8)]
+    test_files=file_list[int(len(file_list)*0.8):len(file_list)]
+    os.mkdir("../benchmarks/shuffled_files")
+    for file,fold_name in zip([train_files,valid_files,test_files],["train_data","valid_data","test_data"]):
+        os.mkdir("../benchmarks/shuffled_files/"+fold_name)
+        print(fold_name+"_files", len(file))
+        for f in file:
+            copy(f, os.path.join("../benchmarks/shuffled_files/", fold_name))
+
+def divide_data_to_threads(root,target_folder):
+    chunk_number=10
+    try:
+        os.mkdir(os.path.join("../benchmarks",target_folder))
+    except:
+        print("path existed")
+    for datafold,datafold_files in zip(["train_data","valid_data","test_data"],[os.path.join(root,"train_data"),os.path.join(root,"valid_data"),os.path.join(root,"test_data")]):
+        datafold_file_list=glob.glob(datafold_files+"/*")
+        print(datafold_files,len(datafold_file_list))
+        chunk_size=int(len(datafold_file_list)/chunk_number)
+        for i in range(0,chunk_number):
+            thread_dir=os.path.join("../benchmarks",target_folder,"thread_"+str(i))
+            try:
+                os.mkdir(thread_dir)
+            except:
+                pass
+            try:
+                os.mkdir(os.path.join(thread_dir, datafold))
+            except:
+                pass
+            for file in datafold_file_list[i*chunk_size:(i+1)*chunk_size]:
+                copy(file, os.path.join(thread_dir,datafold))
+        for file in datafold_file_list[chunk_number*chunk_size:]:
+            copy(file, os.path.join(thread_dir, datafold))
+
+
+
+def moveIncompletedExtractionsToTemp(rootdir):
+    '''
+    move imcompleted ectraction to temp under the rootdir. need create that dirctory first
+    '''
+    for fold in ["train_data","valid_data","test_data"]:
+        file_list = glob.glob(os.path.join(rootdir,fold) + "/*.smt2")
+        for file in file_list:
+            relative_file_list = glob.glob(file+"*")
+            if len(relative_file_list)!=7:
+                for f in relative_file_list:
+                    shutil.move(f,os.path.join(rootdir,"temp"))
+
+
+
+
 
 
 
@@ -487,7 +550,10 @@ def main():
 
     #extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
 
-    shuffle_data("../benchmarks/temp/tobe_shuffled")
+    #shuffle_data("../benchmarks/shuffleFile")
+    #divide_data_to_threads("../benchmarks/shuffled_files","shuffled_files_divided")
+
+    moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
 
 

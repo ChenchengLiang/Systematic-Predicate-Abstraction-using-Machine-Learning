@@ -141,8 +141,8 @@ def set_threshold_by_ranks(true_Y,true_Y_by_file,predicted_Y_loaded_model,true_Y
 
 
 def main():
-    path="../benchmarks/new-full-dataset-valid/"
-    trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-01-15_19-39-16_best.pkl"
+    path="../benchmarks/new-full-dataset-with-and-test/"
+    trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-01-24_20-20-15_best.pkl"
     json_type=".hyperEdgeHornGraph.JSON"
     graph_type = json_type[1:json_type.find(".JSON")]
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
@@ -158,6 +158,7 @@ def main():
     # label = "argument_identify_no_batchs"
     # label = "control_location_identify"
     #label = "predicate_occurrence_in_SCG"
+    #label = "argument_occurrence_binary"
     label = "template_relevance"
 
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
@@ -216,7 +217,7 @@ def main():
     # todo: threshold by rounding values [0,1]
     set_threshold_by_roundings(true_Y,predicted_Y_loaded_model)
     #todo: by rank
-    rank_percentage_list=np.arange(0.0, 1.0, 0.1)
+    rank_percentage_list=np.arange(0.0, 1.0, 0.05)
     for rank_percentage in rank_percentage_list:
         set_threshold_by_ranks(true_Y,true_Y_by_file, predicted_Y_loaded_model, true_Y_file_list,rank_percentage)
 
