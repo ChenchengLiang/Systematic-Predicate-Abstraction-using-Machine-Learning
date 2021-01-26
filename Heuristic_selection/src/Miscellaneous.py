@@ -4,6 +4,21 @@ import os,glob,shutil
 from distutils.dir_util import copy_tree
 import json
 import matplotlib.pyplot as plt
+from numba import cuda
+import tensorflow as tf
+
+def GPU_switch(GPU):
+    if GPU==False:
+        os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+        tf.keras.backend.clear_session()
+    else:
+        #watch nvidia-smi
+        cuda.select_device(0)
+        cuda.close()
+        print('CUDA memory released: GPU0')
+        gpus = tf.config.experimental.list_physical_devices('GPU')
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
 
 def drawBinaryLabelPieChart(learning_label,label,graph_type,benchmark_name,df):
     flat_list = [item for sublist in learning_label for item in sublist]
@@ -187,16 +202,16 @@ def testAccuracy(predictedY,trueY):
     print("test accuracy:", acc)
     return acc
 
-def pickleWrite(content,name,path=""):
-    parenDir = os.path.abspath(os.path.pardir)
-    file=path+'../pickleData/'+name+'.txt'
+def pickleWrite(content,name,path='../pickleData/'):
+    #parenDir = os.path.abspath(os.path.pardir)
+    file=path+name+'.txt'
     print('pickle write to '+file)
     with open(file,"wb") as fp :
         pickle.dump(content,fp)
 
-def pickleRead(name,path=""):
-    parenDir = os.path.abspath(os.path.pardir)
-    file=path+'../pickleData/' + name + '.txt'
+def pickleRead(name,path='../pickleData/'):
+    #parenDir = os.path.abspath(os.path.pardir)
+    file=path + name + '.txt'
     print('pickle read '+file)
     with open(file,"rb") as fp :
         content=pickle.load(fp)

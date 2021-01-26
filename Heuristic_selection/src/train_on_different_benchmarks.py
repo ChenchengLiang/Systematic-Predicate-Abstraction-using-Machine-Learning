@@ -4,6 +4,7 @@ from numba import cuda
 import tensorflow as tf
 import random
 import numpy as np
+from Miscellaneous import GPU_switch
 def main():
     parameter_list = []
     label_list=[]
@@ -19,12 +20,12 @@ def main():
     # label_list.append("argument_upper_bound_existence")
     # label_list.append("argument_lower_bound")
     # label_list.append("argument_upper_bound")
-    label_list.append("argument_occurrence_binary")
-    label_list.append("template_relevance")
+    #label_list.append("argument_occurrence_binary")
+    #label_list.append("template_relevance")
     #label = "clause_occurrence_in_counter_examples_binary"
     # json_type = ".hyperEdgeHornGraph.JSON"
     # json_type = ".layerHornGraph.JSON"
-    force_read = True
+    force_read = False
     form_label = True
     from_json = True
     file_type = ".smt2"
@@ -72,17 +73,7 @@ def main():
         #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
         #                json_type=".fine-grained-edge-type-layerHornGraph.JSON", label=label))
 
-    if GPU==False:
-        os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-        tf.keras.backend.clear_session()
-    else:
-        #watch nvidia-smi
-        cuda.select_device(0)
-        cuda.close()
-        print('CUDA memory released: GPU0')
-        gpus = tf.config.experimental.list_physical_devices('GPU')
-        for gpu in gpus:
-            tf.config.experimental.set_memory_growth(gpu, True)
+    GPU_switch(GPU)
 
 
     for param in parameter_list:

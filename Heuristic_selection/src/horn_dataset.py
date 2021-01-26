@@ -23,7 +23,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
 
     graph_type=json_type[1:json_type.find(".JSON")]
     print("graph_type",graph_type)
-    nodeFeatureDim = 64 #64
+    nodeFeatureDim = 32 #64
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
     parameters['graph_type'] = graph_type  # hyperEdgeHornGraph or layerHornGraph
     #parameters["message_calculation_class"]="rgcn"#rgcn,ggnn,rgat
@@ -40,12 +40,12 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters['num_layers'] = 4
     parameters['node_label_embedding_size'] = nodeFeatureDim
     parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
-    parameters['regression_hidden_layer_size'] = [64,64,64]
+    parameters['regression_hidden_layer_size'] = [32,32,32]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
     parameters ["gathered_nodes_binary_classification_task"]=gathered_nodes_binary_classification_task
-    max_epochs = 500
-    patience = 100
+    max_epochs = 3
+    patience = 3
     # parameters["add_self_loop_edges"]=False
     # parameters["tie_fwd_bkwd_edges"]=True
 
@@ -202,6 +202,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
                                valid_loss_average, mse_loaded_model, mean_loss_list, accuracy_average,
                                best_valid_epoch_average,
                                benchmark=benchmark_name, label=label, graph_type=graph_type)
+
+    pickleWrite(parameters, benchmark_name+"-"+label+"-parameters","../src/trained_model/")
 
 
 
