@@ -37,15 +37,15 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     #parameters["residual_every_num_layers"]=10000000
     parameters['hidden_dim'] = nodeFeatureDim #64
     #parameters["num_edge_MLP_hidden_layers"]
-    parameters['num_layers'] = 4
+    parameters['num_layers'] = 8
     parameters['node_label_embedding_size'] = nodeFeatureDim
     parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
     parameters['regression_hidden_layer_size'] = [32,32,32]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
     parameters ["gathered_nodes_binary_classification_task"]=gathered_nodes_binary_classification_task
-    max_epochs = 3
-    patience = 3
+    max_epochs = 1
+    patience = 1
     # parameters["add_self_loop_edges"]=False
     # parameters["tie_fwd_bkwd_edges"]=True
 
@@ -166,7 +166,6 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         mse_mean = tf.keras.losses.MSE([np.mean(true_Y)]*len(true_Y), true_Y)
         print("\n mse_mean_Y_and_True_Y", mse_mean)
         mean_loss_list=mse_mean
-        #todo: adjust round function with different threshold. threshold could be a rank number or specifict value in [0,1]
         num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, tf.math.round(predicted_Y_loaded_model)),tf.int32))
         accuracy = num_correct / len(predicted_Y_loaded_model)
         accuracy_average.append(accuracy)
@@ -363,8 +362,13 @@ class parsed_graph_data:
         self.graphs_label_indices=graphs_label_indices
         self.graphs_learning_labels=graphs_learning_labels
 
-def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../",from_json=False,file_type=".smt2",json_type=".JSON",max_nodes_per_batch=10000,graph_type="hyperEdgeHornGraph"):
-    vocabulary_set, token_map = build_vocabulary(datafold=["train", "valid", "test"], path=path,json_type=json_type)
+def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../",from_json=False,file_type=".smt2",json_type=".JSON",max_nodes_per_batch=10000,graph_type="hyperEdgeHornGraph",vocabulary_name=""):
+    if len(data_fold)==1:
+        voc=pickleRead(vocabulary_name + "-" + label + "-vocabulary","../src/trained_model/")
+        vocabulary_set, token_map = voc[0],voc[1]
+    else:
+        vocabulary_set, token_map = build_vocabulary(datafold=["train", "valid", "test"], path=path,json_type=json_type)
+        pickleWrite([vocabulary_set, token_map], benchmark + "-" + label + "-vocabulary", "../src/trained_model/")
     benchmark_name = benchmark.replace("/", "-")
     for df in data_fold:
         print("write data_fold to pickle data:", df)
@@ -395,7 +399,7 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                 #print("file_name",fileName)
                 with open(fileGraph) as f:
                     loaded_graph = json.load(f)
-                    #todo:debug check all field if equal to empty
+                    #debug check all field if equal to empty
                     if len(loaded_graph["nodeIds"]) == 0:
                         print("nodeIds==0",fileName)
                         # for f in glob.glob(path+df+"_data/"+fileName + "*"):
@@ -632,7 +636,11 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
         # node tokenization
         tokenized_node_label_ids = []
         for symbol in node_symbols:
-            tokenized_node_label_ids.append(token_map[symbol])
+            try:
+                tokenized_node_label_ids.append(token_map[symbol])
+            except:
+                #todo: classify unknown node symbols
+                tokenized_node_label_ids.append(token_map["unknown"])
         raw_data_graph.labels.append(learning_labels)
 
         #catch label distribution
@@ -777,7 +785,11 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
             #node tokenization
             tokenized_node_label_ids = []
             for symbol in node_symbols:
-                tokenized_node_label_ids.append(token_map[symbol])
+                try:
+                    tokenized_node_label_ids.append(token_map[symbol])
+                except:
+                    #todo: classify unknown node symbols
+                    tokenized_node_label_ids.append(token_map["unknown"])
 
             if label == "rank":
                 raw_data_graph.labels.append(argument_scores)
@@ -889,7 +901,7 @@ def build_vocabulary(datafold=["train", "valid", "test"], path="",json_type=".la
                 vocabulary_set.update(loaded_graph["nodeSymbolList"])
     token_map={}
     token_id=0
-
+    # todo: classify unknown node symbols
     for word in sorted(vocabulary_set):
         token_map[word]=token_id
         token_id=token_id+1

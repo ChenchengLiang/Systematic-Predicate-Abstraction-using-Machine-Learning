@@ -146,7 +146,7 @@ def main():
     benchmark="new-full-dataset-with-and"
     benchmark_fold=benchmark+"-"+"valid-1"
     path="../benchmarks/"+benchmark_fold+"/"
-    trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-01-26_14-39-43_best.pkl"
+    trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-01-26_16-23-07_best.pkl"
     json_type=".hyperEdgeHornGraph.JSON"
     graph_type = json_type[1:json_type.find(".JSON")]
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
@@ -161,15 +161,17 @@ def main():
     # label = "argument_identify"
     # label = "argument_identify_no_batchs"
     # label = "control_location_identify"
-    label = "predicate_occurrence_in_SCG"
+    #label = "predicate_occurrence_in_SCG"
     #label = "argument_occurrence_binary"
-    #label = "template_relevance"
+    label = "template_relevance"
     parameters = pickleRead(benchmark + "-" + label + "-parameters","../src/trained_model/")
+    parameters["benchmark"]=benchmark_name
+    print("voc:",parameters["node_vocab_size"] )
 
 
 
     if force_read==True:
-        write_graph_to_pickle(benchmark_name,  data_fold=["test"], label=label,path=path,from_json=True,file_type="smt2",json_type=json_type,graph_type=graph_type,max_nodes_per_batch=parameters['max_nodes_per_batch'])
+        write_graph_to_pickle(benchmark_name,  data_fold=["test"], label=label,path=path,from_json=True,file_type="smt2",json_type=json_type,graph_type=graph_type,max_nodes_per_batch=parameters['max_nodes_per_batch'],vocabulary_name=benchmark)
     else:
         print("Use pickle data for training")
     #if form_label == True and not os.path.isfile("../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):
@@ -180,6 +182,7 @@ def main():
     dataset = HornGraphDataset(parameters)
     dataset.load_data([DataFold.TEST])
     #parameters["node_vocab_size"] = dataset._node_vocab_size
+    print("dataset._node_vocab_size",dataset._node_vocab_size)
     test_data = dataset.get_tensorflow_dataset(DataFold.TEST)
     loaded_model = tf2_gnn.cli_utils.model_utils.load_model_for_prediction(trained_model_path, dataset)
     _, _, test_results = loaded_model.run_one_epoch(test_data, training=False, quiet=quiet)

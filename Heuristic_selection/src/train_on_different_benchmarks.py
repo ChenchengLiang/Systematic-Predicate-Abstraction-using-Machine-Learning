@@ -14,18 +14,18 @@ def main():
     #label = "argument_identify_no_batchs"
     #label = "control_location_identify"
     #label_list.append("predicate_occurrence_in_clauses")
-    label_list.append("predicate_occurrence_in_SCG")
+    #label_list.append("predicate_occurrence_in_SCG")
     # label="argument_bound"
     #label_list.append("argument_lower_bound_existence")
     # label_list.append("argument_upper_bound_existence")
     # label_list.append("argument_lower_bound")
     # label_list.append("argument_upper_bound")
     #label_list.append("argument_occurrence_binary")
-    #label_list.append("template_relevance")
+    label_list.append("template_relevance")
     #label = "clause_occurrence_in_counter_examples_binary"
     # json_type = ".hyperEdgeHornGraph.JSON"
     # json_type = ".layerHornGraph.JSON"
-    force_read = False
+    force_read = True
     form_label = True
     from_json = True
     file_type = ".smt2"
