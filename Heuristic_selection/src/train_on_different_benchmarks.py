@@ -14,13 +14,13 @@ def main():
     #label = "argument_identify_no_batchs"
     #label = "control_location_identify"
     #label_list.append("predicate_occurrence_in_clauses")
-    #label_list.append("predicate_occurrence_in_SCG")
+    label_list.append("predicate_occurrence_in_SCG")
     # label="argument_bound"
     #label_list.append("argument_lower_bound_existence")
     # label_list.append("argument_upper_bound_existence")
     # label_list.append("argument_lower_bound")
     # label_list.append("argument_upper_bound")
-    #label_list.append("argument_occurrence_binary")
+    label_list.append("argument_occurrence_binary")
     label_list.append("template_relevance")
     #label = "clause_occurrence_in_counter_examples_binary"
     # json_type = ".hyperEdgeHornGraph.JSON"
@@ -31,7 +31,7 @@ def main():
     file_type = ".smt2"
     GPU=True
     pickle = True
-    benchmark_name = "new-full-dataset-with-and/"
+    benchmark_name = "new-full-dataset-with-simple-generated-initlal-predicates-copy/"
 
     # random.seed(0)
     # np.random.seed(0)

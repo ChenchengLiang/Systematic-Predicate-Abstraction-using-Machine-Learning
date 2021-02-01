@@ -101,7 +101,7 @@ def set_threshold_by_roundings(true_Y,predicted_Y_loaded_model):
     for i in threshold_list:
         num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, my_round_fun(predicted_Y_loaded_model,i)), tf.int32))
         accuracy = num_correct / len(predicted_Y_loaded_model)
-        print("threshold", i,"accuracy",float(accuracy))
+        #print("threshold", i,"accuracy",float(accuracy))
         if float(accuracy)>best_set["accuracy"]:
             best_set["accuracy"]=float(accuracy)
             best_set["threshold"]=float(i)
@@ -136,77 +136,52 @@ def set_threshold_by_ranks(true_Y,true_Y_by_file,predicted_Y_loaded_model,true_Y
 
     num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, rounded_by_top_rank), tf.int32))
     accuracy = num_correct / len(predicted_Y_loaded_model)
-    print("top_percentage",top_percentage,"accuracy",float(accuracy))
+    #print("top_percentage",top_percentage,"accuracy",float(accuracy))
     return {"top_percentage":top_percentage,"accuracy":float(accuracy)}
 
 
-
-
-def main():
-    benchmark="new-full-dataset-with-and"
-    benchmark_fold=benchmark+"-"+"valid-1"
-    path="../benchmarks/"+benchmark_fold+"/"
-    trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-01-26_16-23-07_best.pkl"
-    json_type=".hyperEdgeHornGraph.JSON"
-    graph_type = json_type[1:json_type.find(".JSON")]
-    gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
-                                                 "argument_upper_bound_existence", "argument_occurrence_binary",
-                                                 "template_relevance", "clause_occurrence_in_counter_examples_binary"]
+def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label,force_read,form_label,json_type,graph_type,gathered_nodes_binary_classification_task):
+    path = "../benchmarks/" + benchmark_fold + "/"
     benchmark_name = path[len("../benchmarks/"):-1]
-    force_read=True
-    form_label=True
-    GPU_switch(True)
-    #label = "occurrence"
-    # label = "rank"
-    # label = "argument_identify"
-    # label = "argument_identify_no_batchs"
-    # label = "control_location_identify"
-    #label = "predicate_occurrence_in_SCG"
-    #label = "argument_occurrence_binary"
-    label = "template_relevance"
-    parameters = pickleRead(benchmark + "-" + label + "-parameters","../src/trained_model/")
-    parameters["benchmark"]=benchmark_name
-    print("voc:",parameters["node_vocab_size"] )
+    parameters = pickleRead(benchmark + "-" + label + "-parameters", "../src/trained_model/")
+    parameters["benchmark"] = benchmark_name
+    print("vocabulary size:", parameters["node_vocab_size"])
 
-
-
-    if force_read==True:
-        write_graph_to_pickle(benchmark_name,  data_fold=["test"], label=label,path=path,from_json=True,file_type="smt2",json_type=json_type,graph_type=graph_type,max_nodes_per_batch=parameters['max_nodes_per_batch'],vocabulary_name=benchmark)
+    if force_read == True:
+        write_graph_to_pickle(benchmark_name, data_fold=["test"], label=label, path=path, from_json=True,
+                              file_type="smt2", json_type=json_type, graph_type=graph_type,
+                              max_nodes_per_batch=parameters['max_nodes_per_batch'], vocabulary_name=benchmark)
     else:
         print("Use pickle data for training")
-    #if form_label == True and not os.path.isfile("../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):
+    # if form_label == True and not os.path.isfile("../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):
     if form_label == True:
-        form_GNN_inputs_and_labels(label=label, datafold=["test"], benchmark=benchmark_name,graph_type=graph_type,gathered_nodes_binary_classification_task=gathered_nodes_binary_classification_task)
+        form_GNN_inputs_and_labels(label=label, datafold=["test"], benchmark=benchmark_name, graph_type=graph_type,
+                                   gathered_nodes_binary_classification_task=gathered_nodes_binary_classification_task)
 
-    quiet=False
+    quiet = False
     dataset = HornGraphDataset(parameters)
     dataset.load_data([DataFold.TEST])
-    #parameters["node_vocab_size"] = dataset._node_vocab_size
-    print("dataset._node_vocab_size",dataset._node_vocab_size)
     test_data = dataset.get_tensorflow_dataset(DataFold.TEST)
     loaded_model = tf2_gnn.cli_utils.model_utils.load_model_for_prediction(trained_model_path, dataset)
     _, _, test_results = loaded_model.run_one_epoch(test_data, training=False, quiet=quiet)
     test_metric, test_metric_string = loaded_model.compute_epoch_metrics(test_results)
     predicted_Y_loaded_model = loaded_model.predict(test_data)
 
+    print("test_metric_string", test_metric_string)
+    print("test_metric", test_metric)
 
-    print("test_metric_string",test_metric_string)
-    print("test_metric",test_metric)
+    # write_predicted_label_to_JSON_file(dataset, predicted_Y_loaded_model,json_type)
 
-    #write_predicted_label_to_JSON_file(dataset, predicted_Y_loaded_model,json_type)
-
-
-    #test measurement
+    # test measurement
     true_Y = []
     true_Y_by_file = []
-    true_Y_file_list=[]
+    true_Y_file_list = []
     for data in iter(test_data):
         true_Y.extend(np.array(data[1]["node_labels"]))
     for data in dataset._label_list["test"]:
         true_Y_by_file.append(np.array(data))
     for file_name in dataset._file_list["test"]:
         true_Y_file_list.append(file_name)
-
 
     mse_loaded_model = tf.keras.losses.MSE(true_Y, predicted_Y_loaded_model)
     print("\n mse_loaded_model_predicted_Y_and_True_Y", mse_loaded_model)
@@ -217,20 +192,55 @@ def main():
     mse_mean = tf.keras.losses.MSE([np.mean(true_Y)] * len(true_Y), true_Y)
     print("\n mse_mean_Y_and_True_Y", mse_mean)
     mean_loss_list = mse_mean
-    # todo: threshold by rounding values [0,1]
-    best_set_threshold=set_threshold_by_roundings(true_Y,predicted_Y_loaded_model)
-    #todo: by rank
-    best_set_ranks=wrapped_set_threshold_by_ranks(true_Y,true_Y_by_file, predicted_Y_loaded_model, true_Y_file_list)
+    best_set_threshold = set_threshold_by_roundings(true_Y, predicted_Y_loaded_model)
+    best_set_ranks = wrapped_set_threshold_by_ranks(true_Y, true_Y_by_file, predicted_Y_loaded_model, true_Y_file_list)
 
-
-    print("----------",label,"----------")
+    print("----------", benchmark_fold, "-----", label, "----------")
     positive_label_number = sum(true_Y)
     negative_label_number = len(true_Y) - positive_label_number
 
-    print("positive_label_percentage",positive_label_number/len(true_Y))
+    print("positive_label_percentage", positive_label_number / len(true_Y))
     print("negative_label_number", negative_label_number / len(true_Y))
-    print("best_set_threshold","threshold value:",best_set_threshold["threshold"],"accuracy:",best_set_threshold["accuracy"])
-    print("best_set_ranks", "top_percentage:", best_set_ranks["top_percentage"], "accuracy:",best_set_ranks["accuracy"])
+    print("best_set_threshold", "threshold value:", best_set_threshold["threshold"], "accuracy:",
+          best_set_threshold["accuracy"])
+    print("best_set_ranks", "top_percentage:", best_set_ranks["top_percentage"], "accuracy:",
+          best_set_ranks["accuracy"])
+
+    random_guess_accuracy = max(positive_label_number / len(true_Y), negative_label_number / len(true_Y))
+    print("{0:.0%}".format(max(best_set_threshold["accuracy"], best_set_ranks["accuracy"]) - random_guess_accuracy),
+          "better than random guess")
+def main():
+    benchmark="new-full-dataset-with-simple-generated-initlal-predicates-copy"
+    benchmark_fold_list=[]
+    benchmark_fold_list.append(benchmark+"-"+"valid")
+    #benchmark_fold_list.append(benchmark + "-" + "valid-1")
+    benchmark_fold_list.append(benchmark + "-" + "test")
+    trained_model_path_list=[]
+    trained_model_path_list.append("/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-02-01_12-30-47_best.pkl")
+    trained_model_path_list.append()
+    trained_model_path_list.append()
+    json_type=".hyperEdgeHornGraph.JSON"
+    graph_type = json_type[1:json_type.find(".JSON")]
+    gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
+                                                 "argument_upper_bound_existence", "argument_occurrence_binary",
+                                                 "template_relevance", "clause_occurrence_in_counter_examples_binary"]
+    force_read=True
+    form_label=True
+    GPU_switch(True)
+    label_list=[]
+    #label = "occurrence"
+    # label = "rank"
+    # label = "argument_identify"
+    # label = "argument_identify_no_batchs"
+    # label = "control_location_identify"
+    label_list.append("predicate_occurrence_in_SCG")
+    label_list.append("argument_occurrence_binary")
+    label_list.append("template_relevance")
+
+
+    for label,trained_model_path in zip(label_list,trained_model_path_list):
+        for benchmark_fold in benchmark_fold_list:
+            wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label,force_read,form_label,json_type,graph_type,gathered_nodes_binary_classification_task)
 
 
 

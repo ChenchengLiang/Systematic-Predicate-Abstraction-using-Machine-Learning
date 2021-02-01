@@ -69,7 +69,7 @@ def extract_train_data_pool(filePath,fun,countinous_extract=False,parameterList=
             else:
                 for file in glob.glob(root + "/*.smt2"):
                     file_list.append([file,parameterList])
-    pool = Pool(processes=4)
+    pool = Pool(processes=6)
     pool.map(fun, file_list)
 
 
@@ -89,8 +89,9 @@ def main():
     parameterList = ["-extractPredicates","-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120","-getHornGraph:hyperEdgeGraph","-t:1200"] #extract train and valid data, predicates generated from both cegar and simple generator
     extract_train_data_pool(os.path.join(benchmark_name,"train_data"),extract_graph_from_eldarica,countinous_extract=True,parameterList=parameterList)
     extract_train_data_pool(os.path.join(benchmark_name,"valid_data"),extract_graph_from_eldarica, countinous_extract=True, parameterList=parameterList)
+    extract_train_data_pool(os.path.join(benchmark_name, "test_data"), extract_graph_from_eldarica,countinous_extract=True, parameterList=parameterList)
     parameterList = ["-extractPredicates", "-onlySimplePredicates", "-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120","-getHornGraph:hyperEdgeGraph","-t:1200"]  # extract test data, predicates generated from only simple generator
-    extract_train_data_pool(os.path.join(benchmark_name,"test_data"),extract_graph_from_eldarica, countinous_extract=True, parameterList=parameterList)
+    extract_train_data_pool(os.path.join(benchmark_name,"test_data_simple_generator"),extract_graph_from_eldarica, countinous_extract=True, parameterList=parameterList)
 
     #extract data by reading .tpl and json file
     # benchmark_name = os.path.join("../benchmarks/", sys.argv[1])  # "../benchmarks/LIA-lin-datafold/"

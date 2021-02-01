@@ -90,14 +90,67 @@ def mnist_example():
     ])
     probability_model(x_test[:5])
 
-def main():
-    #mnist_example()
-    x=[1,2,3,5,3,2,1]
-    sorted_x = sorted(x)
-    print(x)
-    print(sorted_x)
-    print(x)
+def convert_constant_to_category(constant_string):
+    converted_string=constant_string
+    if constant_string.isdigit() and int(constant_string)>1:
+        converted_string="positive_constant"
+    elif converted_string[1:].isdigit() and int(constant_string)<-1:
+        converted_string="negative_constant"
+    return converted_string
 
+
+def tokenize_symbols(token_map,node_symbols):
+    converted_node_symbols=[ convert_constant_to_category(word) for word in node_symbols]
+    # node tokenization
+    full_operator_list = ["+", "-", "*", "/", ">", ">=", "=", "<", "<=", "==", "===", "!", "+++", "++", "**", "***",
+                          "--", "---", "=/=","&","|","EX"]
+    tokenized_node_label_ids = []
+    for symbol in converted_node_symbols:
+        if symbol in token_map:
+            tokenized_node_label_ids.append((symbol,token_map[symbol],symbol))
+        elif "CONTROL" in symbol:
+            tokenized_node_label_ids.append((symbol,token_map["unknown_predicate"],"unknown_predicate"))
+        elif "predicateArgument" in symbol:
+            tokenized_node_label_ids.append((symbol,token_map["unkown_predicate_argument"],"unkown_predicate_argument"))
+        elif "template" in symbol:
+            tokenized_node_label_ids.append((symbol,token_map["unknown_predicate_label"],"unknown_predicate_label"))
+        elif "SYMBOLIC_CONSTANT" in symbol:
+            tokenized_node_label_ids.append((symbol,token_map["unkown_symblic_constant"],"unkown_symblic_constant"))
+        elif symbol in full_operator_list:
+            tokenized_node_label_ids.append((symbol,token_map["unknown_operator"],"unknown_operator"))
+        elif symbol.isnumeric() or symbol[1:].isnumeric():
+            tokenized_node_label_ids.append((symbol,token_map["unknown_constant"],"unknown_constant"))
+        else:
+            tokenized_node_label_ids.append((symbol,token_map["unknown_node"],"unknown_node"))
+    print("tokenized_node_label_ids",len(tokenized_node_label_ids),len(set(tokenized_node_label_ids)))
+    return tokenized_node_label_ids
+
+def main():
+    node_symbols=["5","-1","0","1","-4","SYMBOLIC_CONSTANT_1"]
+    nodeSymbolList=["-100","5","CONTROL_0","predicateArgument_0","predicateArgument_1","CONTROL_1","0","true","-","1","-","!","=","-","-1","FALSE","!","=","=","&","template_0","=","template_1","=","template_2","=","-"]
+
+    vocabulary_set = set(["unknown_node", "unknown_predicate", "unkown_symblic_constant", "unkown_predicate_argument",
+                          "unknown_operator", "unknown_constant", "unknown_predicate_label"])
+
+    vocabulary_set.update(nodeSymbolList)
+    token_map = {}
+    token_id = 0
+    for word in sorted(vocabulary_set):
+        try:
+            word = convert_constant_to_category(word)
+        except:
+            print("------------debug--------------")
+            print(word)
+        token_map[word] = token_id
+        token_id = token_id + 1
+    print("vocabulary_set", len(vocabulary_set))
+    print("token_map", len(token_map))
+    print(token_map)
+
+    tokenized_node_label_ids=tokenize_symbols(token_map, node_symbols)
+
+
+    print("tokenized_node_label_ids",tokenized_node_label_ids)
 
 
     # tf.debugging.set_log_device_placement(True)

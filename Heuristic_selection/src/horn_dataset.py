@@ -37,15 +37,15 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     #parameters["residual_every_num_layers"]=10000000
     parameters['hidden_dim'] = nodeFeatureDim #64
     #parameters["num_edge_MLP_hidden_layers"]
-    parameters['num_layers'] = 8
+    parameters['num_layers'] = 16
     parameters['node_label_embedding_size'] = nodeFeatureDim
     parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
     parameters['regression_hidden_layer_size'] = [32,32,32]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
     parameters ["gathered_nodes_binary_classification_task"]=gathered_nodes_binary_classification_task
-    max_epochs = 1
-    patience = 1
+    max_epochs = 500
+    patience = 100
     # parameters["add_self_loop_edges"]=False
     # parameters["tie_fwd_bkwd_edges"]=True
 
@@ -634,13 +634,8 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
                                                                                                          graphs_learning_labels):
         raw_data_graph.file_names.append(file_name)
         # node tokenization
-        tokenized_node_label_ids = []
-        for symbol in node_symbols:
-            try:
-                tokenized_node_label_ids.append(token_map[symbol])
-            except:
-                #todo: classify unknown node symbols
-                tokenized_node_label_ids.append(token_map["unknown"])
+        tokenized_node_label_ids=tokenize_symbols(token_map,node_symbols)
+
         raw_data_graph.labels.append(learning_labels)
 
         #catch label distribution
@@ -783,13 +778,7 @@ def form_horn_graph_samples(graphs_node_label_ids,graphs_node_symbols, graphs_ar
             raw_data_graph.file_names.append(file_name)
 
             #node tokenization
-            tokenized_node_label_ids = []
-            for symbol in node_symbols:
-                try:
-                    tokenized_node_label_ids.append(token_map[symbol])
-                except:
-                    #todo: classify unknown node symbols
-                    tokenized_node_label_ids.append(token_map["unknown"])
+            tokenized_node_label_ids=tokenize_symbols(token_map,node_symbols)
 
             if label == "rank":
                 raw_data_graph.labels.append(argument_scores)
@@ -893,7 +882,8 @@ def get_predicted_label_list_divided_by_file(dataset,predicted_Y_loaded_model):
     return predicted_label_lists
 
 def build_vocabulary(datafold=["train", "valid", "test"], path="",json_type=".layerHornGraph.JSON"):
-    vocabulary_set=set(["unknown"])
+    vocabulary_set=set(["unknown_node","unknown_predicate","unkown_symblic_constant","unkown_predicate_argument",
+                        "unknown_operator","unknown_constant","unknown_predicate_label"])
     for fold in datafold:
         for json_file in glob.glob(path+fold+"_data/*"+json_type):
             with open(json_file) as f:
@@ -901,11 +891,52 @@ def build_vocabulary(datafold=["train", "valid", "test"], path="",json_type=".la
                 vocabulary_set.update(loaded_graph["nodeSymbolList"])
     token_map={}
     token_id=0
-    # todo: classify unknown node symbols
+    vocabulary_set=set([convert_constant_to_category(w) for w in vocabulary_set])
     for word in sorted(vocabulary_set):
         token_map[word]=token_id
         token_id=token_id+1
+    #print("vocabulary_set",vocabulary_set)
     return vocabulary_set,token_map
+
+def tokenize_symbols(token_map,node_symbols):
+    converted_node_symbols=[ convert_constant_to_category(word) for word in node_symbols]
+    # node tokenization
+    full_operator_list = ["+", "-", "*", "/", ">", ">=", "=", "<", "<=", "==", "===", "!", "+++", "++", "**", "***",
+                          "--", "---", "=/=","&","|","EX","and","or"]
+    tokenized_node_label_ids = []
+    for symbol in converted_node_symbols:
+        if symbol in token_map:
+            tokenized_node_label_ids.append(token_map[symbol])
+        elif "CONTROL" in symbol:
+            print("unknown_predicate", symbol)
+            tokenized_node_label_ids.append(token_map["unknown_predicate"])
+        elif "predicateArgument" in symbol:
+            tokenized_node_label_ids.append(token_map["unkown_predicate_argument"])
+        elif "template" in symbol:
+            print("unknown_predicate_label", symbol)
+            tokenized_node_label_ids.append(token_map["unknown_predicate_label"])
+        elif "SYMBOLIC_CONSTANT" in symbol:
+            print("unkown_symblic_constant", symbol)
+            tokenized_node_label_ids.append(token_map["unkown_symblic_constant"])
+        elif symbol.isnumeric() or symbol[1:].isnumeric():
+            print("unknown_constant", symbol)
+            tokenized_node_label_ids.append(token_map["unknown_constant"])
+        elif symbol in full_operator_list:
+            #todo: debug here
+            print("unknown_operator",symbol)
+            tokenized_node_label_ids.append(token_map["unknown_operator"])
+        else:
+            tokenized_node_label_ids.append(token_map["unknown_node"])
+    return tokenized_node_label_ids
+
+def convert_constant_to_category(constant_string):
+    converted_string=constant_string
+    if constant_string.isdigit() and int(constant_string)>1:
+        converted_string="positive_constant"
+    elif converted_string[1:].isdigit() and int(constant_string)<-1:
+        converted_string="negative_constant"
+    return converted_string
+
 
 
 def count_paramsters(model):
