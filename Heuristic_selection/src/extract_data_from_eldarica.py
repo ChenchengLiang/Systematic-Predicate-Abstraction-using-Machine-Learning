@@ -86,11 +86,11 @@ def main():
 
     #extract data
     benchmark_name=os.path.join("../benchmarks/",sys.argv[1])#"../benchmarks/LIA-lin-datafold/"
-    parameterList = ["-extractPredicates","-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120","-getHornGraph:hyperEdgeGraph","-t:1200"] #extract train and valid data, predicates generated from both cegar and simple generator
+    parameterList = ["-extractPredicates","-varyGeneratedPredicates","-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120","-getHornGraph:hyperEdgeGraph","-mainTimeout:1200","-t:1200"] #extract train and valid data, predicates generated from both cegar and simple generator
     extract_train_data_pool(os.path.join(benchmark_name,"train_data"),extract_graph_from_eldarica,countinous_extract=True,parameterList=parameterList)
     extract_train_data_pool(os.path.join(benchmark_name,"valid_data"),extract_graph_from_eldarica, countinous_extract=True, parameterList=parameterList)
     extract_train_data_pool(os.path.join(benchmark_name, "test_data"), extract_graph_from_eldarica,countinous_extract=True, parameterList=parameterList)
-    parameterList = ["-extractPredicates", "-onlySimplePredicates", "-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120","-getHornGraph:hyperEdgeGraph","-t:1200"]  # extract test data, predicates generated from only simple generator
+    parameterList = ["-extractPredicates", "-onlySimplePredicates", "-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120","-getHornGraph:hyperEdgeGraph","-mainTimeout:1200","-t:1200"]  # extract test data, predicates generated from only simple generator
     extract_train_data_pool(os.path.join(benchmark_name,"test_data_simple_generator"),extract_graph_from_eldarica, countinous_extract=True, parameterList=parameterList)
 
     #extract data by reading .tpl and json file

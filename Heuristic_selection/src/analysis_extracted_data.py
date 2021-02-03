@@ -443,7 +443,7 @@ def shuffle_data_train_valid(rootdir):
         for f in file_list_:
             copy(f, os.path.join("../benchmarks/temp/", "valid_data"))
 
-def shuffle_data(rootdir):
+def shuffle_data(rootdir,target_folder):
     '''
     shuffle files in rootdir to shuffled_files
     '''
@@ -455,20 +455,28 @@ def shuffle_data(rootdir):
     train_files=file_list[0:int(len(file_list)*0.6)]
     valid_files = file_list[int(len(file_list) * 0.6):int(len(file_list) * 0.8)]
     test_files=file_list[int(len(file_list)*0.8):len(file_list)]
-    os.mkdir("../benchmarks/shuffled_files")
+    try:
+        os.mkdir("../benchmarks/"+target_folder)
+    except:
+        print("../benchmarks/"+target_folder + " existed")
     for file,fold_name in zip([train_files,valid_files,test_files],["train_data","valid_data","test_data"]):
-        os.mkdir("../benchmarks/shuffled_files/"+fold_name)
+        os.mkdir("../benchmarks/"+target_folder+"/"+fold_name)
         print(fold_name+"_files", len(file))
         for f in file:
-            copy(f, os.path.join("../benchmarks/shuffled_files/", fold_name))
+            copy(f, os.path.join("../benchmarks/"+target_folder+"/", fold_name))
+    os.mkdir(os.path.join("../benchmarks/"+target_folder+"/", "test_data_simple_generator"))
+    for file in test_files:
+        copy(file, os.path.join("../benchmarks/"+target_folder+"/", "test_data_simple_generator"))
+
+
 
 def divide_data_to_threads(root,target_folder):
-    chunk_number=10
+    chunk_number=15
     try:
         os.mkdir(os.path.join("../benchmarks",target_folder))
     except:
         print("path existed")
-    for datafold,datafold_files in zip(["train_data","valid_data","test_data"],[os.path.join(root,"train_data"),os.path.join(root,"valid_data"),os.path.join(root,"test_data")]):
+    for datafold,datafold_files in zip(["train_data","valid_data","test_data","test_data_simple_generator"],[os.path.join(root,"train_data"),os.path.join(root,"valid_data"),os.path.join(root,"test_data"),os.path.join(root,"test_data_simple_generator")]):
         datafold_file_list=glob.glob(datafold_files+"/*")
         print(datafold_files,len(datafold_file_list))
         chunk_size=int(len(datafold_file_list)/chunk_number)
@@ -550,10 +558,10 @@ def main():
 
     #extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
 
-    #shuffle_data("../benchmarks/shuffleFile")
-    #divide_data_to_threads("../benchmarks/shuffled_files","shuffled_files_divided")
+    #shuffle_data("../benchmarks/LIA-lin-shuffled-all","../benchmarks/LIA-lin-shuffled-datafold")
+    divide_data_to_threads("../benchmarks/LIA-lin-shuffled-datafold","divided_threads")
 
-    moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
+    #moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
 
 

@@ -186,8 +186,8 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label,force_r
     mse_loaded_model = tf.keras.losses.MSE(true_Y, predicted_Y_loaded_model)
     print("\n mse_loaded_model_predicted_Y_and_True_Y", mse_loaded_model)
 
-    print("true_Y", true_Y)
-    print("predicted_Y_loaded_model", predicted_Y_loaded_model)
+    #print("true_Y", true_Y)
+    #print("predicted_Y_loaded_model", predicted_Y_loaded_model)
 
     mse_mean = tf.keras.losses.MSE([np.mean(true_Y)] * len(true_Y), true_Y)
     print("\n mse_mean_Y_and_True_Y", mse_mean)
@@ -210,15 +210,15 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label,force_r
     print("{0:.0%}".format(max(best_set_threshold["accuracy"], best_set_ranks["accuracy"]) - random_guess_accuracy),
           "better than random guess")
 def main():
-    benchmark="new-full-dataset-with-simple-generated-initlal-predicates-copy"
+    benchmark="new-full-dataset-with-simple-generated-as-initlal-predicates"
     benchmark_fold_list=[]
     benchmark_fold_list.append(benchmark+"-"+"valid")
-    #benchmark_fold_list.append(benchmark + "-" + "valid-1")
     benchmark_fold_list.append(benchmark + "-" + "test")
+    benchmark_fold_list.append(benchmark + "-" + "test-simple-genereator")
     trained_model_path_list=[]
-    trained_model_path_list.append("/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-02-01_12-30-47_best.pkl")
-    trained_model_path_list.append()
-    trained_model_path_list.append()
+    trained_model_path_list.append("/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-02-03_22-20-42_best.pkl")
+    trained_model_path_list.append("/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-02-03_22-22-22_best.pkl")
+    trained_model_path_list.append("/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-02-03_22-24-27_best.pkl")
     json_type=".hyperEdgeHornGraph.JSON"
     graph_type = json_type[1:json_type.find(".JSON")]
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",

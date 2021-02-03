@@ -27,8 +27,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package lazabs.horn.concurrency
-
-import ap.terfor.preds.Predicate
 import ap.parser.{IExpression, _}
 import lazabs.GlobalParameters
 import lazabs.horn.abstractions.{AbsReader, AbstractionRecord, EmptyVerificationHints, LoopDetector, StaticAbstractionBuilder, VerificationHints}
@@ -60,7 +58,47 @@ import lazabs.horn.preprocessor.HornPreprocessor
 
 case class wrappedHintWithID(ID:Int,head:String, hint:String)
 
+class LiteralCollector extends CollectingVisitor[Unit, Unit] {
+  val literals = new MHashSet[IdealInt]
+  def postVisit(t : IExpression, arg : Unit,
+                subres : Seq[Unit]) : Unit = t match {
+    case IIntLit(v)  =>
+      literals += v
+    case _ => ()
+  }
+}
+
 object HintsSelection {
+  val sp =new Simplifier
+
+  def varyPredicateWithOutLogicChanges(f:IFormula): IFormula = {
+    //todo:associativity
+    //todo:replace a-b to -1*x + b
+    f match {
+      case Eq(a,b)=>{
+        //println(a.toString,"=",b.toString)
+        Eq(varyTerm(a),varyTerm(b))
+      }
+      case Geq(a,b)=>{
+        //println(a.toString,">=",b.toString)
+        Geq(varyTerm(a),varyTerm(b))
+      }
+      case INot(subformula)=> INot(varyPredicateWithOutLogicChanges(subformula))
+      case IQuantified(quan, subformula) =>  IQuantified(quan, varyPredicateWithOutLogicChanges(subformula))
+      case IBinFormula(j, f1, f2) => IBinFormula(j, varyPredicateWithOutLogicChanges(f1), varyPredicateWithOutLogicChanges(f2))
+      case _=> f
+    }
+  }
+
+
+  def varyTerm(e:ITerm): ITerm = {
+    e match {
+      case IPlus(t1,t2)=> IPlus(varyTerm(t2),varyTerm(t1))
+      case Difference(t1,t2)=> IPlus(varyTerm(-1*t1),varyTerm(t2))
+      case ITimes(coeff, subterm) => ITimes(coeff, varyTerm(subterm))
+      case _=> e
+    }
+  }
 
   def readPredicateLabelFromJSON(initialHintsCollection: VerificationHintsInfo,labelName:String="predictedLabel"): VerificationHints ={
     import play.api.libs.json._
@@ -137,7 +175,7 @@ object HintsSelection {
     }
   }
 
-  def getSimplePredicates( simplePredicatesGeneratorClauses: HornPreprocessor.Clauses):  Map[Predicate, Seq[IFormula]] ={
+  def getSimplePredicates( simplePredicatesGeneratorClauses: HornPreprocessor.Clauses,verbose:Boolean=false):  Map[Predicate, Seq[IFormula]] ={
 //    for (clause <- simplePredicatesGeneratorClauses)
 //      println(Console.BLUE + clause.toPrologString)
 //    val constraintPredicates = (for(clause <- simplePredicatesGeneratorClauses;atom<-clause.allAtoms) yield {
@@ -153,14 +191,13 @@ object HintsSelection {
 //      atom.pred-> freeVariableReplacedPredicates
 //    }).groupBy(_._1).mapValues(_.flatMap(_._2).distinct)
 
+    //generate predicates from constraint
     val constraintPredicates= (for (clause<-simplePredicatesGeneratorClauses;atom<-clause.allAtoms) yield {
       //println(Console.BLUE + clause.toPrologString)
       val subst=(for(const<-clause.constants;(arg,n)<-atom.args.zipWithIndex; if const.name==arg.toString) yield const->IVariable(n)).toMap
       val argumentReplacedPredicates= ConstantSubstVisitor(clause.constraint,subst)
       val constants=SymbolCollector.constants(argumentReplacedPredicates)
       val freeVariableReplacedPredicates= {
-        //val simplifier=SimpleAPI.spawn
-        val sp =new Simplifier
         val simplifiedPredicates =
           if(constants.isEmpty)
             sp(argumentReplacedPredicates)
@@ -174,23 +211,35 @@ object HintsSelection {
       atom.pred-> freeVariableReplacedPredicates.filter(!_.isTrue).filter(!_.isFalse) //get rid of true and false
     }).groupBy(_._1).mapValues(_.flatMap(_._2).distinct)
 
-    println("--------predicates from constrains---------")
-    for((k,v)<-constraintPredicates;p<-v) println(k,p)
-    //todo: generate arguments =/<=/>= a constant from current clause as predicates instead of 42
-    val eqConstant: IdealInt = IdealInt(0)
-    val argumentConstantEqualPredicate = (for (clause <- simplePredicatesGeneratorClauses; atom <- clause.allAtoms) yield atom.pred ->(for((arg,n) <- atom.args.zipWithIndex) yield argumentEquationGenerator(n,eqConstant)).flatten).groupBy(_._1).mapValues(_.flatMap(_._2).distinct)
-    println("--------predicates from constant and argumenteEqation---------")
-    for(cc<-argumentConstantEqualPredicate; b<-cc._2) println(cc._1,b)
+    //generate predicates from clause's integer constants
+    val integerConstantVisitor = new LiteralCollector
+    val argumentConstantEqualPredicate = (
+      for (clause <- simplePredicatesGeneratorClauses;atom<-clause.allAtoms) yield {
+        integerConstantVisitor.visitWithoutResult(clause.constraint, ()) //collect integer constant in clause
+        val eqConstant= integerConstantVisitor.literals.toSeq
+        integerConstantVisitor.literals.clear()
+         atom.pred ->(for((arg,n) <- atom.args.zipWithIndex) yield argumentEquationGenerator(n,eqConstant)).flatten}
+      ).groupBy(_._1).mapValues(_.flatMap(_._2).distinct)
+
 
     //merge constraint and constant predicates
     val simplelyGeneratedPredicates = for ((cpKey, cpPredicates) <- constraintPredicates; (apKey, apPredicates) <- argumentConstantEqualPredicate; if cpKey.equals(apKey)) yield cpKey -> (cpPredicates ++ apPredicates).distinct
-    println("--------all generated predicates---------")
-    for((k,v)<-simplelyGeneratedPredicates;(p,i)<-v.zipWithIndex) println(k,i,p)
+
+
+    if (verbose==true){
+      println("--------predicates from constrains---------")
+      for((k,v)<-constraintPredicates;p<-v) println(k,p)
+      println("--------predicates from constant and argumenteEqation---------")
+      for(cc<-argumentConstantEqualPredicate; b<-cc._2) println(cc._1,b)
+      println("--------all generated predicates---------")
+      for((k,v)<-simplelyGeneratedPredicates;(p,i)<-v.zipWithIndex) println(k,i,p)
+    }
+
     simplelyGeneratedPredicates
   }
 
-  def argumentEquationGenerator(n:Int,eqConstant:IdealInt): Seq[IFormula] ={
-    Seq(Eq(IVariable(n),eqConstant),Geq(IVariable(n),eqConstant),Geq(eqConstant,IVariable(n)))
+  def argumentEquationGenerator(n:Int,eqConstant:Seq[IdealInt]): Seq[IFormula] ={
+    (for (c<-eqConstant) yield Seq(sp(Eq(IVariable(n),c)),sp(Geq(c,IVariable(n))),sp(Geq(c,IVariable(n))))).flatten
   }
 
   def moveRenameFile(sourceFilename: String, destinationFilename: String): Unit = {
@@ -295,7 +344,7 @@ object HintsSelection {
       val subst = (for ((c, n) <- head.arguments.head.iterator.zipWithIndex) yield (c, IVariable(n))).toMap
       //val headPredicate=new Predicate(head.name,head.arity) //class Predicate(val name : String, val arity : Int)
       val predicateSequence = for (p <- preds) yield {
-        val simplifiedPredicate = (new Simplifier) (Internal2InputAbsy(p.rawPred, p.rs.sf.getFunctionEnc().predTranslation))
+        val simplifiedPredicate = sp (Internal2InputAbsy(p.rawPred, p.rs.sf.getFunctionEnc().predTranslation))
         //println("value:"+simplifiedPredicate)
         val varPred = ConstantSubstVisitor(simplifiedPredicate, subst) //transform variables to _1,_2,_3...
         println("value:" + varPred)
@@ -391,7 +440,7 @@ object HintsSelection {
         val subst = (for ((c, n) <- head.arguments.head.iterator.zipWithIndex) yield (c, IVariable(n))).toMap
         //val headPredicate=new Predicate(head.name,head.arity) //class Predicate(val name : String, val arity : Int)
         val predicateSequence = for (p <- preds) yield {
-          val simplifiedPredicate = (new Simplifier) (Internal2InputAbsy(p.rawPred, p.rs.sf.getFunctionEnc().predTranslation))
+          val simplifiedPredicate = sp (Internal2InputAbsy(p.rawPred, p.rs.sf.getFunctionEnc().predTranslation))
           //println("value:"+simplifiedPredicate)
           val varPred = ConstantSubstVisitor(simplifiedPredicate, subst) //transform variables to _1,_2,_3...
           println("value:" + varPred)
@@ -587,7 +636,7 @@ object HintsSelection {
         var redundantTemplatesSeq: Seq[VerifHintElement] = Seq()
         for (p <- preds) {
           //delete on template in a head
-          val currentTemplatesList = currentTemplates.getValue(head).filter(_ != p)
+          val currentTemplatesList = currentTemplates.predicateHints(head).filter(_ != p)
           currentTemplates = currentTemplates.filterNotPredicates(Set(head))
 
           currentTemplates = currentTemplates.addPredicateHints(Map(head -> currentTemplatesList))
@@ -778,9 +827,9 @@ object HintsSelection {
         println(oneHintValue)
         var criticalHintsList: Seq[VerifHintElement] = Seq()
         var redundantHintsList: Seq[VerifHintElement] = Seq()
-        var currentHintsList = simpHints.getValue(head) //extract hints in this head
+        var currentHintsList = simpHints.predicateHints(head) //extract hints in this head
 
-        for (oneHint <- simpHints.getValue(head)) { //loop for every hint in one head
+        for (oneHint <- simpHints.predicateHints(head)) { //loop for every hint in one head
           println("Current hints:")
           currentTemplates.pretyPrintHints()
 
@@ -1073,7 +1122,7 @@ object HintsSelection {
           val keyTemp = key.toString().substring(0, key.toString().indexOf("/"))
           if (head == keyTemp) {
             var usfulHintsList: Seq[VerifHintElement] = Seq()
-            for (oneHint <- originalHints.getValue(key)) {
+            for (oneHint <- originalHints.predicateHints(key)) {
               if (keyTemp == head && oneHint.toString() == hint) { //match initial hints and hints from file to tell usefulness
                 usfulHintsList = usfulHintsList ++ Seq(oneHint) //add this hint to usfulHintsList
                 //println(element(0),usfulHintsList)
@@ -1426,14 +1475,16 @@ object HintsSelection {
   def writeArgumentOccurrenceInHintsToFile(file: String,
                                argumentList: Array[(IExpression.Predicate, Int)],
                                positiveHints: VerificationHints,
-                               countOccurrence: Boolean = true): ArrayBuffer[argumentInfo]  = {
+                               countOccurrence: Boolean = true,writeToFile:Boolean=false): ArrayBuffer[argumentInfo]  = {
     val arguments = getArgumentOccurrenceInHints(file,argumentList,positiveHints,countOccurrence)
-    println("Write arguments to file")
-    val writer = new PrintWriter(new File(file + ".arguments")) //python path
-    for (arg <- arguments) {
-      writer.write(arg.ID + ":" + arg.location.toString() + ":" + "argument" + arg.index + ":" + arg.score + "\n")
+    if (writeToFile==true){
+      println("Write arguments to file")
+      val writer = new PrintWriter(new File(file + ".arguments")) //python path
+      for (arg <- arguments) {
+        writer.write(arg.ID + ":" + arg.location.toString() + ":" + "argument" + arg.index + ":" + arg.score + "\n")
+      }
+      writer.close()
     }
-    writer.close()
     arguments
   }
 

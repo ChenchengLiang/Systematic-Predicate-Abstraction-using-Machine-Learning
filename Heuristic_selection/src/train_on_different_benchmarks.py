@@ -31,7 +31,7 @@ def main():
     file_type = ".smt2"
     GPU=True
     pickle = True
-    benchmark_name = "new-full-dataset-with-simple-generated-initlal-predicates-copy/"
+    benchmark_name = "new-full-dataset-with-simple-generated-as-initlal-predicates/"
 
     # random.seed(0)
     # np.random.seed(0)

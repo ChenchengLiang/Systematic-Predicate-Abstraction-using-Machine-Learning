@@ -37,7 +37,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     #parameters["residual_every_num_layers"]=10000000
     parameters['hidden_dim'] = nodeFeatureDim #64
     #parameters["num_edge_MLP_hidden_layers"]
-    parameters['num_layers'] = 16
+    parameters['num_layers'] = 8
     parameters['node_label_embedding_size'] = nodeFeatureDim
     parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
     parameters['regression_hidden_layer_size'] = [32,32,32]
@@ -908,22 +908,22 @@ def tokenize_symbols(token_map,node_symbols):
         if symbol in token_map:
             tokenized_node_label_ids.append(token_map[symbol])
         elif "CONTROL" in symbol:
-            print("unknown_predicate", symbol)
+            #print("unknown_predicate_CONTROL", symbol)
             tokenized_node_label_ids.append(token_map["unknown_predicate"])
         elif "predicateArgument" in symbol:
+            #print("unkown_predicateArgument", symbol)
             tokenized_node_label_ids.append(token_map["unkown_predicate_argument"])
         elif "template" in symbol:
-            print("unknown_predicate_label", symbol)
+            #print("unknown_predicate_label", symbol)
             tokenized_node_label_ids.append(token_map["unknown_predicate_label"])
         elif "SYMBOLIC_CONSTANT" in symbol:
-            print("unkown_symblic_constant", symbol)
+            #print("unkown_symblic_constant", symbol)
             tokenized_node_label_ids.append(token_map["unkown_symblic_constant"])
         elif symbol.isnumeric() or symbol[1:].isnumeric():
-            print("unknown_constant", symbol)
+            #print("unknown_constant", symbol)
             tokenized_node_label_ids.append(token_map["unknown_constant"])
         elif symbol in full_operator_list:
-            #todo: debug here
-            print("unknown_operator",symbol)
+            #print("unknown_operator",symbol)
             tokenized_node_label_ids.append(token_map["unknown_operator"])
         else:
             tokenized_node_label_ids.append(token_map["unknown_node"])
