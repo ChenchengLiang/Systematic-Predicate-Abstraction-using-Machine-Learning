@@ -16,14 +16,14 @@ from tf2_gnn.cli_utils.training_utils import train, log_line, make_run_id
 import seaborn
 
 
-def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",from_json=False,json_type=".JSON",form_label=False,GPU=False,pickle=True):
+def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",from_json=False,json_type=".JSON",form_label=False,GPU=False,pickle=True,hyper_parameters={}):
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
                                                  "argument_upper_bound_existence", "argument_occurrence_binary",
                                                  "template_relevance", "clause_occurrence_in_counter_examples_binary"]
 
     graph_type=json_type[1:json_type.find(".JSON")]
     print("graph_type",graph_type)
-    nodeFeatureDim = 32 #64
+    nodeFeatureDim = hyper_parameters["nodeFeatureDim"] #64
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
     parameters['graph_type'] = graph_type  # hyperEdgeHornGraph or layerHornGraph
     #parameters["message_calculation_class"]="rgcn"#rgcn,ggnn,rgat
@@ -37,10 +37,10 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     #parameters["residual_every_num_layers"]=10000000
     parameters['hidden_dim'] = nodeFeatureDim #64
     #parameters["num_edge_MLP_hidden_layers"]
-    parameters['num_layers'] = 8
+    parameters['num_layers'] = hyper_parameters["num_layers"]
     parameters['node_label_embedding_size'] = nodeFeatureDim
-    parameters['max_nodes_per_batch']=10000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
-    parameters['regression_hidden_layer_size'] = [32,32,32]
+    parameters['max_nodes_per_batch']=1000 #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
+    parameters['regression_hidden_layer_size'] = hyper_parameters["regression_hidden_layer_size"]
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
     parameters ["gathered_nodes_binary_classification_task"]=gathered_nodes_binary_classification_task
@@ -93,6 +93,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     test_loss_average = []
     best_valid_epoch_average = []
     accuracy_average=[]
+    trained_model_path=None
 
     for n in range(train_n_times): # train n time to get average performance, default is one
         # initial different models by different training task
@@ -204,7 +205,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
 
     pickleWrite(parameters, benchmark_name+"-"+label+"-parameters","../src/trained_model/")
 
-
+    return trained_model_path
 
 
 def write_accuracy_to_log(label, benchmark, accuracy_list, best_valid_epoch_list, graph_type):

@@ -14,13 +14,13 @@ def main():
     #label = "argument_identify_no_batchs"
     #label = "control_location_identify"
     #label_list.append("predicate_occurrence_in_clauses")
-    label_list.append("predicate_occurrence_in_SCG")
+    #label_list.append("predicate_occurrence_in_SCG")
     # label="argument_bound"
     #label_list.append("argument_lower_bound_existence")
     # label_list.append("argument_upper_bound_existence")
     # label_list.append("argument_lower_bound")
     # label_list.append("argument_upper_bound")
-    label_list.append("argument_occurrence_binary")
+    #label_list.append("argument_occurrence_binary")
     label_list.append("template_relevance")
     #label = "clause_occurrence_in_counter_examples_binary"
     # json_type = ".hyperEdgeHornGraph.JSON"
@@ -31,14 +31,13 @@ def main():
     file_type = ".smt2"
     GPU=True
     pickle = True
-    benchmark_name = "new-full-dataset-with-simple-generated-as-initlal-predicates/"
+    benchmark_name = "new-labelSimpleGeneratedPredicates/"
 
     # random.seed(0)
     # np.random.seed(0)
     # tf.random.set_seed(0)
 
-
-
+    hyper_parameters={"nodeFeatureDim":64,"num_layers":2,"regression_hidden_layer_size":[64,64,64]}
     for label in label_list:
         parameter_list.append(
             parameters(relative_path="../benchmarks/"+benchmark_name,
@@ -80,12 +79,12 @@ def main():
         if pickle==False:
             train_on_graphs(benchmark_name=param.absolute_path[param.absolute_path.find("/benchmarks/")+len("/benchmarks/"):-1], label=param.label, force_read=force_read,
                             train_n_times=1,path=param.absolute_path, file_type=file_type, form_label=form_label, from_json=from_json,
-                            json_type=param.json_type,GPU=GPU,pickle=pickle)
+                            json_type=param.json_type,GPU=GPU,pickle=pickle,hyper_parameters=hyper_parameters)
         else:
             train_on_graphs(benchmark_name=param.benchmark_name(),
                             label=param.label, force_read=force_read,
                             train_n_times=1, path=param.relative_path, file_type=file_type, form_label=form_label,from_json=from_json,
-                            json_type=param.json_type, GPU=GPU, pickle=pickle)
+                            json_type=param.json_type, GPU=GPU, pickle=pickle,hyper_parameters=hyper_parameters)
         tf.keras.backend.clear_session()
 
 class parameters():

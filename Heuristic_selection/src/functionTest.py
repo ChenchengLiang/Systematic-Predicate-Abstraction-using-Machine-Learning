@@ -126,31 +126,7 @@ def tokenize_symbols(token_map,node_symbols):
     return tokenized_node_label_ids
 
 def main():
-    node_symbols=["5","-1","0","1","-4","SYMBOLIC_CONSTANT_1"]
-    nodeSymbolList=["-100","5","CONTROL_0","predicateArgument_0","predicateArgument_1","CONTROL_1","0","true","-","1","-","!","=","-","-1","FALSE","!","=","=","&","template_0","=","template_1","=","template_2","=","-"]
-
-    vocabulary_set = set(["unknown_node", "unknown_predicate", "unkown_symblic_constant", "unkown_predicate_argument",
-                          "unknown_operator", "unknown_constant", "unknown_predicate_label"])
-
-    vocabulary_set.update(nodeSymbolList)
-    token_map = {}
-    token_id = 0
-    for word in sorted(vocabulary_set):
-        try:
-            word = convert_constant_to_category(word)
-        except:
-            print("------------debug--------------")
-            print(word)
-        token_map[word] = token_id
-        token_id = token_id + 1
-    print("vocabulary_set", len(vocabulary_set))
-    print("token_map", len(token_map))
-    print(token_map)
-
-    tokenized_node_label_ids=tokenize_symbols(token_map, node_symbols)
-
-
-    print("tokenized_node_label_ids",tokenized_node_label_ids)
+    print("{0:.2%}".format(0.2345))
 
 
     # tf.debugging.set_log_device_placement(True)

@@ -37,7 +37,8 @@ import lazabs.nts._
 import lazabs.horn.abstractions.StaticAbstractionBuilder.AbstractionType
 import lazabs.horn.concurrency.DrawHornGraph.HornGraphType
 import lazabs.horn.concurrency.{CCReader, HintsSelection}
-import ap.util.Debug
+import ap.util.{Debug, Timeout}
+
 import scala.concurrent._
 
 object GlobalParameters {
@@ -63,6 +64,8 @@ class GlobalParameters extends Cloneable {
   var mainTimeout=60000
   var extractTemplates=false
   var extractPredicates=false
+  var labelSimpleGeneratedPredicates=false
+  var varyGeneratedPredicates=false
   var readHints=false
   var rank=0.0
   var getSMT2=false
@@ -70,7 +73,6 @@ class GlobalParameters extends Cloneable {
   var getAllHornGraph=false
   var getLabelFromCounterExample=false
   var hornGraphType:HornGraphType.Value=HornGraphType.hyperEdgeGraph
-  var onlySimplePredicates=false
   var in: InputStream = null
   var fileName = ""
   var funcName = "main"
@@ -221,12 +223,13 @@ class GlobalParameters extends Cloneable {
     //that.printHints = this.printHints
     that.extractTemplates=this.extractTemplates
     that.extractPredicates=this.extractPredicates
+    that.labelSimpleGeneratedPredicates=this.labelSimpleGeneratedPredicates
+    that.varyGeneratedPredicates=this.varyGeneratedPredicates
     that.readHints=this.readHints
     that.getSMT2=this.getSMT2
     that.getHornGraph=this.getHornGraph
     that.getAllHornGraph=this.getAllHornGraph
     that.getLabelFromCounterExample=this.getLabelFromCounterExample
-    that.onlySimplePredicates=this.onlySimplePredicates
     that.generateSimplePredicates=this.generateSimplePredicates
   }
 
@@ -321,6 +324,8 @@ object Main {
       case "-p" :: rest => prettyPrint = true; arguments(rest)
       case "-extractTemplates" :: rest => extractTemplates = true; arguments(rest)
       case "-extractPredicates" :: rest => extractPredicates = true; arguments(rest)
+      case "-labelSimpleGeneratedPredicates"::rest => labelSimpleGeneratedPredicates = true; arguments(rest)
+      case "-varyGeneratedPredicates":: rest => varyGeneratedPredicates =true; arguments(rest)
       case "-generateSimplePredicates" :: rest => generateSimplePredicates = true; arguments(rest)
       case "-readHints" :: rest => readHints = true; arguments(rest)
       case "-getSMT2" :: rest => getSMT2 = true; arguments(rest)
@@ -370,7 +375,6 @@ object Main {
         hornGraphType = HornGraphType.concretizedHyperedgeGraph
         arguments(rest)
       }
-      case "-onlySimplePredicates" :: rest => onlySimplePredicates = true; arguments(rest)
       case "-pIntermediate" :: rest => printIntermediateClauseSets = true; arguments(rest)
       case "-sp" :: rest => smtPrettyPrint = true; arguments(rest)
 //      case "-pnts" :: rest => ntsPrint = true; arguments(rest)
@@ -572,8 +576,9 @@ object Main {
           " -pIntermediate\t Dump Horn clauses encoding concurrent programs\n"+
           " -extractTemplates\t extract templates training data\n"+
           " -extractPredicates\t extract predicates from CEGAR process\n"+
+          " -labelSimpleGeneratedPredicates\t label simple generated predicates by selected predicates\n"+
+          " -varyGeneratedPredicates\t vary generated predicates from CEGAR process without change of logic mearnings\n"+
           " -generateSimplePredicates\t extract predicates using cegar and simply generated predicates\n"+
-          " -onlySimplePredicates\t extract predicates using only simply generated predicates\n"+
           " -absTimeout:time\t set timeout for labeling hints\n"+
           " -solvabilityTimeout:time\t set timeout for solvability\n"+
           " -rank:n\t use top n or score above n ranked hints read from file\n"+
@@ -705,15 +710,19 @@ object Main {
         //do selection
         lazabs.horn.TrainDataGeneratorSmt2(clauseSet, absMap, global, disjunctive,
           drawRTree, lbe) //generate train data
-
-
         return
       }
       if(extractPredicates){
         //do selection
-        lazabs.horn.TrainDataGeneratorPredicatesSmt2(clauseSet, absMap, global, disjunctive,
+        try{
+          Timeout.withChecker(timeoutChecker){
+            lazabs.horn.TrainDataGeneratorPredicatesSmt2(clauseSet, absMap, global, disjunctive,
               drawRTree, lbe) //generate train data.  clauseSet error may caused by import package
-        return
+          }
+          return
+        }catch {
+          case _=> throw MainTimeoutException
+        }
       }
 
       if(solFileName != "") {

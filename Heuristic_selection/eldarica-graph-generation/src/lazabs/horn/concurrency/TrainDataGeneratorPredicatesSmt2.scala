@@ -49,6 +49,7 @@ import ap.terfor.conjunctions.Conjunction
 import concurrency.HintsSelection.{getClausesInCounterExamples, initialIDForHints}
 import concurrency._
 import ap.basetypes.IdealInt
+import ap.terfor.preds.Predicate
 import ap.terfor.{ConstantTerm, Formula}
 import ap.theories.TheoryCollector
 import ap.types.TypeTheory
@@ -269,6 +270,8 @@ object TrainDataGeneratorPredicatesSmt2 {
         else
           HornPredAbs.CounterexampleMethod.FirstBestShortest
 
+
+      val fileName=GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length)
       //simplify clauses. get rid of some redundancy
       val spAPI = ap.SimpleAPI.spawn
       val sp=new Simplifier
@@ -282,13 +285,18 @@ object TrainDataGeneratorPredicatesSmt2 {
       if (GlobalParameters.get.readHints==true){
         println("-"*10 + "read predicate from .tpl" + "-"*10)
         //read initial predicates from .tpl
-        val initialPredicates =VerificationHints(HintsSelection.wrappedReadHints(simplePredicatesGeneratorClauses).toInitialPredicates.mapValues(_.map(sp(_)).map(VerificationHints.VerifHintInitPred(_))))
-        initialPredicates.pretyPrintHints()
-        //todo:vary selected predicates but not change its logic
-        val initialHintsCollection=new VerificationHintsInfo(initialPredicates,VerificationHints(Map()),VerificationHints(Map()))
+        val initialPredicates =VerificationHints(HintsSelection.wrappedReadHints(simplePredicatesGeneratorClauses).toInitialPredicates.mapValues(_.map(sp(_)).map(VerificationHints.VerifHintInitPred(_))))//simplify after read
+        //vary selected predicates but not change its logic
+        val predicatesForLearning =
+          if(GlobalParameters.get.varyGeneratedPredicates==true)
+            HintsSelection.transformPredicateMapToVerificationHints(HintsSelection.varyPredicates(initialPredicates.toInitialPredicates))
+          else
+            initialPredicates
+
+        val initialHintsCollection=new VerificationHintsInfo(predicatesForLearning,VerificationHints(Map()),VerificationHints(Map()))
         //read label from JSON
         val positiveHints= HintsSelection.readPredicateLabelFromJSON(initialHintsCollection,"templateRelevanceLabel")
-        val hintsCollection=new VerificationHintsInfo(initialPredicates,positiveHints,initialPredicates.filterPredicates(positiveHints.predicateHints.keySet))
+        val hintsCollection=new VerificationHintsInfo(predicatesForLearning,positiveHints,predicatesForLearning.filterPredicates(positiveHints.predicateHints.keySet))
 
         val clauseCollection = new ClauseInfo(simplePredicatesGeneratorClauses,Seq())
         //Output graphs
@@ -315,9 +323,6 @@ object TrainDataGeneratorPredicatesSmt2 {
       val simpleGeneratedPredicates =  HintsSelection.getSimplePredicates(simplePredicatesGeneratorClauses)
 
       val lastPredicates= {
-        if(GlobalParameters.get.onlySimplePredicates==true)
-          Map()
-        else {
           try //GlobalParameters.parameters.withValue(toParamsPredicateGenerator)
           {Timeout.withChecker(toParamsPredicateGenerator.timeoutChecker)
             {
@@ -328,18 +333,13 @@ object TrainDataGeneratorPredicatesSmt2 {
                 counterexampleMethod)
               Cegar.predicates
             }
-
-
           }
           catch {
             case _ =>{
-              val sourceFilename=GlobalParameters.get.fileName
-              val destinationFilename="../benchmarks/solvability-timeout/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length)
-              HintsSelection.moveRenameFile(sourceFilename,destinationFilename)
+              HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/solvability-timeout/" + fileName)
               sys.exit()
             }
           }
-        }
       }
 
       var numberOfpredicates = 0
@@ -355,17 +355,8 @@ object TrainDataGeneratorPredicatesSmt2 {
         }
         head.pred -> predicateSequence.distinct
       }
-//      println(Console.BLUE + "predicateFromCEGAR")
-//      for ((k,v)<-predicateFromCEGAR)
-//        println(k,v)
-      val originalPredicates =
-        if(GlobalParameters.get.onlySimplePredicates==true)
-          simpleGeneratedPredicates.mapValues(_.map(sp(_)))
-        else if (GlobalParameters.get.generateSimplePredicates==true)
-          predicateFromCEGAR.mapValues(_.map(sp(_)))
-          //(simpleGeneratedPredicates.toSeq ++ predicateFromCEGAR.toSeq).groupBy(_._1).mapValues(_.flatMap(_._2).distinct).mapValues(_.map(sp(_)))
-        else
-          predicateFromCEGAR.mapValues(_.map(sp(_)))
+
+      val originalPredicates = predicateFromCEGAR.mapValues(_.map(sp(_)))
 
       //transform Map[Predicate,Seq[IFomula] to VerificationHints:[Predicate,VerifHintElement]
       val initialPredicates = HintsSelection.transformPredicateMapToVerificationHints(originalPredicates)
@@ -380,11 +371,6 @@ object TrainDataGeneratorPredicatesSmt2 {
           throw lazabs.Main.TimeoutException //if catch Counterexample and generate predicates, throw timeout exception
 
       println("check solvability using current predicates")
-      val predicateGeneratorForSolvability =
-        if(GlobalParameters.get.onlySimplePredicates==true)
-          predGenerator
-        else
-          exceptionalPredGen
       val startTimeCEGAR = currentTimeMillis
       val toParamsCEGAR = GlobalParameters.get.clone
       toParamsCEGAR.timeoutChecker = () => {
@@ -394,15 +380,13 @@ object TrainDataGeneratorPredicatesSmt2 {
       try{
         Timeout.withChecker(toParamsCEGAR.timeoutChecker) {
           new HornPredAbs(simplePredicatesGeneratorClauses,
-            originalPredicates, predicateGeneratorForSolvability,
+            originalPredicates, exceptionalPredGen,
             counterexampleMethod)
         }
       }
       catch {
         case lazabs.Main.TimeoutException => {
-          val sourceFilename=GlobalParameters.get.fileName
-          val destinationFilename= "../benchmarks/solvability-timeout/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length)
-          HintsSelection.moveRenameFile(sourceFilename,destinationFilename)
+          HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/solvability-timeout/"+fileName)
           sys.exit()//throw TimeoutException
         }
         case _ =>{println(Console.RED + "-----------solvability-debug------")}
@@ -514,75 +498,76 @@ object TrainDataGeneratorPredicatesSmt2 {
           selectedPredicates.pretyPrintHints()
           println("timeout:" + GlobalParameters.get.threadTimeout + "ms")
 
-          val predicateGeneratorForTest =
-            if(GlobalParameters.get.onlySimplePredicates==true)
-              predGenerator
-            else
-              exceptionalPredGen
-
           try{
             println("\n------------test selected predicates-------------------------")
             val test = new HornPredAbs(simplePredicatesGeneratorClauses,
               optimizedPredicate,
               //selectedPredicates.toInitialPredicates,
-              predicateGeneratorForTest,counterexampleMethod).result
+              exceptionalPredGen,counterexampleMethod).result
             println("-"*10 + "test finished" + "-"*10)
+
+            //todo:vary selected predicates but not change its logic
+            val predicatesForLearning =
+              if(GlobalParameters.get.varyGeneratedPredicates==true)
+                HintsSelection.transformPredicateMapToVerificationHints(HintsSelection.varyPredicates(optimizedPredicate))
+              else
+                selectedPredicates
+
+            val (unlabeledPredicates,labeledPredicates)=
+              if(GlobalParameters.get.labelSimpleGeneratedPredicates==true) {
+                val tempLabel=HintsSelection.labelSimpleGeneratedPredicatesBySelectedPredicates(optimizedPredicate,simpleGeneratedPredicates)
+                val labeledSimpleGeneratedPredicates = HintsSelection.transformPredicateMapToVerificationHints(tempLabel.filterKeys(k => !tempLabel(k).isEmpty))
+                (HintsSelection.transformPredicateMapToVerificationHints(simpleGeneratedPredicates),labeledSimpleGeneratedPredicates)
+              } else
+                (initialPredicates,predicatesForLearning)
+
+            println("-"*10 + "unlabeledPredicates" + "-"*10)
+            unlabeledPredicates.pretyPrintHints()
+            println("-"*10 + "labeledPredicates" + "-"*10)
+            labeledPredicates.pretyPrintHints()
+
             //simplePredicatesGeneratorClauses.map(_.toPrologString).foreach(x=>println(Console.BLUE + x))
             val drawGraphAndWriteLabelsBegin=System.currentTimeMillis
-            if (!selectedPredicates.isEmpty){
-              //todo:vary selected predicates but not change its logic
-              selectedPredicates.pretyPrintHints()
-              //optimizedPredicate.foreach(k=>{println(k._1);k._2.foreach(println)})
-              val transformedPredicates=optimizedPredicate.mapValues(_.map(HintsSelection.varyPredicateWithOutLogicChanges(_)).map(sp(_)))
-              HintsSelection.transformPredicateMapToVerificationHints(transformedPredicates).pretyPrintHints()
-              //transformedPredicates.foreach(k=>{println(k._1);k._2.foreach(println)})
-
-              val mergedPredicates=for ((cpKey, cpPredicates) <- transformedPredicates; (apKey, apPredicates) <- optimizedPredicate; if cpKey.equals(apKey)) yield cpKey -> (cpPredicates ++ apPredicates).distinct
-              HintsSelection.transformPredicateMapToVerificationHints(mergedPredicates).pretyPrintHints()
-              //mergedPredicates.foreach(k=>{println(k._1);k._2.foreach(println)})
-
-              val hintsCollection=new VerificationHintsInfo(initialPredicates,selectedPredicates,initialPredicates.filterPredicates(selectedPredicates.predicateHints.keySet))
+            if (!labeledPredicates.isEmpty){
+              val hintsCollection=new VerificationHintsInfo(unlabeledPredicates,labeledPredicates,VerificationHints(Map()))
               val clausesInCE=getClausesInCounterExamples(test,simplePredicatesGeneratorClauses)
               val clauseCollection = new ClauseInfo(simplePredicatesGeneratorClauses,clausesInCE)
               //Output graphs
               val argumentList = (for (p <- HornClauses.allPredicates(simplePredicatesGeneratorClauses)) yield (p, p.arity)).toArray
-              val argumentInfo = HintsSelection.writeArgumentOccurrenceInHintsToFile(GlobalParameters.get.fileName, argumentList, selectedPredicates,countOccurrence=true)
+              val argumentInfo = HintsSelection.writeArgumentOccurrenceInHintsToFile(GlobalParameters.get.fileName, argumentList, labeledPredicates,countOccurrence=true)
               GraphTranslator.drawAllHornGraph(clauseCollection,hintsCollection,argumentInfo)
-              //Output selected predicates:
-              val output = new java.io.FileOutputStream(GlobalParameters.get.fileName+".tpl")
-              Console.withOut(output) {
+
+              //write predicates to files:
+              Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".initial.tpl")) {
                 AbsReader.printHints(initialPredicates)
               }
               Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".selected.tpl")) {
-                AbsReader.printHints(selectedPredicates)
+                AbsReader.printHints(predicatesForLearning)
               }
+              Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".simpleGenerated.tpl")) {
+                AbsReader.printHints(HintsSelection.transformPredicateMapToVerificationHints(simpleGeneratedPredicates))
+              }
+              Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".labeledSimpleGenerated.tpl")) {
+                AbsReader.printHints(labeledPredicates)
+              }
+              drawingGraphAndFormLabelsTime=(System.currentTimeMillis-drawGraphAndWriteLabelsBegin)/1000
+            } else{
+              HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/no-predicates-selected/"+fileName,"labeledPredicates is empty")
             }
-            drawingGraphAndFormLabelsTime=(System.currentTimeMillis-drawGraphAndWriteLabelsBegin)/1000
+
+
           }catch{
             case lazabs.Main.TimeoutException =>{
-              println(Console.RED + "--test timeout--")
               //todo: not include this to training example? because it can only provide negative training data
-              val sourceFilename=GlobalParameters.get.fileName
-              val destinationFilename= "../benchmarks/test-timeout/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length)
-              HintsSelection.moveRenameFile(sourceFilename,destinationFilename)
+              HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/test-timeout/" +fileName,"test timeout")
             }
           }
+        } else{
+          HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/no-predicates-selected/"+fileName,"optimizedPredicate is empty")
         }
-        else{
-          println(Console.RED + "--optimizedPredicate is empty--")
-          val sourceFilename=GlobalParameters.get.fileName
-          val destinationFilename= "../benchmarks/no-predicates-selected/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length)
-          HintsSelection.moveRenameFile(sourceFilename,destinationFilename)
-        }
-
-
-
 
       }else{
-        println(Console.RED + "--originalPredicate is empty--")
-        val sourceFilename=GlobalParameters.get.fileName
-        val destinationFilename= "../benchmarks/no-predicates-selected/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length)
-        HintsSelection.moveRenameFile(sourceFilename,destinationFilename)
+        HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/no-predicates-selected/"+fileName,"originalPredicate is empty")
       }
       println(Console.GREEN + "time consumption before predicate extracting process: " + timeConsumptionBeforePredicateExtractingProcess + "s")
       println(Console.GREEN + "time for generating initial predicates: "+ generatingInitialPredicatesTime + "s")

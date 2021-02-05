@@ -71,6 +71,12 @@ class LiteralCollector extends CollectingVisitor[Unit, Unit] {
 object HintsSelection {
   val sp =new Simplifier
 
+  def labelSimpleGeneratedPredicatesBySelectedPredicates(optimizedPredicate: Map[Predicate, Seq[IFormula]],simpleGeneratedPredicates: Map[Predicate, Seq[IFormula]]): Map[Predicate, Seq[IFormula]] ={
+    for ((ko,vo)<-optimizedPredicate;(ks,vs)<-simpleGeneratedPredicates; if ko.equals(ks) ) yield {
+      ko->(for (p<-vs if vo.contains(p))yield p)
+    }
+  }
+
   def varyPredicateWithOutLogicChanges(f:IFormula): IFormula = {
     //todo:associativity
     //todo:replace a-b to -1*x + b
@@ -98,6 +104,23 @@ object HintsSelection {
       case ITimes(coeff, subterm) => ITimes(coeff, varyTerm(subterm))
       case _=> e
     }
+  }
+
+  def varyPredicates(optimizedPredicate: Map[Predicate, Seq[IFormula]],verbose:Boolean=false): Map[Predicate, Seq[IFormula]] ={
+    val transformedPredicates=optimizedPredicate.mapValues(_.map(HintsSelection.varyPredicateWithOutLogicChanges(_)).map(sp(_)))
+    val mergedPredicates=for ((cpKey, cpPredicates) <- transformedPredicates; (apKey, apPredicates) <- optimizedPredicate; if cpKey.equals(apKey)) yield cpKey -> (cpPredicates ++ apPredicates).distinct
+    if (verbose==true){
+      println("predicates before transform")
+      transformPredicateMapToVerificationHints(optimizedPredicate).pretyPrintHints()
+      //optimizedPredicate.foreach(k=>{println(k._1);k._2.foreach(println)})
+      println("transformed predicates")
+      transformPredicateMapToVerificationHints(transformedPredicates).pretyPrintHints()
+      //transformedPredicates.foreach(k=>{println(k._1);k._2.foreach(println)})
+      println("merged predicates")
+      transformPredicateMapToVerificationHints(mergedPredicates).pretyPrintHints()
+      //mergedPredicates.foreach(k=>{println(k._1);k._2.foreach(println)})
+    }
+    mergedPredicates
   }
 
   def readPredicateLabelFromJSON(initialHintsCollection: VerificationHintsInfo,labelName:String="predictedLabel"): VerificationHints ={
@@ -242,7 +265,8 @@ object HintsSelection {
     (for (c<-eqConstant) yield Seq(sp(Eq(IVariable(n),c)),sp(Geq(c,IVariable(n))),sp(Geq(c,IVariable(n))))).flatten
   }
 
-  def moveRenameFile(sourceFilename: String, destinationFilename: String): Unit = {
+  def moveRenameFile(sourceFilename: String, destinationFilename: String,message:String=""): Unit = {
+    println(Console.RED+"-"*5+message+"-"*5)
     val path = Files.move(
       Paths.get(sourceFilename),
       Paths.get(destinationFilename),
@@ -1015,18 +1039,6 @@ object HintsSelection {
   }
 
 
-  def neuralNetworkSelection(encoder: ParametricEncoder, simpHints: VerificationHints, simpClauses: Clauses): VerificationHints = {
-    //write redundant hints to JSON
-
-    //call NNs
-
-    //read predicted hints from JSON
-
-    //write to optimized Hints
-
-    val optimizedHints = simpHints
-    return optimizedHints
-  }
 
   def readHintsFromJSON(fileName: String): VerificationHints = {
 
@@ -1092,17 +1104,6 @@ object HintsSelection {
     return optimizedHints
   }
 
-  def readHintsIDFromJSON(fileName: String, originalHints: VerificationHints): VerificationHints = {
-    //    for((key,value)<-originalHints){
-    //      for(v<-value){
-    //      }
-    //    }
-
-
-    var readHints = VerificationHints(Map())
-
-    return readHints
-  }
 
   def storeHintsToVerificationHints_binary(parsedHintslist: Seq[Seq[String]], readInitialHintsWithID: Map[String, String], originalHints: VerificationHints) = {
     //store read hints to VerificationHints
