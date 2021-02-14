@@ -29,24 +29,16 @@
  */
 package lazabs.horn.concurrency
 
-import ap.SimpleAPI
 import ap.basetypes.IdealInt
-
-import java.io.{File, PrintWriter}
-import ap.parser.IExpression.{ConstantTerm, Eq, Predicate}
-import ap.parser.{IAtom, IBinJunctor, IConstant, IExpression, IFormula, ITerm, IVariable, LineariseVisitor, Simplifier, SymbolCollector}
+import ap.parser._
 import ap.types.Sort.Integer.newConstant
-import jdk.nashorn.internal.objects.Global
 import lazabs.GlobalParameters
-import lazabs.horn.abstractions.VerificationHints.VerifHintInitPred
-import lazabs.horn.bottomup.HornClauses
 import lazabs.horn.bottomup.HornClauses.Clause
 import lazabs.horn.concurrency.DrawHornGraph.HornGraphType
-import lazabs.horn.preprocessor.HornPreprocessor.{Clauses, VerificationHints}
-
-import scala.collection.mutable.ArrayBuffer
 import lazabs.horn.concurrency.DrawHyperEdgeHornGraph.HyperEdgeType
-import lazabs.horn.preprocessor.ConstraintSimplifier
+
+import java.io.{File, PrintWriter}
+import scala.collection.mutable.ArrayBuffer
 
 object DrawHyperEdgeHornGraph {
 
@@ -398,7 +390,7 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
     controlFlowNodeSetInOneClause(predicateName) = controlFlowNodeName
   }
 
-  def drawDataFlow(arg: ITerm, dataFlowSet: Set[IExpression]): Unit = {
+  def drawDataFlow(arg: ITerm, dataFlowSet: Set[IFormula]): Unit = {
     val SE = IExpression.SymbolEquation(arg)
     for (df <- dataFlowSet) df match {
       case SE(coefficient, rhs) if (!coefficient.isZero) => {
@@ -421,7 +413,7 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
   }
 
 
-  def getDataFlowAndGuard(clause: Clause, normalizedClause: Clause, dataFlowInfoWriter: PrintWriter): (Set[IExpression], Set[IFormula],Clause) = {
+  def getDataFlowAndGuard(clause: Clause, normalizedClause: Clause, dataFlowInfoWriter: PrintWriter): (Set[IFormula], Set[IFormula],Clause) = {
     /*
     Replace arguments in argumentInHead.intersect(argumentInBody) to arg' and add arg=arg' to constrains
 
@@ -433,7 +425,7 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
    */
     //replace intersect arguments in body and add arg=arg' to constrains
     val replacedClause=DrawHyperEdgeHornGraph.replaceIntersectArgumentInBody(normalizedClause)
-    var dataflowList = Set[IExpression]()
+    var dataflowList = Set[IFormula]()
     var dataflowEquationList=Set[IExpression]()
     var bodySymbolsSet = (for (body <- replacedClause.body; arg <- body.args) yield arg).toSet
     //var bodySymbolsSet = bodySymbols.toSet
@@ -445,7 +437,7 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
         case SE(coefficient, rhs) => { //<1>
           //println(Console.YELLOW + rhs)
           //println(Console.GREEN + bodySymbolsSet)
-          if (!(dataflowList contains f) // f is not in dataflowList
+          if (!(dataflowList.map(_.toString) contains f.toString) // f is not in dataflowList
             //&& !SymbolCollector.constants(rhs).map(_.toString).contains(x.toString) // x is not in y
             && SymbolCollector.constants(rhs).map(_.toString).subsetOf(bodySymbolsSet.map(_.toString)) // <2>
             //&& (for (s <- SymbolCollector.constants(f)) yield s.name).contains(x.toString)// because match SE will match f that does not have head' arguments

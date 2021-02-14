@@ -1,11 +1,12 @@
-import tf2_gnn
-from horn_dataset import HornGraphDataset
-from tf2_gnn.data import DataFold
-from horn_dataset import write_graph_to_pickle,form_GNN_inputs_and_labels
-from Miscellaneous import clear_file,add_JSON_field
 import numpy as np
 import tensorflow as tf
+import tf2_gnn
+from tf2_gnn.data import DataFold
+
+from Miscellaneous import add_JSON_field
 from Miscellaneous import pickleRead
+from horn_dataset import HornGraphDataset
+from horn_dataset import write_graph_to_pickle, form_GNN_inputs_and_labels
 
 
 def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score_list,graph_type=".layerHornGraph.JSON"):
@@ -58,19 +59,25 @@ def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score
         # clear_file(json_file)
         # with open(json_file, 'w') as f:
         #     json.dump(json_obj, f)
-def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_type):
+def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_type,threshold):
     current_positon=0
     for g,file_name in zip(dataset._loaded_data[DataFold.TEST],dataset._file_list["test"]):
         predicted_label=predicted_Y_loaded_model[current_positon:current_positon+len(g._node_label)]
         current_positon=current_positon+len(g._node_label)
         print("file_name",file_name)
-        print("g.node_indices", len(g._node_indices),g._node_indices)
+        #print("g.node_indices", len(g._node_indices),g._node_indices)
         print("g.node_label",len(g._node_label), g._node_label)
         print("predicted_label",predicted_label)
-        #todo: decide threshold later
-        threshold=0.5
-        transfomed_predicted_label=[(lambda l : 1 if l>threshold else 0) (l) for l in predicted_label]
+        print("threshold",threshold)
+
+        transfomed_predicted_label = [(lambda l : 1 if l>threshold else 0) (l) for l in predicted_label]
         print("transfomed_predicted_label",transfomed_predicted_label)
+
+        corrected_label = 0
+        for true_Y, predicted_Y in zip(g._node_label, transfomed_predicted_label):
+            if true_Y == predicted_Y:
+                corrected_label = corrected_label + 1
+        print("corrected label:" + str(corrected_label) + "/" + str(len(g._node_label)))
 
         old_field = ["nodeIds", "nodeSymbolList", "falseIndices", "argumentIndices", "controlLocationIndices",
                      "binaryAdjacentList", "ternaryAdjacencyList", "unknownEdges", "argumentIDList", "argumentNameList",
@@ -94,13 +101,14 @@ def set_threshold_by_roundings(true_Y,predicted_Y_loaded_model):
     #tf.math.round()
     #by value
 
-    threshold_list=[0.00001,0.00005,0.0001,0.0005,0.001,0.01,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99,0.999,0.9999,0.99999]
-    best_set={"threshold":0,"accuracy":0}
+    threshold_list=[1e-13,1e-12,1e-11,1e-10,1e-9,1e-8,1e-7,1e-6,1e-5,0.00005,1e-4,0.0005,1e-3,1e-2,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99,0.999,0.9999,0.99999]
+    best_set={"threshold":0,"accuracy":0,"num_correct":0}
     for i in threshold_list:
         num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, my_round_fun(predicted_Y_loaded_model,i)), tf.int32))
         accuracy = num_correct / len(predicted_Y_loaded_model)
         #print("threshold", i,"accuracy",float(accuracy))
-        if float(accuracy)>best_set["accuracy"]:
+        if num_correct>best_set["num_correct"]:
+            best_set["num_correct"] = num_correct
             best_set["accuracy"]=float(accuracy)
             best_set["threshold"]=float(i)
         # print(true_Y)
@@ -114,6 +122,7 @@ def wrapped_set_threshold_by_ranks(true_Y,true_Y_by_file,predicted_Y_loaded_mode
         if current_set["accuracy"]>best_set["accuracy"]:
             best_set["accuracy"]=current_set["accuracy"]
             best_set["top_percentage"] = current_set["top_percentage"]
+        #print("rank_percentage", rank_percentage,"accuracy",current_set["accuracy"])
     return best_set
 
 def set_threshold_by_ranks(true_Y,true_Y_by_file,predicted_Y_loaded_model,true_Y_file_list,top_percentage=0.8):
@@ -138,12 +147,15 @@ def set_threshold_by_ranks(true_Y,true_Y_by_file,predicted_Y_loaded_model,true_Y
     return {"top_percentage":top_percentage,"accuracy":float(accuracy)}
 
 
-def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label,force_read,form_label,json_type,graph_type,gathered_nodes_binary_classification_task,hyper_parameter={}):
+def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="template_relevance",force_read=True,form_label=True,json_type=".hyperEdgeHornGraph.JSON",graph_type="hyperEdgeHornGraph",gathered_nodes_binary_classification_task=["template_relevance"],hyper_parameter={},set_max_nodes_per_batch=False):
     path = "../benchmarks/" + benchmark_fold + "/"
     benchmark_name = path[len("../benchmarks/"):-1]
     parameters = pickleRead(benchmark + "-" + label + "-parameters", "../src/trained_model/")
     parameters["benchmark"] = benchmark_name
     print("vocabulary size:", parameters["node_vocab_size"])
+    if set_max_nodes_per_batch==True:
+        parameters['max_nodes_per_batch']=hyper_parameter["max_nodes_per_batch"]
+
 
     if force_read == True:
         write_graph_to_pickle(benchmark_name, data_fold=["test"], label=label, path=path, from_json=True,
@@ -168,7 +180,6 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label,force_r
     print("test_metric_string", test_metric_string)
     print("test_metric", test_metric)
 
-    # write_predicted_label_to_JSON_file(dataset, predicted_Y_loaded_model,json_type)
 
     # test measurement
     true_Y = []
@@ -189,7 +200,6 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label,force_r
 
     mse_mean = tf.keras.losses.MSE([np.mean(true_Y)] * len(true_Y), true_Y)
     print("\n mse_mean_Y_and_True_Y", mse_mean)
-    mean_loss_list = mse_mean
     best_set_threshold = set_threshold_by_roundings(true_Y, predicted_Y_loaded_model)
     best_set_ranks = wrapped_set_threshold_by_ranks(true_Y, true_Y_by_file, predicted_Y_loaded_model, true_Y_file_list)
 
@@ -208,3 +218,6 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label,force_r
     random_guess_accuracy = max(positive_label_number / len(true_Y), negative_label_number / len(true_Y))
     print("{0:.2%}".format(max(best_set_threshold["accuracy"], best_set_ranks["accuracy"]) - random_guess_accuracy),
           "better than random guess")
+    return {"trained_model_path":trained_model_path,"best_set_threshold":best_set_threshold["accuracy"],"best_set_ranks":best_set_ranks["accuracy"],
+            "benchmark_fold":benchmark_fold,"label":label,"hyper_parameter":hyper_parameter,"positive_label_percentage":positive_label_number / len(true_Y),
+            "negative_label_number":negative_label_number / len(true_Y),"dataset":dataset,"predicted_Y_loaded_model":predicted_Y_loaded_model,"best_threshold":best_set_threshold["threshold"]}

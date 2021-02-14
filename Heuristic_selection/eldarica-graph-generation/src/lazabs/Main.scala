@@ -29,17 +29,16 @@
  */
 
 package lazabs
-import java.io.{File, FileInputStream, FileNotFoundException, InputStream, PrintWriter}
+import ap.util.{Debug, Timeout}
 import lazabs.art.SearchMethod._
-import lazabs.prover._
-import lazabs.viewer._
-import lazabs.nts._
 import lazabs.horn.abstractions.StaticAbstractionBuilder.AbstractionType
 import lazabs.horn.concurrency.DrawHornGraph.HornGraphType
 import lazabs.horn.concurrency.{CCReader, HintsSelection}
-import ap.util.{Debug, Timeout}
+import lazabs.nts._
+import lazabs.prover._
+import lazabs.viewer._
 
-import scala.concurrent._
+import java.io.{FileInputStream, InputStream}
 
 object GlobalParameters {
   object InputFormat extends Enumeration {
@@ -64,6 +63,7 @@ class GlobalParameters extends Cloneable {
   var mainTimeout=60000
   var extractTemplates=false
   var extractPredicates=false
+  var measurePredictedPredicates=false
   var labelSimpleGeneratedPredicates=false
   var varyGeneratedPredicates=false
   var readHints=false
@@ -223,6 +223,7 @@ class GlobalParameters extends Cloneable {
     //that.printHints = this.printHints
     that.extractTemplates=this.extractTemplates
     that.extractPredicates=this.extractPredicates
+    that.measurePredictedPredicates=this.measurePredictedPredicates
     that.labelSimpleGeneratedPredicates=this.labelSimpleGeneratedPredicates
     that.varyGeneratedPredicates=this.varyGeneratedPredicates
     that.readHints=this.readHints
@@ -313,8 +314,8 @@ object Main {
     // work-around: make the Princess wrapper thread-safe
     lazabs.prover.PrincessWrapper.newWrapper
 
-    import params._
     import GlobalParameters.InputFormat
+    import params._
 
     def arguments(args: List[String]): Boolean = args match {
       case Nil => true
@@ -324,6 +325,7 @@ object Main {
       case "-p" :: rest => prettyPrint = true; arguments(rest)
       case "-extractTemplates" :: rest => extractTemplates = true; arguments(rest)
       case "-extractPredicates" :: rest => extractPredicates = true; arguments(rest)
+      case "-measurePredictedPredicates" :: rest=> measurePredictedPredicates=true; arguments(rest)
       case "-labelSimpleGeneratedPredicates"::rest => labelSimpleGeneratedPredicates = true; arguments(rest)
       case "-varyGeneratedPredicates":: rest => varyGeneratedPredicates =true; arguments(rest)
       case "-generateSimplePredicates" :: rest => generateSimplePredicates = true; arguments(rest)
@@ -576,6 +578,7 @@ object Main {
           " -pIntermediate\t Dump Horn clauses encoding concurrent programs\n"+
           " -extractTemplates\t extract templates training data\n"+
           " -extractPredicates\t extract predicates from CEGAR process\n"+
+          " -measurePredictedPredicates\t output predicted predicate measurements\n"+
           " -labelSimpleGeneratedPredicates\t label simple generated predicates by selected predicates\n"+
           " -varyGeneratedPredicates\t vary generated predicates from CEGAR process without change of logic mearnings\n"+
           " -generateSimplePredicates\t extract predicates using cegar and simply generated predicates\n"+
@@ -719,10 +722,10 @@ object Main {
             lazabs.horn.TrainDataGeneratorPredicatesSmt2(clauseSet, absMap, global, disjunctive,
               drawRTree, lbe) //generate train data.  clauseSet error may caused by import package
           }
-          return
         }catch {
           case _=> throw MainTimeoutException
         }
+        return
       }
 
       if(solFileName != "") {

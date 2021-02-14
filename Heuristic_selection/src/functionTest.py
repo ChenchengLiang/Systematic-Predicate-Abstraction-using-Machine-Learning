@@ -128,6 +128,12 @@ def tokenize_symbols(token_map,node_symbols):
 def main():
     print("{0:.2%}".format(0.2345))
 
+    x="{'timeConsumptionForCEGAR': '1547.0', 'itearationNumber': '15.0', 'generatedPredicateNumber': '43.0', 'averagePredicateSize': '2.883720874786377', 'predicateGeneratorTime': '1236.0'}"
+    print(x)
+    print(type(json.loads(x)))
+    for xx,yy in json.loads(x).items():
+        print(xx,yy)
+
 
     # tf.debugging.set_log_device_placement(True)
     #

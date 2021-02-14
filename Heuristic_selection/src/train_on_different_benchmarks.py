@@ -1,10 +1,9 @@
-from horn_dataset import train_on_graphs
-import os
-from numba import cuda
 import tensorflow as tf
-import random
-import numpy as np
+
 from Miscellaneous import GPU_switch
+from horn_dataset import train_on_graphs
+
+
 def main():
     parameter_list = []
     label_list=[]
@@ -37,7 +36,7 @@ def main():
     # np.random.seed(0)
     # tf.random.set_seed(0)
 
-    hyper_parameters={"nodeFeatureDim":64,"num_layers":2,"regression_hidden_layer_size":[64,64,64]}
+    hyper_parameters={"nodeFeatureDim":128,"num_layers":4,"regression_hidden_layer_size":[128,128,128]}
     for label in label_list:
         parameter_list.append(
             parameters(relative_path="../benchmarks/"+benchmark_name,

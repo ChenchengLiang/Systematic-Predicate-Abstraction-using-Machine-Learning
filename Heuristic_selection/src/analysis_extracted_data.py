@@ -451,7 +451,7 @@ def shuffle_data(rootdir,target_folder):
     print("total file ",len(file_list))
     random.shuffle(file_list)
     random.shuffle(file_list)
-    print(file_list)
+    #print(file_list)
     train_files=file_list[0:int(len(file_list)*0.6)]
     valid_files = file_list[int(len(file_list) * 0.6):int(len(file_list) * 0.8)]
     test_files=file_list[int(len(file_list)*0.8):len(file_list)]
@@ -558,8 +558,8 @@ def main():
 
     #extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
 
-    #shuffle_data("../benchmarks/LIA-lin-shuffled-all","../benchmarks/LIA-lin-shuffled-datafold")
-    divide_data_to_threads("../benchmarks/LIA-lin-shuffled-datafold","divided_threads")
+    #shuffle_data("../benchmarks/LIA-nonlin-shuffled-all","../benchmarks/LIA-nonlin-shuffled-datafold")
+    divide_data_to_threads("../benchmarks/mixed-four-fold","divided_threads_four_fold_mix")
 
     #moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 

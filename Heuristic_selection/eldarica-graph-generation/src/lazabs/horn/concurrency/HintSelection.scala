@@ -27,34 +27,31 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package lazabs.horn.concurrency
-import ap.parser.{IExpression, _}
-import lazabs.GlobalParameters
-import lazabs.horn.abstractions.{AbsReader, AbstractionRecord, EmptyVerificationHints, LoopDetector, StaticAbstractionBuilder, VerificationHints}
-import lazabs.horn.bottomup._
-
-import scala.io.Source
-import scala.collection.mutable.{ArrayBuffer, LinkedHashMap, HashMap => MHashMap, HashSet => MHashSet}
-import java.io.{File, FileWriter, PrintWriter}
-import ap.terfor.conjunctions.Conjunction
-import lazabs.horn.abstractions.AbstractionRecord.AbstractionMap
-import lazabs.horn.abstractions.VerificationHints.{VerifHintElement, _}
-import lazabs.horn.bottomup.DisjInterpolator.AndOrNode
-import lazabs.horn.bottomup.Util.{Dag, DagEmpty}
-import lazabs.horn.preprocessor.HornPreprocessor.{Clauses, VerificationHints}
-
-import java.nio.file.{Files, Paths, StandardCopyOption}
-import ap.parser._
-import IExpression.{Predicate, _}
-import lazabs.horn.bottomup.HornClauses
-
-import java.lang.System.currentTimeMillis
-import ap.{PresburgerTools, SimpleAPI}
+import ap.PresburgerTools
 import ap.basetypes.IdealInt
+import ap.parser.IExpression._
+import ap.parser.{IExpression, _}
+import ap.terfor.conjunctions.Conjunction
+import ap.terfor.preds.Predicate
 import ap.theories.TheoryCollector
 import ap.types.TypeTheory
+import lazabs.GlobalParameters
+import lazabs.horn.abstractions.AbstractionRecord.AbstractionMap
+import lazabs.horn.abstractions.VerificationHints.{VerifHintElement, _}
+import lazabs.horn.abstractions._
+import lazabs.horn.bottomup.DisjInterpolator.AndOrNode
 import lazabs.horn.bottomup.HornClauses.Clause
 import lazabs.horn.bottomup.HornPredAbs.{NormClause, RelationSymbol, SymbolFactory}
+import lazabs.horn.bottomup.Util.Dag
+import lazabs.horn.bottomup.{HornClauses, _}
 import lazabs.horn.preprocessor.HornPreprocessor
+import lazabs.horn.preprocessor.HornPreprocessor.{Clauses, VerificationHints}
+
+import java.io.{File, PrintWriter}
+import java.lang.System.currentTimeMillis
+import java.nio.file.{Files, Paths, StandardCopyOption}
+import scala.collection.mutable.{ArrayBuffer, LinkedHashMap, HashSet => MHashSet}
+import scala.io.Source
 
 case class wrappedHintWithID(ID:Int,head:String, hint:String)
 
@@ -70,10 +67,97 @@ class LiteralCollector extends CollectingVisitor[Unit, Unit] {
 
 object HintsSelection {
   val sp =new Simplifier
+  val spAPI = ap.SimpleAPI.spawn
+
+  def writeMeasurementToJSON(measurementList:Seq[(String,Seq[(String, Double)])]): Unit ={
+    val writer = new PrintWriter(new File(GlobalParameters.get.fileName + "." + "measurement" + ".JSON"))
+    writer.write("{\n")
+    for(m<-measurementList.dropRight(1)){
+      writer.write(DrawHornGraph.addQuotes(m._1)+": {\n")
+      writeFildToJSON(writer,m._2)
+      writer.write("},\n")
+    }
+    val last=measurementList.last
+    writer.write(DrawHornGraph.addQuotes(last._1)+": {\n")
+    writeFildToJSON(writer,last._2)
+    writer.write("}\n")
+
+    writer.write("\n}")
+    writer.close()
+  }
+  def writeFildToJSON(writer:PrintWriter,fields:Seq[(String, Double)]): Unit ={
+    for (field<-fields.dropRight(1)){
+      writer.write(DrawHornGraph.addQuotes(field._1)+":"+DrawHornGraph.addQuotes(field._2.toString)+",\n")
+    }
+    val last=fields.last
+    writer.write(DrawHornGraph.addQuotes(last._1)+":"+DrawHornGraph.addQuotes(last._2.toString)+"\n")
+  }
+
+  def measureCEGAR(simplePredicatesGeneratorClauses: HornPreprocessor.Clauses,initialHints: Map[Predicate, Seq[IFormula]],predicateGenerator : Dag[AndOrNode[HornPredAbs.NormClause, Unit]] =>
+    Either[Seq[(Predicate, Seq[Conjunction])],
+      Dag[(IAtom, HornPredAbs.NormClause)]],counterexampleMethod : HornPredAbs.CounterexampleMethod.Value =
+  HornPredAbs.CounterexampleMethod.FirstBestShortest): Seq[Tuple2[String,Double]] ={
+    val startCEGARTime=currentTimeMillis()
+    val Cegar = new HornPredAbs(simplePredicatesGeneratorClauses,
+      initialHints,
+      predicateGenerator,
+      counterexampleMethod)
+    val timeConsumptionForCEGAR=(currentTimeMillis()-startCEGARTime)
+    println(Console.GREEN + "timeConsumptionForCEGAR (ms)",timeConsumptionForCEGAR)
+    val measurementList:Seq[Tuple2[String,Double]]=Seq(Tuple2("timeConsumptionForCEGAR",timeConsumptionForCEGAR),Tuple2("itearationNumber",Cegar.itearationNumber),
+      Tuple2("generatedPredicateNumber",Cegar.generatedPredicateNumber),Tuple2("averagePredicateSize",Cegar.averagePredicateSize),
+      Tuple2("predicateGeneratorTime",Cegar.predicateGeneratorTime),Tuple2("averagePredicateSize",Cegar.averagePredicateSize))
+    measurementList
+  }
+
+  def writePredicateDistributionToFiles(initialPredicates:VerificationHints,selectedPredicates:VerificationHints,
+                                        labeledPredicates:VerificationHints,unlabeledPredicates:VerificationHints,simpleGeneratedPredicates:VerificationHints,
+                                        constraintPredicates:VerificationHints,argumentConstantEqualPredicate:VerificationHints): Unit ={
+    Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".initial.tpl")) {
+      AbsReader.printHints(initialPredicates)}
+    Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".selected.tpl")) {
+      AbsReader.printHints(selectedPredicates)}
+    Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".unlabeledPredicates.tpl")) {
+      AbsReader.printHints(unlabeledPredicates)}
+    Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".labeledPredicates.tpl")) {
+      AbsReader.printHints(labeledPredicates)}
+    Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".simpleGenerated.tpl")) {
+      AbsReader.printHints(simpleGeneratedPredicates)}
+    Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".constraintPredicates.tpl")) {
+      AbsReader.printHints(constraintPredicates)}
+    Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".argumentConstantEqualPredicate.tpl")) {
+      AbsReader.printHints(argumentConstantEqualPredicate)}
+    val writer=new PrintWriter(new File(GlobalParameters.get.fileName + ".predicateDistribution"))
+    val positiveConstraintPredicates= for ((ck,cv)<-constraintPredicates.predicateHints;(lk,lv)<-selectedPredicates.predicateHints if ck.equals(lk)) yield ck->(for (p<-cv if lv.map(_.toString).contains(p.toString)) yield p)
+    val predicateNumberOfPositiveConstraintPredicates = positiveConstraintPredicates.values.flatten.size
+    val positiveArgumentConstantEqualPredicate = for ((ck,cv)<-argumentConstantEqualPredicate.predicateHints;(lk,lv)<-selectedPredicates.predicateHints if ck.equals(lk)) yield ck->(for (p<-cv if lv.map(_.toString).contains(p.toString)) yield p)
+    val predicateNumberOfPositiveArgumentConstantEqualPredicate=positiveArgumentConstantEqualPredicate.values.flatten.size
+    val predicatesFromCEGAR = for((ki,vi)<-initialPredicates.predicateHints;(ks,vs)<-simpleGeneratedPredicates.predicateHints if ki.equals(ks)) yield {ki->vi.map(_.toString).diff(vs.map(_.toString))}
+    val positivePredicatesFromCEGAR = for ((ck,cv)<-predicatesFromCEGAR;(lk,lv)<-selectedPredicates.predicateHints if ck.equals(lk)) yield ck->(for (p<-cv if lv.map(_.toString).contains(p.toString)) yield p)
+    val predicateNumberOfPositivePredicatesFromCEGAR=positivePredicatesFromCEGAR.values.flatten.size
+
+    writer.println("vary predicates: " + (if(GlobalParameters.get.varyGeneratedPredicates==true) "on" else "off"))
+    writer.println("Predicate distributions: ")
+    writer.println("initialPredicates (initial predicatesFromCEGAR, heuristic simpleGeneratedPredicates):"+initialPredicates.predicateHints.values.flatten.size.toString)
+    writer.println("selectedPredicates (initialPredicates go through CEGAR Filter):"+selectedPredicates.predicateHints.values.flatten.size.toString)
+    writer.println("simpleGeneratedPredicates:"+simpleGeneratedPredicates.predicateHints.values.flatten.size.toString)
+    writer.println("   constraintPredicates:"+constraintPredicates.predicateHints.values.flatten.size.toString)
+    writer.println("       positiveConstraintPredicates:"+predicateNumberOfPositiveConstraintPredicates.toString)
+    writer.println("       negativeConstraintPredicates:"+ (constraintPredicates.predicateHints.values.flatten.size - predicateNumberOfPositiveConstraintPredicates).toString)
+    writer.println("   argumentConstantEqualPredicate:"+argumentConstantEqualPredicate.predicateHints.values.flatten.size.toString)
+    writer.println("       positiveArgumentConstantEqualPredicate:"+predicateNumberOfPositiveArgumentConstantEqualPredicate.toString)
+    writer.println("       negativeArgumentConstantEqualPredicate:"+ (argumentConstantEqualPredicate.predicateHints.values.flatten.size - predicateNumberOfPositiveArgumentConstantEqualPredicate).toString)
+    writer.println("initialPredicates - simpleGeneratedPredicates:"+predicatesFromCEGAR.values.flatten.size.toString)
+    writer.println("       positive(initialPredicates - simpleGeneratedPredicates)):"+predicateNumberOfPositivePredicatesFromCEGAR.toString)
+    writer.println("       negative(initialPredicates - simpleGeneratedPredicates)):"+(predicatesFromCEGAR.values.flatten.size-predicateNumberOfPositivePredicatesFromCEGAR).toString)
+    writer.println("unlabeledPredicates:"+unlabeledPredicates.predicateHints.values.flatten.size.toString)
+    writer.println("labeledPredicates:"+labeledPredicates.predicateHints.values.flatten.size.toString)
+    writer.close()
+  }
 
   def labelSimpleGeneratedPredicatesBySelectedPredicates(optimizedPredicate: Map[Predicate, Seq[IFormula]],simpleGeneratedPredicates: Map[Predicate, Seq[IFormula]]): Map[Predicate, Seq[IFormula]] ={
     for ((ko,vo)<-optimizedPredicate;(ks,vs)<-simpleGeneratedPredicates; if ko.equals(ks) ) yield {
-      ko->(for (p<-vs if vo.contains(p))yield p)
+      ko->(for (p<-vs if vo.map(_.toString).contains(p.toString))yield p)
     }
   }
 
@@ -100,8 +184,8 @@ object HintsSelection {
   def varyTerm(e:ITerm): ITerm = {
     e match {
       case IPlus(t1,t2)=> IPlus(varyTerm(t2),varyTerm(t1))
-      case Difference(t1,t2)=> IPlus(varyTerm(-1*t1),varyTerm(t2))
-      case ITimes(coeff, subterm) => ITimes(coeff, varyTerm(subterm))
+      case Difference(t1,t2)=> IPlus(varyTerm(t1),varyTerm(-1*t2))
+      //case ITimes(coeff, subterm) => ITimes(coeff, varyTerm(subterm))
       case _=> e
     }
   }
@@ -120,11 +204,16 @@ object HintsSelection {
       transformPredicateMapToVerificationHints(mergedPredicates).pretyPrintHints()
       //mergedPredicates.foreach(k=>{println(k._1);k._2.foreach(println)})
     }
-    mergedPredicates
+    for ((k,v)<-mergedPredicates) yield{ //de-duplicate by string
+      val predicateStrings = new MHashSet[String]
+      k->v.filter(x=>predicateStrings.add(x.toString))
+    }
+    //mergedPredicates
   }
 
   def readPredicateLabelFromJSON(initialHintsCollection: VerificationHintsInfo,labelName:String="predictedLabel"): VerificationHints ={
     import play.api.libs.json._
+    val initialHints=initialHintsCollection.initialHints.getPredicateHints.toSeq sortBy (_._1.name)
     val readLabel=labelName
     val input_file = GlobalParameters.get.fileName+".hyperEdgeHornGraph.JSON"
     val json_content = scala.io.Source.fromFile(input_file).mkString
@@ -134,7 +223,7 @@ object HintsSelection {
     }
     println("predictedLabel",predictedLabel.toList.length,predictedLabel.toList)
 
-    val mapLengthList=for ((k,v)<-initialHintsCollection.initialHints.getPredicateHints) yield v.length
+    val mapLengthList=for ((k,v)<-initialHints) yield v.length
     var splitTail=predictedLabel
     val splitedPredictedLabel = for(l<-mapLengthList) yield {
       val temp=splitTail.splitAt(l)._1
@@ -142,11 +231,11 @@ object HintsSelection {
       temp
     }
     for (x<-splitedPredictedLabel)
-      println(x.toSeq)
+      println(x.toSeq,x.size)
 
-    val labeledPredicates=for (((k,v),label)<-initialHintsCollection.initialHints.getPredicateHints zip splitedPredictedLabel) yield {
-      k-> (for ((p,l)<-v zip label if l==1) yield p)
-    }
+    val labeledPredicates=(for (((k,v),label)<-initialHints zip splitedPredictedLabel) yield {
+      k-> (for ((p,l)<-v zip label if l==1) yield p) //match labels with predicates
+    }).filterNot(_._2.isEmpty) //delete empty head
 
     println("--------Filtered initial predicates---------")
     for((k,v)<-labeledPredicates) {
@@ -156,15 +245,15 @@ object HintsSelection {
     }
 
     //simplePredicates ++ simpHints
-    VerificationHints(labeledPredicates)
+    VerificationHints(labeledPredicates.toMap)
   }
 
-  def wrappedReadHints(simplifiedClausesForGraph:Seq[Clause]):VerificationHints={
+  def wrappedReadHints(simplifiedClausesForGraph:Seq[Clause],hintType:String=""):VerificationHints={
     val name2Pred =
       (for (Clause(head, body, _) <- simplifiedClausesForGraph.iterator;
             IAtom(p, _) <- (head :: body).iterator)
         yield (p.name -> p)).toMap
-    HintsSelection.readHints(GlobalParameters.get.fileName+".tpl", name2Pred)
+    HintsSelection.readHints(GlobalParameters.get.fileName+"."+hintType+".tpl", name2Pred)
   }
 
   def readHints(filename : String,
@@ -198,7 +287,7 @@ object HintsSelection {
     }
   }
 
-  def getSimplePredicates( simplePredicatesGeneratorClauses: HornPreprocessor.Clauses,verbose:Boolean=false):  Map[Predicate, Seq[IFormula]] ={
+  def getSimplePredicates( simplePredicatesGeneratorClauses: HornPreprocessor.Clauses,verbose:Boolean=false):  (Map[Predicate, Seq[IFormula]],Map[Predicate, Seq[IFormula]],Map[Predicate, Seq[IFormula]]) ={
 //    for (clause <- simplePredicatesGeneratorClauses)
 //      println(Console.BLUE + clause.toPrologString)
 //    val constraintPredicates = (for(clause <- simplePredicatesGeneratorClauses;atom<-clause.allAtoms) yield {
@@ -215,7 +304,7 @@ object HintsSelection {
 //    }).groupBy(_._1).mapValues(_.flatMap(_._2).distinct)
 
     //generate predicates from constraint
-    val constraintPredicates= (for (clause<-simplePredicatesGeneratorClauses;atom<-clause.allAtoms) yield {
+    val constraintPredicatesTemp= (for (clause<-simplePredicatesGeneratorClauses;atom<-clause.allAtoms) yield {
       //println(Console.BLUE + clause.toPrologString)
       val subst=(for(const<-clause.constants;(arg,n)<-atom.args.zipWithIndex; if const.name==arg.toString) yield const->IVariable(n)).toMap
       val argumentReplacedPredicates= ConstantSubstVisitor(clause.constraint,subst)
@@ -226,13 +315,19 @@ object HintsSelection {
             sp(argumentReplacedPredicates)
           else
             sp(IExpression.quanConsts(Quantifier.EX,constants,argumentReplacedPredicates))
-        if(clause.body.contains(atom)) {
+        if(clause.body.map(_.toString).contains(atom.toString)) {
           (for (p<-LineariseVisitor(sp(simplifiedPredicates.unary_!),IBinJunctor.And)) yield p) ++ (for (p<-LineariseVisitor(simplifiedPredicates,IBinJunctor.And)) yield sp(p.unary_!))
         } else
           LineariseVisitor(simplifiedPredicates,IBinJunctor.And)
       }
-      atom.pred-> freeVariableReplacedPredicates.filter(!_.isTrue).filter(!_.isFalse) //get rid of true and false
-    }).groupBy(_._1).mapValues(_.flatMap(_._2).distinct)
+      atom.pred-> freeVariableReplacedPredicates.filter(!_.isTrue).filter(!_.isFalse).map(spAPI.simplify(_)).filterNot(_.isTrue) //get rid of true and false
+    }).groupBy(_._1).mapValues(_.flatMap(_._2).distinct).filterKeys(_.arity!=0)
+
+    val constraintPredicates=
+      if(GlobalParameters.get.varyGeneratedPredicates==true)
+        HintsSelection.varyPredicates(constraintPredicatesTemp)
+      else
+        constraintPredicatesTemp
 
     //generate predicates from clause's integer constants
     val integerConstantVisitor = new LiteralCollector
@@ -242,12 +337,15 @@ object HintsSelection {
         val eqConstant= integerConstantVisitor.literals.toSeq
         integerConstantVisitor.literals.clear()
          atom.pred ->(for((arg,n) <- atom.args.zipWithIndex) yield argumentEquationGenerator(n,eqConstant)).flatten}
-      ).groupBy(_._1).mapValues(_.flatMap(_._2).distinct)
+      ).groupBy(_._1).mapValues(_.flatMap(_._2).distinct).filterKeys(_.arity!=0)
 
 
     //merge constraint and constant predicates
     val simplelyGeneratedPredicates = for ((cpKey, cpPredicates) <- constraintPredicates; (apKey, apPredicates) <- argumentConstantEqualPredicate; if cpKey.equals(apKey)) yield cpKey -> (cpPredicates ++ apPredicates).distinct
-
+//    val simplelyGeneratedPredicates=for ((k,v)<-simplelyGeneratedPredicatesTemp) yield{ //de-duplicate by string
+//      val predicateStrings = new MHashSet[String]
+//      k->v.filter(x=>predicateStrings.add(x.toString))
+//    }
 
     if (verbose==true){
       println("--------predicates from constrains---------")
@@ -258,7 +356,7 @@ object HintsSelection {
       for((k,v)<-simplelyGeneratedPredicates;(p,i)<-v.zipWithIndex) println(k,i,p)
     }
 
-    simplelyGeneratedPredicates
+    (simplelyGeneratedPredicates,constraintPredicates,argumentConstantEqualPredicate)
   }
 
   def argumentEquationGenerator(n:Int,eqConstant:Seq[IdealInt]): Seq[IFormula] ={
