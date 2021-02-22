@@ -258,6 +258,7 @@ object TrainDataGeneratorPredicatesSmt2 {
         else
           HornPredAbs.CounterexampleMethod.FirstBestShortest
 
+      GlobalParameters.get.timeoutChecker()
 
       val fileName=GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length)
       //simplify clauses. get rid of some redundancy
@@ -290,20 +291,28 @@ object TrainDataGeneratorPredicatesSmt2 {
         val clauseCollection = new ClauseInfo(simplePredicatesGeneratorClauses,Seq())
 
         if(GlobalParameters.get.measurePredictedPredicates){
-          //eliminate time differences by first time call
-          val trial_1=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,Map(),predGenerator,counterexampleMethod)
-          val measurementWithTrueLabel=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,verifyPositiveHints.toInitialPredicates,predGenerator,counterexampleMethod)
-          val trial_2=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,initialPredicates.toInitialPredicates,predGenerator,counterexampleMethod)
-          val measurementWithFullLabel=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,initialPredicates.toInitialPredicates,predGenerator,counterexampleMethod)
-          val trial_3=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,Map(),predGenerator,counterexampleMethod)
-          val measurementWithEmptyLabel=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,Map(),predGenerator,counterexampleMethod)
-          val trial_4=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,predictedPositiveHints.toInitialPredicates,predGenerator,counterexampleMethod)
-          val measurementWithPredictedLabel=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,predictedPositiveHints.toInitialPredicates,predGenerator,counterexampleMethod)
+          //todo:check solvability
+          HintsSelection.checkSolvability(simplePredicatesGeneratorClauses,predictedPositiveHints.toInitialPredicates,predGenerator,counterexampleMethod,fileName,false)
 
-          println("measurementWithTrueLabel",measurementWithTrueLabel)
-          println("measurementWithFullLabel",measurementWithFullLabel)
-          println("measurementWithEmptyLabel",measurementWithEmptyLabel)
-          println("measurementWithPredictedLabel",measurementWithPredictedLabel)
+          //run trails to reduce time consumption deviation
+          val trial_1=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,verifyPositiveHints.toInitialPredicates,predGenerator,counterexampleMethod)
+          val trial_2=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,initialPredicates.toInitialPredicates,predGenerator,counterexampleMethod)
+          val trial_3=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,Map(),predGenerator,counterexampleMethod)
+          val trial_4=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,predictedPositiveHints.toInitialPredicates,predGenerator,counterexampleMethod)
+
+          //val trial_1=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,verifyPositiveHints.toInitialPredicates,predGenerator,counterexampleMethod)
+          val measurementWithTrueLabel=HintsSelection.averageMeasureCEGAR(simplePredicatesGeneratorClauses,verifyPositiveHints.toInitialPredicates,predGenerator,counterexampleMethod)
+          //val trial_2=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,initialPredicates.toInitialPredicates,predGenerator,counterexampleMethod)
+          val measurementWithFullLabel=HintsSelection.averageMeasureCEGAR(simplePredicatesGeneratorClauses,initialPredicates.toInitialPredicates,predGenerator,counterexampleMethod)
+          //val trial_3=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,Map(),predGenerator,counterexampleMethod)
+          val measurementWithEmptyLabel=HintsSelection.averageMeasureCEGAR(simplePredicatesGeneratorClauses,Map(),predGenerator,counterexampleMethod)
+          //val trial_4=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,predictedPositiveHints.toInitialPredicates,predGenerator,counterexampleMethod)
+          val measurementWithPredictedLabel=HintsSelection.averageMeasureCEGAR(simplePredicatesGeneratorClauses,predictedPositiveHints.toInitialPredicates,predGenerator,counterexampleMethod)
+
+//          println("measurementWithTrueLabel",measurementWithTrueLabel)
+//          println("measurementWithFullLabel",measurementWithFullLabel)
+//          println("measurementWithEmptyLabel",measurementWithEmptyLabel)
+//          println("measurementWithPredictedLabel",measurementWithPredictedLabel)
 
           val measurementList=Seq(("measurementWithTrueLabel",measurementWithTrueLabel),("measurementWithFullLabel",measurementWithFullLabel),
             ("measurementWithEmptyLabel",measurementWithEmptyLabel),("measurementWithPredictedLabel",measurementWithPredictedLabel))
@@ -329,22 +338,20 @@ object TrainDataGeneratorPredicatesSmt2 {
       val startTimePredicateGenerator = currentTimeMillis
       val toParamsPredicateGenerator= GlobalParameters.get.clone
       toParamsPredicateGenerator.timeoutChecker = () => {
+        //println("time check point:solvabilityTimeout", ((System.currentTimeMillis - startTimePredicateGenerator)/1000).toString + "/" + ((GlobalParameters.get.solvabilityTimeout * 5)/1000).toString)
         if ((currentTimeMillis - startTimePredicateGenerator) > (GlobalParameters.get.solvabilityTimeout * 5) ) //timeout seconds
           throw lazabs.Main.TimeoutException //Main.TimeoutException
       }
       val (simpleGeneratedPredicates,constraintPredicates,argumentConstantEqualPredicate) =  HintsSelection.getSimplePredicates(simplePredicatesGeneratorClauses)
-
       val lastPredicates= {
-          try //GlobalParameters.parameters.withValue(toParamsPredicateGenerator)
-          {Timeout.withChecker(toParamsPredicateGenerator.timeoutChecker)
-            {
+          try GlobalParameters.parameters.withValue(toParamsPredicateGenerator)
+          {
               val Cegar = new HornPredAbs(simplePredicatesGeneratorClauses,
                 simpleGeneratedPredicates,
                 //simpHints.toInitialPredicates, //use simple generated predicates as initial predicates
                 predGenerator,
                 counterexampleMethod)
               Cegar.predicates
-            }
           }
           catch {
             case _ =>{
@@ -368,7 +375,7 @@ object TrainDataGeneratorPredicatesSmt2 {
         head.pred -> predicateSequence.distinct
       }
 
-      val originalPredicates = predicateFromCEGAR.mapValues(_.map(sp(_)).map(spAPI.simplify(_))).filterKeys(_.arity!=0).transform((k,v)=>v.filterNot(_.isTrue))
+      val originalPredicates = predicateFromCEGAR.mapValues(_.map(sp(_)).map(spAPI.simplify(_))).filterKeys(_.arity!=0).transform((k,v)=>v.filterNot(_.isTrue)).mapValues(_.toSeq)
       //transform Map[Predicate,Seq[IFomula] to VerificationHints:[Predicate,VerifHintElement]
       val initialPredicates =
         if(GlobalParameters.get.varyGeneratedPredicates==true)
@@ -386,27 +393,9 @@ object TrainDataGeneratorPredicatesSmt2 {
           //throw new RuntimeException("interpolator exception")
           throw lazabs.Main.TimeoutException //if catch Counterexample and generate predicates, throw timeout exception
 
-      println("check solvability using current predicates")
-      val startTimeCEGAR = currentTimeMillis
-      val toParamsCEGAR = GlobalParameters.get.clone
-      toParamsCEGAR.timeoutChecker = () => {
-        if ((currentTimeMillis - startTimeCEGAR) > GlobalParameters.get.solvabilityTimeout ) //timeout seconds
-          throw lazabs.Main.TimeoutException //Main.TimeoutException
-      }
-      try{
-        Timeout.withChecker(toParamsCEGAR.timeoutChecker) {
-          new HornPredAbs(simplePredicatesGeneratorClauses,
-            originalPredicates, exceptionalPredGen,
-            counterexampleMethod)
-        }
-      }
-      catch {
-        case lazabs.Main.TimeoutException => {
-          HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/solvability-timeout/"+fileName)
-          sys.exit()//throw TimeoutException
-        }
-        case _ =>{println(Console.RED + "-----------solvability-debug------")}
-      }
+
+      HintsSelection.checkSolvability(simplePredicatesGeneratorClauses,originalPredicates,exceptionalPredGen,counterexampleMethod,fileName)
+
 
       //predicates selection begin
       if (!originalPredicates.isEmpty) {
@@ -433,6 +422,10 @@ object TrainDataGeneratorPredicatesSmt2 {
         var optimizedPredicate: Map[Predicate, Seq[IFormula]] = Map()
         var currentPredicate: Map[Predicate, Seq[IFormula]] = originalPredicates
         val startTimeForExtraction = System.currentTimeMillis()
+        val mainTimeoutChecker = () => {
+          if ((currentTimeMillis - startTimeForExtraction) > GlobalParameters.get.mainTimeout)
+            throw lazabs.Main.MainTimeoutException //Main.TimeoutException
+        }
         for ((head, preds) <- originalPredicates) {
           var criticalPredicatesSeq: Seq[IFormula] = Seq()
           var redundantPredicatesSeq: Seq[IFormula] = Seq()
@@ -458,9 +451,7 @@ object TrainDataGeneratorPredicatesSmt2 {
               if ((currentTimeMillis - startTime) > GlobalParameters.get.threadTimeout)
                 throw lazabs.Main.TimeoutException //Main.TimeoutException
             }
-            try {
-              //GlobalParameters.parameters.withValue(toParams)
-              Timeout.withChecker(toParams.timeoutChecker){
+            try GlobalParameters.parameters.withValue(toParams){
                 println("----------------------------------- CEGAR --------------------------------------")
                 new HornPredAbs(simplePredicatesGeneratorClauses,
                   currentPredicate,
@@ -474,9 +465,7 @@ object TrainDataGeneratorPredicatesSmt2 {
 //                    NegativeHintsWithID =NegativeHintsWithID++Seq(wrappedHint)
 //                  }
 //                }
-                if(currentTimeMillis-startTimeForExtraction>GlobalParameters.get.mainTimeout)
-                  throw lazabs.Main.MainTimeoutException
-              }
+              mainTimeoutChecker()
             } catch {
               case lazabs.Main.TimeoutException => { //need new predicate or timeout
                 criticalPredicatesSeq = criticalPredicatesSeq ++ Seq(p)
@@ -515,8 +504,16 @@ object TrainDataGeneratorPredicatesSmt2 {
           println("\nOptimized Hints:")
           selectedPredicates.pretyPrintHints()
           println("timeout:" + GlobalParameters.get.threadTimeout + "ms")
+          GlobalParameters.get.timeoutChecker()
 
-          try{
+          val startTimeTest = currentTimeMillis
+          val toParamsSolvabilityTest= GlobalParameters.get.clone
+          toParamsSolvabilityTest.timeoutChecker = () => {
+            //println("time check point:solvabilityTimeout", ((System.currentTimeMillis - startTimePredicateGenerator)/1000).toString + "/" + ((GlobalParameters.get.solvabilityTimeout * 5)/1000).toString)
+            if ((currentTimeMillis - startTimeTest) > (GlobalParameters.get.solvabilityTimeout * 2) ) //timeout seconds
+              throw lazabs.Main.TimeoutException //Main.TimeoutException
+          }
+          try GlobalParameters.parameters.withValue(toParamsSolvabilityTest){
             println("\n------------test selected predicates-------------------------")
             val test = new HornPredAbs(simplePredicatesGeneratorClauses,
               optimizedPredicate,
@@ -542,7 +539,7 @@ object TrainDataGeneratorPredicatesSmt2 {
 
             //simplePredicatesGeneratorClauses.map(_.toPrologString).foreach(x=>println(Console.BLUE + x))
             val drawGraphAndWriteLabelsBegin=System.currentTimeMillis
-            if (!labeledPredicates.isEmpty){
+            if (!labeledPredicates.predicateHints.values.flatten.isEmpty){
               val hintsCollection=new VerificationHintsInfo(unlabeledPredicates,labeledPredicates,VerificationHints(Map()))
               val clausesInCE=getClausesInCounterExamples(test,simplePredicatesGeneratorClauses)
               val clauseCollection = new ClauseInfo(simplePredicatesGeneratorClauses,clausesInCE)

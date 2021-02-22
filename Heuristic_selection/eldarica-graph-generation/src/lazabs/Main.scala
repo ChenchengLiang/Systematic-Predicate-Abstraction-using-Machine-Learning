@@ -58,9 +58,9 @@ class GlobalParameters extends Cloneable {
   //var printHints=VerificationHints(Map())
   var generateSimplePredicates=false
   var totalHints=0
-  var threadTimeout = 60000
-  var solvabilityTimeout=60000
-  var mainTimeout=60000
+  var threadTimeout = 120000
+  var solvabilityTimeout=120000
+  var mainTimeout=120000
   var extractTemplates=false
   var extractPredicates=false
   var measurePredictedPredicates=false
@@ -610,6 +610,7 @@ object Main {
 
     timeoutChecker = timeout match {
       case Some(to) => () => {
+        //println("time check point", ((System.currentTimeMillis - startTime)/1000).toString)
         if (System.currentTimeMillis - startTime > to.toLong)
           throw TimeoutException
         if (stoppingCond)
@@ -662,7 +663,7 @@ object Main {
       case _ =>
         // nothing
     }
-    
+
     if (horn) {
       
 /*      format match {
@@ -677,7 +678,6 @@ object Main {
         case _ =>
           // nothing
       }*/
-
       val (clauseSet, absMap) = try { format match {
         case InputFormat.Prolog =>
           (lazabs.horn.parser.HornReader.apply(fileName), None)
@@ -697,7 +697,6 @@ object Main {
           return
         }
       }
-      
       if(prettyPrint) {
         println(HornPrinter(clauseSet))
 
@@ -715,15 +714,14 @@ object Main {
           drawRTree, lbe) //generate train data
         return
       }
-      if(extractPredicates){
+      if (extractPredicates) {
         //do selection
-        try{
-          Timeout.withChecker(timeoutChecker){
-            lazabs.horn.TrainDataGeneratorPredicatesSmt2(clauseSet, absMap, global, disjunctive,
-              drawRTree, lbe) //generate train data.  clauseSet error may caused by import package
-          }
-        }catch {
-          case _=> throw MainTimeoutException
+        try {
+          timeoutChecker()
+          lazabs.horn.TrainDataGeneratorPredicatesSmt2(clauseSet, absMap, global, disjunctive,
+            drawRTree, lbe) //generate train data.  clauseSet error may caused by import package
+        } catch {
+          case _ => throw MainTimeoutException
         }
         return
       }
@@ -856,6 +854,11 @@ object Main {
     }
     case t : Exception =>{
       printError(t.getMessage, GlobalParameters.get.format)
+      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/other-error/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length))
+    }
+    case x:Any=>{
+      printError("other-error", GlobalParameters.get.format)
+      println(Console.RED + x.toString)
       HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/other-error/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length))
     }
 

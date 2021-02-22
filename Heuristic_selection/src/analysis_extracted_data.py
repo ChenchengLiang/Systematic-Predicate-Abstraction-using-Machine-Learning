@@ -559,7 +559,7 @@ def main():
     #extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
 
     #shuffle_data("../benchmarks/LIA-nonlin-shuffled-all","../benchmarks/LIA-nonlin-shuffled-datafold")
-    divide_data_to_threads("../benchmarks/mixed-four-fold","divided_threads_four_fold_mix")
+    divide_data_to_threads("../benchmarks/extractable-four-fold-lin+nonlin","extractable-four-fold-lin+nonlin-divided-threads")
 
     #moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 

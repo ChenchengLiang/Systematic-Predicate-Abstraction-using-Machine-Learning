@@ -13,10 +13,10 @@ def main():
     file_type = ".smt2"
     GPU=True
     pickle = True
-    benchmark = "mixed-three-fold"
+    benchmark = "mixed-four-fold"
     benchmark_name = benchmark+"/"
     hyper_parameters_list = []
-    hyper_parameters_list.append({"nodeFeatureDim": 8, "num_layers": 2, "regression_hidden_layer_size": [8, 8, 8]})
+    #hyper_parameters_list.append({"nodeFeatureDim": 8, "num_layers": 2, "regression_hidden_layer_size": [8, 8, 8]})
     # hyper_parameters_list.append({"nodeFeatureDim": 8, "num_layers": 4, "regression_hidden_layer_size": [8, 8, 8]})
     # hyper_parameters_list.append({"nodeFeatureDim": 8, "num_layers": 6, "regression_hidden_layer_size": [8, 8, 8]})
     # hyper_parameters_list.append({"nodeFeatureDim": 8, "num_layers": 8, "regression_hidden_layer_size": [8, 8, 8]})
@@ -24,20 +24,20 @@ def main():
     # hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 4, "regression_hidden_layer_size": [16, 16, 16]})
     # hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 6, "regression_hidden_layer_size": [16, 16, 16]})
     # hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 8, "regression_hidden_layer_size": [16, 16, 16]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 2, "regression_hidden_layer_size": [32, 32, 32]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 4, "regression_hidden_layer_size": [32, 32, 32]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 6, "regression_hidden_layer_size": [32, 32, 32]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 8, "regression_hidden_layer_size": [32, 32, 32]})
-    #hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 2, "regression_hidden_layer_size": [64, 64, 64]})
-    #hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 4, "regression_hidden_layer_size": [64, 64, 64]})
-    #hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 6, "regression_hidden_layer_size": [64, 64, 64]})
-    #hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 8, "regression_hidden_layer_size": [64, 64, 64]})
-    #hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 12, "regression_hidden_layer_size": [64, 64, 64]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 2, "regression_hidden_layer_size": [128, 128, 128]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 4, "regression_hidden_layer_size": [128, 128, 128]})
-    #hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 8, "regression_hidden_layer_size": [128, 128, 128]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 256, "num_layers": 2, "regression_hidden_layer_size": [256, 256, 256]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 256, "num_layers": 4, "regression_hidden_layer_size": [256, 256, 256]})
+    hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 2, "regression_hidden_layer_size": [32, 32, 32]})
+    hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 4, "regression_hidden_layer_size": [32, 32, 32]})
+    hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 6, "regression_hidden_layer_size": [32, 32, 32]})
+    hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 8, "regression_hidden_layer_size": [32, 32, 32]})
+    hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 2, "regression_hidden_layer_size": [64, 64, 64]})
+    hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 4, "regression_hidden_layer_size": [64, 64, 64]})
+    hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 6, "regression_hidden_layer_size": [64, 64, 64]})
+    hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 8, "regression_hidden_layer_size": [64, 64, 64]})
+    hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 12, "regression_hidden_layer_size": [64, 64, 64]})
+    hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 2, "regression_hidden_layer_size": [128, 128, 128]})
+    hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 4, "regression_hidden_layer_size": [128, 128, 128]})
+    hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 8, "regression_hidden_layer_size": [128, 128, 128]})
+    hyper_parameters_list.append({"nodeFeatureDim": 256, "num_layers": 2, "regression_hidden_layer_size": [256, 256, 256]})
+    hyper_parameters_list.append({"nodeFeatureDim": 256, "num_layers": 4, "regression_hidden_layer_size": [256, 256, 256]})
     for label in label_list:
         parameter_list.append(
             parameters(relative_path="../benchmarks/"+benchmark_name,
@@ -65,7 +65,7 @@ def main():
     benchmark_fold_list = []
     benchmark_fold_list.append(benchmark + "-" + "valid")
     benchmark_fold_list.append(benchmark + "-" + "test")
-    #benchmark_fold_list.append(benchmark + "-" + "test-simple-generator")
+    benchmark_fold_list.append(benchmark + "-" + "test-simple-generator")
     json_type = ".hyperEdgeHornGraph.JSON"
     graph_type = json_type[1:json_type.find(".JSON")]
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
