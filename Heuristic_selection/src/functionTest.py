@@ -134,6 +134,8 @@ def main():
     for xx,yy in json.loads(x).items():
         print(xx,yy)
 
+    xx = lambda _: 0 if True  else 1
+
 
     # tf.debugging.set_log_device_placement(True)
     #

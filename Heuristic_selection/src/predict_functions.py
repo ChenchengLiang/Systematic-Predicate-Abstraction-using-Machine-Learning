@@ -2,9 +2,9 @@ import numpy as np
 import tensorflow as tf
 import tf2_gnn
 from tf2_gnn.data import DataFold
-
+from utils import call_eldarica
 from Miscellaneous import add_JSON_field
-from Miscellaneous import pickleRead
+from Miscellaneous import pickleRead,pickleWrite
 from horn_dataset import HornGraphDataset
 from horn_dataset import write_graph_to_pickle, form_GNN_inputs_and_labels
 
@@ -146,6 +146,11 @@ def set_threshold_by_ranks(true_Y,true_Y_by_file,predicted_Y_loaded_model,true_Y
     #print("top_percentage",top_percentage,"accuracy",float(accuracy))
     return {"top_percentage":top_percentage,"accuracy":float(accuracy)}
 
+def write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,label,benchmark):
+    best_set_threshold=set_threshold_by_roundings(true_Y, predicted_Y_loaded_model)
+    parameters["best_threshold_set"]=best_set_threshold
+    pickleWrite(parameters, benchmark+"-"+label+"-parameters","../src/trained_model/")
+    return best_set_threshold
 
 def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="template_relevance",force_read=True,form_label=True,json_type=".hyperEdgeHornGraph.JSON",graph_type="hyperEdgeHornGraph",gathered_nodes_binary_classification_task=["template_relevance"],hyper_parameter={},set_max_nodes_per_batch=False):
     path = "../benchmarks/" + benchmark_fold + "/"
@@ -200,7 +205,11 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="templa
 
     mse_mean = tf.keras.losses.MSE([np.mean(true_Y)] * len(true_Y), true_Y)
     print("\n mse_mean_Y_and_True_Y", mse_mean)
-    best_set_threshold = set_threshold_by_roundings(true_Y, predicted_Y_loaded_model)
+    best_set_threshold = (lambda : hyper_parameter["best_threshold_set"] if hyper_parameter["read_best_threshold"] else write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,label,benchmark))()
+
+
+
+    #best_set_threshold = set_threshold_by_roundings(true_Y, predicted_Y_loaded_model)
     best_set_ranks = wrapped_set_threshold_by_ranks(true_Y, true_Y_by_file, predicted_Y_loaded_model, true_Y_file_list)
 
     print("----------", benchmark_fold, "-----", label, "----------")
@@ -208,6 +217,7 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="templa
     positive_label_number = sum(true_Y)
     negative_label_number = len(true_Y) - positive_label_number
 
+    print("best_set_threshold",best_set_threshold)
     print("positive_label_percentage", positive_label_number / len(true_Y))
     print("negative_label_number", negative_label_number / len(true_Y))
     print("best_set_threshold", "threshold value:", best_set_threshold["threshold"], "accuracy:",
@@ -221,3 +231,9 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="templa
     return {"trained_model_path":trained_model_path,"best_set_threshold":best_set_threshold["accuracy"],"best_set_ranks":best_set_ranks["accuracy"],
             "benchmark_fold":benchmark_fold,"label":label,"hyper_parameter":hyper_parameter,"positive_label_percentage":positive_label_number / len(true_Y),
             "negative_label_number":negative_label_number / len(true_Y),"dataset":dataset,"predicted_Y_loaded_model":predicted_Y_loaded_model,"best_threshold":best_set_threshold["threshold"]}
+
+def genereate_horn_graph_from_eldarica_with_predicates(file_list):
+    parameter_list=["-getHornGraph:hyperEdgeGraph","-labelSimpleGeneratedPredicates","-varyGeneratedPredicates","-abstract"]
+    for file in file_list:
+        call_eldarica(file,parameter_list)
+

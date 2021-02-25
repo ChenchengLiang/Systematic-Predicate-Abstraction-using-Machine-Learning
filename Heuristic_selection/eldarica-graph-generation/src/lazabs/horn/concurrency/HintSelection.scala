@@ -34,7 +34,7 @@ import ap.parser.{IExpression, _}
 import ap.terfor.conjunctions.Conjunction
 import ap.terfor.preds.Predicate
 import ap.theories.TheoryCollector
-import ap.types.TypeTheory
+import ap.types.{SortedPredicate, TypeTheory}
 import ap.util.Timeout
 import lazabs.GlobalParameters
 import lazabs.horn.abstractions.AbstractionRecord.AbstractionMap
@@ -45,7 +45,7 @@ import lazabs.horn.bottomup.HornClauses.Clause
 import lazabs.horn.bottomup.HornPredAbs.{NormClause, RelationSymbol, SymbolFactory}
 import lazabs.horn.bottomup.Util.Dag
 import lazabs.horn.bottomup.{HornClauses, _}
-import lazabs.horn.preprocessor.HornPreprocessor
+import lazabs.horn.preprocessor.{ConstraintSimplifier, HornPreprocessor}
 import lazabs.horn.preprocessor.HornPreprocessor.{Clauses, VerificationHints}
 
 import java.io.{File, PrintWriter}
@@ -69,6 +69,18 @@ class LiteralCollector extends CollectingVisitor[Unit, Unit] {
 object HintsSelection {
   val sp =new Simplifier
   val spAPI = ap.SimpleAPI.spawn
+  val cs=new ConstraintSimplifier
+
+  def simplifyClausesForGraphs(simplifiedClauses:Clauses,hints:VerificationHints): Clauses ={
+    val uniqueClauses = HintsSelection.distinctByString(simplifiedClauses)
+    val (csSimplifiedClauses,_,_)=cs.process(uniqueClauses.distinct,hints)
+
+    val simplePredicatesGeneratorClauses = GlobalParameters.get.hornGraphType match {
+      case DrawHornGraph.HornGraphType.hyperEdgeGraph | DrawHornGraph.HornGraphType.equivalentHyperedgeGraph | DrawHornGraph.HornGraphType.concretizedHyperedgeGraph => for(clause<-csSimplifiedClauses) yield clause.normalize()
+      case _ => csSimplifiedClauses
+    }
+    simplePredicatesGeneratorClauses
+  }
 
   def checkSolvability(simplePredicatesGeneratorClauses: HornPreprocessor.Clauses,originalPredicates:Map[Predicate, Seq[IFormula]],predicateGen:Dag[AndOrNode[HornPredAbs.NormClause, Unit]] =>
     Either[Seq[(Predicate, Seq[Conjunction])],
@@ -151,7 +163,7 @@ object HintsSelection {
 
   def writePredicateDistributionToFiles(initialPredicates:VerificationHints,selectedPredicates:VerificationHints,
                                         labeledPredicates:VerificationHints,unlabeledPredicates:VerificationHints,simpleGeneratedPredicates:VerificationHints,
-                                        constraintPredicates:VerificationHints,argumentConstantEqualPredicate:VerificationHints,outputAllPredocates:Boolean=false): Unit ={
+                                        constraintPredicates:VerificationHints,argumentConstantEqualPredicate:VerificationHints,outputAllPredocates:Boolean=true): Unit ={
     Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".unlabeledPredicates.tpl")) {
       AbsReader.printHints(unlabeledPredicates)}
     Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".labeledPredicates.tpl")) {
@@ -264,11 +276,7 @@ object HintsSelection {
       transformPredicateMapToVerificationHints(mergedPredicates).pretyPrintHints()
       //mergedPredicates.foreach(k=>{println(k._1);k._2.foreach(println)})
     }
-    for ((k,v)<-mergedPredicates) yield{ //de-duplicate by string
-      val predicateStrings = new MHashSet[String]
-      k->v.filter(x=>predicateStrings.add(x.toString))
-    }
-    //mergedPredicates
+    mergedPredicates.mapValues(distinctByString(_))
   }
 
   def readPredicateLabelFromJSON(initialHintsCollection: VerificationHintsInfo,readLabel:String="predictedLabel"): VerificationHints ={
@@ -387,7 +395,7 @@ object HintsSelection {
         } else
           LineariseVisitor(simplifiedPredicates,IBinJunctor.And)
       }
-      atom.pred-> freeVariableReplacedPredicates.filter(!_.isTrue).filter(!_.isFalse).map(spAPI.simplify(_)).filterNot(_.isTrue) //get rid of true and false
+      atom.pred-> freeVariableReplacedPredicates.filter(!_.isTrue).filter(!_.isFalse).map(spAPI.simplify(_)).filterNot(_.isTrue).map(sp(_)) //get rid of true and false
     }).groupBy(_._1).mapValues(_.flatMap(_._2).distinct).filterKeys(_.arity!=0)
 
     val constraintPredicates=
@@ -399,20 +407,16 @@ object HintsSelection {
     //generate predicates from clause's integer constants
     val integerConstantVisitor = new LiteralCollector
     val argumentConstantEqualPredicate = (
-      for (clause <- simplePredicatesGeneratorClauses;atom<-clause.allAtoms) yield {
-        integerConstantVisitor.visitWithoutResult(clause.constraint, ()) //collect integer constant in clause
-        val eqConstant= integerConstantVisitor.literals.toSeq
+      for (clause <- simplePredicatesGeneratorClauses; atom <- clause.allAtoms) yield {
+        integerConstantVisitor.visitWithoutResult(clause.constraint,()) //collect integer constant in clause
+        val eqConstant = integerConstantVisitor.literals.toSeq
         integerConstantVisitor.literals.clear()
-         atom.pred ->(for((arg,n) <- atom.args.zipWithIndex) yield argumentEquationGenerator(n,eqConstant)).flatten}
-      ).groupBy(_._1).mapValues(_.flatMap(_._2).distinct).filterKeys(_.arity!=0)
-
+        atom.pred -> (for ((arg, n) <- atom.args.zipWithIndex) yield argumentEquationGenerator(n, eqConstant,arg)).flatten
+      }
+      ).groupBy(_._1).mapValues(_.flatMap(_._2).distinct).filterKeys(_.arity != 0)
 
     //merge constraint and constant predicates
-    val simplelyGeneratedPredicates = for ((cpKey, cpPredicates) <- constraintPredicates; (apKey, apPredicates) <- argumentConstantEqualPredicate; if cpKey.equals(apKey)) yield cpKey -> (cpPredicates ++ apPredicates).distinct
-//    val simplelyGeneratedPredicates=for ((k,v)<-simplelyGeneratedPredicatesTemp) yield{ //de-duplicate by string
-//      val predicateStrings = new MHashSet[String]
-//      k->v.filter(x=>predicateStrings.add(x.toString))
-//    }
+    val simplelyGeneratedPredicates = (for ((cpKey, cpPredicates) <- constraintPredicates; (apKey, apPredicates) <- argumentConstantEqualPredicate; if cpKey.equals(apKey)) yield cpKey ->(cpPredicates ++ apPredicates)).mapValues(distinctByString(_))
 
     if (verbose==true){
       println("--------predicates from constrains---------")
@@ -426,8 +430,22 @@ object HintsSelection {
     (simplelyGeneratedPredicates,constraintPredicates,argumentConstantEqualPredicate)
   }
 
-  def argumentEquationGenerator(n:Int,eqConstant:Seq[IdealInt]): Seq[IFormula] ={
-    (for (c<-eqConstant) yield Seq(sp(Eq(IVariable(n),c)),sp(Geq(c,IVariable(n))),sp(Geq(c,IVariable(n))))).flatten
+  def distinctByString[A](formulas:Seq[A]): Seq[A] ={
+    val FormulaStrings = new MHashSet[String]
+    val uniqueFormulas= formulas filter {f => FormulaStrings.add(f.toString)} //de-duplicate formulas
+    uniqueFormulas
+  }
+  def isArgBoolean(arg:ITerm): Boolean ={
+    Sort.sortOf(arg) match {
+      case Sort.MultipleValueBool=>{true}
+      case _=>{false}
+    }
+  }
+  def argumentEquationGenerator(n:Int,eqConstant:Seq[IdealInt],arg:ITerm): Seq[IFormula] ={
+    if(isArgBoolean(arg))
+      Seq()
+    else
+      (for (c<-eqConstant) yield Seq(sp(Eq(IVariable(n),c)),sp(Geq(c,IVariable(n))),sp(Geq(c,IVariable(n))))).flatten
   }
 
   def moveRenameFile(sourceFilename: String, destinationFilename: String,message:String=""): Unit = {
