@@ -232,8 +232,6 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="templa
             "benchmark_fold":benchmark_fold,"label":label,"hyper_parameter":hyper_parameter,"positive_label_percentage":positive_label_number / len(true_Y),
             "negative_label_number":negative_label_number / len(true_Y),"dataset":dataset,"predicted_Y_loaded_model":predicted_Y_loaded_model,"best_threshold":best_set_threshold["threshold"]}
 
-def genereate_horn_graph_from_eldarica_with_predicates(file_list):
-    parameter_list=["-getHornGraph:hyperEdgeGraph","-labelSimpleGeneratedPredicates","-varyGeneratedPredicates","-abstract"]
-    for file in file_list:
-        call_eldarica(file,parameter_list)
+
+
 

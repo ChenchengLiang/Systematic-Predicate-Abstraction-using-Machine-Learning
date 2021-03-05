@@ -18,6 +18,7 @@ import glob
 import json
 from shutil import copyfile,copy,rmtree,copytree,copy2
 from Miscellaneous import replicate_files
+from utils import call_eldarica
 def sleep(seconds=1):
     time.sleep(seconds)
     print("wait for",seconds)
@@ -125,30 +126,49 @@ def tokenize_symbols(token_map,node_symbols):
     print("tokenized_node_label_ids",len(tokenized_node_label_ids),len(set(tokenized_node_label_ids)))
     return tokenized_node_label_ids
 
+
+def run_eldarica_with_shell_pool(filePath, fun, eldarica_parameters,countinous_extract=True):
+    file_list = []
+    for root, subdirs, files in os.walk(filePath):
+        if len(subdirs) == 0:
+            if countinous_extract == True:
+                for file in glob.glob(root + "/*.smt2"):
+                    if not os.path.exists(file + ".circles.gv"):
+                        file_list.append([file,eldarica_parameters])
+            else:
+                for file in glob.glob(root + "/*.smt2"):
+                    file_list.append([file,eldarica_parameters])
+    pool = Pool(processes=4)
+    pool.map(fun, file_list)
+
+
+def run_eldarica_with_shell(file_and_param):
+    file = file_and_param[0]
+    eldarica = "../eldarica-graph-generation/eld "
+    # file = "../benchmarks/ulimit-test/Problem19_label06_true-unreach-call.c.flat_000.smt2"
+    file_name = file[file.rfind("/") + 1:]
+    parameter_list = file_and_param[1]
+    shell_file_name = "run-ulimit" + "-" + file_name + ".sh"
+    timeout_command = "timeout 30"
+    f = open(shell_file_name, "w")
+    f.write("#!/bin/sh\n")
+    # f.write("ulimit -m 4000000; \n")
+    # f.write("ulimit -v 6000000; \n")
+    # f.write("ulimit -a; \n")
+    f.write(timeout_command + " " + eldarica + " " + file + " " + parameter_list + "\n")
+    f.close()
+    supplementary_command = ["sh", shell_file_name]
+    eld = subprocess.Popen(supplementary_command, stdout=subprocess.DEVNULL, shell=False)
+    eld.wait()
+    # subprocess.call(supplementary_command)
+    os.remove(shell_file_name)
+
 def main():
-    print("{0:.2%}".format(0.2345))
 
-    x="{'timeConsumptionForCEGAR': '1547.0', 'itearationNumber': '15.0', 'generatedPredicateNumber': '43.0', 'averagePredicateSize': '2.883720874786377', 'predicateGeneratorTime': '1236.0'}"
-    print(x)
-    print(type(json.loads(x)))
-    for xx,yy in json.loads(x).items():
-        print(xx,yy)
+    dir="../benchmarks/ulimit-test"
+    eldarica_parameters="-t:500 -getHornGraph:hyperEdgeGraph -generateSimplePredicates -varyGeneratedPredicates -abstract -noIntervals -mainTimeout:1200"
+    run_eldarica_with_shell_pool(dir,run_eldarica_with_shell,eldarica_parameters)
 
-    xx = lambda _: 0 if True  else 1
-
-
-    # tf.debugging.set_log_device_placement(True)
-    #
-    # # Create some tensors
-    # a = tf.constant([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
-    # b = tf.constant([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])
-    # c = tf.matmul(a, b)
-    #
-    # print(c)
-
-    # print(tf.test.is_built_with_cuda())
-    #
-    # tf.test.is_gpu_available(cuda_only=False, min_cuda_compute_capability=None)
 
 if __name__ == '__main__':
     main()

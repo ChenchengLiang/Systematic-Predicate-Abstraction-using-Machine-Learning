@@ -195,7 +195,7 @@ object TrainDataGeneratorPredicatesSmt2 {
 
           (simplifiedClauses, simpHints, backTranslator)
         }
-
+      GlobalParameters.get.timeoutChecker()
       val params =
         if (lazabs.GlobalParameters.get.templateBasedInterpolationPortfolio)
           lazabs.GlobalParameters.get.withAndWOTemplates
@@ -252,11 +252,7 @@ object TrainDataGeneratorPredicatesSmt2 {
       //////////////////////////////////////////////////////////////////////////////
 
 
-      val counterexampleMethod =
-        if (disjunctive)
-          HornPredAbs.CounterexampleMethod.AllShortest
-        else
-          HornPredAbs.CounterexampleMethod.FirstBestShortest
+      val counterexampleMethod =HintsSelection.getCounterexampleMethod(disjunctive)
 
       GlobalParameters.get.timeoutChecker()
 
@@ -268,7 +264,7 @@ object TrainDataGeneratorPredicatesSmt2 {
 
       //read hint from file
       if (GlobalParameters.get.readHints==true){
-        val hintType="simpleGenerated" //no
+        val hintType="unlabeledPredicates"
         println("-"*10 + "read predicate from ."+hintType+".tpl" + "-"*10)
         val initialPredicates =VerificationHints(HintsSelection.wrappedReadHints(simplePredicatesGeneratorClauses,hintType).toInitialPredicates.mapValues(_.map(sp(_)).map(VerificationHints.VerifHintInitPred(_))))//simplify after read
         val initialHintsCollection=new VerificationHintsInfo(initialPredicates,VerificationHints(Map()),VerificationHints(Map()))
@@ -276,24 +272,23 @@ object TrainDataGeneratorPredicatesSmt2 {
         val predictedPositiveHints= HintsSelection.readPredicateLabelFromJSON(initialHintsCollection,"predictedLabel")
         Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".predictedHints.tpl")) {
           AbsReader.printHints(predictedPositiveHints)}
-        //read positive hints from JSON label
-        //val positiveHints= HintsSelection.readPredicateLabelFromJSON(initialHintsCollection,"templateRelevanceLabel")
-        //read positive hints from .tpl file
-        val verifyPositiveHints =VerificationHints(HintsSelection.wrappedReadHints(simplePredicatesGeneratorClauses,"labeledPredicates").toInitialPredicates.mapValues(_.map(sp(_)).map(VerificationHints.VerifHintInitPred(_))))
-        val hintsCollection=new VerificationHintsInfo(initialPredicates,verifyPositiveHints,initialPredicates.filterPredicates(verifyPositiveHints.predicateHints.keySet))
+        val truePositiveHints = if (new java.io.File(GlobalParameters.get.fileName + "." + "labeledPredicates" + ".tpl").exists == true)
+          VerificationHints(HintsSelection.wrappedReadHints(simplePredicatesGeneratorClauses, "labeledPredicates").toInitialPredicates.mapValues(_.map(sp(_)).map(VerificationHints.VerifHintInitPred(_))))
+        else HintsSelection.readPredicateLabelFromJSON(initialHintsCollection, "templateRelevanceLabel")
+        val hintsCollection=new VerificationHintsInfo(initialPredicates,truePositiveHints,initialPredicates.filterPredicates(truePositiveHints.predicateHints.keySet))
         val clauseCollection = new ClauseInfo(simplePredicatesGeneratorClauses,Seq())
 
         if(GlobalParameters.get.measurePredictedPredicates){
-          HintsSelection.checkSolvability(simplePredicatesGeneratorClauses,predictedPositiveHints.toInitialPredicates,predGenerator,counterexampleMethod,fileName,false)
+          HintsSelection.checkSolvability(simplePredicatesGeneratorClauses,predictedPositiveHints.toInitialPredicates,predGenerator,counterexampleMethod,moveFile = false)
 
           //run trails to reduce time consumption deviation
-          val trial_1=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,verifyPositiveHints.toInitialPredicates,predGenerator,counterexampleMethod)
+          val trial_1=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,truePositiveHints.toInitialPredicates,predGenerator,counterexampleMethod)
           val trial_2=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,initialPredicates.toInitialPredicates,predGenerator,counterexampleMethod)
           val trial_3=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,Map(),predGenerator,counterexampleMethod)
           val trial_4=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,predictedPositiveHints.toInitialPredicates,predGenerator,counterexampleMethod)
 
           //val trial_1=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,verifyPositiveHints.toInitialPredicates,predGenerator,counterexampleMethod)
-          val measurementWithTrueLabel=HintsSelection.averageMeasureCEGAR(simplePredicatesGeneratorClauses,verifyPositiveHints.toInitialPredicates,predGenerator,counterexampleMethod)
+          val measurementWithTrueLabel=HintsSelection.averageMeasureCEGAR(simplePredicatesGeneratorClauses,truePositiveHints.toInitialPredicates,predGenerator,counterexampleMethod)
           //val trial_2=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,initialPredicates.toInitialPredicates,predGenerator,counterexampleMethod)
           val measurementWithFullLabel=HintsSelection.averageMeasureCEGAR(simplePredicatesGeneratorClauses,initialPredicates.toInitialPredicates,predGenerator,counterexampleMethod)
           //val trial_3=HintsSelection.measureCEGAR(simplePredicatesGeneratorClauses,Map(),predGenerator,counterexampleMethod)
@@ -313,7 +308,7 @@ object TrainDataGeneratorPredicatesSmt2 {
         } else{
           //Output graphs
           val argumentList = (for (p <- HornClauses.allPredicates(simplePredicatesGeneratorClauses)) yield (p, p.arity)).toArray
-          val argumentInfo = HintsSelection.writeArgumentOccurrenceInHintsToFile(GlobalParameters.get.fileName, argumentList, verifyPositiveHints,countOccurrence=true)
+          val argumentInfo = HintsSelection.writeArgumentOccurrenceInHintsToFile(GlobalParameters.get.fileName, argumentList, truePositiveHints,countOccurrence=true)
           GraphTranslator.drawAllHornGraph(clauseCollection,hintsCollection,argumentInfo)
         }
 
@@ -327,16 +322,11 @@ object TrainDataGeneratorPredicatesSmt2 {
       var predicatesExtractingTime:Long=0
       val predicatesExtractingBeginTime=System.currentTimeMillis
 
-      val startTimePredicateGenerator = currentTimeMillis
-      val toParamsPredicateGenerator= GlobalParameters.get.clone
-      toParamsPredicateGenerator.timeoutChecker = () => {
-        //println("time check point:solvabilityTimeout", ((System.currentTimeMillis - startTimePredicateGenerator)/1000).toString + "/" + ((GlobalParameters.get.solvabilityTimeout * 5)/1000).toString)
-        if ((currentTimeMillis - startTimePredicateGenerator) > (GlobalParameters.get.solvabilityTimeout * 5) ) //timeout seconds
-          throw lazabs.Main.TimeoutException //Main.TimeoutException
-      }
+
+      val timeoutCheckerForPredicateGenerator=HintsSelection.clonedTimeChecker(GlobalParameters.get.solvabilityTimeout * 5)
       val (simpleGeneratedPredicates,constraintPredicates,argumentConstantEqualPredicate) =  HintsSelection.getSimplePredicates(simplePredicatesGeneratorClauses)
       val lastPredicates= {
-          try GlobalParameters.parameters.withValue(toParamsPredicateGenerator)
+          try GlobalParameters.parameters.withValue(timeoutCheckerForPredicateGenerator)
           {
               val Cegar = new HornPredAbs(simplePredicatesGeneratorClauses,
                 simpleGeneratedPredicates,
@@ -353,19 +343,7 @@ object TrainDataGeneratorPredicatesSmt2 {
           }
       }
 
-      var numberOfpredicates = 0
-      val predicateFromCEGAR = for ((head, preds) <- lastPredicates) yield{
-        // transfor Map[relationSymbols.values,ArrayBuffer[RelationSymbolPred]] to Map[Predicate, Seq[IFormula]]
-        val subst = (for ((c, n) <- head.arguments.head.iterator.zipWithIndex) yield (c, IVariable(n))).toMap
-        //val headPredicate=new Predicate(head.name,head.arity) //class Predicate(val name : String, val arity : Int)
-        val predicateSequence = for (p <- preds) yield {
-          val simplifiedPredicate = sp(Internal2InputAbsy(p.rawPred, p.rs.sf.getFunctionEnc().predTranslation))
-          val varPred = ConstantSubstVisitor(simplifiedPredicate, subst) //transform variables to _1,_2,_3...
-          numberOfpredicates = numberOfpredicates + 1
-          varPred
-        }
-        head.pred -> predicateSequence.distinct
-      }
+      val predicateFromCEGAR = HintsSelection.transformPredicatesToCanonical(lastPredicates)
 
       val originalPredicates = predicateFromCEGAR.mapValues(_.map(sp(_)).map(spAPI.simplify(_))).filterKeys(_.arity!=0).transform((k,v)=>v.filterNot(_.isTrue)).mapValues(_.toSeq)
       //transform Map[Predicate,Seq[IFomula] to VerificationHints:[Predicate,VerifHintElement]
@@ -391,101 +369,10 @@ object TrainDataGeneratorPredicatesSmt2 {
 
       //predicates selection begin
       if (!originalPredicates.isEmpty) {
-//        val sortedHints = HintsSelection.sortHints(initialPredicates)
-//        //write selected hints with IDs to file
-//        val InitialHintsWithID =  HintsSelection.initialIDForHints(sortedHints) //ID:head->hint
-//        println("---initialHints-----")
-//        for (wrappedHint <- InitialHintsWithID) {
-//          println(wrappedHint.ID.toString,wrappedHint.head,wrappedHint.hint)
-//        }
-
-//          println("------------test original predicates-------")
-//          new HornPredAbs(simplePredicatesGeneratorClauses,
-//            originalPredicates,//need Map[Predicate, Seq[IFormula]]
-//            predGenerator,predicateFlag=false).result
-
         println("---initialHints-----")
         for((k,v)<-originalPredicates;p<-v)
           println(k,p)
-        //Predicate selection begin
-        println("------Predicates selection begin----")
-        var PositiveHintsWithID:Seq[wrappedHintWithID]=Seq()
-        var NegativeHintsWithID:Seq[wrappedHintWithID]=Seq()
-        var optimizedPredicate: Map[Predicate, Seq[IFormula]] = Map()
-        var currentPredicate: Map[Predicate, Seq[IFormula]] = originalPredicates
-        val startTimeForExtraction = System.currentTimeMillis()
-        val mainTimeoutChecker = () => {
-          if ((currentTimeMillis - startTimeForExtraction) > GlobalParameters.get.mainTimeout)
-            throw lazabs.Main.MainTimeoutException //Main.TimeoutException
-        }
-        for ((head, preds) <- originalPredicates) {
-          var criticalPredicatesSeq: Seq[IFormula] = Seq()
-          var redundantPredicatesSeq: Seq[IFormula] = Seq()
-
-          for (p <- preds) {
-//            println("before delete")
-//            println("head", head)
-//            println("predicates", currentPredicate(head)) //key not found
-//            //delete one predicate
-//            println("delete predicate", p)
-            val currentPredicateSeq = currentPredicate(head).filter(_ != p) //delete one predicate
-            currentPredicate = currentPredicate.filterKeys(_ != head) //delete original head
-            currentPredicate = currentPredicate ++ Map(head -> currentPredicateSeq) //add the head with deleted predicate
-//            println("after delete")
-//            println("head", head)
-//            println("predicates", currentPredicate(head))
-//            println("currentPredicate",currentPredicate)
-
-            //try cegar
-            val startTime = System.currentTimeMillis()
-            val toParams = GlobalParameters.get.clone
-            toParams.timeoutChecker = () => {
-              if ((currentTimeMillis - startTime) > GlobalParameters.get.threadTimeout)
-                throw lazabs.Main.TimeoutException //Main.TimeoutException
-            }
-            try GlobalParameters.parameters.withValue(toParams){
-                println("----------------------------------- CEGAR --------------------------------------")
-                new HornPredAbs(simplePredicatesGeneratorClauses,
-                  currentPredicate,
-                  exceptionalPredGen,counterexampleMethod).result
-                //not timeout
-                redundantPredicatesSeq = redundantPredicatesSeq ++ Seq(p)
-                //add useless hint to NegativeHintsWithID   //ID:head->hint
-//                for (wrappedHint <- InitialHintsWithID) { //add useless hint to NegativeHintsWithID   //ID:head->hint
-//                  val pVerifHintInitPred="VerifHintInitPred("+p.toString+")"
-//                  if (head.name == wrappedHint.head && wrappedHint.hint == pVerifHintInitPred) {
-//                    NegativeHintsWithID =NegativeHintsWithID++Seq(wrappedHint)
-//                  }
-//                }
-              mainTimeoutChecker()
-            } catch {
-              case lazabs.Main.TimeoutException => { //need new predicate or timeout
-                criticalPredicatesSeq = criticalPredicatesSeq ++ Seq(p)
-                //add deleted predicate back to curren predicate
-                currentPredicate = currentPredicate.filterKeys(_ != head) //delete original head
-                currentPredicate = currentPredicate ++ Map(head -> (currentPredicateSeq ++ Seq(p))) //add the head with deleted predicate
-                //add useful hint to PositiveHintsWithID
-//                for(wrappedHint<-InitialHintsWithID){
-//                  val pVerifHintInitPred="VerifHintInitPred("+p.toString+")"
-//                  if(head.name.toString()==wrappedHint.head && wrappedHint.hint==pVerifHintInitPred){
-//                    PositiveHintsWithID=PositiveHintsWithID++Seq(wrappedHint)
-//                  }
-//                }
-              }
-              case _ =>{throw lazabs.Main.MainTimeoutException }
-            }
-          }
-          //store selected predicate
-//          if (!criticalPredicatesSeq.isEmpty) {
-//            optimizedPredicate = optimizedPredicate ++ Map(head -> criticalPredicatesSeq)
-//          }
-
-          optimizedPredicate = optimizedPredicate ++ Map(head -> criticalPredicatesSeq)
-          println("current head:", head.toString())
-          println("critical predicates:", criticalPredicatesSeq.toString())
-          println("redundant predicates", redundantPredicatesSeq.toString())
-        }
-
+        val (optimizedPredicate,_)=HintsSelection.getMinimumSetPredicates(originalPredicates,simplePredicatesGeneratorClauses,exceptionalPredGen,counterexampleMethod)
         predicatesExtractingTime=(System.currentTimeMillis-predicatesExtractingBeginTime)/1000
 
         if(!optimizedPredicate.isEmpty){
@@ -498,14 +385,8 @@ object TrainDataGeneratorPredicatesSmt2 {
           println("timeout:" + GlobalParameters.get.threadTimeout + "ms")
           GlobalParameters.get.timeoutChecker()
 
-          val startTimeTest = currentTimeMillis
-          val toParamsSolvabilityTest= GlobalParameters.get.clone
-          toParamsSolvabilityTest.timeoutChecker = () => {
-            //println("time check point:solvabilityTimeout", ((System.currentTimeMillis - startTimePredicateGenerator)/1000).toString + "/" + ((GlobalParameters.get.solvabilityTimeout * 5)/1000).toString)
-            if ((currentTimeMillis - startTimeTest) > (GlobalParameters.get.solvabilityTimeout * 2) ) //timeout seconds
-              throw lazabs.Main.TimeoutException //Main.TimeoutException
-          }
-          try GlobalParameters.parameters.withValue(toParamsSolvabilityTest){
+          val solvabilityTimeoutChecker = HintsSelection.clonedTimeChecker(GlobalParameters.get.solvabilityTimeout * 2)
+          try GlobalParameters.parameters.withValue(solvabilityTimeoutChecker){
             println("\n------------test selected predicates-------------------------")
             val test = new HornPredAbs(simplePredicatesGeneratorClauses,
               optimizedPredicate,
@@ -516,9 +397,10 @@ object TrainDataGeneratorPredicatesSmt2 {
 
             val (unlabeledPredicates,labeledPredicates)=
               if(GlobalParameters.get.labelSimpleGeneratedPredicates==true) {
-                val tempLabel=HintsSelection.labelSimpleGeneratedPredicatesBySelectedPredicates(optimizedPredicate,simpleGeneratedPredicates)
+                val simpleGeneratedAndAbstractGeneratedPredicates=HintsSelection.mergePredicateMaps(HintsSelection.transformVerificationHintsToPredicateMap(simpHints),simpleGeneratedPredicates)
+                val tempLabel=HintsSelection.getPredicatesUsedInMinimizedPredicateFromCegar(simpleGeneratedAndAbstractGeneratedPredicates,optimizedPredicate,simplePredicatesGeneratorClauses,exceptionalPredGen,counterexampleMethod)
                 val labeledSimpleGeneratedPredicates = HintsSelection.transformPredicateMapToVerificationHints(tempLabel)//.filterKeys(k => !tempLabel(k).isEmpty)
-                (HintsSelection.transformPredicateMapToVerificationHints(simpleGeneratedPredicates),labeledSimpleGeneratedPredicates)
+                (HintsSelection.transformPredicateMapToVerificationHints(simpleGeneratedPredicates)++simpHints,labeledSimpleGeneratedPredicates)
               } else
                 (initialPredicates,selectedPredicates)
 
@@ -544,7 +426,7 @@ object TrainDataGeneratorPredicatesSmt2 {
               HintsSelection.writePredicateDistributionToFiles(initialPredicates,selectedPredicates,labeledPredicates,unlabeledPredicates,HintsSelection.transformPredicateMapToVerificationHints(simpleGeneratedPredicates),HintsSelection.transformPredicateMapToVerificationHints(constraintPredicates),HintsSelection.transformPredicateMapToVerificationHints(argumentConstantEqualPredicate))
               drawingGraphAndFormLabelsTime=(System.currentTimeMillis-drawGraphAndWriteLabelsBegin)/1000
             } else{
-              HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/no-predicates-selected/"+fileName,"labeledPredicates is empty")
+              //HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/no-predicates-selected/"+fileName,"labeledPredicates is empty")
             }
 
           }catch{
