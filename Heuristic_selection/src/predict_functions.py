@@ -152,7 +152,9 @@ def write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,la
     pickleWrite(parameters, benchmark+"-"+label+"-parameters","../src/trained_model/")
     return best_set_threshold
 
-def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="template_relevance",force_read=True,form_label=True,json_type=".hyperEdgeHornGraph.JSON",graph_type="hyperEdgeHornGraph",gathered_nodes_binary_classification_task=["template_relevance"],hyper_parameter={},set_max_nodes_per_batch=False):
+def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="template_relevance",force_read=True,form_label=True,
+                       json_type=".hyperEdgeHornGraph.JSON",graph_type="hyperEdgeHornGraph",
+                       gathered_nodes_binary_classification_task=["template_relevance"],hyper_parameter={},set_max_nodes_per_batch=False,file_list=[]):
     path = "../benchmarks/" + benchmark_fold + "/"
     benchmark_name = path[len("../benchmarks/"):-1]
     parameters = pickleRead(benchmark + "-" + label + "-parameters", "../src/trained_model/")
@@ -165,7 +167,7 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="templa
     if force_read == True:
         write_graph_to_pickle(benchmark_name, data_fold=["test"], label=label, path=path, from_json=True,
                               file_type="smt2", json_type=json_type, graph_type=graph_type,
-                              max_nodes_per_batch=parameters['max_nodes_per_batch'], vocabulary_name=benchmark)
+                              max_nodes_per_batch=parameters['max_nodes_per_batch'], vocabulary_name=benchmark,file_list=file_list)
     else:
         print("Use pickle data for training")
     # if form_label == True and not os.path.isfile("../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):

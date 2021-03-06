@@ -7,8 +7,9 @@ def main():
     #benchmark_fold_list.append(benchmark+"-"+"valid")
     #benchmark_fold_list.append(benchmark + "-" + "test")
     #benchmark_fold_list.append(benchmark + "-" + "test-simple-generator")
-    #benchmark_fold_list.append(benchmark + "-" + "predict")
-    benchmark_fold_list.append(benchmark + "-" + "predict-1")
+    benchmark_fold_list.append(benchmark + "-" + "predict")
+    #benchmark_fold_list.append(benchmark + "-" + "predict-1")
+    #benchmark_fold_list.append(benchmark + "-" + "predict-out-of-test-set")
     #benchmark_fold_list.append(benchmark + "-" + "small-test-predict")
     #find and write  best_threshold_set to pickle
     hyper_parameter={"max_nodes_per_batch":1000,"best_threshold_set":{},"read_best_threshold":False}

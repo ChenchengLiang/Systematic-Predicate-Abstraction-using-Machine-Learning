@@ -83,6 +83,6 @@ def run_eldarica_with_shell(file_and_param):
         # subprocess.call(supplementary_command)
         os.remove(shell_file_name)
 
-        if not os.path.exists(file + ".circles.gv"):
+        if not os.path.exists(file + ".circles.gv") and os.path.exists(file):
             os.rename(file,"../benchmarks/shell-timemout/"+file_name)
             print("extracting " + file_name + " failed due to time out, move file to shell-timemout")

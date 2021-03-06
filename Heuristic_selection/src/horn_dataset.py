@@ -366,7 +366,9 @@ class parsed_graph_data:
         self.graphs_learning_labels=graphs_learning_labels
         self.skipped_file_list=skipped_file_list
 
-def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../",from_json=False,file_type=".smt2",json_type=".JSON",max_nodes_per_batch=10000,graph_type="hyperEdgeHornGraph",vocabulary_name=""):
+def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], label="rank",path="../",from_json=False,
+                          file_type=".smt2",json_type=".JSON",max_nodes_per_batch=10000,
+                          graph_type="hyperEdgeHornGraph",vocabulary_name="",file_list=[]):
     if len(data_fold)==1:
         voc=pickleRead(vocabulary_name + "-" + label + "-vocabulary","../src/trained_model/")
         vocabulary_set, token_map = voc[0],voc[1]
@@ -392,12 +394,13 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
 
         # read from JSON
         if from_json==True:
-            suffix=file_type
-            # for fileGraph, fileArgument in zip(sorted(glob.glob(path +df+"_data/"+ '*' + suffix + json_type)),
-            #                                    sorted(glob.glob(path +df+"_data/"+ '*' + suffix + '.arguments'))):
-            fileSet=set(sorted(glob.glob(path +df+"_data/"+ '*' + suffix + json_type)))
-            for fileGraph in fileSet:
-                fileName = fileGraph[:fileGraph.find(suffix + json_type) + len(suffix)]
+            # for fileGraph, fileArgument in zip(sorted(glob.glob(path +df+"_data/"+ '*' + file_type + json_type)),
+            #                                    sorted(glob.glob(path +df+"_data/"+ '*' + file_type + '.arguments'))):
+            files_from_benchmark=set(sorted(glob.glob(path +df+"_data/"+ '*' + file_type + json_type)))
+            file_set=(lambda : [f+json_type for f in file_list] if len(file_list)>0 else files_from_benchmark)()
+            #fileSet=set(sorted(glob.glob(path +df+"_data/"+ '*' + file_type + json_type))) #all .smt2.hyperedge.JSON file
+            for fileGraph in file_set:
+                fileName = fileGraph[:fileGraph.find(file_type + json_type) + len(file_type)]
                 fileName = fileName[fileName.rindex("/") + 1:]
                 # read graph
                 #print("read graph from",fileGraph)
@@ -407,6 +410,7 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                     #debug check all field if equal to empty
                     if len(loaded_graph["nodeIds"]) == 0:
                         print("nodeIds==0",fileName)
+                        skipped_file_list.append(fileName)
                         # for f in glob.glob(path+df+"_data/"+fileName + "*"):
                         #     shutil.copy(f, "../benchmarks/problem_cases/")
                         #     os.remove(f)
