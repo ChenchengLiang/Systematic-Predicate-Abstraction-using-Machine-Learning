@@ -127,47 +127,11 @@ def tokenize_symbols(token_map,node_symbols):
     return tokenized_node_label_ids
 
 
-def run_eldarica_with_shell_pool(filePath, fun, eldarica_parameters,countinous_extract=True):
-    file_list = []
-    for root, subdirs, files in os.walk(filePath):
-        if len(subdirs) == 0:
-            if countinous_extract == True:
-                for file in glob.glob(root + "/*.smt2"):
-                    if not os.path.exists(file + ".circles.gv"):
-                        file_list.append([file,eldarica_parameters])
-            else:
-                for file in glob.glob(root + "/*.smt2"):
-                    file_list.append([file,eldarica_parameters])
-    pool = Pool(processes=4)
-    pool.map(fun, file_list)
-
-
-def run_eldarica_with_shell(file_and_param):
-    file = file_and_param[0]
-    eldarica = "../eldarica-graph-generation/eld "
-    # file = "../benchmarks/ulimit-test/Problem19_label06_true-unreach-call.c.flat_000.smt2"
-    file_name = file[file.rfind("/") + 1:]
-    parameter_list = file_and_param[1]
-    shell_file_name = "run-ulimit" + "-" + file_name + ".sh"
-    timeout_command = "timeout 30"
-    f = open(shell_file_name, "w")
-    f.write("#!/bin/sh\n")
-    # f.write("ulimit -m 4000000; \n")
-    # f.write("ulimit -v 6000000; \n")
-    # f.write("ulimit -a; \n")
-    f.write(timeout_command + " " + eldarica + " " + file + " " + parameter_list + "\n")
-    f.close()
-    supplementary_command = ["sh", shell_file_name]
-    eld = subprocess.Popen(supplementary_command, stdout=subprocess.DEVNULL, shell=False)
-    eld.wait()
-    # subprocess.call(supplementary_command)
-    os.remove(shell_file_name)
-
 def main():
 
-    dir="../benchmarks/ulimit-test"
-    eldarica_parameters="-t:500 -getHornGraph:hyperEdgeGraph -generateSimplePredicates -varyGeneratedPredicates -abstract -noIntervals -mainTimeout:1200"
-    run_eldarica_with_shell_pool(dir,run_eldarica_with_shell,eldarica_parameters)
+    f="jayhorn-tmp2_1_000.smt2"
+    ff=f[:f.rfind(".smt2")]
+    print(ff)
 
 
 if __name__ == '__main__':

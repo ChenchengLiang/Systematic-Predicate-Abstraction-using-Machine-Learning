@@ -7,6 +7,7 @@ import psutil
 import random
 from shutil import copy
 import sys
+from utils import run_eldarica_with_shell,run_eldarica_with_shell_pool
 
 def separate_sat_unsat_dataset(file):
     print(file)
@@ -74,9 +75,12 @@ def extract_train_data_pool(filePath,fun,countinous_extract=False,parameterList=
 
 
 def main():
-    #todo: extract unsat dataset
-    #todo: extract predicate dataset
-    #"-varyGeneratedPredicates","-labelSimpleGeneratedPredicates","-extractPredicates","-noIntervals","-absTimeout:120","getLabelFromCE","-getHornGraph","-getHornGraph:biDirectionLayerGraph","-getHornGraph:hyperEdgeGraph","-getHornGraph:monoDirectionLayerGraph","-getHornGraph:hybridDirectionLayerGraph","fineGrainedEdgeTypeLayerGraph"
+    '''
+    "-varyGeneratedPredicates","-labelSimpleGeneratedPredicates","-extractPredicates","-solvabilityTimeout:120","-mainTimeout:1200","t:1200"
+    "-noIntervals","-absTimeout:120","getLabelFromCE","-getHornGraph","-getHornGraph:biDirectionLayerGraph",
+    "-getHornGraph:hyperEdgeGraph","-getHornGraph:monoDirectionLayerGraph","-getHornGraph:hybridDirectionLayerGraph",
+    "fineGrainedEdgeTypeLayerGraph"
+    '''
     #parameterList = ["-getLabelFromCE", "-abstract:manual"]
     #parameterList = ["-getHornGraph","-abstract:manual"]
     #parameterList = ["-extractPredicates","-solvabilityTimeout:180","-absTimeout:180", "-noIntervals"]
@@ -85,11 +89,11 @@ def main():
     #parameterList = ["-extractPredicates","-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120"] #extract predicate label only from cegar process
 
     #extract data
-    benchmark_name=os.path.join("../benchmarks/",sys.argv[1])#"../benchmarks/LIA-lin-datafold/"
-    parameterList = ["-extractPredicates","-labelSimpleGeneratedPredicates","-varyGeneratedPredicates","-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120","-getHornGraph:hyperEdgeGraph","-mainTimeout:1200","-t:1800"] #extract train and valid data, predicates generated from both cegar and simple generator
-    extract_train_data_pool(os.path.join(benchmark_name,"train_data"),extract_graph_from_eldarica,countinous_extract=True,parameterList=parameterList)
-    extract_train_data_pool(os.path.join(benchmark_name,"valid_data"),extract_graph_from_eldarica, countinous_extract=True, parameterList=parameterList)
-    extract_train_data_pool(os.path.join(benchmark_name, "test_data"), extract_graph_from_eldarica,countinous_extract=True, parameterList=parameterList)
+    # benchmark_name=os.path.join("../benchmarks/",sys.argv[1])#"../benchmarks/LIA-lin-datafold/"
+    # parameterList = ["-extractPredicates","-labelSimpleGeneratedPredicates","-varyGeneratedPredicates","-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120","-getHornGraph:hyperEdgeGraph","-mainTimeout:1200","-t:1800"] #extract train and valid data, predicates generated from both cegar and simple generator
+    # extract_train_data_pool(os.path.join(benchmark_name,"train_data"),extract_graph_from_eldarica,countinous_extract=True,parameterList=parameterList)
+    # extract_train_data_pool(os.path.join(benchmark_name,"valid_data"),extract_graph_from_eldarica, countinous_extract=True, parameterList=parameterList)
+    # extract_train_data_pool(os.path.join(benchmark_name, "test_data"), extract_graph_from_eldarica,countinous_extract=True, parameterList=parameterList)
     # parameterList = ["-extractPredicates", "-labelSimpleGeneratedPredicates","-varyGeneratedPredicates", "-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120","-getHornGraph:hyperEdgeGraph","-mainTimeout:1200","-t:1800"]  # extract test data, predicates generated from only simple generator
     # extract_train_data_pool(os.path.join(benchmark_name,"test_data_simple_generator"),extract_graph_from_eldarica, countinous_extract=True, parameterList=parameterList)
 
@@ -99,6 +103,16 @@ def main():
     # for fold in ["train_data","valid_data","test_data"]:
     #     extract_train_data_pool(os.path.join(benchmark_name, fold), extract_graph_from_eldarica,
     #                             countinous_extract=True, parameterList=parameterList)
+
+
+    # extract data by shell
+    benchmark_name = os.path.join("../benchmarks/",sys.argv[1])
+    thread_number=4
+    timeout=30
+    eldarica_parameters = "-extractPredicates -labelSimpleGeneratedPredicates -getHornGraph:hyperEdgeGraph  -varyGeneratedPredicates -abstract -noIntervals -solvabilityTimeout:120 -mainTimeout:600 -t:1200"
+    run_eldarica_with_shell_pool(os.path.join(benchmark_name,"train_data"), run_eldarica_with_shell, eldarica_parameters,timeout=timeout,thread=thread_number)
+    run_eldarica_with_shell_pool(os.path.join(benchmark_name, "valid_data"), run_eldarica_with_shell,eldarica_parameters,timeout=timeout,thread=thread_number)
+    run_eldarica_with_shell_pool(os.path.join(benchmark_name, "test_data"), run_eldarica_with_shell,eldarica_parameters,timeout=timeout,thread=thread_number)
 
 main()
 

@@ -274,36 +274,8 @@ def separate_datafold_and_get_statistic_data(rootdir="../benchmarks/LIA-lin/",fi
                 copytree(root + "/extracted_data/statistic", root + "/statistic")
                 rmtree(root+"/extracted_data")
 
-def gather_all_train_data(src="../../benchmarks/LIA-lin/",dst="../../benchmarks/LIA-nonlin-trainData-noIntevals/",unique_file=False):
-    if not os.path.isdir(dst):
-        os.mkdir(dst)
-    temp_file='../benchmarks/temp'
-    copytree(src,temp_file)
-    if unique_file==True:
-        unique_names(temp_file)
-    for root, subdirs, files in os.walk(temp_file):
-        #print(root,subdirs,files)
-        if len(subdirs)==1 and subdirs[0]=="trainData":
-            srcname=root+"/trainData/"
-            dstname=dst
-            copy_tree(srcname,dstname)
 
-    rmtree(temp_file)
 
-def unique_names(rootdir):
-    count=0
-    for root, subdirs, files in os.walk(rootdir):
-        #print(root,subdirs,files)
-        if "trainData" in subdirs:
-            srcname = root + "/trainData/*"
-            #print(srcname)
-            file_list=glob.glob(srcname)
-            for file in file_list:
-                preffix=file[:file.rfind(".smt2")]
-                suffix=file[file.rfind(".smt2"):]
-                #print(preffix,count,suffix)
-                os.rename(file,preffix+"-"+str(count)+suffix)
-            count += 1
 
 
 def generate_JSON_field(rootdir,json_file_type=".layerHornGraph.JSON",eldarica_parameters="-getHornGraph"):
@@ -471,7 +443,7 @@ def shuffle_data(rootdir,target_folder):
 
 
 def divide_data_to_threads(root,target_folder):
-    chunk_number=15
+    chunk_number=16
     try:
         os.mkdir(os.path.join("../benchmarks",target_folder))
     except:
@@ -512,6 +484,20 @@ def moveIncompletedExtractionsToTemp(rootdir):
 
 
 
+def gather_data_to_one_file(src,target):
+    count = 1
+    for root, subdirs, files in os.walk(src):
+        if len(subdirs)==0:
+            print(files)
+            for f in files:
+                if not os.path.exists(os.path.join(target,f)):
+                    shutil.move(os.path.join(root,f),target)
+                else:
+                    renamed_f=f[:f.rfind(".smt2")]+"-"+str(count)+".smt2"
+                    shutil.move(os.path.join(root, f), target+"/"+renamed_f)
+                    count=count+1
+
+
 
 
 
@@ -530,9 +516,6 @@ def main():
     #     separate_datafold_and_get_statistic_data(rootdir=benchmark[0],file_type=".smt2",buckets=buckets)
 
 
-    #unique_names("../benchmarks/temp")
-
-    #gather_all_train_data(src="../benchmarks/LIA-lin-noInterval-extract/",dst="../benchmarks/LIA-lin-noInterval-trainData/")
     #separate_dataset_to_train_valid_test_files("../benchmarks/LIA-lin-noInterval-trainData/","../benchmarks/LIA-lin-noInterval-trainData-datafold/")
 
     #get_statistic_data("../benchmarks/LIA-lin-traiData/")
@@ -557,9 +540,9 @@ def main():
 
 
     #extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
-
-    #shuffle_data("../benchmarks/LIA-nonlin-shuffled-all","../benchmarks/LIA-nonlin-shuffled-datafold")
-    divide_data_to_threads("../benchmarks/extractable-four-fold-lin+nonlin","extractable-four-fold-lin+nonlin-divided-threads")
+    #gather_data_to_one_file(os.path.join("../benchmarks/","mix_three_fold-1"),os.path.join("../benchmarks","shuffleFile"))
+    #shuffle_data("../benchmarks/shuffleFile","../benchmarks/shuffled_files")
+    divide_data_to_threads("../benchmarks/shuffled_files","shuffled_files_divided")
 
     #moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
