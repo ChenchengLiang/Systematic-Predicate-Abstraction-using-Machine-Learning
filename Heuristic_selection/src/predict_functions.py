@@ -208,11 +208,7 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="templa
     mse_mean = tf.keras.losses.MSE([np.mean(true_Y)] * len(true_Y), true_Y)
     print("\n mse_mean_Y_and_True_Y", mse_mean)
     best_set_threshold = (lambda : hyper_parameter["best_threshold_set"] if hyper_parameter["read_best_threshold"] else write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,label,benchmark))()
-
-
-
-    #best_set_threshold = set_threshold_by_roundings(true_Y, predicted_Y_loaded_model)
-    best_set_ranks = wrapped_set_threshold_by_ranks(true_Y, true_Y_by_file, predicted_Y_loaded_model, true_Y_file_list)
+    best_set_ranks = (lambda : {"top_percentage":0,"accuracy":0} if hyper_parameter["read_best_threshold"] else wrapped_set_threshold_by_ranks(true_Y, true_Y_by_file, predicted_Y_loaded_model, true_Y_file_list))()
 
     print("----------", benchmark_fold, "-----", label, "----------")
     print(hyper_parameter)

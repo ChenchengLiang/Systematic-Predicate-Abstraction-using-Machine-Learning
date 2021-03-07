@@ -409,7 +409,7 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                     loaded_graph = json.load(f)
                     #debug check all field if equal to empty
                     if len(loaded_graph["nodeIds"]) == 0:
-                        print("nodeIds==0",fileName)
+                        print("nodeIds==0"," skip ",fileName)
                         skipped_file_list.append(fileName)
                         # for f in glob.glob(path+df+"_data/"+fileName + "*"):
                         #     shutil.copy(f, "../benchmarks/problem_cases/")

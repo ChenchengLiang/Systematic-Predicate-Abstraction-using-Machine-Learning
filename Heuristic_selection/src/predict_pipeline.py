@@ -15,7 +15,7 @@ def main():
     benchmark = "mixed-three-fold"
     # benchmark_fold = benchmark + "-" + "predict-1"
     # benchmark_fold = benchmark + "-" + "single-example"
-    benchmark_fold = benchmark + "-" + "predict-out-of-test-set-1"
+    benchmark_fold = benchmark + "-" + "predict-out-of-test-set-2"
     max_nodes_per_batch = 1000
     file_list = glob.glob("../benchmarks/" + benchmark_fold + "/test_data/*.smt2")
     thread_number = 4
@@ -85,6 +85,15 @@ def main():
     solvability_for_full_initial_predicates = [1 if s["solvabilityfullInitialPredicates"] == "true" else 0 for s in
                                                json_solvability_obj_list]
 
+    print("solvability_for_empty_initial_predicates",
+          str(sum(solvability_for_empty_initial_predicates)) + "/" + str(len(solvability_for_empty_initial_predicates)))
+    print("solvability_for_predicted_initial_predicates",
+          str(sum(solvability_for_predicted_initial_predicates)) + "/" + str(
+              len(solvability_for_predicted_initial_predicates)))
+    print("solvability_for_full_initial_predicates",
+          str(sum(solvability_for_full_initial_predicates)) + "/" + str(len(solvability_for_full_initial_predicates)))
+
+
     minimizedPredicateFromCegar_for_empty_initial_predicates = [s["minimizedPredicateFromCegaremptyInitialPredicates"]
                                                                 for s in json_solvability_obj_list]
     minimizedPredicateFromCegar_for_empty_initial_predicates = list(
@@ -113,22 +122,14 @@ def main():
     initialPredicatesUsedInMinimizedPredicateFromCegar_for_full_initial_predicates = list(
         map(lambda x: int(x), initialPredicatesUsedInMinimizedPredicateFromCegar_for_full_initial_predicates))
 
-    print("solvability_for_empty_initial_predicates",
-          str(sum(solvability_for_empty_initial_predicates)) + "/" + str(len(solvability_for_empty_initial_predicates)))
-    print("solvability_for_predicted_initial_predicates",
-          str(sum(solvability_for_predicted_initial_predicates)) + "/" + str(
-              len(solvability_for_predicted_initial_predicates)))
-    print("solvability_for_full_initial_predicates",
-          str(sum(solvability_for_full_initial_predicates)) + "/" + str(len(solvability_for_full_initial_predicates)))
+    # print("minimizedPredicateFromCegar_for_empty_initial_predicates",minimizedPredicateFromCegar_for_empty_initial_predicates)
+    # print("minimizedPredicateFromCegar_for_predicted_initial_predicates",minimizedPredicateFromCegar_for_predicted_initial_predicates)
+    # print("minimizedPredicateFromCegar_for_full_initial_predicates",minimizedPredicateFromCegar_for_full_initial_predicates)
+    # print("initialPredicatesUsedInMinimizedPredicateFromCegar_for_empty_initial_predicates",initialPredicatesUsedInMinimizedPredicateFromCegar_for_empty_initial_predicates)
+    # print("initialPredicatesUsedInMinimizedPredicateFromCegar_for_predicted_initial_predicates",initialPredicatesUsedInMinimizedPredicateFromCegar_for_predicted_initial_predicates)
+    # print("initialPredicatesUsedInMinimizedPredicateFromCegar_for_full_initial_predicates",initialPredicatesUsedInMinimizedPredicateFromCegar_for_full_initial_predicates)
 
-    print("minimizedPredicateFromCegar_for_empty_initial_predicates",minimizedPredicateFromCegar_for_empty_initial_predicates)
-    print("minimizedPredicateFromCegar_for_predicted_initial_predicates",minimizedPredicateFromCegar_for_predicted_initial_predicates)
-    print("minimizedPredicateFromCegar_for_full_initial_predicates",minimizedPredicateFromCegar_for_full_initial_predicates)
-    print("initialPredicatesUsedInMinimizedPredicateFromCegar_for_empty_initial_predicates",initialPredicatesUsedInMinimizedPredicateFromCegar_for_empty_initial_predicates)
-    print("initialPredicatesUsedInMinimizedPredicateFromCegar_for_predicted_initial_predicates",initialPredicatesUsedInMinimizedPredicateFromCegar_for_predicted_initial_predicates)
-    print("initialPredicatesUsedInMinimizedPredicateFromCegar_for_full_initial_predicates",initialPredicatesUsedInMinimizedPredicateFromCegar_for_full_initial_predicates)
-
-    scatter_plot_range = 30
+    scatter_plot_range = 0
     plot_scatter(minimizedPredicateFromCegar_for_empty_initial_predicates,
                  initialPredicatesUsedInMinimizedPredicateFromCegar_for_empty_initial_predicates,
                  "empty_initial_predicates", range=scatter_plot_range)

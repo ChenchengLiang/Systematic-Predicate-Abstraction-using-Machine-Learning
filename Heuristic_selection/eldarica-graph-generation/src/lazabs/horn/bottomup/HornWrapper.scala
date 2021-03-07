@@ -392,7 +392,6 @@ class InnerHornWrapper(unsimplifiedClauses : Seq[Clause],
     val argumentInfo = HintsSelection.getArgumentBoundForSmt(argumentList,disjunctive,simplifiedClausesForGraph,simpHints,predGenerator)
     val initialPredicates=
       if (GlobalParameters.get.generateSimplePredicates==true){
-        //todo:check canonical names
         val (simpleGeneratedPredicates,_,_) =  HintsSelection.getSimplePredicates(simplifiedClausesForGraph)
         val initialPres=HintsSelection.transformPredicateMapToVerificationHints(simpleGeneratedPredicates)++(simpHints)
         Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".unlabeledPredicates.tpl")) {
@@ -425,18 +424,7 @@ class InnerHornWrapper(unsimplifiedClauses : Seq[Clause],
     val simpleGeneratedInitialPredicates = HintsSelection.transformPredicateMapToVerificationHints(simpleGeneratedPredicates)
     val fullInitialPredicates = simpleGeneratedInitialPredicates ++ (simpHints)
     val emptyInitialPredicates = VerificationHints(Map())
-    val predictedPredicates =
-      if (new java.io.File(GlobalParameters.get.fileName + "." + "predictedHints" + ".tpl").exists == true) {
-        VerificationHints(HintsSelection.wrappedReadHints(simplifiedClausesForGraph, "predictedHints").toInitialPredicates.mapValues(_.map(sp(_)).map(VerificationHints.VerifHintInitPred(_))))
-      }
-      else if (HintsSelection.detectIfAJSONFieldExists("predictedLabel")){
-        val initialHintsCollection=new VerificationHintsInfo(fullInitialPredicates,VerificationHints(Map()),VerificationHints(Map()))
-        HintsSelection.readPredicateLabelFromJSON(initialHintsCollection,"predictedLabel")
-      }
-      else {
-        println(Console.RED+"no predicted predicates")
-        VerificationHints(Map())
-      }
+    val predictedPredicates = HintsSelection.readPredictedHints(simplifiedClausesForGraph,fullInitialPredicates)
     val predictedInitialpredicates = predictedPredicates ++ simpHints
 
     val counterexampleMethod =HintsSelection.getCounterexampleMethod(disjunctive)
@@ -452,9 +440,11 @@ class InnerHornWrapper(unsimplifiedClauses : Seq[Clause],
       //minimized predicates intersect initialPredicate
       val initialPredicatesUsedInMinimizedPredicateFromCegar=HintsSelection.getPredicatesUsedInMinimizedPredicateFromCegar(HintsSelection.transformVerificationHintsToPredicateMap(initialPredicate),
         minimizedPredicateFromCegar,simplifiedClausesForGraph,counterexampleMethod=counterexampleMethod)
-      Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".initial.tpl")) {AbsReader.printHints(initialPredicate)}
-      Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".minimizedPredicateFromCegar.tpl")) {AbsReader.printHints(transformPredicateMapToVerificationHints(minimizedPredicateFromCegar))}
-      Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".initialPredicatesUsedInMinimizedPredicateFromCegar.tpl")) {AbsReader.printHints(transformPredicateMapToVerificationHints(initialPredicatesUsedInMinimizedPredicateFromCegar))}
+      if (GlobalParameters.get.log==true){
+        Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".initial-"+fieldName+".tpl")) {AbsReader.printHints(initialPredicate)}
+        Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".minimizedPredicateFromCegar-"+fieldName+".tpl")) {AbsReader.printHints(transformPredicateMapToVerificationHints(minimizedPredicateFromCegar))}
+        Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".initialPredicatesUsedInMinimizedPredicateFromCegar-"+fieldName+".tpl")) {AbsReader.printHints(transformPredicateMapToVerificationHints(initialPredicatesUsedInMinimizedPredicateFromCegar))}
+      }
       Seq(("solveTime"+fieldName,solveTime),("solvability"+fieldName,solvability),
         ("numberOfinitialPredicates"+fieldName,initialPredicate.predicateHints.values.flatten.size),
         ("minimizedPredicateFromCegar"+fieldName,minimizedPredicateFromCegar.values.flatten.size),
