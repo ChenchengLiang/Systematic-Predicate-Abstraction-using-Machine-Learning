@@ -17,7 +17,7 @@ class bcolors:
 
 
 def main():
-    benchmark="mixed-three-fold-predict-1"
+    benchmark="mixed-three-fold-predict"
     file_list=glob.glob("../benchmarks/"+benchmark+"/test_data/*.smt2")
     max_nodes_per_batch=1000
 
@@ -37,11 +37,8 @@ def main():
 
     #get_evaluations_from_eldarica_pool(get_one_valuations_from_eldarica, filtered_file_list, eldarica_parameters)
 
-    #todo: How many predicates in the initial set and how many are used in the end.
-
     #read measurement JSON file
     json_obj_list=read_measurement_from_JSON(filtered_file_list)
-    #todo: scatter
     print("solvable file:" +str(len(json_obj_list))+"/"+str(len(filtered_file_list)))
     get_analysis_for_predicted_labels(json_obj_list)
 

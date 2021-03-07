@@ -385,8 +385,12 @@ class InnerHornWrapper(unsimplifiedClauses : Seq[Clause],
 
   val simplifiedClausesForGraph = HintsSelection.simplifyClausesForGraphs(simplifiedClauses, simpHints)
   val sp=new Simplifier
-  simpHints.pretyPrintHints()
+  //println(simplifiedClauses)
   if (GlobalParameters.get.getHornGraph == true) {
+    if (simplifiedClausesForGraph.isEmpty){
+      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/no-simplified-clauses/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length),message="no simplified clauses")
+      sys.exit()
+    }
     val argumentList = (for (p <- HornClauses.allPredicates(simplifiedClausesForGraph)) yield (p, p.arity)).toArray
     //val argumentInfo = HintsSelection.writeArgumentOccurrenceInHintsToFile(GlobalParameters.get.fileName, argumentList, simpHints,countOccurrence=false)
     val argumentInfo = HintsSelection.getArgumentBoundForSmt(argumentList,disjunctive,simplifiedClausesForGraph,simpHints,predGenerator)
@@ -394,12 +398,18 @@ class InnerHornWrapper(unsimplifiedClauses : Seq[Clause],
       if (GlobalParameters.get.generateSimplePredicates==true){
         val (simpleGeneratedPredicates,_,_) =  HintsSelection.getSimplePredicates(simplifiedClausesForGraph)
         val initialPres=HintsSelection.transformPredicateMapToVerificationHints(simpleGeneratedPredicates)++(simpHints)
-        Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".unlabeledPredicates.tpl")) {
-          AbsReader.printHints(initialPres)}
         initialPres
       }else{
-        VerificationHints(Map())
+        VerificationHints(Map()) ++ simpHints
       }
+    if(initialPredicates.isEmpty){
+      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/no-initial-predicates/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length),message="no initial predicates")
+      sys.exit()
+    }
+    HintsSelection.checkSatisfiability(simplifiedClausesForGraph,initialPredicates,predGenerator,HintsSelection.getCounterexampleMethod(disjunctive),moveFile = true,exit=true )
+    Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".unlabeledPredicates.tpl")) {
+      AbsReader.printHints(initialPredicates)}
+
     val hintCollection=new VerificationHintsInfo(initialPredicates,VerificationHints(Map()),VerificationHints(Map()))
     val clauseCollection = new ClauseInfo(simplifiedClausesForGraph,Seq())
     if (GlobalParameters.get.getAllHornGraph==true) {
@@ -452,6 +462,12 @@ class InnerHornWrapper(unsimplifiedClauses : Seq[Clause],
     }).flatten.toSeq
 
     HintsSelection.writeSolvabilityToJSON(solvabilityList)
+    
+    if (GlobalParameters.get.measurePredictedPredicates==true){
+      HintsSelection.measurePredicates(simplifiedClausesForGraph,predGenerator,counterexampleMethod,
+        predictedPredicates.toInitialPredicates,fullInitialPredicates.toInitialPredicates,Map())
+    }
+
 
   }
 

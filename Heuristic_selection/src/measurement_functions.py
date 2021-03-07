@@ -39,9 +39,7 @@ def read_measurement_from_JSON(file_list,measurement=".measurement.JSON"):
     return json_obj_list
 
 
-def get_analysis_for_predicted_labels(json_obj_list):
-    # todo: analysis
-    # if predidicted label is best, how much better or worse
+def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False):
     int_field_map = {}
     first_obj_str = json_obj_list[0].copy()
     first_obj_str.pop("file_name")
@@ -62,10 +60,11 @@ def get_analysis_for_predicted_labels(json_obj_list):
         generatedPredicateNumber_list = []
         averagePredicateSize_list = []
         predicateGeneratorTime_list = []
-        print("file_name", json_obj.pop("file_name"))
+        file_name=json_obj.pop("file_name")
+        #print("file_name", file_name)
         for field in json_obj:
             measurementStr = json_obj[field].replace('\'', '\"')
-            print(field, "\t", json_obj[field])
+            #print(field, "\t", json_obj[field])
             measurementDir = json.loads(measurementStr)
             timeConsumptionForCEGAR_list.append(measurementDir["timeConsumptionForCEGAR"])
             itearationNumber_list.append(measurementDir["itearationNumber"])
@@ -82,6 +81,14 @@ def get_analysis_for_predicted_labels(json_obj_list):
         # todo: predicted result better than other how much percentage
 
     print("------------")
+    #todo:draw scatter plot
+    if out_of_test_set==True:
+        merge_measurementWithTrueLabel_and_measurementWithEmptyLabel(best_timeConsumptionForCEGAR_count)
+        merge_measurementWithTrueLabel_and_measurementWithEmptyLabel(best_itearationNumber_count)
+        merge_measurementWithTrueLabel_and_measurementWithEmptyLabel(best_generatedPredicateNumber_count)
+        merge_measurementWithTrueLabel_and_measurementWithEmptyLabel(best_averagePredicateSize_count)
+        merge_measurementWithTrueLabel_and_measurementWithEmptyLabel(best_predicateGeneratorTime_count)
+
     print("best_timeConsumptionForCEGAR_count", len(json_obj_list), best_timeConsumptionForCEGAR_count)
     print("best_itearationNumber_count", len(json_obj_list), best_itearationNumber_count)
     print("best_generatedPredicateNumber_count", len(json_obj_list), best_generatedPredicateNumber_count)
@@ -89,10 +96,20 @@ def get_analysis_for_predicted_labels(json_obj_list):
     print("best_predicateGeneratorTime_count", len(json_obj_list), best_predicateGeneratorTime_count)
 
 
+def merge_measurementWithTrueLabel_and_measurementWithEmptyLabel(dir):
+    dir["measurementWithEmptyLabel"] = dir["measurementWithEmptyLabel"] + dir["measurementWithTrueLabel"]
+    del (dir["measurementWithTrueLabel"])
+
+
 def get_best_measurement(int_field_map,measurement_list,best_measurement_count):
     #todo:receive different measurement function min, max ...
     #todo: deal with same value situation
-    best_measurement= int_field_map[np.argmin(measurement_list)]
+    #print("measurement_list",measurement_list)
     best_measurement_value = min(measurement_list)
-    best_measurement_count[best_measurement] = best_measurement_count[best_measurement] + 1
-    print("best_timeConsumptionForCEGAR", best_measurement, best_measurement_value)
+    best_measurement_value_index_list=[int_field_map[i] if best_measurement_value==v else None for i,v in enumerate(measurement_list)]
+    best_measurement_value_index_list = list(filter(None, best_measurement_value_index_list))
+    print("best_measurement_value_index_list",best_measurement_value_index_list)
+    #best_measurement= int_field_map[np.argmin(measurement_list)]
+    for best_measurement in best_measurement_value_index_list:
+        best_measurement_count[best_measurement] = best_measurement_count[best_measurement] + 1/len(best_measurement_value_index_list)
+    #print("best_timeConsumptionForCEGAR", best_measurement, best_measurement_value)
