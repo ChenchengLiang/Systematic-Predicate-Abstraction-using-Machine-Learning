@@ -128,10 +128,9 @@ def tokenize_symbols(token_map,node_symbols):
 
 
 def main():
-
-    f="jayhorn-tmp2_1_000.smt2"
-    ff=f[:f.rfind(".smt2")]
-    print(ff)
+    file_and_param=[1,2,3,True]
+    move_file= (lambda : file_and_param[3] if len(file_and_param)>3 else True)()
+    print(move_file)
 
 
 if __name__ == '__main__':

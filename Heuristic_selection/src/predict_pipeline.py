@@ -35,8 +35,9 @@ def main():
     # description: parameter settings
     benchmark = "mixed-three-fold"
     # benchmark_fold = benchmark + "-" + "predict-1"
+    benchmark_fold = benchmark + "-" + "predict-2"
     # benchmark_fold = benchmark + "-" + "single-example"
-    benchmark_fold = benchmark + "-" + "predict-out-of-test-set-7"
+    #benchmark_fold = benchmark + "-" + "predict-out-of-test-set-8"
     max_nodes_per_batch = 1000
     file_list = glob.glob("../benchmarks/" + benchmark_fold + "/test_data/*.smt2")
     initial_file_number= len(file_list)
@@ -45,9 +46,10 @@ def main():
 
     # description: generate horn graph
     timeout = 120*5  # second
+    move_file=False
     eldarica_parameters = "-getHornGraph:hyperEdgeGraph -generateSimplePredicates -varyGeneratedPredicates -abstract -noIntervals -mainTimeout:1200"
     file_list_with_parameters = [
-        [file, eldarica_parameters, timeout] if not os.path.exists(file + ".circles.gv") else [] for file in file_list]
+        [file, eldarica_parameters, timeout,move_file] if not os.path.exists(file + ".circles.gv") else [] for file in file_list]
     run_eldarica_with_shell_pool_with_file_list(thread_number, run_eldarica_with_shell, file_list_with_parameters) #continuous extracting
 
     file_list = [file if os.path.exists(file + ".hyperEdgeHornGraph.JSON") else None for file in file_list]
@@ -56,29 +58,26 @@ def main():
 
 
     # description: predict label
-    #predict_label(benchmark, max_nodes_per_batch, benchmark_fold, file_list)
+    predict_label(benchmark, max_nodes_per_batch, benchmark_fold, file_list)
 
     # description: filter files by max_nodes_per_batch
     filtered_file_list = filter_file_list_by_max_node(file_list, max_nodes_per_batch)
 
 
     # description: get measurement info with different predicate setting for unseen data.
-    timeout = 1200000
-    measurement_parameter_list="-extractPredicates -readHints -measurePredictedPredicates -noIntervals -abstract -solvabilityTimeout:120"
-    file_list_with_measurement_parameters = [
-        [file, measurement_parameter_list, timeout] if not os.path.exists(file + ".measurement.JSON") else [] for
-        file in filtered_file_list]  # continuous extracting
-    run_eldarica_with_shell_pool_with_file_list(thread_number, run_eldarica_with_shell, file_list_with_measurement_parameters)
-    # description: read measurement JSON file
-    json_obj_list = read_measurement_from_JSON(filtered_file_list)
-    get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=True)
-    print("solvable file by predicted label:" + str(len(json_obj_list)) + "/" + str(len(filtered_file_list)))
+    # timeout = 1200000
+    # measurement_parameter_list="-extractPredicates -readHints -measurePredictedPredicates -noIntervals -abstract -solvabilityTimeout:120"
+    # file_list_with_measurement_parameters = [
+    #     [file, measurement_parameter_list, timeout,move_file] if not os.path.exists(file + ".measurement.JSON") else [] for
+    #     file in filtered_file_list]  # continuous extracting
+    # run_eldarica_with_shell_pool_with_file_list(thread_number, run_eldarica_with_shell, file_list_with_measurement_parameters)
 
-    # description: get solvability info with different predicate setting for unseen data
+
+    # description: get solvability and measurement info with different predicate setting for unseen data
     timeout = 1200000
     check_solvability_parameter_list = "-checkSolvability -measurePredictedPredicates -varyGeneratedPredicates -abstract -noIntervals -solvabilityTimeout:120 -mainTimeout:1200"
     file_list_with_parameters = [
-        [file, check_solvability_parameter_list, timeout] if not os.path.exists(file + ".solvability.JSON") else [] for
+        [file, check_solvability_parameter_list, timeout,move_file] if not os.path.exists(file + ".solvability.JSON") else [] for
         file in filtered_file_list] #continuous extracting
     run_eldarica_with_shell_pool_with_file_list(thread_number, run_eldarica_with_shell, file_list_with_parameters)
 
@@ -91,6 +90,14 @@ def main():
                                                     s in json_solvability_obj_list]
     solvability_for_full_initial_predicates = [1 if s["solvabilityfullInitialPredicates"] == "true" else 0 for s in
                                                json_solvability_obj_list]
+
+    # description: read measurement JSON file
+    scatter_plot_range=0
+    json_obj_list = read_measurement_from_JSON(filtered_file_list)
+    get_analysis_for_predicted_labels(json_obj_list, out_of_test_set=True,
+                                      time_unit=1000,scatter_plot_range=scatter_plot_range)  # time_unit=1 means milliseconds. time_unit =1000 means seconds
+    print("solvable file by predicted label:" + str(len(json_obj_list)) + "/" + str(len(filtered_file_list)))
+
     # description: print results
     print("-"*10)
     print(file_list_with_horn_graph)
@@ -141,16 +148,16 @@ def main():
     # print("initialPredicatesUsedInMinimizedPredicateFromCegar_for_predicted_initial_predicates",initialPredicatesUsedInMinimizedPredicateFromCegar_for_predicted_initial_predicates)
     # print("initialPredicatesUsedInMinimizedPredicateFromCegar_for_full_initial_predicates",initialPredicatesUsedInMinimizedPredicateFromCegar_for_full_initial_predicates)
 
-    scatter_plot_range = 20
+    scatter_plot_range = 0
     plot_scatter(minimizedPredicateFromCegar_for_empty_initial_predicates,
                  initialPredicatesUsedInMinimizedPredicateFromCegar_for_empty_initial_predicates,
-                 "empty_initial_predicates", range=scatter_plot_range)
+                 name="empty_initial_predicates", range=scatter_plot_range)
     plot_scatter(minimizedPredicateFromCegar_for_predicted_initial_predicates,
                  initialPredicatesUsedInMinimizedPredicateFromCegar_for_predicted_initial_predicates,
-                 "predicted_initial_predicates", range=scatter_plot_range)
+                 name="predicted_initial_predicates", range=scatter_plot_range)
     plot_scatter(minimizedPredicateFromCegar_for_full_initial_predicates,
                  initialPredicatesUsedInMinimizedPredicateFromCegar_for_full_initial_predicates,
-                 "full_initial_predicates", range=scatter_plot_range)
+                 name="full_initial_predicates", range=scatter_plot_range)
 
 
 

@@ -1,6 +1,6 @@
 import os
 from multiprocessing import Pool
-from utils import call_eldarica
+from utils import call_eldarica,plot_scatter
 import json
 import numpy as np
 def get_evaluations_from_eldarica_pool(fun,file_list,parameters,countinous=True):
@@ -39,7 +39,7 @@ def read_measurement_from_JSON(file_list,measurement=".measurement.JSON"):
     return json_obj_list
 
 
-def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False):
+def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False,time_unit=1,scatter_plot_range=0): #time_unit=1 means milliseconds. time_unit =1000 means seconds
     int_field_map = {}
     first_obj_str = json_obj_list[0].copy()
     first_obj_str.pop("file_name")
@@ -53,7 +53,11 @@ def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False):
     best_generatedPredicateNumber_count = measurement_count_map.copy()
     best_averagePredicateSize_count = measurement_count_map.copy()
     best_predicateGeneratorTime_count = measurement_count_map.copy()
-    best_count_map = {}
+    timeConsumptionForCEGAR_list_all_files=[]
+    itearationNumber_list_all_files=[]
+    generatedPredicateNumber_list_all_files=[]
+    averagePredicateSize_list_all_files=[]
+    predicateGeneratorTime_list_all_files=[]
     for json_obj in json_obj_list:
         timeConsumptionForCEGAR_list = []
         itearationNumber_list = []
@@ -71,6 +75,11 @@ def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False):
             generatedPredicateNumber_list.append(measurementDir["generatedPredicateNumber"])
             averagePredicateSize_list.append(measurementDir["averagePredicateSize"])
             predicateGeneratorTime_list.append(measurementDir["predicateGeneratorTime"])
+        timeConsumptionForCEGAR_list_all_files.append(timeConsumptionForCEGAR_list)
+        itearationNumber_list_all_files.append(itearationNumber_list)
+        generatedPredicateNumber_list_all_files.append(generatedPredicateNumber_list)
+        averagePredicateSize_list_all_files.append(averagePredicateSize_list)
+        predicateGeneratorTime_list_all_files.append(predicateGeneratorTime_list)
 
         get_best_measurement(int_field_map, timeConsumptionForCEGAR_list, best_timeConsumptionForCEGAR_count)
         get_best_measurement(int_field_map, itearationNumber_list, best_itearationNumber_count)
@@ -81,13 +90,31 @@ def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False):
         # todo: predicted result better than other how much percentage
 
     print("------------")
-    #todo:draw scatter plot
+    scatter_plot_range = scatter_plot_range
+    timeConsumptionForCEGAR_list_all_files=[[float(data)/time_unit for data in data_fold] for data_fold in timeConsumptionForCEGAR_list_all_files]
+    predicateGeneratorTime_list_all_files = [[float(data) / time_unit for data in data_fold] for data_fold in predicateGeneratorTime_list_all_files]
     if out_of_test_set==True:
         merge_measurementWithTrueLabel_and_measurementWithEmptyLabel(best_timeConsumptionForCEGAR_count)
         merge_measurementWithTrueLabel_and_measurementWithEmptyLabel(best_itearationNumber_count)
         merge_measurementWithTrueLabel_and_measurementWithEmptyLabel(best_generatedPredicateNumber_count)
         merge_measurementWithTrueLabel_and_measurementWithEmptyLabel(best_averagePredicateSize_count)
         merge_measurementWithTrueLabel_and_measurementWithEmptyLabel(best_predicateGeneratorTime_count)
+        measurement_scatter(timeConsumptionForCEGAR_list_all_files, scatter_plot_range,
+                            plot_name="timeConsumptionForCEGAR",index=[0,2])
+        measurement_scatter(itearationNumber_list_all_files, scatter_plot_range, plot_name="itearationNumber",index=[0,2])
+        measurement_scatter(generatedPredicateNumber_list_all_files, scatter_plot_range,
+                            plot_name="totalPredicateNumber",index=[0,2])
+        measurement_scatter(averagePredicateSize_list_all_files, scatter_plot_range, plot_name="averagePredicateSize",index=[0,2])
+        measurement_scatter(predicateGeneratorTime_list_all_files, scatter_plot_range,
+                            plot_name="predicateGeneratorTime",index=[0,2])
+    else:
+        measurement_scatter(timeConsumptionForCEGAR_list_all_files, scatter_plot_range,
+                          plot_name="timeConsumptionForCEGAR",index=[1,3])
+        measurement_scatter(itearationNumber_list_all_files, scatter_plot_range, plot_name="itearationNumber",index=[1,3])
+        measurement_scatter(generatedPredicateNumber_list_all_files, scatter_plot_range,
+                          plot_name="generatedPredicateNumber",index=[1,3])
+        measurement_scatter(averagePredicateSize_list_all_files, scatter_plot_range, plot_name="averagePredicateSize",index=[1,3])
+        measurement_scatter(predicateGeneratorTime_list_all_files, scatter_plot_range, plot_name="predicateGeneratorTime",index=[1,3])
 
     print("best_timeConsumptionForCEGAR_count", len(json_obj_list), best_timeConsumptionForCEGAR_count)
     print("best_itearationNumber_count", len(json_obj_list), best_itearationNumber_count)
@@ -96,6 +123,14 @@ def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False):
     print("best_predicateGeneratorTime_count", len(json_obj_list), best_predicateGeneratorTime_count)
 
 
+def measurement_scatter(measurement_list_all_files,scatter_plot_range,plot_name="",index=[1,3]):
+    measurement_list_all_files_full_label = [float(v[index[0]]) for v in measurement_list_all_files]
+    measurement_list_all_files_predicted_label = [float(v[index[1]]) for v in measurement_list_all_files]
+    plot_scatter(measurement_list_all_files_full_label,
+                 measurement_list_all_files_predicted_label,
+                 name=plot_name, range=scatter_plot_range, x_label="full label " + plot_name,
+                 y_label="predicted label" + plot_name)
+
 def merge_measurementWithTrueLabel_and_measurementWithEmptyLabel(dir):
     dir["measurementWithEmptyLabel"] = dir["measurementWithEmptyLabel"] + dir["measurementWithTrueLabel"]
     del (dir["measurementWithTrueLabel"])
@@ -103,12 +138,11 @@ def merge_measurementWithTrueLabel_and_measurementWithEmptyLabel(dir):
 
 def get_best_measurement(int_field_map,measurement_list,best_measurement_count):
     #todo:receive different measurement function min, max ...
-    #todo: deal with same value situation
     #print("measurement_list",measurement_list)
     best_measurement_value = min(measurement_list)
     best_measurement_value_index_list=[int_field_map[i] if best_measurement_value==v else None for i,v in enumerate(measurement_list)]
     best_measurement_value_index_list = list(filter(None, best_measurement_value_index_list))
-    print("best_measurement_value_index_list",best_measurement_value_index_list)
+    #print("best_measurement_value_index_list",best_measurement_value_index_list)
     #best_measurement= int_field_map[np.argmin(measurement_list)]
     for best_measurement in best_measurement_value_index_list:
         best_measurement_count[best_measurement] = best_measurement_count[best_measurement] + 1/len(best_measurement_value_index_list)

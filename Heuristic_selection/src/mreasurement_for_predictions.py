@@ -40,6 +40,6 @@ def main():
     #read measurement JSON file
     json_obj_list=read_measurement_from_JSON(filtered_file_list)
     print("solvable file:" +str(len(json_obj_list))+"/"+str(len(filtered_file_list)))
-    get_analysis_for_predicted_labels(json_obj_list)
+    get_analysis_for_predicted_labels(json_obj_list,time_unit=1000,scatter_plot_range=0)
 
 main()
