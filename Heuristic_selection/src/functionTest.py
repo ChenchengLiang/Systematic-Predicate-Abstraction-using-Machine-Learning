@@ -128,9 +128,8 @@ def tokenize_symbols(token_map,node_symbols):
 
 
 def main():
-    file_and_param=[1,2,3,True]
-    move_file= (lambda : file_and_param[3] if len(file_and_param)>3 else True)()
-    print(move_file)
+    x="minimizedPredicateFromCegaremptyInitialPredicates"
+    print(x[len("minimizedPredicateFromCegar"):])
 
 
 if __name__ == '__main__':

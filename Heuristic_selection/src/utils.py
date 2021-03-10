@@ -25,14 +25,14 @@ def filter_file_list_by_max_node(file_list,max_nodes_per_batch):
                 filtered_file_list.append(file)
     return filtered_file_list
 
-def plot_scatter(true_Y,predicted_Y,name="",range=0,x_label="True Values",y_label="Predictions"):
+def plot_scatter(true_Y,predicted_Y,name="",range=[0,0],x_label="True Values",y_label="Predictions"):
     a = plt.axes(aspect='equal')
     plt.scatter(true_Y, predicted_Y)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-    small_lims = [0,range]
+    small_lims = range
     lims = [0, np.max([np.max(true_Y), np.max(predicted_Y)])]
-    lims = (lambda : small_lims if range!=0 else lims)()
+    lims = (lambda : small_lims if range!=[0,0] else lims)()
     plt.xlim(lims)
     plt.ylim(lims)
     _ = plt.plot(lims, lims)
