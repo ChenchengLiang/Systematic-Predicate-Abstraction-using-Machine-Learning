@@ -12,7 +12,7 @@ def main():
     #benchmark_fold_list.append(benchmark + "-" + "predict-out-of-test-set")
     #benchmark_fold_list.append(benchmark + "-" + "small-test-predict")
     #find and write  best_threshold_set to pickle
-    hyper_parameter={"max_nodes_per_batch":1000,"best_threshold_set":{},"read_best_threshold":False}
+    hyper_parameter={"max_nodes_per_batch":1000,"best_threshold_set":{},"read_best_threshold":False} #todo:get threshold from valid data
     trained_model_path_list=[]
     #trained_model_path_list.append("/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-02-04_16-58-14_best.pkl")
     #trained_model_path_list.append("/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-02-05_15-47-16_best.pkl")

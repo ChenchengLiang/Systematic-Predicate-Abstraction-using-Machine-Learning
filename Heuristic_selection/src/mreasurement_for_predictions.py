@@ -17,7 +17,7 @@ class bcolors:
 
 
 def main():
-    benchmark="mixed-three-fold-predict"
+    benchmark="mixed-three-fold-predict-5"
     file_list=glob.glob("../benchmarks/"+benchmark+"/test_data/*.smt2")
     max_nodes_per_batch=1000
 

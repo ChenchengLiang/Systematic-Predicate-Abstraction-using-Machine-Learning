@@ -77,26 +77,37 @@ def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False,time_u
     measurement_list_all_files_map["predicateGeneratorTime"] = [[float(data) / time_unit for data in data_fold] for data_fold in measurement_list_all_files_map["predicateGeneratorTime"]]
     extended_measurement_name_list=measurement_name_list + ["timeConsumptionForCEGAR_ms"] + ["predicateGeneratorTime_ms"]
 
-    #todo: draw scatter compare predicted label with empty labels
-    for fild_name in extended_measurement_name_list:
-        measurement_scatter(measurement_list_all_files_map[fild_name], scatter_plot_range,
-                            plot_name=fild_name + "-full_predicates", index=[1, 3])
-    for fild_name in extended_measurement_name_list:
-        measurement_scatter(measurement_list_all_files_map[fild_name], scatter_plot_range,
-                            plot_name=fild_name + "-empty_predicates", index=[2, 3],
-                            x_label="empty predicates")
+
     if out_of_test_set==True:
         for fild_name in measurement_name_list:
             merge_measurementWithTrueLabel_and_measurementWithEmptyLabel(measurement_best_count_map[fild_name])
+        for fild_name in extended_measurement_name_list:
+            measurement_list_all_files_map[fild_name] = [[float(data_fold[0]) + float(data_fold[2]), float(data_fold[1]), float(data_fold[3])] for
+                                                         data_fold in measurement_list_all_files_map[fild_name]] #0:empty,1:full,2:predicted
+        for fild_name in extended_measurement_name_list:
+            measurement_scatter(measurement_list_all_files_map[fild_name], scatter_plot_range,
+                                plot_name=fild_name + "-full_predicates", index=[1, 2])
+            measurement_scatter(measurement_list_all_files_map[fild_name], scatter_plot_range,
+                                plot_name=fild_name + "-empty_predicates", index=[0, 2],
+                                x_label="empty predicates")
     else:
         for fild_name in extended_measurement_name_list:
             measurement_scatter(measurement_list_all_files_map[fild_name], scatter_plot_range,
                                 plot_name=fild_name+"-true_predicates", index=[0, 3],
                                 x_label="true predicates")
+            measurement_scatter(measurement_list_all_files_map[fild_name], scatter_plot_range,
+                                plot_name=fild_name + "-full_predicates", index=[1, 3])
+            measurement_scatter(measurement_list_all_files_map[fild_name], scatter_plot_range,
+                                plot_name=fild_name + "-empty_predicates", index=[2, 3],
+                                x_label="empty predicates")
 
-    for fild_name in measurement_name_list:
-        print("best_"+fild_name+"_count", len(json_obj_list), measurement_best_count_map[fild_name])
-        #print(fild_name,measurement_list_all_files_map[fild_name])
+
+    with open("trained_model/measurement.log", 'w') as outfile:
+        for fild_name in measurement_name_list:
+            write_content="best_"+fild_name+"_count, " + str(len(json_obj_list))+"," +  str(measurement_best_count_map[fild_name])
+            print(write_content)
+            outfile.write(write_content+"\n")
+            #print(fild_name,measurement_list_all_files_map[fild_name])
 
 def measurement_scatter(measurement_list_all_files,scatter_plot_range=[0,0],plot_name="",index=[1,3],x_label="full predicates",y_label="predicted predicates"):
     measurement_list_all_files_full_label = [float(v[index[0]]) for v in measurement_list_all_files]

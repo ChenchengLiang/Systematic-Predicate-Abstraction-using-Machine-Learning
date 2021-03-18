@@ -13,7 +13,7 @@ def main():
     file_type = ".smt2"
     GPU=True
     pickle = True
-    benchmark = "mixed-four-fold"
+    benchmark = "mixed-three-fold-intervals"
     benchmark_name = benchmark+"/"
     hyper_parameters_list = []
     #hyper_parameters_list.append({"nodeFeatureDim": 8, "num_layers": 2, "regression_hidden_layer_size": [8, 8, 8]})
@@ -36,8 +36,8 @@ def main():
     hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 2, "regression_hidden_layer_size": [128, 128, 128]})
     hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 4, "regression_hidden_layer_size": [128, 128, 128]})
     hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 8, "regression_hidden_layer_size": [128, 128, 128]})
-    hyper_parameters_list.append({"nodeFeatureDim": 256, "num_layers": 2, "regression_hidden_layer_size": [256, 256, 256]})
-    hyper_parameters_list.append({"nodeFeatureDim": 256, "num_layers": 4, "regression_hidden_layer_size": [256, 256, 256]})
+    #hyper_parameters_list.append({"nodeFeatureDim": 256, "num_layers": 2, "regression_hidden_layer_size": [256, 256, 256]})
+    #hyper_parameters_list.append({"nodeFeatureDim": 256, "num_layers": 4, "regression_hidden_layer_size": [256, 256, 256]})
     for label in label_list:
         parameter_list.append(
             parameters(relative_path="../benchmarks/"+benchmark_name,
@@ -73,9 +73,11 @@ def main():
                                                  "template_relevance", "clause_occurrence_in_counter_examples_binary"]
     predict_results=[]
     for trained_model_path,hyper_parameters in zip(trained_model_path_list,hyper_parameters_list):
+        hyper_parameters["read_best_threshold"]=False
         for label in label_list:
             for benchmark_fold in benchmark_fold_list:
-                retult=wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label,force_read,form_label,json_type,graph_type,gathered_nodes_binary_classification_task,hyper_parameters)
+                retult=wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label,force_read,form_label,
+                                          json_type,graph_type,gathered_nodes_binary_classification_task,hyper_parameters)
                 predict_results.append(retult)
 
     #print results

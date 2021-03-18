@@ -540,9 +540,9 @@ def main():
 
 
     #extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
-    #gather_data_to_one_file(os.path.join("../benchmarks/","mix_three_fold-1"),os.path.join("../benchmarks","shuffleFile"))
-    #shuffle_data("../benchmarks/shuffleFile","../benchmarks/shuffled_files")
-    divide_data_to_threads("../benchmarks/shuffled_files","shuffled_files_divided")
+    gather_data_to_one_file(os.path.join("../benchmarks/","LIA-nonlin"),os.path.join("../benchmarks","shuffleFile"))
+    shuffle_data("../benchmarks/shuffleFile","../benchmarks/shuffled_files")
+    #divide_data_to_threads("../benchmarks/shuffled_files","shuffled_files_divided")
 
     #moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
