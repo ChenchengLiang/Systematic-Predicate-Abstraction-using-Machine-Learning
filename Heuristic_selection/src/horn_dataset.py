@@ -46,8 +46,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
     parameters ["gathered_nodes_binary_classification_task"]=gathered_nodes_binary_classification_task
-    max_epochs = 500
-    patience = 100
+    max_epochs = 200
+    patience = 50
     # parameters["add_self_loop_edges"]=False
     # parameters["tie_fwd_bkwd_edges"]=True
 

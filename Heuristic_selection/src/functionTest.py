@@ -128,8 +128,12 @@ def tokenize_symbols(token_map,node_symbols):
 
 
 def main():
-    x="minimizedPredicateFromCegaremptyInitialPredicates"
-    print(x[len("minimizedPredicateFromCegar"):])
+
+    pos_features=[0,1,2]
+    neg_features=[3,4,5,6,7,8,9]
+    ids = np.arange(len(pos_features))
+    choices = np.random.choice(ids, len(neg_features))
+    print(choices)
 
 
 if __name__ == '__main__':

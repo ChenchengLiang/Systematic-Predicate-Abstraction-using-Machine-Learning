@@ -16,6 +16,10 @@ def main():
     benchmark = "mixed-three-fold-intervals"
     benchmark_name = benchmark+"/"
     hyper_parameters_list = []
+    '''
+    To find an appropriate model size, it's best to start with relatively few layers and parameters,
+     then begin increasing the size of the layers or adding new layers until you see diminishing returns on the validation loss.
+    '''
     #hyper_parameters_list.append({"nodeFeatureDim": 8, "num_layers": 2, "regression_hidden_layer_size": [8, 8, 8]})
     # hyper_parameters_list.append({"nodeFeatureDim": 8, "num_layers": 4, "regression_hidden_layer_size": [8, 8, 8]})
     # hyper_parameters_list.append({"nodeFeatureDim": 8, "num_layers": 6, "regression_hidden_layer_size": [8, 8, 8]})
@@ -36,8 +40,8 @@ def main():
     hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 2, "regression_hidden_layer_size": [128, 128, 128]})
     hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 4, "regression_hidden_layer_size": [128, 128, 128]})
     hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 8, "regression_hidden_layer_size": [128, 128, 128]})
-    #hyper_parameters_list.append({"nodeFeatureDim": 256, "num_layers": 2, "regression_hidden_layer_size": [256, 256, 256]})
-    #hyper_parameters_list.append({"nodeFeatureDim": 256, "num_layers": 4, "regression_hidden_layer_size": [256, 256, 256]})
+    hyper_parameters_list.append({"nodeFeatureDim": 256, "num_layers": 2, "regression_hidden_layer_size": [256, 256, 256]})
+    hyper_parameters_list.append({"nodeFeatureDim": 256, "num_layers": 4, "regression_hidden_layer_size": [256, 256, 256]})
     for label in label_list:
         parameter_list.append(
             parameters(relative_path="../benchmarks/"+benchmark_name,
@@ -62,10 +66,11 @@ def main():
             tf.keras.backend.clear_session()
 
     #predict
+    #description: need build benchmark-valid and benchmark-test folder with test_data as subfolder to do the evaluation
     benchmark_fold_list = []
     benchmark_fold_list.append(benchmark + "-" + "valid")
     benchmark_fold_list.append(benchmark + "-" + "test")
-    benchmark_fold_list.append(benchmark + "-" + "test-simple-generator")
+    #benchmark_fold_list.append(benchmark + "-" + "test-simple-generator")
     json_type = ".hyperEdgeHornGraph.JSON"
     graph_type = json_type[1:json_type.find(".JSON")]
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
@@ -73,11 +78,11 @@ def main():
                                                  "template_relevance", "clause_occurrence_in_counter_examples_binary"]
     predict_results=[]
     for trained_model_path,hyper_parameters in zip(trained_model_path_list,hyper_parameters_list):
-        hyper_parameters["read_best_threshold"]=False
+        hyper_parameters.update({"max_nodes_per_batch":1000,"best_threshold_set":{},"read_best_threshold":False})
         for label in label_list:
             for benchmark_fold in benchmark_fold_list:
                 retult=wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label,force_read,form_label,
-                                          json_type,graph_type,gathered_nodes_binary_classification_task,hyper_parameters)
+                                          json_type,graph_type,gathered_nodes_binary_classification_task,hyper_parameters,set_max_nodes_per_batch=True)
                 predict_results.append(retult)
 
     #print results

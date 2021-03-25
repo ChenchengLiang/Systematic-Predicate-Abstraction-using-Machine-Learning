@@ -5,6 +5,7 @@ import numpy as np
 from multiprocessing import Pool
 import glob
 import os
+import time
 def call_eldarica(file,parameter_list,message="",supplementary_command=[]):
     print("call eldarica for " + message,file)
     param = ["../eldarica-graph-generation/eld", file] + parameter_list
@@ -78,12 +79,53 @@ def run_eldarica_with_shell(file_and_param):
         f.close()
         supplementary_command = ["sh", shell_file_name]
         print("extracting "+file_name)
+        start=time.time()
         eld = subprocess.Popen(supplementary_command, stdout=subprocess.DEVNULL, shell=False)
         eld.wait()
-        print("extracting " + file_name + " finished")
+        end = time.time()
+        used_time=end-start
+        print("extracting " + file_name + " finished", "use time: ", used_time)
         # subprocess.call(supplementary_command)
         os.remove(shell_file_name)
-        #todo: don't move it if it is out of test set
-        if not os.path.exists(file + ".circles.gv") and os.path.exists(file) and move_file==True:
-            os.rename(file,"../benchmarks/shell-timemout/"+file_name)
-            print("extracting " + file_name + " failed due to time out, move file to shell-timemout")
+
+        if used_time>timeout and os.path.exists(file) and move_file==True:
+            os.rename(file,"../benchmarks/exceptions/shell-timeout/"+file_name)
+            print("extracting " + file_name + " failed due to time out, move file to shell-timeout")
+
+
+def get_statistic_data(file_list):
+    true_label = []
+    predicted_label = []
+    for file in file_list:
+        with open(file + ".hyperEdgeHornGraph.JSON") as f:
+            loaded_graph = json.load(f)
+            predicted_label.append(loaded_graph["predictedLabel"])
+            true_label.append(loaded_graph["templateRelevanceLabel"])
+    true_label = flattenList(true_label)
+    predicted_label = flattenList(predicted_label)
+
+    truePositive, trueNegative, faslePositive, flaseNegative = 0, 0, 0, 0
+    for t, p in zip(true_label, predicted_label):
+        if t == 1 and p == 1:
+            truePositive = truePositive + 1
+        elif t == 0 and p == 0:
+            trueNegative = trueNegative + 1
+        elif t == 0 and p == 1:
+            faslePositive = faslePositive + 1
+        elif t == 1 and p == 0:
+            flaseNegative = flaseNegative + 1
+
+    precision=truePositive/(truePositive+faslePositive)
+    recall=truePositive/(truePositive+flaseNegative)
+
+    print("truePositive",truePositive)
+    print("trueNegative", trueNegative)
+    print("faslePositive", faslePositive)
+    print("flaseNegative", flaseNegative)
+    print("precision",precision)
+    print("recall",recall)
+    #todo: draw AUC when adjust the threshold
+
+
+def flattenList(t):
+    return [item for sublist in t for item in sublist]

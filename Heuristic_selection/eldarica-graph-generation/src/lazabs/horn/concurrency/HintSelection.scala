@@ -109,7 +109,6 @@ object HintsSelection {
                               exceptionalPredGen: Dag[AndOrNode[NormClause, Unit]] => Either[Seq[(Predicate, Seq[Conjunction])], Dag[(IAtom, NormClause)]]=getExceptionalPredicatedGenerator(),
                               counterexampleMethod: HornPredAbs.CounterexampleMethod.Value=getCounterexampleMethod(GlobalParameters.get.disjunctive)):
   (Map[Predicate, Seq[IFormula]],Long) ={
-    var minimumSetPredicate: Map[Predicate, Seq[IFormula]] = Map()
     val startTimeForExtraction = System.currentTimeMillis()
     val mainTimeoutChecker = () => {
       if ((currentTimeMillis - startTimeForExtraction) > GlobalParameters.get.mainTimeout)
@@ -117,12 +116,16 @@ object HintsSelection {
     }
     val predicatesExtractingBeginTime=System.currentTimeMillis
     var currentInitialPredicates:Map[Predicate,Seq[IFormula]]=sortHints(originalPredicates)
+    var pIndex = 0
     if (!originalPredicates.isEmpty) {
       for ((head, preds) <- sortHints(originalPredicates)) {
         //var leftPredicates:Seq[IFormula]=preds
         for (p <- preds) {
           //delete p and useless predicates
-          currentInitialPredicates=currentInitialPredicates.transform((k,v)=>if (k==head) v.filterNot(x=>x.toString==p.toString) else v)
+          currentInitialPredicates=currentInitialPredicates.transform((k,v)=>if (k.name==head.name) {
+            pIndex = v.indexWhere(x=>x.toString==p.toString)
+            v.filterNot(x=>x.toString==p.toString)
+          } else v)
           //leftPredicates=leftPredicates.filterNot(x=>x.toString==p.toString)
           //currentInitialPredicates=sortHints(currentInitialPredicates.filterNot(_._1==head)  ++ Map(head->leftPredicates))
           val predicateUsefulnessTimeoutChecker=clonedTimeChecker(GlobalParameters.get.threadTimeout)
@@ -135,7 +138,10 @@ object HintsSelection {
             case lazabs.Main.TimeoutException=>{
               //p is useful,append p to usefulPredicatesInCurrentHead, add it back to left predicates
               //leftPredicates=leftPredicates.:+(p)
-              currentInitialPredicates=currentInitialPredicates.transform((k,v)=>if(k==head) v.:+(p) else v)
+              currentInitialPredicates=currentInitialPredicates.transform((k,v)=>if(k.name==head.name) {
+                v.take(pIndex).:+(p) ++ v.drop(pIndex)
+                //v.:+(p)
+              } else v)
             }
             case _=>{throw lazabs.Main.MainTimeoutException}
           }
@@ -154,7 +160,7 @@ object HintsSelection {
                                                      exceptionalPredGen: Dag[AndOrNode[NormClause, Unit]] => Either[Seq[(Predicate, Seq[Conjunction])], Dag[(IAtom, NormClause)]]=getExceptionalPredicatedGenerator(),
                                                      counterexampleMethod: HornPredAbs.CounterexampleMethod.Value=getCounterexampleMethod(GlobalParameters.get.disjunctive)):
   (Map[Predicate, Seq[IFormula]],Map[Predicate, Seq[IFormula]]) ={
-    val mergedPredicates=mergePredicateMaps(initialPredicates,minimizedPredicatesFromCegar)
+    val mergedPredicates=sortHints(mergePredicateMaps(initialPredicates,minimizedPredicatesFromCegar))
     //delete predicates from minimizedPredicatesFromCegar
     var usefulPredicatesInInitialPredicatesFormat: Map[Predicate, Seq[IFormula]]=Map()
     val startTimeForExtraction = System.currentTimeMillis()
@@ -162,12 +168,17 @@ object HintsSelection {
       if ((currentTimeMillis - startTimeForExtraction) > GlobalParameters.get.mainTimeout)
         throw lazabs.Main.MainTimeoutException //Main.TimeoutException
     }
-    var currentInitialPredicates:Map[Predicate,Seq[IFormula]]=sortHints(mergedPredicates)
-    for ((head,preds)<-sortHints(mergedPredicates)){
+    var pIndex=0
+    var currentInitialPredicates:Map[Predicate,Seq[IFormula]]=mergedPredicates
+    for ((head,preds)<-mergedPredicates){
       //todo: check this when varyGeneratedPredicates is on
       //var leftPredicates:Seq[IFormula]=preds
       for(p<-minimizedPredicatesFromCegar(head)){
-        currentInitialPredicates=currentInitialPredicates.transform((k,v)=>if (k==head) v.filterNot(x=>x.toString==p.toString) else v)
+        //delete p
+        currentInitialPredicates=currentInitialPredicates.transform((k,v)=>if (k.name==head.name) {
+          pIndex = v.indexWhere(x=>x.toString==p.toString)
+          v.filterNot(x=>x.toString==p.toString)
+        } else v)
 //        leftPredicates=leftPredicates.filterNot(x=>x.toString==p.toString)
 //        currentInitialPredicates=sortHints(currentInitialPredicates.filterNot(_._1.name==head.name) ++ Map(head->leftPredicates))
         val predicateUsefulnessTimeoutChecker=clonedTimeChecker(GlobalParameters.get.threadTimeout)
@@ -180,7 +191,11 @@ object HintsSelection {
           case lazabs.Main.TimeoutException=>{
             //p is useful
             //leftPredicates=leftPredicates.:+(p)
-            currentInitialPredicates=currentInitialPredicates.transform((k,v)=>if(k==head) v.:+(p) else v)
+            //todo: intert it back in exact position where it is deleted
+            currentInitialPredicates=currentInitialPredicates.transform((k,v)=>if(k.name==head.name) {
+              v.take(pIndex).:+(p) ++ v.drop(pIndex)
+              //v.:+(p)
+            } else v)
           }
           case _=>{throw lazabs.Main.MainTimeoutException}
         }
@@ -206,7 +221,7 @@ object HintsSelection {
 //    val (minimizedVariedMinimizedB,_)=getMinimumSetPredicates(variedMinimizedB,simplePredicatesGeneratorClauses,exceptionalPredGen,counterexampleMethod)
 //
 //    println("A",initialPredicates.values.flatten.size)
-//    //printPredicateInMapFormat(initialPredicates,"A")
+//    printPredicateInMapFormat(initialPredicates,"A")
 //    println("B",minimizedPredicatesFromCegar.values.flatten.size)
 //    printPredicateInMapFormat(sortHints(minimizedPredicatesFromCegar),"B")
 //    println("A u B",mergedPredicates.values.flatten.size)
@@ -214,7 +229,7 @@ object HintsSelection {
 //    println("minimized A u B",minimizedMergedPredicates.values.flatten.size)
 //    printPredicateInMapFormat(minimizedMergedPredicates,"minimized A u B")
 //    println("minimized A",minimizedA.values.flatten.size)
-//    //printPredicateInMapFormat(minimizedA,"minimized A")
+//    printPredicateInMapFormat(minimizedA,"minimized A")
 //    println("minimized B",minimizedB.values.flatten.size)
 //    //printPredicateInMapFormat(minimizedB,"minimized B")
 //    println("variedMinimized B",variedMinimizedB.values.flatten.size)
@@ -304,7 +319,7 @@ object HintsSelection {
           satisfiability = false
           println(Console.RED + "-"*10+"unsat"+"-"*10)
           if (moveFile == true)
-            HintsSelection.moveRenameFile(filePath, "../benchmarks/unsat/" + fileName)
+            HintsSelection.moveRenameFile(filePath, "../benchmarks/exceptions/unsat/" + fileName)
           if (exit == true)
             sys.exit()
         }
@@ -312,7 +327,7 @@ object HintsSelection {
     } catch {
       case lazabs.Main.TimeoutException => {
         println(Console.RED + "-"*10 +"solvability-timeout"+"-"*10)
-        HintsSelection.moveRenameFile(filePath, "../benchmarks/solvability-timeout/" + fileName)
+        HintsSelection.moveRenameFile(filePath, "../benchmarks/exceptions/solvability-timeout/" + fileName)
         sys.exit()
       }
     }
@@ -341,7 +356,7 @@ object HintsSelection {
       case lazabs.Main.TimeoutException => {
         println(Console.RED + "-"*10 +"solvability-timeout"+"-"*10)
         if (moveFile == true)
-          HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/solvability-timeout/" + fileName)
+          HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/exceptions/solvability-timeout/" + fileName)
         if (exit == true)
           sys.exit() //throw TimeoutException
         solveTime = ((currentTimeMillis - startTime) / 1000).toInt
@@ -677,9 +692,8 @@ object HintsSelection {
         } else
           LineariseVisitor(simplifiedPredicates,IBinJunctor.And)
       }
-      atom.pred-> freeVariableReplacedPredicates.filter(!_.isTrue).filter(!_.isFalse).map(spAPI.simplify(_)).filterNot(_.isTrue).map(sp(_)) //get rid of true and false
+      atom.pred-> freeVariableReplacedPredicates.map(sp(_)).filter(!_.isTrue).filter(!_.isFalse)//map(spAPI.simplify(_)) //get rid of true and false
     }).groupBy(_._1).mapValues(_.flatMap(_._2).distinct).filterKeys(_.arity!=0)
-
     val constraintPredicates=
       if(GlobalParameters.get.varyGeneratedPredicates==true)
         HintsSelection.varyPredicates(constraintPredicatesTemp)
@@ -738,17 +752,25 @@ object HintsSelection {
   }
 
   def moveRenameFile(sourceFilename: String, destinationFilename: String,message:String=""): Unit = {
-    println(Console.RED+"-"*5+message+"-"*5)
-    val path = Files.move(
-      Paths.get(sourceFilename),
-      Paths.get(destinationFilename),
-      StandardCopyOption.REPLACE_EXISTING
-    )
-    if (path != null) {
-      println(s"moved the file $sourceFilename successfully")
-    } else {
-      println(s"could NOT move the file $sourceFilename")
+    if (GlobalParameters.get.moveFile==true){
+      println(Console.RED+"-"*5+message+"-"*5)
+      val path = Files.move(
+        Paths.get(sourceFilename),
+        Paths.get(destinationFilename),
+        StandardCopyOption.REPLACE_EXISTING
+      )
+      if (path != null) {
+        println(s"moved the file $sourceFilename successfully")
+      } else {
+        println(s"could NOT move the file $sourceFilename")
+      }
     }
+  }
+  def removeRelativeFiles(fileName:String): Unit ={
+    Files.delete(Paths.get(fileName+".circles.gv"))
+    Files.delete(Paths.get(fileName+".HornGraph"))
+    Files.delete(Paths.get(fileName+".hyperEdgeHornGraph.gv"))
+    Files.delete(Paths.get(fileName+".unlabeledPredicates.tpl"))
   }
   def copyRenameFile(sourceFilename: String, destinationFilename: String): Unit = {
     val path = Files.copy(
