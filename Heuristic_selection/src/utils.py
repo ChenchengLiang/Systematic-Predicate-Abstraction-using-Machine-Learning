@@ -6,6 +6,10 @@ from multiprocessing import Pool
 import glob
 import os
 import time
+import seaborn
+import tensorflow as tf
+import sklearn
+from sklearn.metrics import confusion_matrix
 def call_eldarica(file,parameter_list,message="",supplementary_command=[]):
     print("call eldarica for " + message,file)
     param = ["../eldarica-graph-generation/eld", file] + parameter_list
@@ -40,6 +44,17 @@ def plot_scatter(true_Y,predicted_Y,name="",range=[0,0],x_label="True Values",y_
     plt.savefig("trained_model/" + name+ "-scatter.png")
     plt.clf()
 
+def plot_confusion_matrix(predicted_Y_loaded_model,true_Y,saving_path,recall=0,precision=0):
+    predicted_Y_loaded_model = tf.math.round(predicted_Y_loaded_model)
+    cm = confusion_matrix(true_Y, predicted_Y_loaded_model)
+    plt.figure(figsize=(5, 5))
+    seaborn.heatmap(cm, annot=True, fmt="d")
+    plt.title("recall:"+str(recall)+", precision:"+str(precision))
+    plt.ylabel('Actual label')
+    plt.xlabel('Predicted label')
+    plt.savefig(saving_path)
+    plt.clf()
+    seaborn.reset_defaults()
 
 def run_eldarica_with_shell_pool(filePath, fun, eldarica_parameters,timeout=60,thread=4,countinous_extract=True):
     file_list = []
@@ -93,7 +108,7 @@ def run_eldarica_with_shell(file_and_param):
             print("extracting " + file_name + " failed due to time out, move file to shell-timeout")
 
 
-def get_statistic_data(file_list):
+def get_statistic_data(file_list,benchmark_fold=""):
     true_label = []
     predicted_label = []
     for file in file_list:
@@ -116,7 +131,22 @@ def get_statistic_data(file_list):
             flaseNegative = flaseNegative + 1
 
     precision=truePositive/(truePositive+faslePositive)
+    '''
+    higher precision closer to empty label
+    higher precision = lower falsePositive means closer to the combination given by train data
+    lower precision = higher falsePositive means try to find new combination in redundancy given by the train data (a part of one combination)
+    '''
     recall=truePositive/(truePositive+flaseNegative)
+    '''
+    recall= predicted predicate number / useful predicate number in train data (a part of one combination)
+    higher recall = lower flaseNegative means closer to full label, possible to give new combination
+    lower recall = higher flaseNegative means less probability to find the same combination given by train data.
+    lower recall have higher probability to eliminate more redundant predicates to find new combination.
+    In summary, both direction provide possibility to get new combination. Lower recall tend to give newer and smaller combination 
+    '''
+    #recall= predicted predicate number /
+    # higher recall = lower flaseNegative means closer to full label,
+    # lower recall closer to empty label and eliminate more redundant predicates
 
     print("truePositive",truePositive)
     print("trueNegative", trueNegative)
@@ -124,6 +154,9 @@ def get_statistic_data(file_list):
     print("flaseNegative", flaseNegative)
     print("precision",precision)
     print("recall",recall)
+    #todo: draw confusion matrix
+    saving_path="../benchmarks/"+benchmark_fold+"/confusion-matrix.png"
+    plot_confusion_matrix(predicted_label,true_label,saving_path,recall,precision)
     #todo: draw AUC when adjust the threshold
 
 

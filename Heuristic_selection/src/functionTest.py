@@ -126,15 +126,32 @@ def tokenize_symbols(token_map,node_symbols):
     print("tokenized_node_label_ids",len(tokenized_node_label_ids),len(set(tokenized_node_label_ids)))
     return tokenized_node_label_ids
 
-
+from Miscellaneous import GPU_switch
 def main():
+    GPU_switch(False)
+    predicted_y=[0.5,0.5,0.5,0.5,0.5]
+    true_y=[0,0,0,1,1]
+    weight_for_1=4
+    weight_for_0=1
+    weight_class={"weight_for_1":weight_for_1,"weight_for_0":weight_for_0}
+    weighted_ce,raw_weighted_ce=get_weighted_binary_crossentropy(weight_class,true_y,predicted_y)
+    print("weighted_ce",weighted_ce)
+    print("raw_weighted_ce",raw_weighted_ce)
+    print("ce",tf.keras.losses.binary_crossentropy(true_y,predicted_y,from_logits=True))
 
-    pos_features=[0,1,2]
-    neg_features=[3,4,5,6,7,8,9]
-    ids = np.arange(len(pos_features))
-    choices = np.random.choice(ids, len(neg_features))
-    print(choices)
+def sigmoid(x):
+    return 1/ (1 + np.exp(-x))
+def get_weighted_binary_crossentropy(weight_class,true_y,predicted_y):
+    ce_raw=0
+    ce = 0
+    for p, y in zip(predicted_y, true_y):
+        ce_raw=ce_raw + (-y*np.log(sigmoid(p))* weight_class["weight_for_1"]) - (1-y)*np.log(1-sigmoid(p)) * weight_class["weight_for_0"]
+        if (y == 1):
+            ce = ce + tf.keras.losses.binary_crossentropy([y], [p],from_logits=True) * weight_class["weight_for_1"]
+        if (y == 0):
+            ce = ce + tf.keras.losses.binary_crossentropy([y], [p],from_logits=True) * weight_class["weight_for_0"]
+    return ce / len(true_y), ce_raw/len(true_y)
 
 
-if __name__ == '__main__':
-    main()
+
+main()

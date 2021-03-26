@@ -25,7 +25,7 @@ def main():
     initial_file_number= len(file_list)
     thread_number = 4
     print("file_list " + str(initial_file_number))
-    continuous_extracting=False
+    continuous_extracting=True
     move_file = True
     out_of_test_set=False
 
@@ -47,7 +47,7 @@ def main():
     filtered_file_list = filter_file_list_by_max_node(file_list, max_nodes_per_batch)
 
     # description: predict label
-    #predict_label(benchmark, max_nodes_per_batch, benchmark_fold, filtered_file_list)#file_list
+    predict_label(benchmark, max_nodes_per_batch, benchmark_fold, filtered_file_list)#file_list
 
 
     # description: get solvability and measurement info with different predicate setting for unseen data
@@ -87,7 +87,7 @@ def main():
 
     #todo: get ROC AUC
     #description: statistic data
-    get_statistic_data(filtered_file_list)
+    get_statistic_data(filtered_file_list,benchmark_fold)
 
     # description: how many predicates used in end
     #get_recall_scatter(solvability_name_fold, json_solvability_obj_list, filtered_file_list)

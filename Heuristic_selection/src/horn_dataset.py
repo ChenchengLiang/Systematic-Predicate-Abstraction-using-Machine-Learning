@@ -16,7 +16,7 @@ from tf2_gnn.models import InvariantArgumentSelectionTask, InvariantNodeIdentify
 
 from Miscellaneous import pickleWrite, pickleRead, drawBinaryLabelPieChart
 from archived.dotToGraphInfo import parseArgumentsFromJson
-
+from utils import plot_confusion_matrix
 
 def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",from_json=False,json_type=".JSON",form_label=False,GPU=False,pickle=True,hyper_parameters={}):
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
@@ -46,7 +46,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters["benchmark"]=benchmark_name
     parameters["label_type"]=label
     parameters ["gathered_nodes_binary_classification_task"]=gathered_nodes_binary_classification_task
-    max_epochs = 200
+    max_epochs = 100
     patience = 50
     # parameters["add_self_loop_edges"]=False
     # parameters["tie_fwd_bkwd_edges"]=True
@@ -82,6 +82,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         dataset._use_worker_threads=False #solve Failed setting context: CUDA_ERROR_NOT_INITIALIZED: initialization error
     dataset.load_data([DataFold.TRAIN,DataFold.VALIDATION,DataFold.TEST])
     parameters["node_vocab_size"]=dataset._node_vocab_size
+    parameters["class_weight"]=dataset._class_weight
+    print("class_weight",parameters["class_weight"])
     def log(msg):
         log_line(log_file, msg)
 
@@ -89,7 +91,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     valid_loss_list_average = []
     test_loss_list_average = []
     mean_loss_list_average = []
-    mse_loaded_model_average = []
+    error_loaded_model_average = []
     train_loss_average = []
     valid_loss_average = []
     test_loss_average = []
@@ -158,8 +160,9 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             #print(data[0]) #input
             true_Y.extend(np.array(data[1]["node_labels"]))
 
-        mse_loaded_model = tf.keras.losses.MSE(true_Y, predicted_Y_loaded_model)
-        print("\n mse_loaded_model_predicted_Y_and_True_Y", mse_loaded_model)
+        error_loaded_model = (lambda : tf.keras.losses.MSE(true_Y, predicted_Y_loaded_model) \
+            if label not in gathered_nodes_binary_classification_task else tf.keras.losses.binary_crossentropy(true_Y, predicted_Y_loaded_model))()
+        print("\n error of loaded_model", error_loaded_model)
 
         #print("true_Y", true_Y)
         #print("predicted_Y_loaded_model_from_memory", predicted_Y_loaded_model_from_memory)
@@ -175,7 +178,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
 
         test_loss_list_average.append(predicted_Y_loaded_model)
         mean_loss_list_average.append(mean_loss_list)
-        mse_loaded_model_average.append(mse_loaded_model)
+        error_loaded_model_average.append(error_loaded_model)
         test_loss_average.append(predicted_Y_loaded_model[-1])
 
         train_loss_list_average.append(train_loss_list)
@@ -189,7 +192,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     valid_loss_list_average = np.mean(valid_loss_list_average, axis=0)
     test_loss_list_average = np.mean(test_loss_list_average, axis=0)
     mean_loss_list_average = np.mean(mean_loss_list)
-    mse_loaded_model_average = np.mean(mse_loaded_model)
+    error_loaded_model_average = np.mean(error_loaded_model_average)
     train_loss_average = np.mean(train_loss_average)
     valid_loss_average = np.mean(valid_loss_average)
     best_valid_epoch_average = np.mean(best_valid_epoch_average)
@@ -198,10 +201,10 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     # visualize results
     draw_training_results(train_loss_list_average, valid_loss_list_average, test_loss_list_average,
                           mean_loss_list_average,
-                          mse_loaded_model_average, valid_loss_list, true_Y, predicted_Y_loaded_model, label,
+                          error_loaded_model_average, valid_loss_list, true_Y, predicted_Y_loaded_model, label,
                           benchmark_name, graph_type,gathered_nodes_binary_classification_task)
     write_train_results_to_log(dataset, predicted_Y_loaded_model, train_loss_average,
-                               valid_loss_average, mse_loaded_model, mean_loss_list, accuracy_average,
+                               valid_loss_average, error_loaded_model, mean_loss_list, accuracy_average,
                                best_valid_epoch_average,
                                benchmark=benchmark_name, label=label, graph_type=graph_type)
 
@@ -244,19 +247,21 @@ def draw_training_results(train_loss_list_average, valid_loss_list_average, test
     # plt.show()
 
     if label in gathered_nodes_binary_classification_task: # confusion matrix on true y and predicted y
-        predicted_Y_loaded_model = tf.math.round(predicted_Y_loaded_model)
-        res = tf.math.confusion_matrix(true_Y, predicted_Y_loaded_model)
-        seaborn.set(color_codes=True)
-        plt.figure(1, figsize=(2, 2))
-        plt.title("Confusion Matrix")
-        seaborn.set(font_scale=1.4)
-        ax = seaborn.heatmap(res, annot=True, cmap="YlGnBu", cbar_kws={'label': 'Scale'})
-        ax.set_xticklabels(["1","0"])
-        ax.set_yticklabels(["1","0"])
-        ax.set(ylabel="True Label", xlabel="Predicted Label")
-        plt.savefig("trained_model/" + label + "-" + graph_type + "-" + benchmark_name + "-confusion_matrix.png")
-        plt.clf()
-        seaborn.reset_defaults()
+        saving_path="trained_model/" + label + "-" + graph_type + "-" + benchmark_name + "-confusion_matrix.png"
+        plot_confusion_matrix(predicted_Y_loaded_model,true_Y,saving_path)
+        # predicted_Y_loaded_model = tf.math.round(predicted_Y_loaded_model)
+        # res = tf.math.confusion_matrix(true_Y, predicted_Y_loaded_model)
+        # seaborn.set(color_codes=True)
+        # plt.figure(1, figsize=(2, 2))
+        # plt.title("Confusion Matrix")
+        # seaborn.set(font_scale=1.4)
+        # ax = seaborn.heatmap(res, annot=True, cmap="YlGnBu", cbar_kws={'label': 'Scale'})
+        # ax.set_xticklabels(["1","0"])
+        # ax.set_yticklabels(["1","0"])
+        # ax.set(ylabel="True Label", xlabel="Predicted Label")
+        # plt.savefig("trained_model/" + label + "-" + graph_type + "-" + benchmark_name + "-confusion_matrix.png")
+        # plt.clf()
+        # seaborn.reset_defaults()
     else:
         # scatter on true y and predicted y
         a = plt.axes(aspect='equal')
@@ -346,6 +351,7 @@ class raw_graph_inputs():
         self.label_size=0
         self.vocabulary_set=set()
         self.token_map={}
+        self.class_weight={}
 
 class parsed_graph_data:
     def __init__(self,graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
@@ -703,6 +709,11 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
     print("all_one_label", all_one_label, "percentage", all_one_label / total_files)
     print("one_one_label", one_one_label, "percentage", one_one_label / total_files)
     print("other_distribution", other_distribution, "percentage", other_distribution / total_files)
+    weight_for_0,weight_for_1=get_class_weight(sum(all_label),len(all_label)-sum(all_label),len(all_label))
+    print("weight_for_0",weight_for_0)
+    print("weight_for_1",weight_for_1)
+    raw_data_graph.class_weight["weight_for_0"]=weight_for_0
+    raw_data_graph.class_weight["weight_for_1"] = weight_for_1
 
     if pickle==True:
         pickleWrite(raw_data_graph, label +"-"+graph_type+ "-" + benchmark + "-gnnInput_" + df + "_data")
@@ -948,8 +959,6 @@ def convert_constant_to_category(constant_string):
         converted_string="negative_constant"
     return converted_string
 
-
-
 def count_paramsters(model):
     from keras import backend as K
     trainable_count = int(
@@ -962,8 +971,7 @@ def count_paramsters(model):
     print('Non-trainable params: {:,}'.format(non_trainable_count))
 
 
-
-
-
-
-
+def get_class_weight(pos, neg, total):
+    weight_for_0 = (1 / neg) * (total) / 2
+    weight_for_1 = (1 / pos) * (total) / 2
+    return weight_for_0,weight_for_1

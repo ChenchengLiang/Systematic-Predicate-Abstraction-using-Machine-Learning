@@ -52,7 +52,7 @@ def generate_JSON_field(rootdir,json_file_type=".layerHornGraph.JSON",eldarica_p
                 # write json object to JSON file
                 clear_file(graph_json_file)
                 with open(graph_json_file, 'w') as f:
-                    json.dump(json_obj, f)
+                    json.dump(json_obj, f,indent=4)
 
 
 def add_horn_graph_json_file(rootdir,graph_type="-getHornGraph",json_file_type=".layerHornGraph.JSON"):
@@ -100,10 +100,10 @@ def add_horn_graph_json_file(rootdir,graph_type="-getHornGraph",json_file_type="
                     # write json object to JSON file
                     clear_file(graph_json_file)
                     with open(graph_json_file, 'w') as f:
-                        json.dump(json_obj, f)
+                        json.dump(json_obj, f,indent=4)
                 else:
                     with open(graph_json_file, 'w') as f:
-                        json.dump(json_obj, f)
+                        json.dump(json_obj, f,indent=4)
                     # for f in glob.glob(file+"*"):
                     #     copy(f,"../benchmarks/memory_problem_cases/")
                     #     os.remove(f)

@@ -51,7 +51,7 @@ def add_JSON_field(fileName="",file_type=".layerHornGraph.JSON",old_field=[],new
     # write json object to JSON file
     clear_file(json_file)
     with open(json_file, 'w') as f:
-        json.dump(json_obj, f)
+        json.dump(json_obj, f,indent=4)
 
 def copy_and_remove(src,dst):
     if os.path.isdir(src):

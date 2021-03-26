@@ -30,13 +30,13 @@ def main():
     file_type = ".smt2"
     GPU=True
     pickle = True
-    benchmark_name = "new-labelSimpleGeneratedPredicates/"
+    benchmark_name = "mixed-three-fold-single-example/"
 
     # random.seed(0)
     # np.random.seed(0)
     # tf.random.set_seed(0)
 
-    hyper_parameters={"nodeFeatureDim":128,"num_layers":4,"regression_hidden_layer_size":[128,128,128]}
+    hyper_parameters={"nodeFeatureDim":32,"num_layers":2,"regression_hidden_layer_size":[32,32,32]}
     for label in label_list:
         parameter_list.append(
             parameters(relative_path="../benchmarks/"+benchmark_name,

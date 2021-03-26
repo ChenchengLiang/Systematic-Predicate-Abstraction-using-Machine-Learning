@@ -58,7 +58,7 @@ def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score
         # # write json object to JSON file
         # clear_file(json_file)
         # with open(json_file, 'w') as f:
-        #     json.dump(json_obj, f)
+        #     json.dump(json_obj, f,indent=4)
 def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_type,threshold):
     current_positon=0
     for g,file_name in zip(dataset._loaded_data[DataFold.TEST],dataset._file_list["test"]):
