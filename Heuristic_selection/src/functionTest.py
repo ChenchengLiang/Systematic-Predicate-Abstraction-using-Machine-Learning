@@ -52,14 +52,7 @@ def occurance_to_rank_examples(x=[0,1,1,1,1,0,5]):
     print("max rank",ss.rankdata(x, method="max"))  # 'average', 'min', 'max', 'dense', 'ordinal'
     print("ordinal rank",ss.rankdata(x, method="ordinal"))  # 'average', 'min', 'max', 'dense', 'ordinal'
 
-def pool_kill_popen_test(to):
-    try:
-        x = subprocess.Popen(["../venv/bin/python3", "archived/sleep.py"])
-        x.wait(timeout=to)
-        print(x.pid)
-    except:
-        print(x.pid)
-        os.kill(x.pid, signal.SIGKILL)
+
 
 def mnist_example():
     mnist = tf.keras.datasets.mnist
@@ -126,32 +119,96 @@ def tokenize_symbols(token_map,node_symbols):
     print("tokenized_node_label_ids",len(tokenized_node_label_ids),len(set(tokenized_node_label_ids)))
     return tokenized_node_label_ids
 
-from Miscellaneous import GPU_switch
-def main():
-    GPU_switch(False)
-    predicted_y=[0.5,0.5,0.5,0.5,0.5]
-    true_y=[0,0,0,1,1]
-    weight_for_1=4
-    weight_for_0=1
-    weight_class={"weight_for_1":weight_for_1,"weight_for_0":weight_for_0}
-    weighted_ce,raw_weighted_ce=get_weighted_binary_crossentropy(weight_class,true_y,predicted_y)
-    print("weighted_ce",weighted_ce)
-    print("raw_weighted_ce",raw_weighted_ce)
-    print("ce",tf.keras.losses.binary_crossentropy(true_y,predicted_y,from_logits=True))
-
 def sigmoid(x):
     return 1/ (1 + np.exp(-x))
 def get_weighted_binary_crossentropy(weight_class,true_y,predicted_y):
     ce_raw=0
     ce = 0
+    ce_raw_from_logit=0
     for p, y in zip(predicted_y, true_y):
         ce_raw=ce_raw + (-y*np.log(sigmoid(p))* weight_class["weight_for_1"]) - (1-y)*np.log(1-sigmoid(p)) * weight_class["weight_for_0"]
-        if (y == 1):
-            ce = ce + tf.keras.losses.binary_crossentropy([y], [p],from_logits=True) * weight_class["weight_for_1"]
-        if (y == 0):
-            ce = ce + tf.keras.losses.binary_crossentropy([y], [p],from_logits=True) * weight_class["weight_for_0"]
+
+        # if (y == 1):
+        #     ce = ce + tf.keras.losses.binary_crossentropy([y], [p],from_logits=False) * weight_class["weight_for_1"]
+        # if (y == 0):
+        #     ce = ce + tf.keras.losses.binary_crossentropy([y], [p],from_logits=False) * weight_class["weight_for_0"]
     return ce / len(true_y), ce_raw/len(true_y)
+def main():
+    l=[0.5,0.7]
+    print(list(map(round,l)))
+
+    # GPU_switch(False)
+    # predicted_y=[-5.5,5,-5,5,10]
+    # true_y=[0,0,0,1,1]
+    # weight_for_1=1
+    # weight_for_0=1
+    # weight_class={"weight_for_1":weight_for_1,"weight_for_0":weight_for_0}
+    # weighted_ce,raw_weighted_ce=get_weighted_binary_crossentropy(weight_class,true_y,predicted_y)
+    # print("weighted_ce",weighted_ce)
+    # print("raw_weighted_ce",raw_weighted_ce)
 
 
+    # from utils import filter_file_list_by_max_node,get_statistic_data
+    # from measurement_functions import read_measurement_from_JSON,get_analysis_for_predicted_labels
+    #
+    # benchmark = "mixed-three-fold"
+    # benchmark_fold = benchmark + "-" + "predict-unsolvable"
+    # max_nodes_per_batch = 1000
+    # file_list = glob.glob("../benchmarks/" + benchmark_fold + "/test_data/*.smt2")
+    # trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-02-14_22-37-39_best.pkl"
+    # initial_file_number= len(file_list)
+    # thread_number = 4
+    # print("file_list " + str(initial_file_number))
+    # continuous_extracting=True
+    # move_file = True
+    # out_of_test_set=True
+    #
+    # file_list = [file if os.path.exists(file + ".hyperEdgeHornGraph.JSON") else None for file in file_list]
+    # file_list = list(filter(None, file_list))
+    # file_list_with_horn_graph = "file with horn graph " + str(len(file_list)) + "/" + str(initial_file_number)
+    # print("file_list_with_horn_graph", file_list_with_horn_graph)
+    #
+    # filtered_file_list = filter_file_list_by_max_node(file_list, max_nodes_per_batch)
+    #
+    # timeout = 1200000  # -measurePredictedPredicates
+    # check_solvability_parameter_list = "-checkSolvability  -measurePredictedPredicates -varyGeneratedPredicates -abstract -noIntervals -solvabilityTimeout:300 -mainTimeout:1200"
+    # file_list_with_parameters = (lambda: [
+    #     [file, check_solvability_parameter_list, timeout, move_file] if not os.path.exists(
+    #         file + ".solvability.JSON") else [] for
+    #     file in filtered_file_list] if continuous_extracting == True
+    # else [[file, check_solvability_parameter_list, timeout, move_file] for
+    #       file in filtered_file_list])()
+    # file_list_for_solvability_check=list(filter(lambda x: len(x) != 0, file_list_with_parameters))
+    # print("file_list_for_solvability_check",len(file_list_for_solvability_check))
+    #
+    #
+    # json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
+    #
+    # three_fild_name=["empty","predicted","full"]
+    # solvability_name_fold= (lambda : three_fild_name if out_of_test_set==True else three_fild_name + ["true"])()
+    # solvability_json_name_fold=[ "solvability"+x+"InitialPredicates" for x in solvability_name_fold]
+    # for name_fold in solvability_json_name_fold:
+    #     solvability= [1 if s[name_fold] == "true" else 0 for s in json_solvability_obj_list]
+    #     print(name_fold,str(sum(solvability)) + "/" + str(len(json_solvability_obj_list)))
+    #     for i,(s,f) in enumerate(zip(solvability,json_solvability_obj_list)) :
+    #         if s==1:
+    #             print(json_solvability_obj_list[i]["file_name"])
+    #
+    # # description: read measurement JSON file
+    # scatter_plot_range = [0, 120]
+    # json_obj_list = read_measurement_from_JSON(filtered_file_list)
+    #
+    # get_analysis_for_predicted_labels(json_obj_list, out_of_test_set=out_of_test_set, time_unit=1000,
+    #                                   scatter_plot_range=scatter_plot_range)
+    # print("solvable file by predicted label:" + str(len(json_obj_list)) + "/" + str(len(filtered_file_list)))
+    #
+    # # description: print results
+    # print("-" * 10)
+    # print(file_list_with_horn_graph)
+    # print("max_nodes_per_batch", max_nodes_per_batch)
+    # print("filtered_file_list by max_nodes_per_batch:" + str(len(filtered_file_list)) + "/" + str(len(file_list)))
+    #
+    # # description: statistic data
+    # get_statistic_data(filtered_file_list, benchmark_fold)
 
 main()

@@ -10,11 +10,12 @@ def main():
     label_list.append("template_relevance")
     force_read = True
     form_label = True
-    from_json = True
     file_type = ".smt2"
     GPU = True
     pickle = True
-    benchmark = "mixed-three-fold"
+    threshold=0.5
+    max_nodes_per_batch=1000
+    benchmark = "mixed-three-fold-single-example"
     benchmark_name = benchmark + "/"
     hyper_parameters_list = []
     '''
@@ -25,27 +26,29 @@ def main():
     # hyper_parameters_list.append({"nodeFeatureDim": 8, "num_layers": 4, "regression_hidden_layer_size": [8, 8, 8]})
     # hyper_parameters_list.append({"nodeFeatureDim": 8, "num_layers": 6, "regression_hidden_layer_size": [8, 8, 8]})
     # hyper_parameters_list.append({"nodeFeatureDim": 8, "num_layers": 8, "regression_hidden_layer_size": [8, 8, 8]})
-    hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 2, "regression_hidden_layer_size": [16]})
-    hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 2, "regression_hidden_layer_size": [16, 16, 16]})
-    hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 4, "regression_hidden_layer_size": [16, 16, 16]})
+    hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 12, "regression_hidden_layer_size": [16]})
+    hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 16, "regression_hidden_layer_size": [16]})
+    hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 20, "regression_hidden_layer_size": [16]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 2, "regression_hidden_layer_size": [16, 16, 16]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 4, "regression_hidden_layer_size": [16, 16, 16]})
     # hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 6, "regression_hidden_layer_size": [16, 16, 16]})
-    hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 8, "regression_hidden_layer_size": [16, 16, 16]})
-    hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 2, "regression_hidden_layer_size": [32]})
-    hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 2, "regression_hidden_layer_size": [32, 32, 32]})
-    hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 4, "regression_hidden_layer_size": [32, 32, 32]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 6, "regression_hidden_layer_size": [32, 32, 32]})
-    hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 8, "regression_hidden_layer_size": [32, 32, 32]})
-    hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 2, "regression_hidden_layer_size": [64]})
-    hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 2, "regression_hidden_layer_size": [64, 64, 64]})
-    hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 4, "regression_hidden_layer_size": [64, 64, 64]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 6, "regression_hidden_layer_size": [64, 64, 64]})
-    hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 8, "regression_hidden_layer_size": [64, 64, 64]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 12, "regression_hidden_layer_size": [64, 64, 64]})
-    hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 2, "regression_hidden_layer_size": [128]})
-    hyper_parameters_list.append(
-        {"nodeFeatureDim": 128, "num_layers": 2, "regression_hidden_layer_size": [128, 128, 128]})
-    hyper_parameters_list.append(
-        {"nodeFeatureDim": 128, "num_layers": 4, "regression_hidden_layer_size": [128, 128, 128]})
+    # #hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 8, "regression_hidden_layer_size": [16, 16, 16]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 2, "regression_hidden_layer_size": [32]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 2, "regression_hidden_layer_size": [32, 32, 32]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 4, "regression_hidden_layer_size": [32, 32, 32]})
+    # # hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 6, "regression_hidden_layer_size": [32, 32, 32]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 8, "regression_hidden_layer_size": [32, 32, 32]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 2, "regression_hidden_layer_size": [64]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 2, "regression_hidden_layer_size": [64, 64, 64]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 4, "regression_hidden_layer_size": [64, 64, 64]})
+    # # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 6, "regression_hidden_layer_size": [64, 64, 64]})
+    # #hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 8, "regression_hidden_layer_size": [64, 64, 64]})
+    # # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 12, "regression_hidden_layer_size": [64, 64, 64]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 2, "regression_hidden_layer_size": [128]})
+    # hyper_parameters_list.append(
+    #     {"nodeFeatureDim": 128, "num_layers": 2, "regression_hidden_layer_size": [128, 128, 128]})
+    # hyper_parameters_list.append(
+    #     {"nodeFeatureDim": 128, "num_layers": 4, "regression_hidden_layer_size": [128, 128, 128]})
     # hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 8, "regression_hidden_layer_size": [128, 128, 128]})
     # hyper_parameters_list.append({"nodeFeatureDim": 256, "num_layers": 2, "regression_hidden_layer_size": [256, 256, 256]})
     # hyper_parameters_list.append({"nodeFeatureDim": 256, "num_layers": 4, "regression_hidden_layer_size": [256, 256, 256]})
@@ -58,6 +61,8 @@ def main():
     # train
     trained_model_path_list = []
     for hyper_parameters in hyper_parameters_list:
+        hyper_parameters["threshold"]=threshold
+        hyper_parameters["max_nodes_per_batch"] = max_nodes_per_batch
         for param in parameter_list:
             trained_model_path = None
             if pickle == False:
@@ -66,14 +71,14 @@ def main():
                                                                         "/benchmarks/"):-1], label=param.label,
                                                      force_read=force_read,
                                                      train_n_times=1, path=param.absolute_path, file_type=file_type,
-                                                     form_label=form_label, from_json=from_json,
+                                                     form_label=form_label,
                                                      json_type=param.json_type, GPU=GPU, pickle=pickle,
                                                      hyper_parameters=hyper_parameters)
             else:
                 trained_model_path = train_on_graphs(benchmark_name=param.benchmark_name(),
                                                      label=param.label, force_read=force_read,
                                                      train_n_times=1, path=param.relative_path, file_type=file_type,
-                                                     form_label=form_label, from_json=from_json,
+                                                     form_label=form_label,
                                                      json_type=param.json_type, GPU=GPU, pickle=pickle,
                                                      hyper_parameters=hyper_parameters)
             trained_model_path_list.append(trained_model_path)
@@ -100,7 +105,6 @@ def main():
                                             json_type, graph_type, gathered_nodes_binary_classification_task,
                                             hyper_parameters, set_max_nodes_per_batch=True)
                 predict_results.append(retult)
-
     # print results
     print("--------------------")
     with open("trained_model/" + "grid_search" + "-" + label + "-" + graph_type + "-" + benchmark + ".log",
@@ -109,7 +113,7 @@ def main():
             out_file.write(
                 "----------" + str(result["benchmark_fold"]) + "-----" + str(result["label"]) + "----------" + "\n")
             out_file.write(str(result["hyper_parameter"]) + "\n")
-            out_file.write(str(result["best_threshold"]) + "\n")
+            out_file.write("best_threshold: "+str(result["best_threshold"]) + "\n")
             out_file.write(result["trained_model_path"] + "\n")
             # print("positive_label_percentage", result["positive_label_percentage"])
             # print("negative_label_number", result["negative_label_number"])

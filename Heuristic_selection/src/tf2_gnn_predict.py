@@ -7,15 +7,15 @@ def main():
     #benchmark_fold_list.append(benchmark+"-"+"valid")
     #benchmark_fold_list.append(benchmark + "-" + "test")
     #benchmark_fold_list.append(benchmark + "-" + "test-simple-generator")
-    benchmark_fold_list.append(benchmark + "-" + "predict")
-    #benchmark_fold_list.append(benchmark + "-" + "predict-1")
+    #benchmark_fold_list.append(benchmark + "-" + "predict")
+    #benchmark_fold_list.append(benchmark + "-" + "mixed-three-fold-predict-unsolvable")
     #benchmark_fold_list.append(benchmark + "-" + "predict-out-of-test-set")
-    #benchmark_fold_list.append(benchmark + "-" + "small-test-predict")
+    #benchmark_fold_list.append(benchmark + "-" + "single-example")
     #find and write  best_threshold_set to pickle
     hyper_parameter={"max_nodes_per_batch":1000,"best_threshold_set":{},"read_best_threshold":False} #todo:get threshold from valid data
     trained_model_path_list=[]
     #trained_model_path_list.append("/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-02-04_16-58-14_best.pkl")
-    #trained_model_path_list.append("/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-02-05_15-47-16_best.pkl")
+    #trained_model_path_list.append("/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-03-29_11-16-30_best.pkl")
     trained_model_path_list.append("/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-02-14_22-37-39_best.pkl")
     json_type=".hyperEdgeHornGraph.JSON"
     graph_type = json_type[1:json_type.find(".JSON")]

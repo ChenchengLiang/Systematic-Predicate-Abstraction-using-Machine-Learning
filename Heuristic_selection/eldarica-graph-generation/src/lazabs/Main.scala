@@ -57,12 +57,13 @@ object GlobalParameters {
 class GlobalParameters extends Cloneable {
   //var printHints=VerificationHints(Map())
   var checkSolvability=false
+  var onlyInitialPredicates=false
   var generateSimplePredicates=false
   var moveFile = false
   var maxNode=1000000
-  var threadTimeout = 120000
-  var solvabilityTimeout=120000
-  var mainTimeout=120000
+  var threadTimeout = 300000
+  var solvabilityTimeout=300000
+  var mainTimeout=300000
   var extractTemplates=false
   var extractPredicates=false
   var measurePredictedPredicates=false
@@ -235,6 +236,7 @@ class GlobalParameters extends Cloneable {
     that.getAllHornGraph=this.getAllHornGraph
     that.getLabelFromCounterExample=this.getLabelFromCounterExample
     that.generateSimplePredicates=this.generateSimplePredicates
+    that.onlyInitialPredicates=this.onlyInitialPredicates
     that.checkSolvability=this.checkSolvability
     that.moveFile = this.moveFile
   }
@@ -308,7 +310,7 @@ object Main {
   
 
   val greeting =
-    "Eldarica v2.0.5.\n(C) Copyright 2012-2021 Hossein Hojjat and Philipp Ruemmer"
+    "Eldarica v2.0.6.\n(C) Copyright 2012-2021 Hossein Hojjat and Philipp Ruemmer"
 
   def doMain(args: Array[String],
              stoppingCond : => Boolean) : Unit = try {
@@ -333,6 +335,7 @@ object Main {
       case "-labelSimpleGeneratedPredicates"::rest => labelSimpleGeneratedPredicates = true; arguments(rest)
       case "-varyGeneratedPredicates":: rest => varyGeneratedPredicates =true; arguments(rest)
       case "-generateSimplePredicates" :: rest => generateSimplePredicates = true; arguments(rest)
+      case "-onlyInitialPredicates" :: rest => onlyInitialPredicates = true; arguments(rest)
       case "-moveFile" :: rest => moveFile = true; arguments(rest)
       case "-checkSolvability" :: rest => checkSolvability = true; arguments(rest)
       case "-readHints" :: rest => readHints = true; arguments(rest)
@@ -590,7 +593,8 @@ object Main {
           " -measurePredictedPredicates\t output predicted predicate measurements\n"+
           " -labelSimpleGeneratedPredicates\t label simple generated predicates by selected predicates\n"+
           " -varyGeneratedPredicates\t vary generated predicates from CEGAR process without change of logic mearnings\n"+
-          " -generateSimplePredicates\t extract predicates using cegar and simply generated predicates\n"+
+          " -generateSimplePredicates\t generate simple predicates\n"+
+          " -onlyInitialPredicates\t extract predicates using initial predicates only\n"+
           " -moveFile\t if exception occur, move file to excepion directory\n"+
           " -checkSolvability \t check solvability for different initial predicate settings\n"+
           " -absTimeout:time\t set timeout for labeling hints\n"+
@@ -622,7 +626,7 @@ object Main {
 
     timeoutChecker = timeout match {
       case Some(to) => () => {
-        println("time check point", ((System.currentTimeMillis - startTime)/1000).toString+"/"+(to/1000).toString)
+        //println("time check point", ((System.currentTimeMillis - startTime)/1000).toString+"/"+(to/1000).toString)
         if (System.currentTimeMillis - startTime > to.toLong)
           throw TimeoutException
         if (stoppingCond)
@@ -709,6 +713,7 @@ object Main {
           return
         }
       }
+
       if(prettyPrint) {
         println(HornPrinter(clauseSet))
 

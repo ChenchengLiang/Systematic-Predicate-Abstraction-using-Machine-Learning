@@ -10,6 +10,7 @@ def main():
 
     node_label_ids = tf.constant(list(range(0, numberOfNode))) #[0, 1, 2,..., 14]
 
+
     #get node_to_graph_map from NodeNumberList
     node_to_graph_map=[]
     for i, nodeNumber in enumerate(NodeNumberList):
@@ -39,10 +40,10 @@ def main():
     for edge_type_idx,edgeType in enumerate(adjacency_lists): # 3,4,2
         inputs[f"adjacency_list_{edge_type_idx}"]=tf.TensorSpec(shape=(None, edgeType.shape[1]), dtype=tf.int32)
 
-
     layers=InvariantArgumentSelectionModel(parameters)
     output=layers(inputs)
     print(output)
+
 
 
 main()

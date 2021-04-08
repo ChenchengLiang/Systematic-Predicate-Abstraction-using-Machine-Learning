@@ -71,7 +71,6 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
         print("threshold",threshold)
 
         transfomed_predicted_label = [(lambda l : 1 if l>threshold else 0) (l) for l in predicted_label]
-        print("transfomed_predicted_label",transfomed_predicted_label)
 
         corrected_label = 0
         for true_Y, predicted_Y in zip(g._node_label, transfomed_predicted_label):
@@ -90,18 +89,19 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
                      "clauseBinaryOccurrenceInCounterExampleList", "templateASTEdges", "templateEdges", "dummyFiled"]
         new_field = ["predictedLabel"]
         new_filed_content=[transfomed_predicted_label]
-
         add_JSON_field(file_name,graph_type,old_field,new_field,new_filed_content)
+        old_field=old_field+["predictedLabel"]
+        new_field = ["predictedLabelLogit"]
+        new_filed_content = [[str(np.round(l,2)) for l in predicted_label]]
+        add_JSON_field(file_name, graph_type, old_field, new_field, new_filed_content)
 
 
 def my_round_fun(num_list,threshold):
     return  [float(1) if num>threshold else float(0) for num in num_list]
 
 def set_threshold_by_roundings(true_Y,predicted_Y_loaded_model):
-    #tf.math.round()
-    #by value
-
-    threshold_list=[1e-13,1e-12,1e-11,1e-10,1e-9,1e-8,1e-7,1e-6,1e-5,0.00005,1e-4,0.0005,1e-3,1e-2,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99,0.999,0.9999,0.99999]
+    threshold_list=np.arange(0,1,0.05)
+    #threshold_list=[1e-13,1e-12,1e-11,1e-10,1e-9,1e-8,1e-7,1e-6,1e-5,0.00005,1e-4,0.0005,1e-3,1e-2,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99,0.999,0.9999,0.99999]
     best_set={"threshold":0,"accuracy":0,"num_correct":0}
     for i in threshold_list:
         num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, my_round_fun(predicted_Y_loaded_model,i)), tf.int32))
@@ -155,6 +155,7 @@ def write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,la
 def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="template_relevance",force_read=True,form_label=True,
                        json_type=".hyperEdgeHornGraph.JSON",graph_type="hyperEdgeHornGraph",
                        gathered_nodes_binary_classification_task=["template_relevance"],hyper_parameter={},set_max_nodes_per_batch=False,file_list=[]):
+
     path = "../benchmarks/" + benchmark_fold + "/"
     benchmark_name = path[len("../benchmarks/"):-1]
     parameters = pickleRead(benchmark + "-" + label + "-parameters", "../src/trained_model/")
@@ -165,8 +166,8 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="templa
 
 
     if force_read == True:
-        write_graph_to_pickle(benchmark_name, data_fold=["test"], label=label, path=path, from_json=True,
-                              file_type="smt2", json_type=json_type, graph_type=graph_type,
+        write_graph_to_pickle(benchmark_name, data_fold=["test"], label=label, path=path,
+                              file_type=".smt2",  graph_type=graph_type,
                               max_nodes_per_batch=parameters['max_nodes_per_batch'], vocabulary_name=benchmark,file_list=file_list)
     else:
         print("Use pickle data for training")
@@ -202,8 +203,6 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="templa
     mse_loaded_model = tf.keras.losses.MSE(true_Y, predicted_Y_loaded_model)
     print("\n mse_loaded_model_predicted_Y_and_True_Y", mse_loaded_model)
 
-    #print("true_Y", true_Y)
-    #print("predicted_Y_loaded_model", predicted_Y_loaded_model)
 
     mse_mean = tf.keras.losses.MSE([np.mean(true_Y)] * len(true_Y), true_Y)
     print("\n mse_mean_Y_and_True_Y", mse_mean)

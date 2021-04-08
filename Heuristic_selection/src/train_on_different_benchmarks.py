@@ -26,17 +26,16 @@ def main():
     # json_type = ".layerHornGraph.JSON"
     force_read = True
     form_label = True
-    from_json = True
     file_type = ".smt2"
     GPU=True
     pickle = True
-    benchmark_name = "mixed-three-fold-single-example/"
+    benchmark_name = "extracted-three-fold-lin+nonlin-interval-finished/"
 
     # random.seed(0)
     # np.random.seed(0)
     # tf.random.set_seed(0)
 
-    hyper_parameters={"nodeFeatureDim":32,"num_layers":2,"regression_hidden_layer_size":[32,32,32]}
+    hyper_parameters={"nodeFeatureDim":64,"num_layers":12,"regression_hidden_layer_size":[64,32,16],"threshold":0.5,"max_nodes_per_batch":1000}
     for label in label_list:
         parameter_list.append(
             parameters(relative_path="../benchmarks/"+benchmark_name,
@@ -77,12 +76,12 @@ def main():
     for param in parameter_list:
         if pickle==False:
             train_on_graphs(benchmark_name=param.absolute_path[param.absolute_path.find("/benchmarks/")+len("/benchmarks/"):-1], label=param.label, force_read=force_read,
-                            train_n_times=1,path=param.absolute_path, file_type=file_type, form_label=form_label, from_json=from_json,
+                            train_n_times=1,path=param.absolute_path, file_type=file_type, form_label=form_label,
                             json_type=param.json_type,GPU=GPU,pickle=pickle,hyper_parameters=hyper_parameters)
         else:
             train_on_graphs(benchmark_name=param.benchmark_name(),
                             label=param.label, force_read=force_read,
-                            train_n_times=1, path=param.relative_path, file_type=file_type, form_label=form_label,from_json=from_json,
+                            train_n_times=1, path=param.relative_path, file_type=file_type, form_label=form_label,
                             json_type=param.json_type, GPU=GPU, pickle=pickle,hyper_parameters=hyper_parameters)
         tf.keras.backend.clear_session()
 

@@ -157,13 +157,20 @@ def shuffle_data(rootdir,target_folder):
 
 
 
-def divide_data_to_threads(root,target_folder):
-    chunk_number=16
+def divide_data_to_threads(root,target_folder,three_fold=True):
+    chunk_number=5
     try:
         os.mkdir(os.path.join("../benchmarks",target_folder))
     except:
         print("path existed")
-    for datafold,datafold_files in zip(["train_data","valid_data","test_data","test_data_simple_generator"],[os.path.join(root,"train_data"),os.path.join(root,"valid_data"),os.path.join(root,"test_data"),os.path.join(root,"test_data_simple_generator")]):
+    datafold_list = ["train_data", "valid_data", "test_data"]
+    datafold_files_list = [os.path.join(root, "train_data"), os.path.join(root, "valid_data"),
+                           os.path.join(root, "test_data")]
+    if three_fold==False:
+        datafold_list=datafold_list+["test_data_simple_generator"]
+        datafold_files_list=datafold_files_list+[os.path.join(root,"test_data_simple_generator")]
+
+    for datafold,datafold_files in zip(datafold_list,datafold_files_list):
         datafold_file_list=glob.glob(datafold_files+"/*")
         print(datafold_files,len(datafold_file_list))
         chunk_size=int(len(datafold_file_list)/chunk_number)
@@ -224,7 +231,6 @@ class parameters():
 def main():
 
 
-    #get_statistic_data("../benchmarks/LIA-lin-traiData/")
 
     #generate_JSON_field("../benchmarks/temp-extract-trainData-datafold")
     #parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph",json_file_type=".hyperEdgeHornGraph.JSON",graph_type="-getHornGraph:hyperEdgeGraph")
@@ -246,13 +252,31 @@ def main():
 
 
     #extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
-    gather_data_to_one_file(os.path.join("../benchmarks/","LIA-nonlin"),os.path.join("../benchmarks","shuffleFile"))
-    shuffle_data("../benchmarks/shuffleFile","../benchmarks/shuffled_files")
-    #divide_data_to_threads("../benchmarks/shuffled_files","shuffled_files_divided")
+    # gather_data_to_one_file(os.path.join("../benchmarks/","LIA-nonlin"),os.path.join("../benchmarks","shuffleFile"))
+    # shuffle_data("../benchmarks/shuffleFile","../benchmarks/shuffled_files")
+    #divide_data_to_threads("../benchmarks/extractable-three-fold-lin+nonlin","extractable-three-fold-lin+nonlin_divided",three_fold=True)
 
     #moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
+    #todo: analysis benchmark
+    benchmark_exceptions_analysis()
 
+    pass
+
+
+def benchmark_exceptions_analysis():
+    loaded_fields_empty=read_benchmark_exception_json("exceptions-noIntervals-abstractOn-emptyLabel")
+    loaded_fields_full = read_benchmark_exception_json("exceptions-noIntervals-abstractOn-fullLabel")
+    common_files=set(loaded_fields_empty["shell-timeout"]).intersection(set(loaded_fields_full["shell-timeout"]))
+    print("timeout files when use full label",len(loaded_fields_full["shell-timeout"]))
+    print("timeout files when use empty label", len(loaded_fields_empty["shell-timeout"]))
+    print("common timeout files",len(common_files))
+
+def read_benchmark_exception_json(folder_name):
+    json_file="../benchmarks/"+folder_name+"/benchmark_info_merged.JSON"
+    with open(json_file) as f:
+        loaded_graph = json.load(f)
+    return loaded_graph
 
 if __name__ == '__main__':
     main()
