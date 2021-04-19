@@ -388,7 +388,7 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
     controlFlowNodeSetInOneClause(predicateName) = controlFlowNodeName
   }
 
-  def drawDataFlow(arg: ITerm, dataFlowSet: Set[IFormula]): Unit = {
+  def drawDataFlow(arg: ITerm, dataFlowSet: Seq[IFormula]): Unit = {
     val SE = IExpression.SymbolEquation(arg)
     for (df <- dataFlowSet) df match {
       case SE(coefficient, rhs) if (!coefficient.isZero) => {
@@ -411,7 +411,7 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
   }
 
 
-  def getDataFlowAndGuard(clause: Clause, normalizedClause: Clause, dataFlowInfoWriter: PrintWriter): (Set[IFormula], Set[IFormula],Clause) = {
+  def getDataFlowAndGuard(clause: Clause, normalizedClause: Clause, dataFlowInfoWriter: PrintWriter): (Seq[IFormula], Seq[IFormula],Clause) = {
     /*
     Replace arguments in argumentInHead.intersect(argumentInBody) to arg' and add arg=arg' to constrains
 
@@ -451,12 +451,15 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
         }
       }
     }
-    val guardList = (for (f <- LineariseVisitor(replacedClause.constraint, IBinJunctor.And)) yield f).toSet.diff(for (df <- dataflowList) yield df.asInstanceOf[IFormula]).map(sp(_))
+    val guardList = (for (f <- LineariseVisitor(replacedClause.constraint, IBinJunctor.And)) yield f).toSet.diff(for (df <- dataflowList) yield df).map(sp(_))
 
     //todo: delete some redundant predicates
 //    val redundantFormulas = for(g<-guardList if SymbolCollector.constants(g).map(_.toString).toSet.diff(replacedClause.head.args.map(_.toString).toSet).intersect(bodySymbolsSet.map(_.toString)).isEmpty) yield {
 //      g
 //    }
+
+    val dataFlowSeq=dataflowList.toSeq.sortBy(_.toString)
+    val guardSeq=guardList.toSeq.sortBy(_.toString)
 
     dataFlowInfoWriter.write("--------------------\n")
     dataFlowInfoWriter.write("original clause:\n")
@@ -464,15 +467,15 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
     dataFlowInfoWriter.write("normalized and replaced clause:\n")
     dataFlowInfoWriter.write(replacedClause.toPrologString + "\n")
     dataFlowInfoWriter.write("dataflow:\n")
-    for (df <- dataflowList)
+    for (df <- dataFlowSeq)
       dataFlowInfoWriter.write(df.toString + "\n")
     dataFlowInfoWriter.write("guard:\n")
-    for (g <- guardList)
+    for (g <- guardSeq)
       dataFlowInfoWriter.write(g.toString + "\n")
 //    dataFlowInfoWriter.write("redundant:\n")
 //    for (r <- redundantFormulas)
 //      dataFlowInfoWriter.write(r.toString + "\n")
-    (dataflowList, guardList,replacedClause)
+    (dataFlowSeq, guardSeq,replacedClause)
   }
 
 }

@@ -59,16 +59,12 @@ def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score
         # clear_file(json_file)
         # with open(json_file, 'w') as f:
         #     json.dump(json_obj, f,indent=4)
-def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_type,threshold):
+def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_type,threshold,verbose=True):
     current_positon=0
     for g,file_name in zip(dataset._loaded_data[DataFold.TEST],dataset._file_list["test"]):
         predicted_label=predicted_Y_loaded_model[current_positon:current_positon+len(g._node_label)]
         current_positon=current_positon+len(g._node_label)
-        print("file_name",file_name)
-        #print("g.node_indices", len(g._node_indices),g._node_indices)
-        print("g.node_label",len(g._node_label), g._node_label)
-        print("predicted_label",predicted_label)
-        print("threshold",threshold)
+
 
         transfomed_predicted_label = [(lambda l : 1 if l>threshold else 0) (l) for l in predicted_label]
 
@@ -76,7 +72,14 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
         for true_Y, predicted_Y in zip(g._node_label, transfomed_predicted_label):
             if true_Y == predicted_Y:
                 corrected_label = corrected_label + 1
-        print("corrected label:" + str(corrected_label) + "/" + str(len(g._node_label)))
+        if verbose==True:
+            print("file_name", file_name)
+            # print("g.node_indices", len(g._node_indices),g._node_indices)
+            print("g.node_label", len(g._node_label), g._node_label)
+            print("predicted_label", predicted_label)
+            print("rounded predicted_label", transfomed_predicted_label)
+            print("threshold", threshold)
+            print("corrected label:" + str(corrected_label) + "/" + str(len(g._node_label)))
 
         old_field = ["nodeIds", "nodeSymbolList", "falseIndices", "argumentIndices", "controlLocationIndices",
                      "binaryAdjacentList", "ternaryAdjacencyList", "unknownEdges", "argumentIDList", "argumentNameList",
@@ -100,7 +103,7 @@ def my_round_fun(num_list,threshold):
     return  [float(1) if num>threshold else float(0) for num in num_list]
 
 def set_threshold_by_roundings(true_Y,predicted_Y_loaded_model):
-    threshold_list=np.arange(0,1,0.05)
+    threshold_list=np.arange(0,1,0.1)
     #threshold_list=[1e-13,1e-12,1e-11,1e-10,1e-9,1e-8,1e-7,1e-6,1e-5,0.00005,1e-4,0.0005,1e-3,1e-2,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99,0.999,0.9999,0.99999]
     best_set={"threshold":0,"accuracy":0,"num_correct":0}
     for i in threshold_list:
@@ -174,7 +177,7 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="templa
     # if form_label == True and not os.path.isfile("../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):
     if form_label == True:
         form_GNN_inputs_and_labels(label=label, datafold=["test"], benchmark=benchmark_name, graph_type=graph_type,
-                                   gathered_nodes_binary_classification_task=gathered_nodes_binary_classification_task)
+                                   gathered_nodes_binary_classification_task=gathered_nodes_binary_classification_task,use_class_weight=False)
 
     quiet = False
     dataset = HornGraphDataset(parameters)

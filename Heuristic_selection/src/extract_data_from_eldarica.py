@@ -109,7 +109,8 @@ def main():
     benchmark_name = os.path.join("../benchmarks/",sys.argv[1])
     thread_number=8 #16
     timeout=600
-    eldarica_parameters = "-moveFile -extractPredicates -onlyInitialPredicates -labelSimpleGeneratedPredicates -getHornGraph:hyperEdgeGraph  -varyGeneratedPredicates -abstract -noIntervals -solvabilityTimeout:300 -mainTimeout:600 -t:1200"
+    #-onlyInitialPredicates -noIntervals
+    eldarica_parameters = "-moveFile -generateSimplePredicates -extractPredicates -noIntervals -labelSimpleGeneratedPredicates -getHornGraph:hyperEdgeGraph  -abstract -solvabilityTimeout:300 -mainTimeout:600 -t:1200"
     run_eldarica_with_shell_pool(os.path.join(benchmark_name,"train_data"), run_eldarica_with_shell, eldarica_parameters,timeout=timeout,thread=thread_number)
     run_eldarica_with_shell_pool(os.path.join(benchmark_name, "valid_data"), run_eldarica_with_shell,eldarica_parameters,timeout=timeout,thread=thread_number)
     run_eldarica_with_shell_pool(os.path.join(benchmark_name, "test_data"), run_eldarica_with_shell,eldarica_parameters,timeout=timeout,thread=thread_number)

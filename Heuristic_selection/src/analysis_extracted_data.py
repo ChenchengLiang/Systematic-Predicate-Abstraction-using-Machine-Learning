@@ -258,18 +258,75 @@ def main():
 
     #moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
-    #todo: analysis benchmark
-    benchmark_exceptions_analysis()
+    #analysis benchmark
+    #benchmark_exceptions_analysis()
 
-    pass
+    #rebuild_exception_file()
+
+    #clean_extracted_data("mixed-three-fold-noIntervals-only-initial-unsolved/test")
+    get_generated_horn_graph()
+
+def get_generated_horn_graph(horn_graph_folder="lia-lin-horn_graphs",target_folder="lia-lin-extract-unsolved-fullLabel"):
+    horn_graph_file_list=glob.glob("../benchmarks/"+horn_graph_folder+"/*.hyperEdgeHornGraph.JSON")
+    horn_graph_smt2_target_file_list=glob.glob("../benchmarks/"+target_folder+"/*.smt2")
+    print("horn_graph_smt2_target_file_list",horn_graph_smt2_target_file_list)
+    horn_graph_file_name_list=[f[f.find(horn_graph_folder)+len(horn_graph_folder)+1:] for f in horn_graph_file_list]
+    print("horn_graph_file_name_list",horn_graph_file_name_list)
+    for f in horn_graph_smt2_target_file_list:
+        f_name=f[f.rfind(target_folder)+len(target_folder)+1:]
+        graph_file_name=f_name+".hyperEdgeHornGraph.JSON"
+        if graph_file_name in horn_graph_file_name_list:
+            shutil.copyfile("../benchmarks/"+horn_graph_folder+"/"+f_name+".hyperEdgeHornGraph.JSON", "../benchmarks/"+target_folder+"/"+f_name+ ".hyperEdgeHornGraph.JSON")
+            shutil.copyfile("../benchmarks/"+horn_graph_folder+"/"+f_name+".unlabeledPredicates.tpl","../benchmarks/"+target_folder+"/"+f_name+ ".unlabeledPredicates.tpl")
+        else:
+            os.remove(f)
+
+
+def rebuild_exception_file():
+    folder_name="lia-lin-exceptions-noIntervals-abstractOn-emptyLabel-only-initial-predicates"
+    field_list=["solvability-timeout","shell-timeout"]
+    loaded_fields = read_benchmark_exception_json(folder_name)
+    for filed in field_list:
+        new_folder="../benchmarks/"+folder_name+"/"+filed
+        os.mkdir(new_folder)
+        for f in loaded_fields[filed]:
+            file_name="../benchmarks/lia-lin/"+f
+            shutil.copyfile(file_name,new_folder+"/"+f)
+
+def clean_extracted_data(benchmark):
+    file_list=glob.glob("../benchmarks/"+benchmark+"/*.smt2")
+    for f in file_list:
+        if not (os.path.exists(f + ".hyperEdgeHornGraph.JSON") and os.path.exists(f+".unlabeledPredicates.tpl") ):
+            os.remove(f)
+            if os.path.exists(f+".HornGraph"):
+                os.remove(f+".HornGraph")
+            if os.path.exists(f+".circles.gv"):
+                os.remove(f + ".circles.gv")
+            if os.path.exists(f + ".hyperEdgeHornGraph.gv"):
+                os.remove(f + ".hyperEdgeHornGraph.gv")
+
+    circle_file_list = glob.glob("../benchmarks/" + benchmark + "/*.circles.gv")
+    file_list=[f[:-len(".circles.gv")] for f in circle_file_list]
+    print(file_list)
+    for f in file_list:
+        if not os.path.exists(f):
+            if os.path.exists(f + ".HornGraph"):
+                os.remove(f + ".HornGraph")
+            if os.path.exists(f + ".circles.gv"):
+                os.remove(f + ".circles.gv")
+            if os.path.exists(f + ".hyperEdgeHornGraph.gv"):
+                os.remove(f + ".hyperEdgeHornGraph.gv")
+            if os.path.exists(f + ".unlabeledPredicates.tpl"):
+                os.remove(f + ".unlabeledPredicates.tpl")
 
 
 def benchmark_exceptions_analysis():
-    loaded_fields_empty=read_benchmark_exception_json("exceptions-noIntervals-abstractOn-emptyLabel")
-    loaded_fields_full = read_benchmark_exception_json("exceptions-noIntervals-abstractOn-fullLabel")
-    common_files=set(loaded_fields_empty["shell-timeout"]).intersection(set(loaded_fields_full["shell-timeout"]))
-    print("timeout files when use full label",len(loaded_fields_full["shell-timeout"]))
-    print("timeout files when use empty label", len(loaded_fields_empty["shell-timeout"]))
+    filed="shell-timeout" #shell-timeout, solvability-timeout
+    loaded_fields_empty=read_benchmark_exception_json("lia-lin-exceptions-noIntervals-abstractOn-fullLabel-300*5")
+    loaded_fields_full = read_benchmark_exception_json("lia-lin-exceptions-noIntervals-abstractOn-emptyLabel-300*5")
+    common_files=set(loaded_fields_empty[filed]).intersection(set(loaded_fields_full[filed]))
+    print("timeout files when use full label",len(loaded_fields_full[filed]))
+    print("timeout files when use empty label", len(loaded_fields_empty[filed]))
     print("common timeout files",len(common_files))
 
 def read_benchmark_exception_json(folder_name):

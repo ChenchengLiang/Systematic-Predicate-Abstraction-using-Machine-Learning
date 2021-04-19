@@ -134,25 +134,53 @@ def get_weighted_binary_crossentropy(weight_class,true_y,predicted_y):
         #     ce = ce + tf.keras.losses.binary_crossentropy([y], [p],from_logits=False) * weight_class["weight_for_0"]
     return ce / len(true_y), ce_raw/len(true_y)
 def main():
-    l=[0.5,0.7]
-    print(list(map(round,l)))
+    from utils import wrapped_generate_horn_graph
+    move_file = True
+    max_nodes_per_batch=10000
+    thread_number=4
+    filtered_file_list, file_list_with_horn_graph, file_list = wrapped_generate_horn_graph(os.path.join("../benchmarks/",sys.argv[1]),
+                                                                                           max_nodes_per_batch,
+                                                                                           move_file=move_file,
+                                                                                           thread_number=thread_number)
+    # from pandas import DataFrame
+    # from pandas import concat
+    # from keras.models import Sequential
+    # from keras.layers import Dense
+    # from sklearn.metrics import mean_squared_error
+    #
+    # # fit MLP to dataset and print error
+    # def fit_model(X, y):
+    #     # design network
+    #     model = Sequential()
+    #     model.add(Dense(10, input_dim=1))
+    #     model.add(Dense(1))
+    #     model.compile(loss='mean_squared_error', optimizer='adam')
+    #     # fit network
+    #     model.fit(X, y, epochs=100, batch_size=len(X), verbose=0)
+    #     return model
+    #
+    # # create sequence
+    # length = 10
+    # sequence = [i / float(length) for i in range(length)]
+    # # create X/y pairs
+    # df = DataFrame(sequence)
+    # df = concat([df.shift(1), df], axis=1)
+    # df.dropna(inplace=True)
+    # # convert to MLP friendly format
+    # values = df.values
+    # X, y = values[:, 0], values[:, 1]
+    # # repeat experiment
+    # repeats = 10
+    # model = fit_model(X, y)
+    # for _ in range(repeats):
+    #     print(sum(model.predict(X, verbose=0)))
 
-    # GPU_switch(False)
-    # predicted_y=[-5.5,5,-5,5,10]
-    # true_y=[0,0,0,1,1]
-    # weight_for_1=1
-    # weight_for_0=1
-    # weight_class={"weight_for_1":weight_for_1,"weight_for_0":weight_for_0}
-    # weighted_ce,raw_weighted_ce=get_weighted_binary_crossentropy(weight_class,true_y,predicted_y)
-    # print("weighted_ce",weighted_ce)
-    # print("raw_weighted_ce",raw_weighted_ce)
-
-
+    #
     # from utils import filter_file_list_by_max_node,get_statistic_data
     # from measurement_functions import read_measurement_from_JSON,get_analysis_for_predicted_labels
     #
-    # benchmark = "mixed-three-fold"
-    # benchmark_fold = benchmark + "-" + "predict-unsolvable"
+    # benchmark = "mixed-three-fold-noIntervals-only-initial-predicate"
+    # benchmark_fold = benchmark + "-" + "test"
     # max_nodes_per_batch = 1000
     # file_list = glob.glob("../benchmarks/" + benchmark_fold + "/test_data/*.smt2")
     # trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-02-14_22-37-39_best.pkl"
@@ -187,12 +215,23 @@ def main():
     # three_fild_name=["empty","predicted","full"]
     # solvability_name_fold= (lambda : three_fild_name if out_of_test_set==True else three_fild_name + ["true"])()
     # solvability_json_name_fold=[ "solvability"+x+"InitialPredicates" for x in solvability_name_fold]
+    # solvable_file_list = {name_fold: [] for name_fold in solvability_json_name_fold}
     # for name_fold in solvability_json_name_fold:
-    #     solvability= [1 if s[name_fold] == "true" else 0 for s in json_solvability_obj_list]
-    #     print(name_fold,str(sum(solvability)) + "/" + str(len(json_solvability_obj_list)))
-    #     for i,(s,f) in enumerate(zip(solvability,json_solvability_obj_list)) :
-    #         if s==1:
-    #             print(json_solvability_obj_list[i]["file_name"])
+    #     solvability = [1 if s[name_fold] == "true" else 0 for s in json_solvability_obj_list]
+    #     print(name_fold, str(sum(solvability)) + "/" + str(len(json_solvability_obj_list)))
+    #     for i, (s, f) in enumerate(zip(solvability, json_solvability_obj_list)):
+    #         if s == 1:
+    #             # print(json_solvability_obj_list[i]["file_name"])
+    #             solvable_file_list[name_fold].append(json_solvability_obj_list[i]["file_name"])
+    # difference_betw_predicted_full=set(solvable_file_list["solvabilitypredictedInitialPredicates"]).difference(set(solvable_file_list["solvabilityfullInitialPredicates"]))
+    # difference_betw_predicted_empty = set(solvable_file_list["solvabilitypredictedInitialPredicates"]).difference(
+    #     set(solvable_file_list["solvabilityemptyInitialPredicates"]))
+    # difference_betw_full_empty = set(solvable_file_list["solvabilityfullInitialPredicates"]).difference(
+    #     set(solvable_file_list["solvabilityemptyInitialPredicates"]))
+    # print("difference_betw_predicted_full",len(difference_betw_predicted_full))
+    # print("difference_betw_predicted_empty", len(difference_betw_predicted_empty))
+    # print("difference_betw_full_empty", len(difference_betw_full_empty))
+    #
     #
     # # description: read measurement JSON file
     # scatter_plot_range = [0, 120]

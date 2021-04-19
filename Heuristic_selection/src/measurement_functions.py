@@ -3,6 +3,7 @@ from multiprocessing import Pool
 from utils import call_eldarica,plot_scatter
 import json
 import numpy as np
+from utils import flattenList
 def get_evaluations_from_eldarica_pool(fun,file_list,parameters,countinous=True):
     parameter_list=[]
     if countinous == True:
@@ -70,7 +71,8 @@ def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False,time_u
             get_best_measurement(int_field_map, measurement_list_map[fild_name], measurement_best_count_map[fild_name])
 
     print("------------")
-    scatter_plot_range = scatter_plot_range
+    scatter_plot_range = [0,max(list(map(np.float,flattenList(measurement_list_all_files_map["timeConsumptionForCEGAR"]))))/1000]#scatter_plot_range
+    print("scatter_plot_range",scatter_plot_range)
     measurement_list_all_files_map["timeConsumptionForCEGAR_ms"]=measurement_list_all_files_map["timeConsumptionForCEGAR"].copy()
     measurement_list_all_files_map["predicateGeneratorTime_ms"]=measurement_list_all_files_map["predicateGeneratorTime"].copy()
     measurement_list_all_files_map["timeConsumptionForCEGAR"]=[[float(data)/time_unit for data in data_fold] for data_fold in measurement_list_all_files_map["timeConsumptionForCEGAR"]]

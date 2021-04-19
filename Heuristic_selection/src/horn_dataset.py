@@ -46,8 +46,9 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters["label_type"]=label
     parameters ["gathered_nodes_binary_classification_task"]=gathered_nodes_binary_classification_task
     parameters["threshold"]=hyper_parameters["threshold"]
-    max_epochs = 2
-    patience = 2
+    max_epochs = 200
+    patience = 50
+    use_class_weight=False
     # parameters["add_self_loop_edges"]=False
     # parameters["tie_fwd_bkwd_edges"]=True
 
@@ -72,7 +73,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             print("Use pickle data for training")
         #if form_label == True and not os.path.isfile("../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):
         if form_label == True:
-            form_GNN_inputs_and_labels(label=label, datafold=["train", "valid", "test"], benchmark=benchmark_name,graph_type=graph_type,gathered_nodes_binary_classification_task=gathered_nodes_binary_classification_task)
+            form_GNN_inputs_and_labels(label=label, datafold=["train", "valid", "test"], benchmark=benchmark_name,graph_type=graph_type,gathered_nodes_binary_classification_task=gathered_nodes_binary_classification_task,use_class_weight=use_class_weight)
         else:
             print("Use label in pickle data for training")
     elif pickle==False:
@@ -82,8 +83,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         dataset._use_worker_threads=False #solve Failed setting context: CUDA_ERROR_NOT_INITIALIZED: initialization error
     dataset.load_data([DataFold.TRAIN,DataFold.VALIDATION,DataFold.TEST])
     parameters["node_vocab_size"]=dataset._node_vocab_size
-    parameters["class_weight"]=dataset._class_weight["train"]
-    parameters["class_weight_fold"] = dataset._class_weight
+    parameters["class_weight_fold"] = dataset._class_weight_fold
     def log(msg):
         log_line(log_file, msg)
 
@@ -169,10 +169,9 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         #print("predicted_Y_loaded_model_from_memory", predicted_Y_loaded_model_from_memory)
         #print("predicted_Y_loaded_model", predicted_Y_loaded_model)
 
-
-        mse_mean = tf.keras.losses.MSE([np.mean(true_Y)]*len(true_Y), true_Y)
-        print("\n mse_mean_Y_and_True_Y", mse_mean)
-        mean_loss_list=mse_mean
+        mean_loss = (lambda : tf.keras.losses.binary_crossentropy([np.mean(true_Y)]*len(true_Y), true_Y) if label in gathered_nodes_binary_classification_task else tf.keras.losses.MSE([np.mean(true_Y)]*len(true_Y), true_Y))()
+        print("\n mean_loss_Y_and_True_Y", mean_loss)
+        mean_loss_list=mean_loss
         num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, tf.math.round(predicted_Y_loaded_model)),tf.int32))
         accuracy = num_correct / len(predicted_Y_loaded_model)
         accuracy_average.append(accuracy)
@@ -200,9 +199,9 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     mean_accuracy = np.mean(accuracy_average)
     write_accuracy_to_log(label, benchmark_name, accuracy_average, best_valid_epoch_average, graph_type)
     # visualize results
-    draw_training_results(train_loss_list_average, valid_loss_list_average, test_loss_list_average,
+    draw_training_results(train_loss_list_average, valid_loss_list_average,
                           mean_loss_list_average,
-                          error_loaded_model_average, valid_loss_list, true_Y, predicted_Y_loaded_model, label,
+                          error_loaded_model_average, true_Y, predicted_Y_loaded_model, label,
                           benchmark_name, graph_type,gathered_nodes_binary_classification_task,hyper_parameters)
     write_train_results_to_log(dataset, predicted_Y_loaded_model, train_loss_average,
                                valid_loss_average, error_loaded_model, mean_loss_list, accuracy_average,
@@ -224,18 +223,19 @@ def write_accuracy_to_log(label, benchmark, accuracy_list, best_valid_epoch_list
         out_file.write("best_valid_epoch_average:" + str(best_valid_epoch_average) + "\n")
 
 
-def draw_training_results(train_loss_list_average, valid_loss_list_average, test_loss_list_average,
+def draw_training_results(train_loss_list_average, valid_loss_list_average,
                           mean_loss_list_average,
-                          mse_loaded_model_average, valid_loss_list, true_Y, predicted_Y_loaded_model, label,
+                          mse_loaded_model_average, true_Y, predicted_Y_loaded_model, label,
                           benchmark_name, graph_type,gathered_nodes_binary_classification_task,hyper_parameters):
     # mse on train, validation,test,mean
     plt.plot(train_loss_list_average, color="blue")
     plt.plot(valid_loss_list_average, color="green")
-    plt.plot([mean_loss_list_average] * len(valid_loss_list), color="red")
-    plt.plot([mse_loaded_model_average] * len(valid_loss_list), color="black")
-    y_range=[0,0.5]
+    plt.plot([mean_loss_list_average] * len(train_loss_list_average), color="red")
+    plt.plot([mse_loaded_model_average] * len(train_loss_list_average), color="black")
+    y_range=[0,max(max(train_loss_list_average),max(valid_loss_list_average))]
+    grid=max(np.round(y_range,1))/10
     plt.ylim(y_range)
-    plt.yticks(np.arange(min(y_range), max(y_range), 0.025))
+    plt.yticks(np.arange(min(y_range), max(y_range), grid))
     plt.ylabel('loss')
     plt.xlabel('epochs')
     train_loss_legend = mpatches.Patch(color='blue', label='train_loss')
@@ -518,7 +518,7 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
         pickleWrite(pickle_data, "train-" +label+"-"+ graph_type +"-"+benchmark_name + "-gnnInput_" + df + "_data")
 
 
-def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "test"], benchmark="",graph_type="hyperEdgeHornGraph",gathered_nodes_binary_classification_task="gathered_nodes_binary_classification_task"):
+def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "test"], benchmark="",graph_type="hyperEdgeHornGraph",gathered_nodes_binary_classification_task="gathered_nodes_binary_classification_task",use_class_weight=True):
     print("form labels")
     benchmark_name = benchmark.replace("/", "-")
     for df in datafold:
@@ -534,7 +534,8 @@ def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "
                                                                     parsed_dot_file.skipped_file_list,benchmark, df,
                                                                     parsed_dot_file.graphs_argument_indices,
                                                                     parsed_dot_file.graphs_label_indices,
-                                                                    parsed_dot_file.graphs_learning_labels,label,graph_type,gathered_nodes_binary_classification_task)
+                                                                    parsed_dot_file.graphs_learning_labels,label,
+                                                                 graph_type,gathered_nodes_binary_classification_task,use_class_weight=use_class_weight)
 
         else:
             form_horn_graph_samples(parsed_dot_file.graphs_node_label_ids, parsed_dot_file.graphs_node_symbols,
@@ -573,7 +574,7 @@ def get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,voca
 def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,graphs_node_symbols,
                                                             graphs_adjacency_lists,total_number_of_node,
                                                             vocabulary_set,token_map,file_name_list,skipped_file_list,benchmark,df,
-                                                            graphs_argument_indices,graphs_label_indices,graphs_learning_labels,label,graph_type,gathered_nodes_binary_classification_task,pickle=True):
+                                                            graphs_argument_indices,graphs_label_indices,graphs_learning_labels,label,graph_type,gathered_nodes_binary_classification_task,pickle=True,use_class_weight=True):
     final_graphs=[]
     raw_data_graph=get_batch_graph_sample_info(graphs_adjacency_lists,total_number_of_node,vocabulary_set,token_map)
     if label=="predicate_occurrence_in_SCG" or label=="predicate_occurrence_in_clauses" or label=="template_relevance" or label=="clause_occurrence_in_counter_examples_binary":
@@ -680,6 +681,7 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
         #     print("\n node_indices ", len(node_indices))
         #     print("learning_labels", len(learning_labels))
 
+
         final_graphs.append(
             HornGraphSample(
                 adjacency_lists=adjacency_lists,
@@ -702,7 +704,7 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
     print("one_one_label", one_one_label, "percentage", one_one_label / total_files)
     print("other_distribution", other_distribution, "percentage", other_distribution / total_files)
     weight_for_0, weight_for_1 = 1,1
-    if df=="train":
+    if df=="train" and use_class_weight==True:
         weight_for_0,weight_for_1=get_class_weight(sum(all_label),len(all_label)-sum(all_label),len(all_label))
     print("weight_for_0",weight_for_0)
     print("weight_for_1",weight_for_1)
@@ -919,6 +921,7 @@ def tokenize_symbols(token_map,node_symbols):
     full_operator_list = ["+", "-", "*", "/", ">", ">=", "=", "<", "<=", "==", "===", "!", "+++", "++", "**", "***",
                           "--", "---", "=/=","&","|","EX","and","or"]
     tokenized_node_label_ids = []
+    #print("converted_node_symbols",converted_node_symbols)
     for symbol in converted_node_symbols:
         if symbol in token_map:
             tokenized_node_label_ids.append(token_map[symbol])

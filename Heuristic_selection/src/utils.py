@@ -11,9 +11,9 @@ import seaborn
 import sklearn
 from sklearn.metrics import confusion_matrix
 
-def get_solvability_and_measurement_from_eldarica(filtered_file_list,thread_number,continuous_extracting=True,move_file=True):
-    timeout = 1200000  # -measurePredictedPredicates
-    check_solvability_parameter_list = "-checkSolvability  -measurePredictedPredicates -varyGeneratedPredicates -abstract -noIntervals -solvabilityTimeout:300 -mainTimeout:1200"
+def get_solvability_and_measurement_from_eldarica(filtered_file_list,thread_number,continuous_extracting=True,move_file=True,checkSolvability="-checkSolvability",measurePredictedPredicates="-measurePredictedPredicates"):
+    timeout = 3600  # -measurePredictedPredicates -varyGeneratedPredicates
+    check_solvability_parameter_list = " "+checkSolvability+" "+measurePredictedPredicates+"  -abstract -noIntervals -solvabilityTimeout:300 -mainTimeout:1200"
     file_list_with_parameters = (lambda: [
         [file, check_solvability_parameter_list, timeout, move_file] if not os.path.exists(
             file + ".solvability.JSON") else [] for
@@ -45,8 +45,8 @@ def generate_horn_graph(file_list,max_nodes_per_batch=1000,move_file=True,thread
     # description: generate horn graph
     timeout = 120 * 5  # second
     move_file_parameter_eldarica = (lambda: " -moveFile " if move_file == True else " ")()
-    # todo: use intervals and abstract:off
-    eldarica_parameters = "-getHornGraph:hyperEdgeGraph -generateSimplePredicates -varyGeneratedPredicates  " + move_file_parameter_eldarica + " -maxNode:" + str(
+    # todo: use intervals and abstract:off -varyGeneratedPredicates
+    eldarica_parameters = "-getHornGraph:hyperEdgeGraph -generateSimplePredicates   " + move_file_parameter_eldarica + " -maxNode:" + str(
         max_nodes_per_batch) + " -abstract -noIntervals -mainTimeout:1200"
     file_list_with_parameters = [
         [file, eldarica_parameters, timeout, move_file] if not os.path.exists(file + ".hyperEdgeHornGraph.JSON") else []
@@ -185,14 +185,17 @@ def get_statistic_data(file_list,benchmark_fold=""):
     saving_path_confusion_matrix="trained_model/"+benchmark_fold+"-confusion-matrix.png"
     saving_path_roc="trained_model/"+benchmark_fold+"-ROC.png"
     plot_confusion_matrix(predicted_label,true_label,saving_path_confusion_matrix,recall,precision,f1_score)
-    #todo:ROC
+    #ROC
     false_positive_rate_list=[]
     recall_list=[]
-    for t in np.arange(0,1,0.05):
+    step=0.05
+    for t in np.arange(0,1+step,step):
         predicted_label_with_threshold=[1 if l>=t else 0 for l in predicted_label_logit]
         recall, precision, f1_score, false_positive_rate = get_recall_and_precision(true_label, predicted_label_with_threshold)
         recall_list.append(recall)
         false_positive_rate_list.append(false_positive_rate)
+    recall_list.append(0)
+    false_positive_rate_list.append(0)
     plot_ROC(false_positive_rate_list,recall_list,saving_path_roc)
 
 
@@ -275,10 +278,13 @@ def get_recall_scatter(solvability_name_fold,json_solvability_obj_list,filtered_
                      name=fold_name + "_used_in_the_end", range=scatter_plot_range,
                      x_label="minimized_useful_predicate_number", y_label=fold_name + "_predicates")
         print("initialPredicatesUsedInMinimizedPredicate > minimizedPredicateFromCegar", name)
+        f_number=0
         for i, (x, y) in enumerate(zip(minimizedPredicateFromCegar_list[name],
                                        initialPredicatesUsedInMinimizedPredicateFromCegar_list[name])):
             if x < y:
-                print(filtered_file_list[i])
+                f_number=f_number+1
+                #print(filtered_file_list[i])
+        print(f_number)
 
 def flattenList(t):
     return [item for sublist in t for item in sublist]
@@ -288,3 +294,8 @@ def assemble_name(*args):
     for a in args:
         name=name+"-"+a
     return name[1:]
+
+def mutual_differences(set_1,set_2):
+    set_1=set(set_1)
+    set_2=set(set_2)
+    return set_1.difference(set_2).union(set_2.difference(set_1))

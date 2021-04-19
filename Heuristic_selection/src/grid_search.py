@@ -15,36 +15,46 @@ def main():
     pickle = True
     threshold=0.5
     max_nodes_per_batch=1000
-    benchmark = "mixed-three-fold-single-example"
+    benchmark = "mixed-three-fold-noIntervals-only-initial-predicate"
     benchmark_name = benchmark + "/"
     hyper_parameters_list = []
     '''
     To find an appropriate model size, it's best to start with relatively few layers and parameters,
      then begin increasing the size of the layers or adding new layers until you see diminishing returns on the validation loss.
     '''
-    # hyper_parameters_list.append({"nodeFeatureDim": 8, "num_layers": 2, "regression_hidden_layer_size": [8, 8, 8]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 8, "num_layers": 4, "regression_hidden_layer_size": [8, 8, 8]})
     # hyper_parameters_list.append({"nodeFeatureDim": 8, "num_layers": 6, "regression_hidden_layer_size": [8, 8, 8]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 8, "num_layers": 8, "regression_hidden_layer_size": [8, 8, 8]})
-    hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 12, "regression_hidden_layer_size": [16]})
-    hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 16, "regression_hidden_layer_size": [16]})
-    hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 20, "regression_hidden_layer_size": [16]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 2, "regression_hidden_layer_size": [16, 16, 16]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 4, "regression_hidden_layer_size": [16, 16, 16]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 6, "regression_hidden_layer_size": [16, 16, 16]})
+    #hyper_parameters_list.append({"nodeFeatureDim": 8, "num_layers": 8, "regression_hidden_layer_size": [8, 8, 8]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 8, "regression_hidden_layer_size": [16]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 8, "regression_hidden_layer_size": [16,16]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 8, "regression_hidden_layer_size": [16, 16, 16]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 12, "regression_hidden_layer_size": [16]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 16, "regression_hidden_layer_size": [16]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 20, "regression_hidden_layer_size": [16]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 24, "regression_hidden_layer_size": [16]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 32, "regression_hidden_layer_size": [16]})
+    #hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 64, "regression_hidden_layer_size": [16]})
     # #hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 8, "regression_hidden_layer_size": [16, 16, 16]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 2, "regression_hidden_layer_size": [32]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 2, "regression_hidden_layer_size": [32, 32, 32]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 4, "regression_hidden_layer_size": [32, 32, 32]})
-    # # hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 6, "regression_hidden_layer_size": [32, 32, 32]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 8, "regression_hidden_layer_size": [32, 32, 32]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 2, "regression_hidden_layer_size": [64]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 2, "regression_hidden_layer_size": [64, 64, 64]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 4, "regression_hidden_layer_size": [64, 64, 64]})
-    # # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 6, "regression_hidden_layer_size": [64, 64, 64]})
-    # #hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 8, "regression_hidden_layer_size": [64, 64, 64]})
-    # # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 12, "regression_hidden_layer_size": [64, 64, 64]})
-    # hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 2, "regression_hidden_layer_size": [128]})
+    hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 8, "regression_hidden_layer_size": [32, 32, 32]})
+    hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 16, "regression_hidden_layer_size": [32, 32, 32]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 16, "regression_hidden_layer_size": [64]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 24, "regression_hidden_layer_size": [64]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 32, "regression_hidden_layer_size": [64]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 64, "regression_hidden_layer_size": [64]})
+    hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 16, "regression_hidden_layer_size": [64,32,16]})
+    hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 24, "regression_hidden_layer_size": [64,32,16]})
+    hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 32, "regression_hidden_layer_size": [64,32,16]})
+    #hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 64, "regression_hidden_layer_size": [64,32,16]})
+    #hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 128, "regression_hidden_layer_size": [64]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 16, "regression_hidden_layer_size": [64,64,64,64]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 24, "regression_hidden_layer_size": [64,64,64,64]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 8, "regression_hidden_layer_size": [64, 64, 64]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 12, "regression_hidden_layer_size": [64, 64, 64]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 16, "regression_hidden_layer_size": [64, 64, 64]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 24, "regression_hidden_layer_size": [64, 64, 64]})
+    hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 8, "regression_hidden_layer_size": [128]})
+    hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 16, "regression_hidden_layer_size": [128]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 24, "regression_hidden_layer_size": [128]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 32, "regression_hidden_layer_size": [128]})
     # hyper_parameters_list.append(
     #     {"nodeFeatureDim": 128, "num_layers": 2, "regression_hidden_layer_size": [128, 128, 128]})
     # hyper_parameters_list.append(

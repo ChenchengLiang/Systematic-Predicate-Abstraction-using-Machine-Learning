@@ -6,14 +6,17 @@ from tf2_gnn.cli_utils.training_utils import train, log_line, make_run_id
 from tf2_gnn.models import InvariantArgumentSelectionTask, InvariantNodeIdentifyTask
 import os
 from predict_functions import my_round_fun,write_predicted_label_to_JSON_file
-from Miscellaneous import pickleRead
+from Miscellaneous import pickleRead,pickleWrite
 import glob
 from measurement_functions import read_measurement_from_JSON,get_analysis_for_predicted_labels
 from utils import get_statistic_data,get_recall_scatter,wrapped_generate_horn_graph,get_solvability_and_measurement_from_eldarica
-
+from horn_dataset import draw_training_results,write_train_results_to_log
+import numpy as np
+import tensorflow as tf
 def main():
+    random_seed(1)
     # description: set hyper-parameters
-    params = {"benchmark": "mixed-three-fold-single-example",
+    params = {"benchmark": "lia-lin-extract",#lia-lin-extract, mixed-three-fold-single-example
               "label": "template_relevance",
               "force_read": True,
               "file_type": ".smt2",
@@ -22,37 +25,44 @@ def main():
               "GPU": True,
               "train_quiet": False,
               "test_quiet": False,
-              "max_epochs": 10,
-              "patience": 10,
-              "max_nodes_per_batch": 1000,
+              "max_epochs": 1000,
+              "patience": 100,
+              "max_nodes_per_batch": 10000,
               "threshold": 0.5,
+              "verbose":True,
+              "use_class_weight":True,
               "gathered_nodes_binary_classification_task": ["predicate_occurrence_in_SCG",
                                                             "argument_lower_bound_existence",
                                                             "argument_upper_bound_existence",
                                                             "argument_occurrence_binary",
                                                             "template_relevance",
                                                             "clause_occurrence_in_counter_examples_binary"]}
-    hyper_parameters = {"nodeFeatureDim": 16, "num_layers": 2, "regression_hidden_layer_size": [16]}
+    hyper_parameters = {"nodeFeatureDim": 64, "num_layers": 32, "regression_hidden_layer_size": [64,64,64],"threshold": params["threshold"]}
 
     #description: generate horn graph if there is no horn graph file
     filtered_file_list,file_list_with_horn_graph,file_list = wrapped_generate_horn_graph(params["benchmark"], params["max_nodes_per_batch"], move_file=True,
                                                      thread_number=4)
 
     # description: train
-    trained_model_path, test_data, model, dataset = read_data_and_train(params, hyper_parameters)
+    trained_model_path, test_data, model, dataset,train_loss_list, valid_loss_list, best_valid_epoch = read_data_and_train(params, hyper_parameters)
 
     # description: predict with threshold
     predicted_Y = predict_test_set_model_from_memory(params, test_data, model)
-    # predicted_Y = predict_test_set_model_from_file(params, test_data, trained_model_path, dataset)
-    #this should be performed in the folder "benchmark-predict"
-    #predicted_Y=predict_unseen_set(params, trained_model_path, file_list=filtered_file_list, set_max_nodes_per_batch=True)
-    write_predicted_label_to_JSON_file(dataset, predicted_Y, "."+params["graph_type"]+".JSON", params["threshold"])
+    #predicted_Y = predict_test_set_model_from_file(params, test_data, trained_model_path, dataset)
+    #this should be performed in the folder "benchmark-unsolved"
+    #predicted_Y, dataset =predict_unseen_set(params, trained_model_path, file_list=filtered_file_list, set_max_nodes_per_batch=True)
+
+
+    write_predicted_label_to_JSON_file(dataset, predicted_Y, "."+params["graph_type"]+".JSON", params["threshold"],verbose=params["verbose"])
+
+
+    #description: draw train-predict diagrams
+    draw_train_predict_plots(params, dataset, test_data, predicted_Y, train_loss_list, valid_loss_list,best_valid_epoch, hyper_parameters)
 
     # description: get final measurement from Eldarica
-    get_solvability_and_measurement_from_eldarica(filtered_file_list, thread_number=4,continuous_extracting=True,move_file=True)
+    get_solvability_and_measurement_from_eldarica(filtered_file_list, thread_number=4,continuous_extracting=True,move_file=False)
 
-    # todo In solvable set
-        # todo: draw time consumption
+    # description: In solvable set, draw time consumption
 
     out_of_test_set = False
     # description: read solvability results
@@ -85,15 +95,73 @@ def main():
     # description: how many predicates used in end
     get_recall_scatter(solvability_name_fold, json_solvability_obj_list, filtered_file_list)
 
-    # todo: in unsovable set. perform separate grid search. use other folder
-        # todo:check solvability
+    #
+    # print("------------unsolvable data----------------")
+    #
+    # out_of_test_set = True
+    # params["max_nodes_per_batch"]=100000
+    #
+    # #description: generate horn graph if there is no horn graph file
+    # filtered_file_list,file_list_with_horn_graph,file_list = wrapped_generate_horn_graph(params["benchmark"]+"-unsolvable", params["max_nodes_per_batch"], move_file=True,
+    #                                                  thread_number=4)
+    # # description: predict with threshold
+    # predicted_Y,dataset=predict_unseen_set(params, trained_model_path, file_list=filtered_file_list, set_max_nodes_per_batch=True)
+    # write_predicted_label_to_JSON_file(dataset, predicted_Y, "." + params["graph_type"] + ".JSON", params["threshold"],verbose=params["verbose"])
+    #
+    # # description: get final measurement from Eldarica
+    # get_solvability_and_measurement_from_eldarica(filtered_file_list, thread_number=4, continuous_extracting=True,
+    #                                               move_file=True)
+    #
+    # # description: read solvability results
+    # json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
+    #
+    # three_fild_name = ["empty", "predicted", "full"]
+    # solvability_name_fold = (lambda: three_fild_name if out_of_test_set == True else three_fild_name + ["true"])()
+    # solvability_json_name_fold = ["solvability" + x + "InitialPredicates" for x in solvability_name_fold]
+    # for name_fold in solvability_json_name_fold:
+    #     solvability = [1 if s[name_fold] == "true" else 0 for s in json_solvability_obj_list]
+    #     print(name_fold, str(sum(solvability)) + "/" + str(len(json_solvability_obj_list)))
+    #
+    # # description: read measurement JSON file
+    # scatter_plot_range = [0, 120]
+    # json_obj_list = read_measurement_from_JSON(filtered_file_list)
+    #
+    # get_analysis_for_predicted_labels(json_obj_list, out_of_test_set=out_of_test_set, time_unit=1000,
+    #                                   scatter_plot_range=scatter_plot_range)
+    # print("solvable file by predicted label:" + str(len(json_obj_list)) + "/" + str(len(filtered_file_list)))
+    #
 
 
 
+def draw_train_predict_plots(params,dataset,test_data,predicted_Y,train_loss_list,valid_loss_list,best_valid_epoch,hyper_parameters):
+    true_Y = []
+    for data in iter(test_data):
+        # print(data[0]) #input
+        true_Y.extend(np.array(data[1]["node_labels"]))
 
+    error_loaded_model = (lambda: tf.keras.losses.MSE(true_Y, predicted_Y) \
+        if params["label"] not in params[
+        "gathered_nodes_binary_classification_task"] else tf.keras.losses.binary_crossentropy(true_Y, predicted_Y))()
 
+    print("\n error of loaded_model", error_loaded_model)
 
+    mean_loss = (lambda: tf.keras.losses.binary_crossentropy([np.mean(true_Y)] * len(true_Y),
+                                                             true_Y) if params["label"] not in params[
+        "gathered_nodes_binary_classification_task"] else tf.keras.losses.MSE(
+        [np.mean(true_Y)] * len(true_Y), true_Y))()
+    print("\n mean_loss_Y_and_True_Y", mean_loss)
+    num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, tf.math.round(predicted_Y)), tf.int32))
+    accuracy = num_correct / len(predicted_Y)
 
+    draw_training_results(train_loss_list, valid_loss_list,
+                          mean_loss,
+                          error_loaded_model, true_Y, predicted_Y, params["label"],
+                          params["benchmark"], params["graph_type"],
+                          params["gathered_nodes_binary_classification_task"], hyper_parameters)
+    write_train_results_to_log(dataset, predicted_Y, train_loss_list,
+                               valid_loss_list, error_loaded_model, mean_loss, accuracy,
+                               best_valid_epoch, hyper_parameters,
+                               benchmark=params["benchmark"], label=params["label"], graph_type=params["graph_type"])
 def read_data_and_train(params, hyper_parameters):
     # description: set parameters
     gathered_nodes_binary_classification_task = params["gathered_nodes_binary_classification_task"]
@@ -112,11 +180,17 @@ def read_data_and_train(params, hyper_parameters):
     parameters["threshold"] = params["threshold"]
     these_hypers: Dict[str, Any] = {
         "optimizer": "Adam",  # One of "SGD", "RMSProp", "Adam"
-        "learning_rate": 0.001,
+        "learning_rate": 0.001,#0.001
         "learning_rate_decay": 0.98,
         "momentum": 0.85,
         "gradient_clip_value": 1,  # 1
         "use_intermediate_gnn_results": False,
+        # "global_exchange_dropout_rate":0,
+        # "layer_input_dropout_rate": 0,
+        # "gnn_layer_input_dropout_rate": 0,
+        # "graph_aggregation_dropout_rate": 0,
+        # "regression_mlp_dropout": 0,
+        # "scoring_mlp_dropout_rate": 0,
     }
     parameters.update(these_hypers)
 
@@ -133,7 +207,7 @@ def read_data_and_train(params, hyper_parameters):
         form_GNN_inputs_and_labels(label=params["label"], datafold=["train", "valid", "test"],
                                    benchmark=params["benchmark"],
                                    graph_type=params["graph_type"],
-                                   gathered_nodes_binary_classification_task=gathered_nodes_binary_classification_task)
+                                   gathered_nodes_binary_classification_task=gathered_nodes_binary_classification_task,use_class_weight=params["use_class_weight"])
     else:
         print("Use label in pickle data for training")
 
@@ -141,8 +215,8 @@ def read_data_and_train(params, hyper_parameters):
         dataset._use_worker_threads = False  # solve Failed setting context: CUDA_ERROR_NOT_INITIALIZED: initialization error
     dataset.load_data([DataFold.TRAIN, DataFold.VALIDATION, DataFold.TEST])
     parameters["node_vocab_size"] = dataset._node_vocab_size
-    parameters["class_weight"] = dataset._class_weight["train"]
-    parameters["class_weight_fold"] = dataset._class_weight
+    #parameters["class_weight"] = dataset._class_weight["train"]
+    parameters["class_weight_fold"] = dataset._class_weight_fold
 
     # description:get model
     model = None
@@ -181,7 +255,10 @@ def read_data_and_train(params, hyper_parameters):
     print("trained_model_path", trained_model_path)
 
     test_data = dataset.get_tensorflow_dataset(DataFold.TEST)
-    return trained_model_path, test_data, model, dataset
+
+    pickleWrite(parameters, params["benchmark"] + "-" + params["label"] + "-parameters", "../src/trained_model/")
+
+    return trained_model_path, test_data, model, dataset,train_loss_list, valid_loss_list, best_valid_epoch
 
 
 def predict_test_set_model_from_memory(params, test_data, model):
@@ -194,8 +271,8 @@ def predict_test_set_model_from_file(params, test_data, trained_model_path, data
 
 
 def predict_unseen_set(params, trained_model_path, file_list=[], set_max_nodes_per_batch=True):
-    benchmark_fold = params["benchmark"] + "-" + "predict"
-    path = "../benchmarks/" + benchmark_fold + "/"
+
+    path = "../benchmarks/" + params["benchmark"] +"-unsolvable" + "/"
     benchmark_name = path[len("../benchmarks/"):-1]
     parameters = pickleRead(params["benchmark"] + "-" + params["label"] + "-parameters", "../src/trained_model/")
     parameters["benchmark"] = benchmark_name
@@ -215,19 +292,24 @@ def predict_unseen_set(params, trained_model_path, file_list=[], set_max_nodes_p
         form_GNN_inputs_and_labels(label=params["label"], datafold=["test"], benchmark=benchmark_name,
                                    graph_type=params["graph_type"],
                                    gathered_nodes_binary_classification_task=params[
-                                       "gathered_nodes_binary_classification_task"])
+                                       "gathered_nodes_binary_classification_task"],use_class_weight=False)
 
     dataset = HornGraphDataset(parameters)
     dataset.load_data([DataFold.TEST])
     test_data = dataset.get_tensorflow_dataset(DataFold.TEST)
     loaded_model = tf2_gnn.cli_utils.model_utils.load_model_for_prediction(trained_model_path, dataset)
-    return get_predicted_results(params, loaded_model, test_data)
+    return get_predicted_results(params, loaded_model, test_data),dataset
 
 
 def get_predicted_results(params, model, test_data):
     _, _, test_results = model.run_one_epoch(test_data, training=False, quiet=params["test_quiet"])
     test_metric, test_metric_string = model.compute_epoch_metrics(test_results)
     predicted_Y = model.predict(test_data)
+    print("predicted_Y-debug",predicted_Y)
+    predicted_Y = model.predict(test_data)
+    print("predicted_Y-debug", predicted_Y)
+    predicted_Y = model.predict(test_data)
+    print("predicted_Y-debug", predicted_Y)
     print_predicted_results(
         {"predicted_Y": predicted_Y, "test_metric_string": test_metric_string,
          "test_metric": test_metric})
@@ -239,5 +321,12 @@ def print_predicted_results(result_dic):
     print("test_metric_string", result_dic["test_metric_string"])
     print("test_metric", result_dic["test_metric"])
 
-
+def random_seed(seed):
+    import random
+    os.environ['PYTHONHASHSEED'] = str(seed) # Python general
+    np.random.seed(seed)
+    random.seed(seed) # Python random
+    tf.random.set_seed(seed)
+    os.environ['TF_DETERMINISTIC_OPS'] = '1'
+    os.environ['HOROVOD_FUSION_THRESHOLD'] = '1'
 main()

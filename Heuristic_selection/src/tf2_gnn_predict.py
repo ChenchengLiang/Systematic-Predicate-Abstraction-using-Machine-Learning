@@ -41,6 +41,6 @@ def main():
             result_dir=wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label,force_read,form_label,
                                           json_type,graph_type,gathered_nodes_binary_classification_task,hyper_parameter,True)
 
-            write_predicted_label_to_JSON_file(result_dir["dataset"], result_dir["predicted_Y_loaded_model"],json_type,result_dir["best_threshold"])
+            write_predicted_label_to_JSON_file(result_dir["dataset"], result_dir["predicted_Y_loaded_model"],json_type,result_dir["best_threshold"],verbose=True)
 
 main()
