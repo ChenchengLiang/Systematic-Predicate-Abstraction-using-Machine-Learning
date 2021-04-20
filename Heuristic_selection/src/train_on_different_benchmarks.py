@@ -29,7 +29,7 @@ def main():
     file_type = ".smt2"
     GPU=True
     pickle = True
-    benchmark_name = "extracted-three-fold-lin+nonlin-interval-finished/"
+    benchmark_name = "single-layer-graph-example/"
 
     # random.seed(0)
     # np.random.seed(0)
@@ -37,10 +37,10 @@ def main():
 
     hyper_parameters={"nodeFeatureDim":64,"num_layers":16,"regression_hidden_layer_size":[64],"threshold":0.5,"max_nodes_per_batch":1000}
     for label in label_list:
-        parameter_list.append(
-            parameters(relative_path="../benchmarks/"+benchmark_name,
-                       absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
-                       json_type=".hyperEdgeHornGraph.JSON", label=label))
+        # parameter_list.append(
+        #     parameters(relative_path="../benchmarks/"+benchmark_name,
+        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
+        #                json_type=".hyperEdgeHornGraph.JSON", label=label))
         # parameter_list.append(
         #     parameters(relative_path="../benchmarks/" + benchmark_name,
         #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
@@ -49,10 +49,10 @@ def main():
         #     parameters(relative_path="../benchmarks/" + benchmark_name,
         #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
         #                json_type=".concretized-hyperedgeGraph.JSON", label=label))
-        # parameter_list.append(
-        #     parameters(relative_path="../benchmarks/" + benchmark_name,
-        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
-        #                json_type=".mono-layerHornGraph.JSON", label=label))
+        parameter_list.append(
+            parameters(relative_path="../benchmarks/" + benchmark_name,
+                       absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+                       json_type=".mono-layerHornGraph.JSON", label=label))
         # parameter_list.append(
         #     parameters(relative_path="../benchmarks/"+benchmark_name,
         #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,

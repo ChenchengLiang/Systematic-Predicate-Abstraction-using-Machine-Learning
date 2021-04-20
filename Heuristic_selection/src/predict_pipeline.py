@@ -13,10 +13,10 @@ import sys
 
 def main():
     # description: parameter settings
-    benchmark = "lia-lin-extract"#sys.argv[1]
+    benchmark = "lia-lin-extract-only-initial-predicates"#sys.argv[1]
     #benchmark_fold = benchmark + "-" + "test"
     #benchmark_fold = benchmark + "-" + "predict"
-    benchmark_fold = benchmark + "-" + "unsolved-fullLabel"#sys.argv[2]
+    benchmark_fold = benchmark + "-" + "unsolved-emptyLabel"#sys.argv[2]
     #benchmark_fold = benchmark + "-" + "predict-5"
     #benchmark_fold = benchmark + "-" + "single-example"
     max_nodes_per_batch = 10000
@@ -37,7 +37,8 @@ def main():
 
 
     # description: get solvability and measurement info with different predicate setting for unseen data
-    #get_solvability_and_measurement_from_eldarica(filtered_file_list, thread_number, continuous_extracting=continuous_extracting,move_file=move_file,checkSolvability="-checkSolvability",measurePredictedPredicates=" ")
+    # get_solvability_and_measurement_from_eldarica(filtered_file_list, thread_number, continuous_extracting=continuous_extracting,move_file=move_file,
+    #                                               checkSolvability="-checkSolvability",measurePredictedPredicates=" ",onlyInitialPredicates="")
 
     # description: read solvability results
     json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
@@ -56,9 +57,15 @@ def main():
     difference_betw_predicted_full=mutual_differences(solvable_file_list["solvabilitypredictedInitialPredicates"],solvable_file_list["solvabilityfullInitialPredicates"])
     difference_betw_predicted_empty = mutual_differences(solvable_file_list["solvabilitypredictedInitialPredicates"],solvable_file_list["solvabilityemptyInitialPredicates"])
     difference_betw_full_empty = mutual_differences(solvable_file_list["solvabilityfullInitialPredicates"],solvable_file_list["solvabilityemptyInitialPredicates"])
-    print("difference_betw_predicted_full",len(difference_betw_predicted_full))
+    common_betw_predicted_full=set(solvable_file_list["solvabilitypredictedInitialPredicates"]).intersection(set(solvable_file_list["solvabilityfullInitialPredicates"]))
+    common_betw_predicted_empty = set(solvable_file_list["solvabilitypredictedInitialPredicates"]).intersection(set(solvable_file_list["solvabilityemptyInitialPredicates"]))
+    common_betw_full_empty = set(solvable_file_list["solvabilityfullInitialPredicates"]).intersection(set(solvable_file_list["solvabilityemptyInitialPredicates"]))
+    print("difference_betw_predicted_full", len(difference_betw_predicted_full))
     print("difference_betw_predicted_empty", len(difference_betw_predicted_empty))
     print("difference_betw_full_empty", len(difference_betw_full_empty))
+    print("common_betw_predicted_empty", len(common_betw_predicted_empty))
+    print("common_betw_predicted_full", len(common_betw_predicted_full))
+    print("common_betw_full_empty", len(common_betw_full_empty))
 
 
     # description: read measurement JSON file

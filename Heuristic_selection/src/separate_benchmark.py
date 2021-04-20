@@ -34,7 +34,7 @@ def main():
         benchmark_name = os.path.join("../benchmarks/", command_input)
         thread_number = 8  # 16
         timeout = 300
-        eldarica_parameters = " -moveFile -abstract -noIntervals -onlyInitialPredicates"#-onlyInitialPredicates
+        eldarica_parameters = " -moveFile -abstract -noIntervals -onlyInitialPredicates -generateSimplePredicates"#-onlyInitialPredicates
         # todo: use generateSimplePredicates =  full label
         #todo: not use generateSimplePredicates =  empty label
         #todo: with or without -abstract

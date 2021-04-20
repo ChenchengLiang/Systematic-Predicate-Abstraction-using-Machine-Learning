@@ -11,9 +11,9 @@ import seaborn
 import sklearn
 from sklearn.metrics import confusion_matrix
 
-def get_solvability_and_measurement_from_eldarica(filtered_file_list,thread_number,continuous_extracting=True,move_file=True,checkSolvability="-checkSolvability",measurePredictedPredicates="-measurePredictedPredicates"):
+def get_solvability_and_measurement_from_eldarica(filtered_file_list,thread_number,continuous_extracting=True,move_file=True,checkSolvability="-checkSolvability",measurePredictedPredicates="-measurePredictedPredicates",onlyInitialPredicates=""):
     timeout = 3600  # -measurePredictedPredicates -varyGeneratedPredicates
-    check_solvability_parameter_list = " "+checkSolvability+" "+measurePredictedPredicates+"  -abstract -noIntervals -solvabilityTimeout:300 -mainTimeout:1200"
+    check_solvability_parameter_list = " "+checkSolvability+" "+measurePredictedPredicates+ " "+ onlyInitialPredicates +"  -abstract -noIntervals -solvabilityTimeout:300 -mainTimeout:1200"
     file_list_with_parameters = (lambda: [
         [file, check_solvability_parameter_list, timeout, move_file] if not os.path.exists(
             file + ".solvability.JSON") else [] for
