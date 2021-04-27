@@ -299,3 +299,4 @@ def mutual_differences(set_1,set_2):
     set_1=set(set_1)
     set_2=set(set_2)
     return set_1.difference(set_2).union(set_2.difference(set_1))
+

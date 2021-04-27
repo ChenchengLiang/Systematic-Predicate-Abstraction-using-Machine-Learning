@@ -16,7 +16,7 @@ def main():
     benchmark = "lia-lin-extract-only-initial-predicates"#sys.argv[1]
     #benchmark_fold = benchmark + "-" + "test"
     #benchmark_fold = benchmark + "-" + "predict"
-    benchmark_fold = benchmark + "-" + "unsolved-emptyLabel"#sys.argv[2]
+    benchmark_fold = benchmark + "-" + "unsolved-fullLabel"#sys.argv[2]
     #benchmark_fold = benchmark + "-" + "predict-5"
     #benchmark_fold = benchmark + "-" + "single-example"
     max_nodes_per_batch = 10000
@@ -33,12 +33,12 @@ def main():
 
 
     # description: predict label
-    #predict_label(benchmark, max_nodes_per_batch, benchmark_fold, filtered_file_list,trained_model_path,use_test_threshold)#file_list
+    predict_label(benchmark, max_nodes_per_batch, benchmark_fold, filtered_file_list,trained_model_path,use_test_threshold)#file_list
 
 
     # description: get solvability and measurement info with different predicate setting for unseen data
-    # get_solvability_and_measurement_from_eldarica(filtered_file_list, thread_number, continuous_extracting=continuous_extracting,move_file=move_file,
-    #                                               checkSolvability="-checkSolvability",measurePredictedPredicates=" ",onlyInitialPredicates="")
+    get_solvability_and_measurement_from_eldarica(filtered_file_list, thread_number, continuous_extracting=continuous_extracting,move_file=move_file,
+                                                   checkSolvability="-checkSolvability",measurePredictedPredicates=" ",onlyInitialPredicates="")
 
     # description: read solvability results
     json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")

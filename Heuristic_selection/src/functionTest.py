@@ -66,6 +66,9 @@ def mnist_example():
         tf.keras.layers.Dense(10)
     ])
 
+    x_train=x_train[0:1]
+    y_train=y_train[0:1]
+
     predictions = model(x_train[:1]).numpy()
     predictions
     tf.nn.softmax(predictions).numpy()
@@ -75,7 +78,7 @@ def mnist_example():
                   loss=loss_fn,
                   metrics=['accuracy'])
 
-    model.fit(x_train, y_train, epochs=5)
+    history=model.fit(x_train, y_train, epochs=500,validation_data=(x_train, y_train))
 
     model.evaluate(x_test, y_test, verbose=2)
     probability_model = tf.keras.Sequential([
@@ -83,6 +86,13 @@ def mnist_example():
         tf.keras.layers.Softmax()
     ])
     probability_model(x_test[:5])
+    ce=model.evaluate(x_train,y_train)
+    print("ce",ce)
+    plt.plot([ce[0]]*len(history.history["loss"]),color="black")
+    plt.plot(history.history["loss"],color="blue")
+    plt.plot(history.history["val_loss"],color="green")
+    plt.yscale('log')
+    plt.show()
 
 def convert_constant_to_category(constant_string):
     converted_string=constant_string
@@ -134,14 +144,23 @@ def get_weighted_binary_crossentropy(weight_class,true_y,predicted_y):
         #     ce = ce + tf.keras.losses.binary_crossentropy([y], [p],from_logits=False) * weight_class["weight_for_0"]
     return ce / len(true_y), ce_raw/len(true_y)
 def main():
-    from utils import wrapped_generate_horn_graph
-    move_file = True
-    max_nodes_per_batch=10000
-    thread_number=4
-    filtered_file_list, file_list_with_horn_graph, file_list = wrapped_generate_horn_graph(os.path.join("../benchmarks/",sys.argv[1]),
-                                                                                           max_nodes_per_batch,
-                                                                                           move_file=move_file,
-                                                                                           thread_number=thread_number)
+    mnist_example()
+    # from horn_dataset import logit
+    # y=tf.constant([0],tf.float32)
+    # y_hat=tf.constant([0],tf.float32)
+    # logit_y_hat=tf.constant([logit(0)],tf.float32)
+    # weight=tf.constant([1],tf.float32)
+    # print("ce",tf.keras.losses.binary_crossentropy(y,logit_y_hat,from_logits=False))
+    # print("weighted_ce", tf.nn.weighted_cross_entropy_with_logits(y, logit_y_hat,weight))
+    #
+    # from utils import wrapped_generate_horn_graph
+    # move_file = True
+    # max_nodes_per_batch=10000
+    # thread_number=4
+    # filtered_file_list, file_list_with_horn_graph, file_list = wrapped_generate_horn_graph(os.path.join("../benchmarks/",sys.argv[1]),
+    #                                                                                        max_nodes_per_batch,
+    #                                                                                        move_file=move_file,
+    #                                                                                        thread_number=thread_number)
     # from pandas import DataFrame
     # from pandas import concat
     # from keras.models import Sequential

@@ -404,7 +404,6 @@ class InnerHornWrapper(unsimplifiedClauses : Seq[Clause],
       sys.exit()
     }
 
-
     Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".unlabeledPredicates.tpl")) {
       AbsReader.printHints(initialPredicates)}
     val clauseCollection = new ClauseInfo(simplifiedClausesForGraph,Seq())
@@ -427,7 +426,10 @@ class InnerHornWrapper(unsimplifiedClauses : Seq[Clause],
     HintsSelection.writeSMTFormatToFile(for (c<-simplifiedClausesForGraph) yield DrawHyperEdgeHornGraph.replaceIntersectArgumentInBody(c),GlobalParameters.get.fileName+"-simplified")
   }
   if (GlobalParameters.get.checkSolvability == true) {
+    println("ap.CmdlMain.version",ap.CmdlMain.version)
+
     //read from unlabeled .tpl file
+    val debugX=HintsSelection.wrappedReadHints(simplifiedClausesForGraph,"unlabeledPredicates")
     val simpleGeneratedInitialPredicates=HintsSelection.transformPredicateMapToVerificationHints(HintsSelection.wrappedReadHints(simplifiedClausesForGraph,"unlabeledPredicates").toInitialPredicates.mapValues(_.map(sp(_)).filterNot(_.isTrue).filterNot(_.isFalse)))
     //simpleGeneratedInitialPredicates.pretyPrintHints()
     //generate by simple generator
@@ -439,7 +441,6 @@ class InnerHornWrapper(unsimplifiedClauses : Seq[Clause],
     val truePredicates = if ((new java.io.File(GlobalParameters.get.fileName + "." + "labeledPredicates" + ".tpl")).exists == true)
       HintsSelection.wrappedReadHints(simplifiedClausesForGraph,"labeledPredicates") else emptyInitialPredicates
       //VerificationHints(HintsSelection.wrappedReadHints(simplifiedClausesForGraph,"labeledPredicates").toInitialPredicates.mapValues(_.map(sp(_)).map(VerificationHints.VerifHintInitPred(_))))
-
     val counterexampleMethod =HintsSelection.getCounterexampleMethod(disjunctive)
     val dataFold=Map("emptyInitialPredicates"->emptyInitialPredicates,
       "predictedInitialPredicates"->predictedPredicates,

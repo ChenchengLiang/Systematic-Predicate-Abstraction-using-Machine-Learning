@@ -187,6 +187,7 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="templa
     _, _, test_results = loaded_model.run_one_epoch(test_data, training=False, quiet=quiet)
     test_metric, test_metric_string = loaded_model.compute_epoch_metrics(test_results)
     predicted_Y_loaded_model = loaded_model.predict(test_data)
+    #predicted_Y_loaded_model=tf.math.sigmoid(predicted_Y_loaded_model)
 
     print("test_metric_string", test_metric_string)
     print("test_metric", test_metric)

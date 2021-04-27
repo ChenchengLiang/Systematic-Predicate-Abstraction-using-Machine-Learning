@@ -46,8 +46,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters["label_type"]=label
     parameters ["gathered_nodes_binary_classification_task"]=gathered_nodes_binary_classification_task
     parameters["threshold"]=hyper_parameters["threshold"]
-    max_epochs = 1
-    patience = 1
+    max_epochs = 1000
+    patience = 100
     use_class_weight=False
     # parameters["add_self_loop_edges"]=False
     # parameters["tie_fwd_bkwd_edges"]=True
@@ -143,6 +143,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         _, _, test_results = model.run_one_epoch(test_data, training=False, quiet=quiet)
         test_metric, test_metric_string = model.compute_epoch_metrics(test_results)
         predicted_Y_loaded_model_from_memory = model.predict(test_data)
+        #predicted_Y_loaded_model_from_memory=tf.math.sigmoid(predicted_Y_loaded_model_from_memory)
         print("test_metric_string model from memory", test_metric_string)
         print("test_metric model from memory", test_metric)
         print("predicted_Y_loaded_model_from_memory",tf.math.round(predicted_Y_loaded_model_from_memory))
@@ -151,6 +152,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         _, _, test_results = loaded_model.run_one_epoch(test_data, training=False, quiet=quiet)
         test_metric, test_metric_string = loaded_model.compute_epoch_metrics(test_results)
         predicted_Y_loaded_model = loaded_model.predict(test_data)
+        #predicted_Y_loaded_model=tf.math.sigmoid(predicted_Y_loaded_model)
         print("predicted_Y_loaded_model",tf.math.round(predicted_Y_loaded_model))
 
         print("test_metric_string",test_metric_string)
@@ -161,15 +163,17 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             #print(data[0]) #input
             true_Y.extend(np.array(data[1]["node_labels"]))
 
+        class_weight={"weight_for_1":parameters["class_weight_fold"] ["train"]["weight_for_1"]/parameters["class_weight_fold"] ["train"]["weight_for_0"],"weight_for_0":1}
+        from_logits=False
         error_loaded_model = (lambda : tf.keras.losses.MSE(true_Y, predicted_Y_loaded_model) \
-            if label not in gathered_nodes_binary_classification_task else tf.keras.losses.binary_crossentropy(true_Y, predicted_Y_loaded_model))()
+            if label not in gathered_nodes_binary_classification_task else get_test_loss_with_class_weight(class_weight,predicted_Y_loaded_model,true_Y,from_logits=from_logits))()
         print("\n error of loaded_model", error_loaded_model)
 
         #print("true_Y", true_Y)
         #print("predicted_Y_loaded_model_from_memory", predicted_Y_loaded_model_from_memory)
         #print("predicted_Y_loaded_model", predicted_Y_loaded_model)
 
-        mean_loss = (lambda : tf.keras.losses.binary_crossentropy([np.mean(true_Y)]*len(true_Y), true_Y) if label in gathered_nodes_binary_classification_task else tf.keras.losses.MSE([np.mean(true_Y)]*len(true_Y), true_Y))()
+        mean_loss = (lambda : get_test_loss_with_class_weight(class_weight,[np.mean(true_Y)]*len(true_Y), true_Y,from_logits=from_logits) if label in gathered_nodes_binary_classification_task else tf.keras.losses.MSE([np.mean(true_Y)]*len(true_Y), true_Y))()
         print("\n mean_loss_Y_and_True_Y", mean_loss)
         mean_loss_list=mean_loss
         num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, tf.math.round(predicted_Y_loaded_model)),tf.int32))
@@ -233,9 +237,12 @@ def draw_training_results(train_loss_list_average, valid_loss_list_average,
     plt.plot([mean_loss_list_average] * len(train_loss_list_average), color="red")
     plt.plot([mse_loaded_model_average] * len(train_loss_list_average), color="black")
     y_range=[0,max(max(train_loss_list_average),max(valid_loss_list_average))]
-    grid=max(np.round(y_range,1))/10
-    plt.ylim(y_range)
-    plt.yticks(np.arange(min(y_range), max(y_range), grid))
+    upper_bound=1#max(y_range)
+    grid=upper_bound/10
+    plt.ylim([min(y_range), upper_bound])
+    plt.yticks(np.arange(min(y_range), upper_bound, grid))
+    #plt.yscale('log')
+    #plt.ylim(bottom=0, top=15)
     plt.ylabel('loss')
     plt.xlabel('epochs')
     train_loss_legend = mpatches.Patch(color='blue', label='train_loss')
@@ -472,13 +479,13 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                     if json_type==".hyperEdgeHornGraph.JSON" or json_type==".equivalent-hyperedgeGraph.JSON" or json_type==".concretized-hyperedgeGraph.JSON": #read adjacency_lists
                         #for hyperedge horn graph
                         graphs_adjacency_lists.append([
-                            np.array(loaded_graph["argumentEdges"]),
-                            np.array(loaded_graph["guardASTEdges"]),
-                            np.array(loaded_graph["dataFlowASTEdges"]),
+                            #np.array(loaded_graph["argumentEdges"]),
+                            #np.array(loaded_graph["guardASTEdges"]),
+                            #np.array(loaded_graph["dataFlowASTEdges"]),
                             np.array(loaded_graph["binaryAdjacentList"]),
-                            np.array(loaded_graph["controlFlowHyperEdges"]),
-                            np.array(loaded_graph["dataFlowHyperEdges"]),
-                            np.array(loaded_graph["ternaryAdjacencyList"])
+                            #np.array(loaded_graph["controlFlowHyperEdges"]),
+                            #np.array(loaded_graph["dataFlowHyperEdges"]),
+                            #np.array(loaded_graph["ternaryAdjacencyList"])
                         ])
                     else:
                         #for layer horn graph
@@ -971,3 +978,25 @@ def get_class_weight(pos, neg, total):
     weight_for_0 = (1 / neg) * (total) / 2
     weight_for_1 = (1 / pos) * (total) / 2
     return weight_for_0,weight_for_1
+
+def get_test_loss_with_class_weight(class_weight,task_output,labels,from_logits=True):
+    #predicted_y = (lambda: task_output if from_logits == False else [logit(x) for x in task_output])()
+    #predicted_y=task_output
+    predicted_y=[logit(x) for x in task_output]
+    # description: implemented by exaggerating inputs
+    # weighted_prediction = [y_hat * class_weight["weight_for_1"] if y == 1 else y_hat for y, y_hat in zip(labels, predicted_y)]
+    # return tf.reduce_mean(tf.keras.losses.binary_crossentropy(labels,weighted_prediction,from_logits=from_logits))
+    # description: implemented by weighted_cross_entropy_with_logits
+    #print("class_weight",class_weight["weight_for_1"],class_weight["weight_for_0"])
+    return tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(labels,predicted_y,class_weight["weight_for_1"]))
+    # description: implemented by conditions
+    # ce = []
+    # for y, y_hat in zip(labels, predicted_y):
+    #     if y == 1:
+    #         ce.append(tf.keras.losses.binary_crossentropy([y], [y_hat], from_logits=from_logits) * class_weight[
+    #             "weight_for_1"])
+    #     elif y == 0:
+    #         ce.append(tf.keras.losses.binary_crossentropy([y], [y_hat], from_logits=from_logits))
+    # return tf.reduce_mean(ce)
+def logit(p):
+    return tf.math.log(p/(1-p))

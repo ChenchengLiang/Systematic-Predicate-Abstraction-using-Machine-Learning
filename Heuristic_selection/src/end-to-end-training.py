@@ -1,3 +1,4 @@
+import sys
 from typing import Dict, Any
 import tf2_gnn
 from tf2_gnn.data import DataFold, HornGraphSample, HornGraphDataset
@@ -10,13 +11,15 @@ from Miscellaneous import pickleRead,pickleWrite
 import glob
 from measurement_functions import read_measurement_from_JSON,get_analysis_for_predicted_labels
 from utils import get_statistic_data,get_recall_scatter,wrapped_generate_horn_graph,get_solvability_and_measurement_from_eldarica
-from horn_dataset import draw_training_results,write_train_results_to_log
+from horn_dataset import draw_training_results,write_train_results_to_log,get_test_loss_with_class_weight,logit
 import numpy as np
 import tensorflow as tf
+from tensorflow.keras import mixed_precision
 def main():
     random_seed(1)
+    tf.keras.backend.clear_session()
     # description: set hyper-parameters
-    params = {"benchmark": "lia-lin-extract",#lia-lin-extract, mixed-three-fold-single-example
+    params = {"benchmark": "mixed-three-fold-single-example",#lia-lin-extract, mixed-three-fold-single-example
               "label": "template_relevance",
               "force_read": True,
               "file_type": ".smt2",
@@ -25,19 +28,19 @@ def main():
               "GPU": True,
               "train_quiet": False,
               "test_quiet": False,
-              "max_epochs": 1000,
-              "patience": 100,
+              "max_epochs": 500,
+              "patience": 500,
               "max_nodes_per_batch": 10000,
               "threshold": 0.5,
               "verbose":True,
-              "use_class_weight":True,
+              "use_class_weight":False,
               "gathered_nodes_binary_classification_task": ["predicate_occurrence_in_SCG",
                                                             "argument_lower_bound_existence",
                                                             "argument_upper_bound_existence",
                                                             "argument_occurrence_binary",
                                                             "template_relevance",
                                                             "clause_occurrence_in_counter_examples_binary"]}
-    hyper_parameters = {"nodeFeatureDim": 64, "num_layers": 32, "regression_hidden_layer_size": [64,64,64],"threshold": params["threshold"]}
+    hyper_parameters = {"nodeFeatureDim": 32, "num_layers": 2, "regression_hidden_layer_size": [32],"threshold": params["threshold"]}
 
     #description: generate horn graph if there is no horn graph file
     filtered_file_list,file_list_with_horn_graph,file_list = wrapped_generate_horn_graph(params["benchmark"], params["max_nodes_per_batch"], move_file=True,
@@ -48,8 +51,10 @@ def main():
 
     # description: predict with threshold
     predicted_Y = predict_test_set_model_from_memory(params, test_data, model)
+    #print("from file")
     #predicted_Y = predict_test_set_model_from_file(params, test_data, trained_model_path, dataset)
     #this should be performed in the folder "benchmark-unsolved"
+    #trained_model_path = "trained_model/R-GCN_template_relevance__2021-04-23_20-47-42_best.pkl"
     #predicted_Y, dataset =predict_unseen_set(params, trained_model_path, file_list=filtered_file_list, set_max_nodes_per_batch=True)
 
 
@@ -139,14 +144,16 @@ def draw_train_predict_plots(params,dataset,test_data,predicted_Y,train_loss_lis
         # print(data[0]) #input
         true_Y.extend(np.array(data[1]["node_labels"]))
 
+    parameters = pickleRead(params["benchmark"] + "-" + params["label"] + "-parameters", "../src/trained_model/")
+    class_weight = {"weight_for_1": parameters["class_weight_fold"]["train"]["weight_for_1"] /
+                                    parameters["class_weight_fold"]["train"]["weight_for_0"], "weight_for_0": 1}
+    from_logits=False
     error_loaded_model = (lambda: tf.keras.losses.MSE(true_Y, predicted_Y) \
-        if params["label"] not in params[
-        "gathered_nodes_binary_classification_task"] else tf.keras.losses.binary_crossentropy(true_Y, predicted_Y))()
-
+        if params["label"] not in params["gathered_nodes_binary_classification_task"] else
+    get_test_loss_with_class_weight(class_weight,predicted_Y,true_Y,from_logits=from_logits))()
     print("\n error of loaded_model", error_loaded_model)
 
-    mean_loss = (lambda: tf.keras.losses.binary_crossentropy([np.mean(true_Y)] * len(true_Y),
-                                                             true_Y) if params["label"] not in params[
+    mean_loss = (lambda: get_test_loss_with_class_weight(class_weight,[np.mean(true_Y)] * len(true_Y),true_Y,from_logits=from_logits)if params["label"] not in params[
         "gathered_nodes_binary_classification_task"] else tf.keras.losses.MSE(
         [np.mean(true_Y)] * len(true_Y), true_Y))()
     print("\n mean_loss_Y_and_True_Y", mean_loss)
@@ -167,10 +174,13 @@ def read_data_and_train(params, hyper_parameters):
     gathered_nodes_binary_classification_task = params["gathered_nodes_binary_classification_task"]
     nodeFeatureDim = hyper_parameters["nodeFeatureDim"]
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
+    parameters["dense_every_num_layers"]=2
+    #parameters["residual_every_num_layers"]=1
     print("graph_type", params["graph_type"])
     parameters['graph_type'] = params["graph_type"]  # hyperEdgeHornGraph or layerHornGraph
     parameters['hidden_dim'] = nodeFeatureDim  # 64
     parameters['num_layers'] = hyper_parameters["num_layers"]
+    #parameters["residual_every_num_layers"] = 10000000
     parameters['node_label_embedding_size'] = nodeFeatureDim
     parameters['max_nodes_per_batch'] = params["max_nodes_per_batch"]
     parameters['regression_hidden_layer_size'] = hyper_parameters["regression_hidden_layer_size"]
@@ -181,7 +191,7 @@ def read_data_and_train(params, hyper_parameters):
     these_hypers: Dict[str, Any] = {
         "optimizer": "Adam",  # One of "SGD", "RMSProp", "Adam"
         "learning_rate": 0.001,#0.001
-        "learning_rate_decay": 0.98,
+        "learning_rate_decay": 0.98,#0.98
         "momentum": 0.85,
         "gradient_clip_value": 1,  # 1
         "use_intermediate_gnn_results": False,
@@ -305,14 +315,14 @@ def get_predicted_results(params, model, test_data):
     _, _, test_results = model.run_one_epoch(test_data, training=False, quiet=params["test_quiet"])
     test_metric, test_metric_string = model.compute_epoch_metrics(test_results)
     predicted_Y = model.predict(test_data)
-    print("predicted_Y-debug",predicted_Y)
-    predicted_Y = model.predict(test_data)
-    print("predicted_Y-debug", predicted_Y)
-    predicted_Y = model.predict(test_data)
-    print("predicted_Y-debug", predicted_Y)
+    #predicted_Y=tf.math.sigmoid(predicted_Y)
+    # print("predicted_Y-debug",predicted_Y)
+    # predicted_Y = model.predict(test_data)
+    # print("predicted_Y-debug", predicted_Y)
+    # predicted_Y = model.predict(test_data)
+    # print("predicted_Y-debug", predicted_Y)
     print_predicted_results(
-        {"predicted_Y": predicted_Y, "test_metric_string": test_metric_string,
-         "test_metric": test_metric})
+        {"predicted_Y": predicted_Y, "test_metric_string": test_metric_string,"test_metric": test_metric})
     return predicted_Y
 
 
@@ -327,6 +337,6 @@ def random_seed(seed):
     np.random.seed(seed)
     random.seed(seed) # Python random
     tf.random.set_seed(seed)
-    os.environ['TF_DETERMINISTIC_OPS'] = '1'
-    os.environ['HOROVOD_FUSION_THRESHOLD'] = '1'
+    os.environ['TF_DETERMINISTIC_OPS'] = "1"
+    os.environ['HOROVOD_FUSION_THRESHOLD'] = '0'
 main()

@@ -628,30 +628,41 @@ object HintsSelection {
 //    }).groupBy(_._1).mapValues(_.flatMap(_._2).distinct)
 
     //generate predicates from constraint
+
     val constraintPredicatesTemp= (for (clause<-simplePredicatesGeneratorClauses;atom<-clause.allAtoms) yield {
       //println(Console.BLUE + clause.toPrologString)
       val subst=(for(const<-clause.constants;(arg,n)<-atom.args.zipWithIndex; if const.name==arg.toString) yield const->IVariable(n)).toMap
       val argumentReplacedPredicates= ConstantSubstVisitor(clause.constraint,subst)
       val constants=SymbolCollector.constants(argumentReplacedPredicates)
       val freeVariableReplacedPredicates= {
-        val simplifiedPredicates =
-          if(constants.isEmpty)
-            sp(argumentReplacedPredicates)
-          else
-            sp(IExpression.quanConsts(Quantifier.EX,constants,argumentReplacedPredicates))
+        /*todo:debug on quantifiers on constants
+        run ../predicted_arguments/chc-lia-lin-0015_000.smt2 -abstract -noIntervals -generateSimplePredicates  -getHornGraph:hyperEdgeGraph
+        run ../predicted_arguments/chc-lia-lin-0015_000.smt2 -abstract -noIntervals -checkSolvability -onlyInitialPredicates
+        */
+        println("argumentReplacedPredicates",argumentReplacedPredicates)
+        println("constants",constants)
+        val simplifiedPredicates = {
+          if(constants.isEmpty) {
+            (argumentReplacedPredicates)
+          } else {
+            spAPI.simplify(IExpression.quanConsts(Quantifier.EX,constants,argumentReplacedPredicates))
+          }
+        }
+        println("simplifiedPredicates",simplifiedPredicates)
+
         if(clause.body.map(_.toString).contains(atom.toString)) {
           (for (p<-LineariseVisitor(sp(simplifiedPredicates.unary_!),IBinJunctor.And)) yield p) ++ (for (p<-LineariseVisitor(simplifiedPredicates,IBinJunctor.And)) yield sp(p.unary_!))
-        } else
+        } else {
           LineariseVisitor(simplifiedPredicates,IBinJunctor.And)
+        }
       }
-      atom.pred-> freeVariableReplacedPredicates.map(sp(_)).filter(!_.isTrue).filter(!_.isFalse)//map(spAPI.simplify(_)) //get rid of true and false
+      atom.pred-> freeVariableReplacedPredicates.filter(!_.isTrue).filter(!_.isFalse)//map(spAPI.simplify(_)) //get rid of true and false
     }).groupBy(_._1).mapValues(_.flatMap(_._2).distinct).filterKeys(_.arity!=0)//.mapValues(distinctByLogic(_))
     val constraintPredicates=
       if(GlobalParameters.get.varyGeneratedPredicates==true)
         HintsSelection.varyPredicates(constraintPredicatesTemp)
       else
         constraintPredicatesTemp
-
     //generate predicates from clause's integer constants
 //    val integerConstantVisitor = new LiteralCollector
 //    val argumentConstantEqualPredicate = (
@@ -682,7 +693,7 @@ object HintsSelection {
 
     //merge constraint and constant predicates
     //val simplelyGeneratedPredicates = mergePredicateMaps(constraintPredicates,argumentConstantEqualPredicate).mapValues(_.map(sp(_)).filter(!_.isTrue).filter(!_.isFalse))
-    val simplelyGeneratedPredicates = mergePredicateMaps(constraintPredicates,pairWiseVariablePredicates).mapValues(_.map(sp(_)).filter(!_.isTrue).filter(!_.isFalse)).mapValues(distinctByString(_))//.mapValues(distinctByLogic(_))
+    val simplelyGeneratedPredicates = mergePredicateMaps(constraintPredicates,pairWiseVariablePredicates).mapValues(_.map(sp(_)).map(spAPI.simplify(_)).filter(!_.isTrue).filter(!_.isFalse)).mapValues(distinctByString(_))//.mapValues(distinctByLogic(_))
     if (verbose==true){
       println("--------predicates from constrains---------")
       for((k,v)<-constraintPredicates;p<-v) println(k,p)
