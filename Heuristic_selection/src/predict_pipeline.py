@@ -22,7 +22,7 @@ def main():
     max_nodes_per_batch = 10000
 
     #/home/cheli243/PycharmProjects/HintsLearning/src/
-    trained_model_path="trained_model/R-GCN_template_relevance__2021-04-18_22-21-17_best.pkl"
+    trained_model_path="trained_model/R-GCN_template_relevance__2021-05-02_16-39-22_best.pkl"
     thread_number = 6
     continuous_extracting=True
     move_file = True

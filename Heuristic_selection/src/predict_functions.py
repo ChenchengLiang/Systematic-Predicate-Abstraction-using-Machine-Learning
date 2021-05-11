@@ -83,7 +83,7 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
 
         old_field = ["nodeIds", "nodeSymbolList", "falseIndices", "argumentIndices", "controlLocationIndices",
                      "binaryAdjacentList", "ternaryAdjacencyList", "unknownEdges", "argumentIDList", "argumentNameList",
-                     "argumentEdges", "guardASTEdges", "dataFlowASTEdges", "controlFlowHyperEdges",
+                     "argumentEdges", "guardASTEdges", "dataFlowASTEdges","ASTEdges","AST_1Edges","AST_2Edges", "controlFlowHyperEdges",
                      "dataFlowHyperEdges",
                      "argumentOccurrence", "predicateIndices", "predicateOccurrenceInClause",
                      "predicateStrongConnectedComponent",

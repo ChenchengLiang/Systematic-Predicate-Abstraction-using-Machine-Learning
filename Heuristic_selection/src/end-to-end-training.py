@@ -7,7 +7,7 @@ from tf2_gnn.cli_utils.training_utils import train, log_line, make_run_id
 from tf2_gnn.models import InvariantArgumentSelectionTask, InvariantNodeIdentifyTask
 import os
 from predict_functions import my_round_fun,write_predicted_label_to_JSON_file
-from Miscellaneous import pickleRead,pickleWrite
+from Miscellaneous import pickleRead,pickleWrite,GPU_switch
 import glob
 from measurement_functions import read_measurement_from_JSON,get_analysis_for_predicted_labels
 from utils import get_statistic_data,get_recall_scatter,wrapped_generate_horn_graph,get_solvability_and_measurement_from_eldarica
@@ -15,7 +15,14 @@ from horn_dataset import draw_training_results,write_train_results_to_log,get_te
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import mixed_precision
+import gc
 def main():
+    for num_layers in [128]:#1,2,4,8,16,32,64,128
+        end_to_end_training(num_layers)
+        gc.collect()
+        tf.keras.backend.clear_session()
+
+def end_to_end_training(num_layers):
     random_seed(1)
     tf.keras.backend.clear_session()
     # description: set hyper-parameters
@@ -25,7 +32,7 @@ def main():
               "file_type": ".smt2",
               "graph_type": "hyperEdgeHornGraph",
               "form_label": True,
-              "GPU": True,
+              "GPU": False,
               "train_quiet": False,
               "test_quiet": False,
               "max_epochs": 500,
@@ -40,7 +47,7 @@ def main():
                                                             "argument_occurrence_binary",
                                                             "template_relevance",
                                                             "clause_occurrence_in_counter_examples_binary"]}
-    hyper_parameters = {"nodeFeatureDim": 32, "num_layers": 2, "regression_hidden_layer_size": [32],"threshold": params["threshold"]}
+    hyper_parameters = {"nodeFeatureDim": 32, "num_layers": num_layers, "regression_hidden_layer_size": [32],"threshold": params["threshold"]}
 
     #description: generate horn graph if there is no horn graph file
     filtered_file_list,file_list_with_horn_graph,file_list = wrapped_generate_horn_graph(params["benchmark"], params["max_nodes_per_batch"], move_file=True,
@@ -51,61 +58,58 @@ def main():
 
     # description: predict with threshold
     predicted_Y = predict_test_set_model_from_memory(params, test_data, model)
-    #print("from file")
     #predicted_Y = predict_test_set_model_from_file(params, test_data, trained_model_path, dataset)
     #this should be performed in the folder "benchmark-unsolved"
     #trained_model_path = "trained_model/R-GCN_template_relevance__2021-04-23_20-47-42_best.pkl"
     #predicted_Y, dataset =predict_unseen_set(params, trained_model_path, file_list=filtered_file_list, set_max_nodes_per_batch=True)
-
 
     write_predicted_label_to_JSON_file(dataset, predicted_Y, "."+params["graph_type"]+".JSON", params["threshold"],verbose=params["verbose"])
 
 
     #description: draw train-predict diagrams
     draw_train_predict_plots(params, dataset, test_data, predicted_Y, train_loss_list, valid_loss_list,best_valid_epoch, hyper_parameters)
-
-    # description: get final measurement from Eldarica
-    get_solvability_and_measurement_from_eldarica(filtered_file_list, thread_number=4,continuous_extracting=True,move_file=False)
-
-    # description: In solvable set, draw time consumption
-
-    out_of_test_set = False
-    # description: read solvability results
-    json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
-
-    three_fild_name = ["empty", "predicted", "full"]
-    solvability_name_fold = (lambda: three_fild_name if out_of_test_set == True else three_fild_name + ["true"])()
-    solvability_json_name_fold = ["solvability" + x + "InitialPredicates" for x in solvability_name_fold]
-    for name_fold in solvability_json_name_fold:
-        solvability = [1 if s[name_fold] == "true" else 0 for s in json_solvability_obj_list]
-        print(name_fold, str(sum(solvability)) + "/" + str(len(json_solvability_obj_list)))
-
-    # description: read measurement JSON file
-    scatter_plot_range = [0, 120]
-    json_obj_list = read_measurement_from_JSON(filtered_file_list)
-
-    get_analysis_for_predicted_labels(json_obj_list, out_of_test_set=out_of_test_set, time_unit=1000,
-                                      scatter_plot_range=scatter_plot_range)
-    print("solvable file by predicted label:" + str(len(json_obj_list)) + "/" + str(len(filtered_file_list)))
-
-    # description: print results
-    print("-" * 10)
-    print(file_list_with_horn_graph)
-    print("max_nodes_per_batch", params["max_nodes_per_batch"])
-    print("filtered_file_list by max_nodes_per_batch:" + str(len(filtered_file_list)) + "/" + str(len(file_list)))
-
-    # description: statistic data
-    get_statistic_data(filtered_file_list, params["benchmark"])
-
-    # description: how many predicates used in end
-    get_recall_scatter(solvability_name_fold, json_solvability_obj_list, filtered_file_list)
-
+    #
+    # # description: get final measurement from Eldarica
+    # get_solvability_and_measurement_from_eldarica(filtered_file_list, thread_number=4,continuous_extracting=True,move_file=False)
+    #
+    # # description: In solvable set, draw time consumption
+    #
+    # out_of_test_set = False
+    # # description: read solvability results
+    # json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
+    #
+    # three_fild_name = ["empty", "predicted", "full"]
+    # solvability_name_fold = (lambda: three_fild_name if out_of_test_set == True else three_fild_name + ["true"])()
+    # solvability_json_name_fold = ["solvability" + x + "InitialPredicates" for x in solvability_name_fold]
+    # for name_fold in solvability_json_name_fold:
+    #     solvability = [1 if s[name_fold] == "true" else 0 for s in json_solvability_obj_list]
+    #     print(name_fold, str(sum(solvability)) + "/" + str(len(json_solvability_obj_list)))
+    #
+    # # description: read measurement JSON file
+    # scatter_plot_range = [0, 120]
+    # json_obj_list = read_measurement_from_JSON(filtered_file_list)
+    #
+    # get_analysis_for_predicted_labels(json_obj_list, out_of_test_set=out_of_test_set, time_unit=1000,
+    #                                   scatter_plot_range=scatter_plot_range)
+    # print("solvable file by predicted label:" + str(len(json_obj_list)) + "/" + str(len(filtered_file_list)))
+    #
+    # # description: print results
+    # print("-" * 10)
+    # print(file_list_with_horn_graph)
+    # print("max_nodes_per_batch", params["max_nodes_per_batch"])
+    # print("filtered_file_list by max_nodes_per_batch:" + str(len(filtered_file_list)) + "/" + str(len(file_list)))
+    #
+    # # description: statistic data
+    # get_statistic_data(filtered_file_list, params["benchmark"])
+    #
+    # # description: how many predicates used in end
+    # get_recall_scatter(solvability_name_fold, json_solvability_obj_list, filtered_file_list)
+    #
     #
     # print("------------unsolvable data----------------")
     #
     # out_of_test_set = True
     # params["max_nodes_per_batch"]=100000
-    #
     # #description: generate horn graph if there is no horn graph file
     # filtered_file_list,file_list_with_horn_graph,file_list = wrapped_generate_horn_graph(params["benchmark"]+"-unsolvable", params["max_nodes_per_batch"], move_file=True,
     #                                                  thread_number=4)
@@ -134,7 +138,7 @@ def main():
     # get_analysis_for_predicted_labels(json_obj_list, out_of_test_set=out_of_test_set, time_unit=1000,
     #                                   scatter_plot_range=scatter_plot_range)
     # print("solvable file by predicted label:" + str(len(json_obj_list)) + "/" + str(len(filtered_file_list)))
-    #
+
 
 
 
@@ -188,6 +192,7 @@ def read_data_and_train(params, hyper_parameters):
     parameters["label_type"] = params["label"]  # label
     parameters["gathered_nodes_binary_classification_task"] = gathered_nodes_binary_classification_task
     parameters["threshold"] = params["threshold"]
+    parameters["GPU"]=params["GPU"]
     these_hypers: Dict[str, Any] = {
         "optimizer": "Adam",  # One of "SGD", "RMSProp", "Adam"
         "learning_rate": 0.001,#0.001
@@ -222,7 +227,10 @@ def read_data_and_train(params, hyper_parameters):
         print("Use label in pickle data for training")
 
     if params["GPU"] == True:
+        GPU_switch(True)
         dataset._use_worker_threads = False  # solve Failed setting context: CUDA_ERROR_NOT_INITIALIZED: initialization error
+    else:
+        GPU_switch(False)
     dataset.load_data([DataFold.TRAIN, DataFold.VALIDATION, DataFold.TEST])
     parameters["node_vocab_size"] = dataset._node_vocab_size
     #parameters["class_weight"] = dataset._class_weight["train"]
@@ -276,7 +284,7 @@ def predict_test_set_model_from_memory(params, test_data, model):
 
 
 def predict_test_set_model_from_file(params, test_data, trained_model_path, dataset):
-    loaded_model = tf2_gnn.cli_utils.model_utils.load_model_for_prediction(trained_model_path, dataset)
+    loaded_model = tf2_gnn.cli_utils.model_utils.load_model_for_prediction(trained_model_path, dataset,False)
     return get_predicted_results(params, loaded_model, test_data)
 
 
@@ -315,7 +323,6 @@ def get_predicted_results(params, model, test_data):
     _, _, test_results = model.run_one_epoch(test_data, training=False, quiet=params["test_quiet"])
     test_metric, test_metric_string = model.compute_epoch_metrics(test_results)
     predicted_Y = model.predict(test_data)
-    #predicted_Y=tf.math.sigmoid(predicted_Y)
     # print("predicted_Y-debug",predicted_Y)
     # predicted_Y = model.predict(test_data)
     # print("predicted_Y-debug", predicted_Y)

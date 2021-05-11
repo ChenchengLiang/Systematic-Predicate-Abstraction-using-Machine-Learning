@@ -14,8 +14,8 @@ def main():
     GPU = True
     pickle = True
     threshold=0.5
-    max_nodes_per_batch=1000
-    benchmark = "mixed-three-fold-noIntervals-only-initial-predicate"
+    max_nodes_per_batch=10000
+    benchmark = "lia-lin-extract-only-initial-predicates"
     benchmark_name = benchmark + "/"
     hyper_parameters_list = []
     '''
@@ -34,15 +34,16 @@ def main():
     # hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 32, "regression_hidden_layer_size": [16]})
     #hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 64, "regression_hidden_layer_size": [16]})
     # #hyper_parameters_list.append({"nodeFeatureDim": 16, "num_layers": 8, "regression_hidden_layer_size": [16, 16, 16]})
-    hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 8, "regression_hidden_layer_size": [32, 32, 32]})
-    hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 16, "regression_hidden_layer_size": [32, 32, 32]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 8, "regression_hidden_layer_size": [32, 32, 32]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 32, "num_layers": 16, "regression_hidden_layer_size": [32, 32, 32]})
     # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 16, "regression_hidden_layer_size": [64]})
     # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 24, "regression_hidden_layer_size": [64]})
     # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 32, "regression_hidden_layer_size": [64]})
     # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 64, "regression_hidden_layer_size": [64]})
-    hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 16, "regression_hidden_layer_size": [64,32,16]})
-    hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 24, "regression_hidden_layer_size": [64,32,16]})
-    hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 32, "regression_hidden_layer_size": [64,32,16]})
+    hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 2, "regression_hidden_layer_size": [64,64,64]})
+    hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 4, "regression_hidden_layer_size": [64,64,64]})
+    hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 6, "regression_hidden_layer_size": [64, 64, 64]})
+    hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 8, "regression_hidden_layer_size": [64,64,64]})
     #hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 64, "regression_hidden_layer_size": [64,32,16]})
     #hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 128, "regression_hidden_layer_size": [64]})
     # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 16, "regression_hidden_layer_size": [64,64,64,64]})
@@ -51,8 +52,8 @@ def main():
     # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 12, "regression_hidden_layer_size": [64, 64, 64]})
     # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 16, "regression_hidden_layer_size": [64, 64, 64]})
     # hyper_parameters_list.append({"nodeFeatureDim": 64, "num_layers": 24, "regression_hidden_layer_size": [64, 64, 64]})
-    hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 8, "regression_hidden_layer_size": [128]})
-    hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 16, "regression_hidden_layer_size": [128]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 8, "regression_hidden_layer_size": [128]})
+    # hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 16, "regression_hidden_layer_size": [128]})
     # hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 24, "regression_hidden_layer_size": [128]})
     # hyper_parameters_list.append({"nodeFeatureDim": 128, "num_layers": 32, "regression_hidden_layer_size": [128]})
     # hyper_parameters_list.append(
@@ -107,7 +108,7 @@ def main():
                                                  "template_relevance", "clause_occurrence_in_counter_examples_binary"]
     predict_results = []
     for trained_model_path, hyper_parameters in zip(trained_model_path_list, hyper_parameters_list):
-        hyper_parameters.update({"max_nodes_per_batch": 1000, "best_threshold_set": {}, "read_best_threshold": False})
+        hyper_parameters.update({"max_nodes_per_batch": 10000, "best_threshold_set": {}, "read_best_threshold": False})
         for label in label_list:
             for benchmark_fold in benchmark_fold_list:
                 retult = wrapped_prediction(trained_model_path, benchmark, benchmark_fold, label, force_read,

@@ -10,6 +10,7 @@ def main():
     #label = "occurrence"
     #label = "rank"
     #label = "argument_identify"
+    #label_list.append("argument_identify")
     #label = "argument_identify_no_batchs"
     #label = "control_location_identify"
     #label_list.append("predicate_occurrence_in_clauses")
@@ -35,7 +36,7 @@ def main():
     # np.random.seed(0)
     # tf.random.set_seed(0)
 
-    hyper_parameters={"nodeFeatureDim":64,"num_layers":16,"regression_hidden_layer_size":[64],"threshold":0.5,"max_nodes_per_batch":1000}
+    hyper_parameters={"nodeFeatureDim":32,"num_layers":1,"regression_hidden_layer_size":[32,32,32],"threshold":0.5,"max_nodes_per_batch":10000}
     for label in label_list:
         # parameter_list.append(
         #     parameters(relative_path="../benchmarks/"+benchmark_name,

@@ -29,8 +29,11 @@
  */
 package lazabs.horn.concurrency
 
+import ap.SimpleAPI
 import ap.basetypes.IdealInt
 import ap.parser._
+import ap.parser.smtlib.Absyn.ConstantTerm
+import ap.terfor.preds.Predicate
 import ap.types.Sort.Integer.newConstant
 import lazabs.GlobalParameters
 import lazabs.horn.bottomup.HornClauses.Clause
@@ -80,11 +83,14 @@ class hyperEdgeInfo(name: String, from: String = "", to: String, nodeType: Hyper
 
 class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints: VerificationHintsInfo, argumentInfoList: ArrayBuffer[argumentInfo]) extends DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: VerificationHintsInfo, argumentInfoList: ArrayBuffer[argumentInfo]) {
   println("Write " + GlobalParameters.get.hornGraphType.toString + " to file")
-  val withOutAndConnectionToHyperedge=false
+  val withOutAndConnectionToHyperedge = false
   edgeNameMap += ("controlFlowHyperEdge" -> "CFHE")
   edgeNameMap += ("dataFlowHyperEdge" -> "DFHE")
   edgeNameMap += ("dataFlowAST" -> "data")
   edgeNameMap += ("guardAST" -> "guard")
+  edgeNameMap += ("AST" -> "AST")
+  edgeNameMap += ("AST_1" -> "AST_1")
+  edgeNameMap += ("AST_2" -> "AST_2")
   edgeNameMap += ("argument" -> "arg")
   edgeNameMap += ("clause" -> "clause")
   //turn on/off edge's label
@@ -97,6 +103,9 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
   edgeDirectionMap += ("dataFlowHyperEdge" -> false)
   edgeDirectionMap += ("dataFlowAST" -> false)
   edgeDirectionMap += ("guardAST" -> false)
+  edgeDirectionMap += ("AST" -> false)
+  edgeDirectionMap += ("AST_1" -> false)
+  edgeDirectionMap += ("AST_2" -> false)
   edgeDirectionMap += ("argument" -> false)
   edgeDirectionMap += ("clause" -> false)
   //node cotegory: Operator and Constant don't need canonical name. FALSE is unique category
@@ -122,71 +131,85 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
   var tempID = 0
   var clauseNumber = 0
   var hyperEdgeList = scala.collection.mutable.ArrayBuffer[hyperEdgeInfo]()
-  //for (clause <- Seq(simpClauses.head)) {
+  //create unique Initial and FALSE node
+  val initialControlFlowNodeName = controlNodePrefix + gnn_input.CONTROLCanonicalID.toString
+  createNode(canonicalName = initialControlFlowNodeName, labelName = "Initial", className = "CONTROL", shape = nodeShapeMap("CONTROL"))
+  controlFlowNodeSetInOneClause("Initial") = initialControlFlowNodeName
+  //  val falseControlFlowNodeName = controlNodePrefix + gnn_input.CONTROLCanonicalID.toString
+  //  createNode(canonicalName=falseControlFlowNodeName, labelName="FALSE", className="CONTROL", shape=nodeShapeMap("CONTROL"))
+  //  controlFlowNodeSetInOneClause("FALSE") = falseControlFlowNodeName
+  var guardSubGraph:Map[Predicate,Seq[Tuple2[String,IFormula]]] = (for (clause <- simpClauses; a <- clause.allAtoms; if a.pred.name != "FALSE") yield a.pred -> Seq()).toMap
+
   for (clause <- simpClauses) {
     hyperEdgeList.clear()
     constantNodeSetInOneClause.clear()
-    val (dataFlowSet, guardSet,normalizedClause) = getDataFlowAndGuard(clause, clause.normalize(), dataFlowInfoWriter)
+//    println("debug",binaryOperatorSubGraphSetInOneClause)
+//    binaryOperatorSubGraphSetInOneClause.clear()
+//    unaryOperatorSubGraphSetInOneClause.clear()
+    //simplify clauses by quantifiers and replace arguments to _0,_1,...
+    val (dataFlowSet, guardSet, normalizedClause) = getDataFlowAndGuard(clause, dataFlowInfoWriter)
     //draw head predicate node and argument node
-    val headNodeName=
-    if (normalizedClause.head.pred.name == "FALSE") {
-      //draw predicate node
-      drawPredicateNode("FALSE", "FALSE", "FALSE")
-      "FALSE"
-    } else {
-      if (!controlFlowNodeSetInOneClause.keySet.contains(normalizedClause.head.pred.name)) {
+    val headNodeName =
+      if (normalizedClause.head.pred.name == "FALSE") {
         //draw predicate node
-        val controlFlowNodeName = controlNodePrefix + gnn_input.CONTROLCanonicalID.toString
-        drawPredicateNode(controlFlowNodeName, normalizedClause.head.pred.name, "CONTROL")
-        //draw argument node
-        drawArgumentNodeForPredicate(normalizedClause.head,controlFlowNodeName)
-        controlFlowNodeName
+        drawPredicateNode("FALSE", "FALSE", "FALSE")
+        "FALSE"
+        //falseControlFlowNodeName
+      } else {
+        if (!controlFlowNodeSetInOneClause.keySet.contains(normalizedClause.head.pred.name)) {
+          //draw predicate node
+          val controlFlowNodeName = controlNodePrefix + gnn_input.CONTROLCanonicalID.toString
+          drawPredicateNode(controlFlowNodeName, normalizedClause.head.pred.name, "CONTROL")
+          //draw argument node
+          drawArgumentNodeForPredicate(normalizedClause.head, controlFlowNodeName)
+          controlFlowNodeName
 
-      } else{
-        for (controlNodeName <- argumentNodeSetInOneClause.keySet) if (controlNodeName == normalizedClause.head.pred.name) {
-          for ((argNodeName, arg) <- argumentNodeSetInOneClause(controlNodeName) zip normalizedClause.head.args) {
-            constantNodeSetInOneClause(arg.toString) = argNodeName
+        } else {
+          for (controlNodeName <- argumentNodeSetInOneClause.keySet) if (controlNodeName == normalizedClause.head.pred.name) {
+            for ((argNodeName, arg) <- argumentNodeSetInOneClause(controlNodeName) zip normalizedClause.head.args) {
+              constantNodeSetInOneClause(arg.toString) = argNodeName
+            }
           }
+          controlFlowNodeSetInOneClause(normalizedClause.head.pred.name)
         }
-        controlFlowNodeSetInOneClause(normalizedClause.head.pred.name)
       }
-    }
     //draw body predicate node and argument node
-    var bodyNodeNameList:Array[String]=Array()
+    var bodyNodeNameList: Array[String] = Array()
     if (normalizedClause.body.isEmpty) {
-      //draw predicate node
-      val initialControlFlowNodeName = controlNodePrefix + gnn_input.CONTROLCanonicalID.toString
-      drawPredicateNode(initialControlFlowNodeName, "Initial", "CONTROL")
+      //draw predicate node: initial node
+      //val initialControlFlowNodeName = controlNodePrefix + gnn_input.CONTROLCanonicalID.toString
+      //drawPredicateNode(initialControlFlowNodeName, "Initial", "CONTROL")
+
       //draw control flow hyperedge node between body and head
       val controlFlowHyperedgeName = controlFlowHyperEdgeNodePrefix + gnn_input.controlFlowHyperEdgeCanonicalID.toString
-      matchAndCreateHyperEdgeNode(controlFlowHyperedgeName,"guarded CFHE Clause " + clauseNumber.toString,"controlFlowHyperEdge")
+      matchAndCreateHyperEdgeNode(controlFlowHyperedgeName, "guarded CFHE Clause " + clauseNumber.toString, "controlFlowHyperEdge")
       //store control flow hyperedge connection between body and head
       hyperEdgeList :+= new hyperEdgeInfo(controlFlowHyperedgeName, initialControlFlowNodeName, controlFlowNodeSetInOneClause(normalizedClause.head.pred.name), HyperEdgeType.controlFlow)
-      bodyNodeNameList:+=initialControlFlowNodeName
+      bodyNodeNameList :+= initialControlFlowNodeName
     } else {
       for (body <- normalizedClause.body) {
         if (!controlFlowNodeSetInOneClause.keySet.contains(body.pred.name)) {
           //draw predicate node
           val controlFlowNodeName = controlNodePrefix + gnn_input.CONTROLCanonicalID.toString
-          bodyNodeNameList:+=controlFlowNodeName
+          bodyNodeNameList :+= controlFlowNodeName
           drawPredicateNode(controlFlowNodeName, body.pred.name, "CONTROL")
           //draw control flow hyperedge node between body and head
           val controlFlowHyperedgeName = controlFlowHyperEdgeNodePrefix + gnn_input.controlFlowHyperEdgeCanonicalID.toString
-          matchAndCreateHyperEdgeNode(controlFlowHyperedgeName,"guarded CFHE Clause " + clauseNumber.toString,"controlFlowHyperEdge")
+          matchAndCreateHyperEdgeNode(controlFlowHyperedgeName, "guarded CFHE Clause " + clauseNumber.toString, "controlFlowHyperEdge")
           //store control flow hyperedge connection between body and head
           hyperEdgeList :+= new hyperEdgeInfo(controlFlowHyperedgeName, controlFlowNodeName, controlFlowNodeSetInOneClause(normalizedClause.head.pred.name), HyperEdgeType.controlFlow)
           //draw argument node
-          drawArgumentNodeForPredicate(body,controlFlowNodeName)
+          drawArgumentNodeForPredicate(body, controlFlowNodeName)
         } else {
           for (controlNodeName <- argumentNodeSetInOneClause.keySet) if (controlNodeName == body.pred.name) {
             for ((argNodeName, arg) <- argumentNodeSetInOneClause(controlNodeName) zip body.args) {
               constantNodeSetInOneClause(arg.toString) = argNodeName
             }
-            bodyNodeNameList:+=controlFlowNodeSetInOneClause(controlNodeName)
+            bodyNodeNameList :+= controlFlowNodeSetInOneClause(controlNodeName)
           }
           //draw control flow hyperedge node between body and head
           val controlFlowHyperedgeName = controlFlowHyperEdgeNodePrefix + gnn_input.controlFlowHyperEdgeCanonicalID.toString
-          matchAndCreateHyperEdgeNode(controlFlowHyperedgeName,"guarded CFHE Clause " + clauseNumber.toString,"controlFlowHyperEdge")
+          matchAndCreateHyperEdgeNode(controlFlowHyperedgeName, "guarded CFHE Clause " + clauseNumber.toString, "controlFlowHyperEdge")
           //store control flow hyperedge connection between body and head
           hyperEdgeList :+= new hyperEdgeInfo(controlFlowHyperedgeName, controlFlowNodeSetInOneClause(body.pred.name), controlFlowNodeSetInOneClause(normalizedClause.head.pred.name), HyperEdgeType.controlFlow)
         }
@@ -196,87 +219,94 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
     for (arg <- normalizedClause.head.args)
       drawDataFlow(arg, dataFlowSet)
 
-    var guardRootNodeList:Array[String]=Array()
-    if(withOutAndConnectionToHyperedge==true){
+    var guardRootNodeList: Array[String] = Array()
+    if (withOutAndConnectionToHyperedge == true) {
       if (guardSet.isEmpty) {
-        val trueNodeName = "true_" + gnn_input.GNNNodeID.toString
-        guardRootNodeList:+=trueNodeName
-        createNode(trueNodeName, "true", "constant", nodeShapeMap("constant"))
-        constantNodeSetCrossGraph("true")=trueNodeName
-        constantNodeSetInOneClause("true") = trueNodeName
-        drawHyperEdgeWithTrueGuard(trueNodeName)
+        guardRootNodeList :+= drawTrueGuardCondition()
       } else {
-        astEdgeType = "guardAST"
+        //astEdgeType = "guardAST"
+        astEdgeType = "AST"
         for (guard <- guardSet) {
           val guardRootNodeName = drawAST(guard)
-          guardRootNodeList:+=guardRootNodeName
+          for (a <- normalizedClause.allAtoms; if a.pred.name != "FALSE") {
+            guardSubGraph = guardSubGraph ++ Map(a.pred -> (guardSubGraph(a.pred) ++ Seq(Tuple2(guardRootNodeName,guard))))
+          }
+
+          guardRootNodeList :+= guardRootNodeName
           for (hyperEdgeNode <- hyperEdgeList) {
             hyperEdgeNode.guardName += guardRootNodeName
             if (hyperEdgeNode.guardName.size <= 1) {
               GlobalParameters.get.hornGraphType match {
-                case HornGraphType.concretizedHyperedgeGraph=> drawHyperEdge(hyperEdgeNode,guardRootNodeName,addConcretinizedTernaryEdge)
-                case HornGraphType.hyperEdgeGraph| HornGraphType.equivalentHyperedgeGraph=> drawHyperEdge(hyperEdgeNode,guardRootNodeName,addTernaryEdge)
+                case HornGraphType.concretizedHyperedgeGraph => drawHyperEdge(hyperEdgeNode, guardRootNodeName, addConcretinizedTernaryEdge)
+                case HornGraphType.hyperEdgeGraph | HornGraphType.equivalentHyperedgeGraph => drawHyperEdge(hyperEdgeNode, guardRootNodeName, addTernaryEdge)
               }
             } else
               GlobalParameters.get.hornGraphType match {
-                case HornGraphType.concretizedHyperedgeGraph=> drawHyperEdge(hyperEdgeNode,guardRootNodeName,updateConcretinizedTernaryEdge)
-                case HornGraphType.hyperEdgeGraph| HornGraphType.equivalentHyperedgeGraph=> drawHyperEdge(hyperEdgeNode,guardRootNodeName,updateTernaryEdge)
+                case HornGraphType.concretizedHyperedgeGraph => drawHyperEdge(hyperEdgeNode, guardRootNodeName, updateConcretinizedTernaryEdge)
+                case HornGraphType.hyperEdgeGraph | HornGraphType.equivalentHyperedgeGraph => drawHyperEdge(hyperEdgeNode, guardRootNodeName, updateTernaryEdge)
               }
           }
         }
       }
-    }else{
+    } else {
       if (guardSet.isEmpty) {
-        val trueNodeName = "true_" + gnn_input.GNNNodeID.toString
-        guardRootNodeList:+=trueNodeName
-        createNode(trueNodeName, "true", "constant", nodeShapeMap("constant"))
-        constantNodeSetCrossGraph("true")=trueNodeName
-        constantNodeSetInOneClause("true") = trueNodeName
-        drawHyperEdgeWithTrueGuard(trueNodeName)
-      } else if(guardSet.size==1){
-        astEdgeType = "guardAST"
+        guardRootNodeList :+= drawTrueGuardCondition()
+      } else if (guardSet.size == 1) {
+        //astEdgeType = "guardAST"
+        astEdgeType = "AST"
         for (guard <- guardSet) {
           val guardRootNodeName = drawAST(guard)
+          for (a <- normalizedClause.allAtoms; if a.pred.name != "FALSE") {
+            guardSubGraph = guardSubGraph ++ Map(a.pred -> (guardSubGraph(a.pred) ++ Seq(Tuple2(guardRootNodeName,guard))))
+          }
           for (hyperEdgeNode <- hyperEdgeList) {
             hyperEdgeNode.guardName += guardRootNodeName
             GlobalParameters.get.hornGraphType match {
-              case HornGraphType.concretizedHyperedgeGraph=> drawHyperEdge(hyperEdgeNode,guardRootNodeName,addConcretinizedTernaryEdge)
-              case HornGraphType.hyperEdgeGraph| HornGraphType.equivalentHyperedgeGraph=> drawHyperEdge(hyperEdgeNode,guardRootNodeName,addTernaryEdge)
+              case HornGraphType.concretizedHyperedgeGraph => drawHyperEdge(hyperEdgeNode, guardRootNodeName, addConcretinizedTernaryEdge)
+              case HornGraphType.hyperEdgeGraph | HornGraphType.equivalentHyperedgeGraph => drawHyperEdge(hyperEdgeNode, guardRootNodeName, addTernaryEdge)
             }
           }
         }
-      }else{
-        astEdgeType = "guardAST"
+      } else {
+        //astEdgeType = "guardAST"
+        astEdgeType = "AST"
+        //draw all guardSet
         for (guard <- guardSet) {
           val guardRootNodeName = drawAST(guard)
-          guardRootNodeList:+=guardRootNodeName
+          for (a <- normalizedClause.allAtoms; if a.pred.name != "FALSE") {
+            guardSubGraph = guardSubGraph ++ Map(a.pred -> (guardSubGraph(a.pred) ++ Seq(Tuple2(guardRootNodeName,guard))))
+          }
+          guardRootNodeList :+= guardRootNodeName
         }
+        //connect guards by &
         val andName = "&" + "_" + gnn_input.GNNNodeID
-        createNode(andName, labelName="&", "operator", nodeShapeMap("operator"))
-        for(frn<-guardRootNodeList)
-          addBinaryEdge(frn,andName,"guardAST",edgeDirectionMap("guardAST"))
+        createNode(andName, labelName = "&", "operator", nodeShapeMap("operator"))
+        for (frn <- guardRootNodeList)
+          addBinaryEdge(frn, andName, "guardAST", edgeDirectionMap("guardAST")) //AST,guardAST
+        //connect & to hyperedge
         for (hyperEdgeNode <- hyperEdgeList) {
-          hyperEdgeNode.guardName += andName
+          val rootASTForHyperedge=andName //andName
+          hyperEdgeNode.guardName += rootASTForHyperedge
           GlobalParameters.get.hornGraphType match {
-            case HornGraphType.concretizedHyperedgeGraph=> drawHyperEdge(hyperEdgeNode,andName,addConcretinizedTernaryEdge)
-            case HornGraphType.hyperEdgeGraph| HornGraphType.equivalentHyperedgeGraph=> drawHyperEdge(hyperEdgeNode,andName,addTernaryEdge)
+            case HornGraphType.concretizedHyperedgeGraph => drawHyperEdge(hyperEdgeNode, rootASTForHyperedge, addConcretinizedTernaryEdge)
+            case HornGraphType.hyperEdgeGraph | HornGraphType.equivalentHyperedgeGraph => drawHyperEdge(hyperEdgeNode, rootASTForHyperedge, addTernaryEdge)//updateTernaryEdge
           }
         }
       }
     }
 
 
-    if(GlobalParameters.get.getLabelFromCounterExample==true){
+    if (GlobalParameters.get.getLabelFromCounterExample == true) {
       //create clause node and connect with guards
       val clauseNodeName = clauseNodePrefix + gnn_input.clauseCanonicalID.toString
-      createNode(clauseNodeName,clauseNodeName,"clause",nodeShapeMap("clause"),Seq(clause))
+      createNode(clauseNodeName, clauseNodeName, "clause", nodeShapeMap("clause"), Seq(clause))
       //add edges to the clause
-      for (guardRootNode<-guardRootNodeList) { //from guards to clause
-        addBinaryEdge(guardRootNode,clauseNodeName,"guardAST")
+      for (guardRootNode <- guardRootNodeList) { //from guards to clause
+        addBinaryEdge(guardRootNode, clauseNodeName, "AST")//guardAST
       }
-      addBinaryEdge(clauseNodeName,headNodeName,label="clause") //from clause to head
-      for (bodyNodeName<-bodyNodeNameList) //from body to clause
-        addBinaryEdge(bodyNodeName,clauseNodeName,"clause")
+      addBinaryEdge(clauseNodeName, headNodeName, label = "clause") //from clause to head
+      for (bodyNodeName <- bodyNodeNameList) //from body to clause
+        addBinaryEdge(bodyNodeName, clauseNodeName, "clause")
     }
     clauseNumber += 1
 
@@ -284,46 +314,48 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
 
 
   //draw templates
-  for (argInfo<-gnn_input.argumentInfoHornGraphList){
-    argumentNodeSetInPredicates("_"+argInfo.index.toString)=argInfo.canonicalName //add _ to differentiate index with other constants
+  for (argInfo <- gnn_input.argumentInfoHornGraphList) {
+    argumentNodeSetInPredicates("_" + argInfo.index.toString) = argInfo.canonicalName //add _ to differentiate index with other constants
   }
-  astEdgeType = "templateAST"
-  val templateNameList=drawTemplates()
-  for ((head,templateNodeNameList)<-templateNameList;templateNodeName<-templateNodeNameList)
-    addBinaryEdge(controlFlowNodeSetInOneClause(head),templateNodeName,"template")
+  astEdgeType = "AST"//"templateAST"
+  //val templateNameList = drawTemplates(guardSubGraph)
+  val templateNameList=drawPredicate()
+  for ((head, templateNodeNameList) <- templateNameList; templateNodeName <- templateNodeNameList)
+    addBinaryEdge(controlFlowNodeSetInOneClause(head), templateNodeName, "template")
 
   writerGraph.write("}" + "\n")
   writerGraph.close()
   dataFlowInfoWriter.close()
 
-  val (argumentIDList, argumentNameList, argumentOccurrenceList,argumentBoundList,argumentIndicesList,argumentBinaryOccurrenceList) = matchArguments()
-  writeGNNInputToJSONFile(argumentIDList, argumentNameList, argumentOccurrenceList,argumentBoundList,argumentIndicesList,argumentBinaryOccurrenceList)
+  val (argumentIDList, argumentNameList, argumentOccurrenceList, argumentBoundList, argumentIndicesList, argumentBinaryOccurrenceList) = matchArguments()
+  writeGNNInputToJSONFile(argumentIDList, argumentNameList, argumentOccurrenceList, argumentBoundList, argumentIndicesList, argumentBinaryOccurrenceList)
 
-  def matchAndCreateHyperEdgeNode(controlFlowHyperedgeName:String,labelName:String,className:String): Unit =
+  def matchAndCreateHyperEdgeNode(controlFlowHyperedgeName: String, labelName: String, className: String): Unit =
     GlobalParameters.get.hornGraphType match {
       case DrawHornGraph.HornGraphType.hyperEdgeGraph => createHyperEdgeNode(controlFlowHyperedgeName, labelName, className, nodeShapeMap(className))
       case DrawHornGraph.HornGraphType.equivalentHyperedgeGraph =>
-      case DrawHornGraph.HornGraphType.concretizedHyperedgeGraph=>createConcretinizedHyperEdgeNode(controlFlowHyperedgeName,labelName,className,nodeShapeMap(className))
+      case DrawHornGraph.HornGraphType.concretizedHyperedgeGraph => createConcretinizedHyperEdgeNode(controlFlowHyperedgeName, labelName, className, nodeShapeMap(className))
     }
-  def drawHyperEdgeWithTrueGuard(middleNodeName:String): Unit =
+
+  def drawHyperEdgeWithTrueGuard(middleNodeName: String): Unit =
     GlobalParameters.get.hornGraphType match {
-      case DrawHornGraph.HornGraphType.equivalentHyperedgeGraph =>{
+      case DrawHornGraph.HornGraphType.equivalentHyperedgeGraph => {
         for (hyperEdgeNode <- hyperEdgeList) {
           hyperEdgeNode.hyperEdgeType match {
             case HyperEdgeType.controlFlow => {
-              addBinaryEdge(hyperEdgeNode.fromName,middleNodeName,label = "controlFlowHyperEdge")
-              addBinaryEdge(middleNodeName,hyperEdgeNode.toName,label = "controlFlowHyperEdge")
-              addBinaryEdge(hyperEdgeNode.toName,hyperEdgeNode.fromName,label = "controlFlowHyperEdge")
+              addBinaryEdge(hyperEdgeNode.fromName, middleNodeName, label = "controlFlowHyperEdge")
+              addBinaryEdge(middleNodeName, hyperEdgeNode.toName, label = "controlFlowHyperEdge")
+              addBinaryEdge(hyperEdgeNode.toName, hyperEdgeNode.fromName, label = "controlFlowHyperEdge")
             }
             case HyperEdgeType.dataFlow => {
-              addBinaryEdge(hyperEdgeNode.fromName, middleNodeName,label="dataFlowHyperEdge")
-              addBinaryEdge(middleNodeName,hyperEdgeNode.toName,label="dataFlowHyperEdge")
-              addBinaryEdge(hyperEdgeNode.toName,hyperEdgeNode.fromName,label="dataFlowHyperEdge")
+              addBinaryEdge(hyperEdgeNode.fromName, middleNodeName, label = "dataFlowHyperEdge")
+              addBinaryEdge(middleNodeName, hyperEdgeNode.toName, label = "dataFlowHyperEdge")
+              addBinaryEdge(hyperEdgeNode.toName, hyperEdgeNode.fromName, label = "dataFlowHyperEdge")
             }
           }
         }
       }
-      case DrawHornGraph.HornGraphType.concretizedHyperedgeGraph=>{
+      case DrawHornGraph.HornGraphType.concretizedHyperedgeGraph => {
         for (hyperEdgeNode <- hyperEdgeList) {
           hyperEdgeNode.hyperEdgeType match {
             case HyperEdgeType.controlFlow => addConcretinizedTernaryEdge(hyperEdgeNode.fromName, middleNodeName, hyperEdgeNode.toName, hyperEdgeNode.hyperEdgeNodeName, "controlFlowHyperEdge")
@@ -341,33 +373,35 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
       }
     }
 
-  def drawHyperEdge(hyperEdgeNode:hyperEdgeInfo,guardRootNodeName:String,f: (String,String,String,String,String) => Unit): Unit =
+  def drawHyperEdge(hyperEdgeNode: hyperEdgeInfo, guardRootNodeName: String, f: (String, String, String, String, String) => Unit): Unit =
     hyperEdgeNode.hyperEdgeType match {
       case HyperEdgeType.controlFlow => {
         GlobalParameters.get.hornGraphType match {
           case DrawHornGraph.HornGraphType.equivalentHyperedgeGraph => {
-            addBinaryEdge(hyperEdgeNode.fromName, guardRootNodeName,label="controlFlowHyperEdge")
-            addBinaryEdge(guardRootNodeName,hyperEdgeNode.toName,label="controlFlowHyperEdge")
-            addBinaryEdge(hyperEdgeNode.toName,hyperEdgeNode.fromName,label="controlFlowHyperEdge")
+            addBinaryEdge(hyperEdgeNode.fromName, guardRootNodeName, label = "controlFlowHyperEdge")
+            addBinaryEdge(guardRootNodeName, hyperEdgeNode.toName, label = "controlFlowHyperEdge")
+            addBinaryEdge(hyperEdgeNode.toName, hyperEdgeNode.fromName, label = "controlFlowHyperEdge")
           }
           //case DrawHornGraph.HornGraphType.concretizedHyperedgeGraph=> addConcretinizedTernaryEdge(hyperEdgeNode.fromName, guardRootNodeName, hyperEdgeNode.toName, hyperEdgeNode.hyperEdgeNodeName, "controlFlowHyperEdge")
-          case DrawHornGraph.HornGraphType.hyperEdgeGraph |DrawHornGraph.HornGraphType.concretizedHyperedgeGraph => f(hyperEdgeNode.fromName, guardRootNodeName, hyperEdgeNode.toName, hyperEdgeNode.hyperEdgeNodeName, "controlFlowHyperEdge")
+          case DrawHornGraph.HornGraphType.hyperEdgeGraph | DrawHornGraph.HornGraphType.concretizedHyperedgeGraph =>
+            f(hyperEdgeNode.fromName, guardRootNodeName, hyperEdgeNode.toName, hyperEdgeNode.hyperEdgeNodeName, "controlFlowHyperEdge")
         }
       }
       case HyperEdgeType.dataFlow => {
         GlobalParameters.get.hornGraphType match {
           case DrawHornGraph.HornGraphType.equivalentHyperedgeGraph => {
-            addBinaryEdge(hyperEdgeNode.fromName, guardRootNodeName,label="dataFlowHyperEdge")
-            addBinaryEdge(guardRootNodeName,hyperEdgeNode.toName,label="dataFlowHyperEdge")
-            addBinaryEdge(hyperEdgeNode.toName,hyperEdgeNode.fromName,label="dataFlowHyperEdge")
+            addBinaryEdge(hyperEdgeNode.fromName, guardRootNodeName, label = "dataFlowHyperEdge")
+            addBinaryEdge(guardRootNodeName, hyperEdgeNode.toName, label = "dataFlowHyperEdge")
+            addBinaryEdge(hyperEdgeNode.toName, hyperEdgeNode.fromName, label = "dataFlowHyperEdge")
           }
           //case DrawHornGraph.HornGraphType.concretizedHyperedgeGraph=> addConcretinizedTernaryEdge(hyperEdgeNode.fromName, guardRootNodeName, hyperEdgeNode.toName, hyperEdgeNode.hyperEdgeNodeName, "dataFlowHyperEdge")
-          case DrawHornGraph.HornGraphType.hyperEdgeGraph | DrawHornGraph.HornGraphType.concretizedHyperedgeGraph=>  f(hyperEdgeNode.fromName, guardRootNodeName, hyperEdgeNode.toName, hyperEdgeNode.hyperEdgeNodeName, "dataFlowHyperEdge")
+          case DrawHornGraph.HornGraphType.hyperEdgeGraph | DrawHornGraph.HornGraphType.concretizedHyperedgeGraph =>
+            f(hyperEdgeNode.fromName, guardRootNodeName, hyperEdgeNode.toName, hyperEdgeNode.hyperEdgeNodeName, "dataFlowHyperEdge")
         }
       }
     }
 
-  def drawArgumentNodeForPredicate(pre:IAtom,controlFlowNodeName:String): Unit ={
+  def drawArgumentNodeForPredicate(pre: IAtom, controlFlowNodeName: String): Unit = {
     var argumentNodeArray = Array[String]()
     tempID = 0
     for (arg <- pre.args) {
@@ -375,13 +409,14 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
       createNode(argumentnodeName, "ARG_" + tempID.toString, "predicateArgument", nodeShapeMap("predicateArgument"))
       constantNodeSetInOneClause(arg.toString) = argumentnodeName
       argumentNodeArray :+= argumentnodeName
-      updateArgumentInfoHornGraphList(pre.pred.name,tempID,argumentnodeName,arg)
+      updateArgumentInfoHornGraphList(pre.pred.name, tempID, argumentnodeName, arg)
       tempID += 1
       //connect to control flow node
       addBinaryEdge(argumentnodeName, controlFlowNodeName, "argument")
     }
     argumentNodeSetInOneClause(pre.pred.name) = argumentNodeArray
   }
+
   def drawPredicateNode(controlFlowNodeName: String, predicateName: String, className: String): Unit = {
     //draw predicate node
     createNode(controlFlowNodeName, predicateName, className, nodeShapeMap(className))
@@ -394,15 +429,20 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
       case SE(coefficient, rhs) if (!coefficient.isZero) => {
         //draw data flow hyperedge node
         val dataFlowHyperedgeName = dataFlowHyperEdgeNodePrefix + gnn_input.dataFlowHyperEdgeCanonicalID.toString
-        matchAndCreateHyperEdgeNode(dataFlowHyperedgeName,"guarded DFHE Clause " + clauseNumber.toString,"dataFlowHyperEdge")
-        astEdgeType = "dataFlowAST"
-        val dataFlowRoot=
-        if (coefficient.isOne)
-          drawAST(rhs)
-        else if(coefficient>IdealInt(1))
-          drawAST(rhs*coefficient)
-        else
-          drawAST((coefficient*rhs).minusSimplify)
+        matchAndCreateHyperEdgeNode(dataFlowHyperedgeName, "guarded DFHE Clause " + clauseNumber.toString, "dataFlowHyperEdge")
+        //astEdgeType = "dataFlowAST"
+        astEdgeType = "AST"
+//        println("coefficient",coefficient)
+//        println("rhs",rhs)
+//        println("coefficient * rhs",coefficient * rhs)
+//        println("(coefficient * rhs).minusSimplify",(coefficient * rhs).minusSimplify)
+        val dataFlowRoot =
+          if (coefficient.isOne)
+            drawAST(rhs)
+          else if (coefficient > IdealInt(1))
+            drawAST(coefficient * rhs)
+          else
+            drawAST((coefficient * rhs))//.minusSimplify
         //store data flow hyperedge connection
         hyperEdgeList :+= new hyperEdgeInfo(dataFlowHyperedgeName, dataFlowRoot, constantNodeSetInOneClause(arg.toString), HyperEdgeType.dataFlow)
       }
@@ -411,7 +451,7 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
   }
 
 
-  def getDataFlowAndGuard(clause: Clause, normalizedClause: Clause, dataFlowInfoWriter: PrintWriter): (Seq[IFormula], Seq[IFormula],Clause) = {
+  def getDataFlowAndGuard(clause: Clause, dataFlowInfoWriter: PrintWriter): (Seq[IFormula], Seq[IFormula], Clause) = {
     /*
     Replace arguments in argumentInHead.intersect(argumentInBody) to arg' and add arg=arg' to constrains
 
@@ -421,24 +461,33 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
    <2> every element of y occurs as an argument of an uninterpreted predicate in the body
    <3> any variable assignment (assignment of values to the variables occurring in C) that satisfies the constraint of C also satisfies (1).
    */
+
+    val normalizedClause=clause.normalize()
     //replace intersect arguments in body and add arg=arg' to constrains
-    val replacedClause=DrawHyperEdgeHornGraph.replaceIntersectArgumentInBody(normalizedClause)
+    val replacedClause = DrawHyperEdgeHornGraph.replaceIntersectArgumentInBody(normalizedClause)
+//    val argumentCanonilizedClauses=getArgumentReplacedClause(replacedClause)
+//    val simplifiedArgumentCanonilizedClauses=getSimplifiedClauses(argumentCanonilizedClauses)
+    val simplifyedClauses=getSimplifiedClauses(replacedClause)
+
+    val finalSimplifiedClauses=simplifyedClauses
+
+
     var dataflowList = Set[IFormula]()
-    var dataflowEquationList=Set[IExpression]()
-    var bodySymbolsSet = (for (body <- replacedClause.body; arg <- body.args) yield arg).toSet
+    var dataflowEquationList = Set[IExpression]()
+    var bodySymbolsSet = (for (body <- finalSimplifiedClauses.body; arg <- body.args) yield arg).toSet
     //var bodySymbolsSet = bodySymbols.toSet
-    //println(Console.GREEN + replacedClause)
-    for (x <- replacedClause.head.args) {
+    //println(Console.GREEN + finalSimplifiedClauses)
+    for (x <- finalSimplifiedClauses.head.args) {
       //println(Console.RED + x)
       val SE = IExpression.SymbolEquation(x)
-      for (f <- LineariseVisitor(replacedClause.constraint, IBinJunctor.And)) f match {
+      for (f <- LineariseVisitor(finalSimplifiedClauses.constraint, IBinJunctor.And)) f match {
         case SE(coefficient, rhs) => { //<1>
           //println(Console.YELLOW + rhs)
           //println(Console.GREEN + bodySymbolsSet)
           if (!(dataflowList.map(_.toString) contains f.toString) // f is not in dataflowList
             //&& !SymbolCollector.constants(rhs).map(_.toString).contains(x.toString) // x is not in y
             && SymbolCollector.constants(rhs).map(_.toString).subsetOf(bodySymbolsSet.map(_.toString)) // <2>
-            //&& (for (s <- SymbolCollector.constants(f)) yield s.name).contains(x.toString)// because match SE will match f that does not have head' arguments
+          //&& (for (s <- SymbolCollector.constants(f)) yield s.name).contains(x.toString)// because match SE will match f that does not have head' arguments
           ) {
             // discovered dataflow from body to x
             //println(Console.RED + f)
@@ -451,31 +500,64 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
         }
       }
     }
-    val guardList = (for (f <- LineariseVisitor(replacedClause.constraint, IBinJunctor.And)) yield f).toSet.diff(for (df <- dataflowList) yield df).map(sp(_))
+    val guardList = (for (f <- LineariseVisitor(finalSimplifiedClauses.constraint, IBinJunctor.And)) yield f).toSet.diff(for (df <- dataflowList) yield df).map(sp(_))
 
-    //todo: delete some redundant predicates
-//    val redundantFormulas = for(g<-guardList if SymbolCollector.constants(g).map(_.toString).toSet.diff(replacedClause.head.args.map(_.toString).toSet).intersect(bodySymbolsSet.map(_.toString)).isEmpty) yield {
-//      g
-//    }
 
-    val dataFlowSeq=dataflowList.toSeq.sortBy(_.toString)
-    val guardSeq=guardList.toSeq.sortBy(_.toString)
+    val dataFlowSeq = dataflowList.toSeq.sortBy(_.toString)
+    val guardSeq = guardList.toSeq.sortBy(_.toString)
 
     dataFlowInfoWriter.write("--------------------\n")
     dataFlowInfoWriter.write("original clause:\n")
     dataFlowInfoWriter.write(clause.toPrologString + "\n")
-    dataFlowInfoWriter.write("normalized and replaced clause:\n")
+    dataFlowInfoWriter.write("normalized clause:\n")
+    dataFlowInfoWriter.write(normalizedClause.toPrologString + "\n")
+    dataFlowInfoWriter.write("replaceIntersectArgumentInBody clause:\n")
     dataFlowInfoWriter.write(replacedClause.toPrologString + "\n")
+    dataFlowInfoWriter.write("simplified clause:\n")
+    dataFlowInfoWriter.write(simplifyedClauses.toPrologString + "\n")
+//    dataFlowInfoWriter.write("argument canonicalized  clauses:\n")
+//    dataFlowInfoWriter.write(argumentCanonilizedClauses.toPrologString + "\n")
+//    dataFlowInfoWriter.write("simplified argument canonilized clauses:\n")
+//    dataFlowInfoWriter.write(simplifiedArgumentCanonilizedClauses.toPrologString + "\n")
     dataFlowInfoWriter.write("dataflow:\n")
     for (df <- dataFlowSeq)
       dataFlowInfoWriter.write(df.toString + "\n")
     dataFlowInfoWriter.write("guard:\n")
     for (g <- guardSeq)
       dataFlowInfoWriter.write(g.toString + "\n")
-//    dataFlowInfoWriter.write("redundant:\n")
-//    for (r <- redundantFormulas)
-//      dataFlowInfoWriter.write(r.toString + "\n")
-    (dataFlowSeq, guardSeq,replacedClause)
+    //    dataFlowInfoWriter.write("redundant:\n")
+    //    for (r <- redundantFormulas)
+    //      dataFlowInfoWriter.write(r.toString + "\n")
+    (dataFlowSeq, guardSeq, simplifyedClauses)
   }
 
+  def getArgumentReplacedClause(clause:Clause): Clause ={
+    val subst=(for(const<-clause.constants;atom<-clause.allAtoms;(arg,n)<-atom.args.zipWithIndex; if const.name==arg.toString) yield const->IVariable(n)).toMap
+    val substKeyString=subst.map {case (key, value) => key.toString -> value}
+    val head=IAtom(clause.head.pred,for(arg<-clause.head.args) yield substKeyString(arg.toString))
+    val body = for (b<-clause.body) yield IAtom(b.pred, for(arg<-b.args) yield substKeyString(arg.toString))
+    val argumentReplacedConstraint= ConstantSubstVisitor(clause.constraint,subst)
+    //val quantifyAndSimplifyedConstraints=spAPI.simplify(sp(HintsSelection.predicateQuantify(argumentReplacedConstraint)))
+    Clause(head, body, argumentReplacedConstraint)
+  }
+
+  def getSimplifiedClauses(clause: Clause): Clause = {
+    val simplifyedConstraints = (sp(HintsSelection.clauseConstraintQuantify(clause)))
+    Clause(clause.head, clause.body, simplifyedConstraints)
+  }
+
+  def drawTrueGuardCondition(): String ={
+    val trueNodeName = "true_" + gnn_input.GNNNodeID.toString
+    createNode(trueNodeName, "true", "constant", nodeShapeMap("constant"))
+    constantNodeSetCrossGraph("true") = trueNodeName
+    constantNodeSetInOneClause("true") = trueNodeName
+    drawHyperEdgeWithTrueGuard(trueNodeName)
+    trueNodeName
+  }
+
+
 }
+
+
+
+

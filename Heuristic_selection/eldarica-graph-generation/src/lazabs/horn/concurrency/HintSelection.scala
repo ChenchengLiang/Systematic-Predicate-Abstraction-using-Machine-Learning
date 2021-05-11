@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package lazabs.horn.concurrency
-import ap.PresburgerTools
+import ap.{PresburgerTools, Prover, SimpleAPI}
 import ap.basetypes.IdealInt
 import ap.parser.IExpression._
 import ap.parser.{IExpression, IFormula, _}
@@ -46,7 +46,7 @@ import lazabs.horn.bottomup.HornPredAbs.{NormClause, RelationSymbol, SymbolFacto
 import lazabs.horn.bottomup.Util.Dag
 import lazabs.horn.bottomup.{HornClauses, _}
 import lazabs.horn.preprocessor.{ConstraintSimplifier, HornPreprocessor}
-import lazabs.horn.preprocessor.HornPreprocessor.{Clauses, VerificationHints}
+import lazabs.horn.preprocessor.HornPreprocessor.{Clauses, VerificationHints, simplify}
 
 import java.io.{File, PrintWriter}
 import java.lang.System.currentTimeMillis
@@ -242,11 +242,12 @@ object HintsSelection {
     val uniqueClauses = HintsSelection.distinctByString(simplifiedClauses)
     val (csSimplifiedClauses,_,_)=cs.process(uniqueClauses.distinct,hints)
 
-    val simplePredicatesGeneratorClauses = GlobalParameters.get.hornGraphType match {
-      case DrawHornGraph.HornGraphType.hyperEdgeGraph | DrawHornGraph.HornGraphType.equivalentHyperedgeGraph | DrawHornGraph.HornGraphType.concretizedHyperedgeGraph => for(clause<-csSimplifiedClauses) yield clause.normalize()
-      case _ => csSimplifiedClauses
-    }
-    simplePredicatesGeneratorClauses
+//    val simplePredicatesGeneratorClauses = GlobalParameters.get.hornGraphType match {
+//      case DrawHornGraph.HornGraphType.hyperEdgeGraph | DrawHornGraph.HornGraphType.equivalentHyperedgeGraph | DrawHornGraph.HornGraphType.concretizedHyperedgeGraph => for(clause<-csSimplifiedClauses) yield clause.normalize()
+//      case _ => csSimplifiedClauses
+//    }
+//    simplePredicatesGeneratorClauses
+    csSimplifiedClauses
   }
 
   def transformPredicatesToCanonical( lastPredicates:Map[HornPredAbs.RelationSymbol, ArrayBuffer[HornPredAbs.RelationSymbolPred]]):
@@ -430,8 +431,8 @@ object HintsSelection {
       Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".selected.tpl")) {
         AbsReader.printHints(selectedPredicates)}
     }
-    println("-"*10 + "positive predicates found by CEGAR" +"-"*10)
-    transformPredicateMapToVerificationHints(positivePredicatesFromCEGAR).pretyPrintHints()
+//    println("-"*10 + "positive predicates found by CEGAR" +"-"*10)
+//    transformPredicateMapToVerificationHints(positivePredicatesFromCEGAR).pretyPrintHints()
   }
 
 //  def labelSimpleGeneratedPredicatesBySelectedPredicates(optimizedPredicate: Map[Predicate, Seq[IFormula]],
@@ -611,6 +612,35 @@ object HintsSelection {
     }
   }
 
+  def predicateQuantify(p: IFormula): IFormula = {
+    val constants = SymbolCollector.constants(p)
+    if (constants.isEmpty) p
+    else spAPI.simplify(IExpression.quanConsts(Quantifier.EX, constants, p))
+  }
+  def clauseConstraintQuantify(clause: Clause): IFormula ={
+    //todo: collect constants from body and head
+    println(clause.toPrologString)
+    val projectedConstraint=
+    SimpleAPI.withProver { p=>
+      p.scope{
+        p.addConstantsRaw(clause.constants)
+        val constants = for (a <- clause.allAtoms; c <- SymbolCollector.constants(a)) yield c
+        p.simplify(p.projectEx(clause.constraint,constants))
+      }
+    }
+    projectedConstraint
+//    println(spAPI.projectEx(clause.constraint,constants))
+//    spAPI.projectEx(clause.constraint,constants)
+
+//    val constants = for (a <- clause.allAtoms; c <- SymbolCollector.constants(a)) yield c
+//    val freeVariables= SymbolCollector.constants(clause.constraint).toSeq.filterNot(constants.contains(_))
+//    println("freeVariables",freeVariables)
+//    val quantifiedConstrants=IExpression.quanConsts(Quantifier.EX, freeVariables, clause.constraint)
+//    println(quantifiedConstrants)
+//    println(spAPI.simplify(quantifiedConstrants))
+//    println("debug")
+//    IExpression.quanConsts(Quantifier.EX, freeVariables, clause.constraint)
+  }
   def getSimplePredicates( simplePredicatesGeneratorClauses: HornPreprocessor.Clauses,verbose:Boolean=false):  (Map[Predicate, Seq[IFormula]],Map[Predicate, Seq[IFormula]],Map[Predicate, Seq[IFormula]]) ={
 //    for (clause <- simplePredicatesGeneratorClauses)
 //      println(Console.BLUE + clause.toPrologString)
@@ -633,23 +663,8 @@ object HintsSelection {
       //println(Console.BLUE + clause.toPrologString)
       val subst=(for(const<-clause.constants;(arg,n)<-atom.args.zipWithIndex; if const.name==arg.toString) yield const->IVariable(n)).toMap
       val argumentReplacedPredicates= ConstantSubstVisitor(clause.constraint,subst)
-      val constants=SymbolCollector.constants(argumentReplacedPredicates)
+      val simplifiedPredicates = predicateQuantify(argumentReplacedPredicates)
       val freeVariableReplacedPredicates= {
-        /*todo:debug on quantifiers on constants
-        run ../predicted_arguments/chc-lia-lin-0015_000.smt2 -abstract -noIntervals -generateSimplePredicates  -getHornGraph:hyperEdgeGraph
-        run ../predicted_arguments/chc-lia-lin-0015_000.smt2 -abstract -noIntervals -checkSolvability -onlyInitialPredicates
-        */
-        println("argumentReplacedPredicates",argumentReplacedPredicates)
-        println("constants",constants)
-        val simplifiedPredicates = {
-          if(constants.isEmpty) {
-            (argumentReplacedPredicates)
-          } else {
-            spAPI.simplify(IExpression.quanConsts(Quantifier.EX,constants,argumentReplacedPredicates))
-          }
-        }
-        println("simplifiedPredicates",simplifiedPredicates)
-
         if(clause.body.map(_.toString).contains(atom.toString)) {
           (for (p<-LineariseVisitor(sp(simplifiedPredicates.unary_!),IBinJunctor.And)) yield p) ++ (for (p<-LineariseVisitor(simplifiedPredicates,IBinJunctor.And)) yield sp(p.unary_!))
         } else {
@@ -675,6 +690,7 @@ object HintsSelection {
 //      ).groupBy(_._1).mapValues(_.flatMap(_._2).distinct).filterKeys(_.arity != 0)//.mapValues(distinctByLogic(_))
 
     //generate predicates with pairwise variables
+    //const1*v1 + const2*v2 + const =|!=|>= 0
     val integerConstantVisitor = new LiteralCollector
     //val variableConstantPairs=Seq(0,1,1,-1,-1).map(IdealInt(_)).combinations(2).toSeq.map(listToTuple2(_))
     val variableConstantPairs=Seq((-1,-1),(1,1),(0,1),(1,0),(-1,1),(1,-1),(0,-1),(-1,0)).map(x=>Tuple2(IdealInt(x._1),IdealInt(x._2)))
@@ -701,6 +717,8 @@ object HintsSelection {
 //      for(cc<-argumentConstantEqualPredicate; b<-cc._2) println(cc._1,b)
       println("--------predicates from pairwise variables---------")
       for(cc<-pairWiseVariablePredicates; b<-cc._2) println(cc._1,b)
+      println("--------predicates from pairwise variables simplified---------")
+      for(cc<-pairWiseVariablePredicates.mapValues(_.map(spAPI.simplify(_))); b<-cc._2) println(cc._1,b)
       println("--------all generated predicates---------")
       for((k,v)<-simplelyGeneratedPredicates;(p,i)<-v.zipWithIndex) println(k,i,p)
     }

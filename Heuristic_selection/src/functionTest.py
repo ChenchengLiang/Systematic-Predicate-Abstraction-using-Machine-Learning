@@ -144,7 +144,16 @@ def get_weighted_binary_crossentropy(weight_class,true_y,predicted_y):
         #     ce = ce + tf.keras.losses.binary_crossentropy([y], [p],from_logits=False) * weight_class["weight_for_0"]
     return ce / len(true_y), ce_raw/len(true_y)
 def main():
-    mnist_example()
+
+    d={"aa":1,"bb":2}
+    xx= {}
+    for dd in d:
+        xx=d.get(dd)
+    print(xx)
+    print(d.get("aa"))
+
+    #mnist_example()
+
     # from horn_dataset import logit
     # y=tf.constant([0],tf.float32)
     # y_hat=tf.constant([0],tf.float32)

@@ -46,8 +46,9 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters["label_type"]=label
     parameters ["gathered_nodes_binary_classification_task"]=gathered_nodes_binary_classification_task
     parameters["threshold"]=hyper_parameters["threshold"]
-    max_epochs = 1000
-    patience = 100
+    parameters["GPU"]=True
+    max_epochs = 10
+    patience = 10
     use_class_weight=False
     # parameters["add_self_loop_edges"]=False
     # parameters["tie_fwd_bkwd_edges"]=True
@@ -479,11 +480,15 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                     if json_type==".hyperEdgeHornGraph.JSON" or json_type==".equivalent-hyperedgeGraph.JSON" or json_type==".concretized-hyperedgeGraph.JSON": #read adjacency_lists
                         #for hyperedge horn graph
                         graphs_adjacency_lists.append([
-                            #np.array(loaded_graph["argumentEdges"]),
-                            #np.array(loaded_graph["guardASTEdges"]),
+                            np.array(loaded_graph["argumentEdges"]),
+                            np.array(loaded_graph["guardASTEdges"]),
                             #np.array(loaded_graph["dataFlowASTEdges"]),
-                            np.array(loaded_graph["binaryAdjacentList"]),
-                            #np.array(loaded_graph["controlFlowHyperEdges"]),
+                            #np.array(loaded_graph["ASTEdges"]),
+                            np.array(loaded_graph["AST_1Edges"]),
+                            np.array(loaded_graph["AST_2Edges"]),
+                            np.array(loaded_graph["templateEdges"]),
+                            #np.array(loaded_graph["binaryAdjacentList"]),
+                            np.array(loaded_graph["controlFlowHyperEdges"]),
                             #np.array(loaded_graph["dataFlowHyperEdges"]),
                             #np.array(loaded_graph["ternaryAdjacencyList"])
                         ])
@@ -652,6 +657,20 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
         raw_data_graph.file_names.append(file_name)
         # node tokenization
         tokenized_node_label_ids=tokenize_symbols(token_map,node_symbols)
+        # todo: try simple example
+        # tokenized_node_label_ids=[0,1,2,3,4,5,6,7,8,9,10]
+        # adjacency_lists=[np.array([[0,4],[1,2],[3,4],[4,5],[1,4],[5,6],[7,8],[9,10],[10,4],[9,5],[3,1],[8,6],[0,1],[1,4],[2,4],[4,7],[2,4],[8,6],[3,8],[1,10],[10,5],[9,5],[3,1],[6,8]])]
+        # node_indices=[3,3,3,3,4,4,4,4]
+        # learning_labels=[0,0,0,0,1,1,1,1]
+        node_indices=[0,1,2,3,4,5,6,7,8,9,10,11,12,13]
+        learning_labels = [0,0,1,0,0,0,0,0,0,0,0,0,0,0]
+        graphs_learning_labels=[learning_labels]
+        print("node_label_ids",len(node_label_ids),node_label_ids)
+        print("tokenized_node_label_ids",len(tokenized_node_label_ids),tokenized_node_label_ids)
+        print("node_indices",node_indices)
+        print("learning_labels",learning_labels)
+
+
 
         raw_data_graph.labels.append(learning_labels)
 
@@ -692,7 +711,7 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
         final_graphs.append(
             HornGraphSample(
                 adjacency_lists=adjacency_lists,
-                node_features=np.array(tokenized_node_label_ids),
+                node_features=np.array(tokenized_node_label_ids), #node_label_ids,tokenized_node_label_ids
                 node_indices=np.array(node_indices),
                 node_label=np.array(learning_labels)
             )
@@ -999,4 +1018,4 @@ def get_test_loss_with_class_weight(class_weight,task_output,labels,from_logits=
     #         ce.append(tf.keras.losses.binary_crossentropy([y], [y_hat], from_logits=from_logits))
     # return tf.reduce_mean(ce)
 def logit(p):
-    return tf.math.log(p/(1-p))
+    return tf.cast(tf.math.log(p/(1-p)),tf.float32)
