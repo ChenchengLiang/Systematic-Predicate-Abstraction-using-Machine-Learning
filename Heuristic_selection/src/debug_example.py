@@ -10,7 +10,8 @@ from utils import plot_confusion_matrix,get_recall_and_precision,plot_ROC,assemb
 import numpy as np
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
-"""
+
+""" debug for zigzag behaviour when doing approximation after unsorted_segment_sum()
 This will read train, valid, and test data on tree leaf node identification task on one graph:
 tokenized_node_label_ids = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 adjacency_lists = [np.array([[0, 1], [0, 2], [1, 3], [1, 4], [1, 5], [4, 7], [4, 8], [2, 6], [6, 9], [6, 10]])]
@@ -19,7 +20,11 @@ learning_labels = [0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1]
 
 This graph is directly constructed in tg2_gnn/data/horn_graph_dataset.__load_data()
 
-After running you can find the train-valid-test loss chart in src/trained_model
+After training you can find the train-valid-test loss chart in src/trained_model.
+
+The zigzag behavior only occurs when num_layers>=4 
+
+trauncating and rounding after unsorted_segment_sum can be found in tf2_gnn/layers/message_passing.py
 """
 
 
@@ -32,11 +37,13 @@ def main():
     GPU_switch(GPU)
     nodeFeatureDim = 32
     num_layers=8
+    max_epochs = 500
+    patience = 500
     parameters = tf2_gnn.GNN.get_default_hyperparameters()
     parameters['hidden_dim'] = nodeFeatureDim
     parameters['num_layers'] = num_layers
     parameters['node_label_embedding_size'] = nodeFeatureDim
-    parameters['max_nodes_per_batch'] = 1000
+    parameters['max_nodes_per_batch'] = 10000
     parameters['regression_hidden_layer_size'] = [32]
     parameters["label_type"] = "template_relevance"
     parameters["gathered_nodes_binary_classification_task"] = gathered_nodes_binary_classification_task
@@ -45,9 +52,6 @@ def main():
     parameters["pickle"] = pickle
     parameters["benchmark"]="tree-leaf-identification"
     parameters["graph_type"]="tree"
-    max_epochs = 500
-    patience = 500
-
 
     these_hypers: Dict[str, Any] = {
         "optimizer": "Adam",  # One of "SGD", "RMSProp", "Adam"
@@ -58,7 +62,7 @@ def main():
         "use_intermediate_gnn_results": False,
     }
     parameters.update(these_hypers)
-    # initial dataset
+    # initiate dataset
     dataset = HornGraphDataset(parameters)
     if GPU==True:
         dataset._use_worker_threads=False #solve Failed setting context: CUDA_ERROR_NOT_INITIALIZED: initialization error
