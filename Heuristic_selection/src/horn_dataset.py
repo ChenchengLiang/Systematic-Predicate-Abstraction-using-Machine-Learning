@@ -15,8 +15,7 @@ from tf2_gnn.models import InvariantArgumentSelectionTask, InvariantNodeIdentify
 
 from Miscellaneous import pickleWrite, pickleRead, drawBinaryLabelPieChart
 from archived.dotToGraphInfo import parseArgumentsFromJson
-from utils import plot_confusion_matrix,get_recall_and_precision,plot_ROC,assemble_name
-
+from utils import plot_confusion_matrix,get_recall_and_precision,plot_ROC,assemble_name,my_round_fun
 def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",json_type=".JSON",form_label=False,GPU=False,pickle=True,hyper_parameters={}):
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
                                                  "argument_upper_bound_existence", "argument_occurrence_binary",
@@ -46,9 +45,10 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters["label_type"]=label
     parameters ["gathered_nodes_binary_classification_task"]=gathered_nodes_binary_classification_task
     parameters["threshold"]=hyper_parameters["threshold"]
-    parameters["GPU"]=True
-    max_epochs = 10
-    patience = 10
+    parameters["GPU"]=GPU
+    parameters["pickle"]=pickle
+    max_epochs = 500
+    patience = 500
     use_class_weight=False
     # parameters["add_self_loop_edges"]=False
     # parameters["tie_fwd_bkwd_edges"]=True
@@ -93,6 +93,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     test_loss_list_average = []
     mean_loss_list_average = []
     error_loaded_model_average = []
+    error_memory_model_average=[]
     train_loss_average = []
     valid_loss_average = []
     test_loss_average = []
@@ -144,17 +145,23 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         _, _, test_results = model.run_one_epoch(test_data, training=False, quiet=quiet)
         test_metric, test_metric_string = model.compute_epoch_metrics(test_results)
         predicted_Y_loaded_model_from_memory = model.predict(test_data)
+        rounded_predicted_Y_loaded_model_from_memory=my_round_fun(predicted_Y_loaded_model_from_memory,threshold=hyper_parameters["threshold"])
         #predicted_Y_loaded_model_from_memory=tf.math.sigmoid(predicted_Y_loaded_model_from_memory)
         print("test_metric_string model from memory", test_metric_string)
         print("test_metric model from memory", test_metric)
-        print("predicted_Y_loaded_model_from_memory",tf.math.round(predicted_Y_loaded_model_from_memory))
+        print("predicted_Y_loaded_model_from_memory",predicted_Y_loaded_model_from_memory)
+        print("rounded_predicted_Y_loaded_model_from_memory",rounded_predicted_Y_loaded_model_from_memory)
+
         #load model from files
         loaded_model = tf2_gnn.cli_utils.model_utils.load_model_for_prediction(trained_model_path, dataset)
         _, _, test_results = loaded_model.run_one_epoch(test_data, training=False, quiet=quiet)
         test_metric, test_metric_string = loaded_model.compute_epoch_metrics(test_results)
+
         predicted_Y_loaded_model = loaded_model.predict(test_data)
+        rounded_predicted_Y_loaded_model=my_round_fun(predicted_Y_loaded_model,threshold=hyper_parameters["threshold"])
         #predicted_Y_loaded_model=tf.math.sigmoid(predicted_Y_loaded_model)
-        print("predicted_Y_loaded_model",tf.math.round(predicted_Y_loaded_model))
+        print("predicted_Y_loaded_model",predicted_Y_loaded_model)
+        print("rounded_predicted_Y_loaded_model",rounded_predicted_Y_loaded_model)
 
         print("test_metric_string",test_metric_string)
         print("test_metric",test_metric)
@@ -170,20 +177,21 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             if label not in gathered_nodes_binary_classification_task else get_test_loss_with_class_weight(class_weight,predicted_Y_loaded_model,true_Y,from_logits=from_logits))()
         print("\n error of loaded_model", error_loaded_model)
 
-        #print("true_Y", true_Y)
-        #print("predicted_Y_loaded_model_from_memory", predicted_Y_loaded_model_from_memory)
-        #print("predicted_Y_loaded_model", predicted_Y_loaded_model)
+        error_memory_model = (lambda: tf.keras.losses.MSE(true_Y, predicted_Y_loaded_model) \
+            if label not in gathered_nodes_binary_classification_task else get_test_loss_with_class_weight(class_weight,predicted_Y_loaded_model_from_memory,true_Y,from_logits=from_logits))()
+        print("\n error of error_memory_model", error_memory_model)
 
         mean_loss = (lambda : get_test_loss_with_class_weight(class_weight,[np.mean(true_Y)]*len(true_Y), true_Y,from_logits=from_logits) if label in gathered_nodes_binary_classification_task else tf.keras.losses.MSE([np.mean(true_Y)]*len(true_Y), true_Y))()
         print("\n mean_loss_Y_and_True_Y", mean_loss)
         mean_loss_list=mean_loss
-        num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, tf.math.round(predicted_Y_loaded_model)),tf.int32))
-        accuracy = num_correct / len(predicted_Y_loaded_model)
+        num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, rounded_predicted_Y_loaded_model),tf.int32))
+        accuracy = num_correct / len(rounded_predicted_Y_loaded_model)
         accuracy_average.append(accuracy)
 
         test_loss_list_average.append(predicted_Y_loaded_model)
         mean_loss_list_average.append(mean_loss_list)
         error_loaded_model_average.append(error_loaded_model)
+        error_memory_model_average.append(error_memory_model)
         test_loss_average.append(predicted_Y_loaded_model[-1])
 
         train_loss_list_average.append(train_loss_list)
@@ -198,6 +206,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     test_loss_list_average = np.mean(test_loss_list_average, axis=0)
     mean_loss_list_average = np.mean(mean_loss_list)
     error_loaded_model_average = np.mean(error_loaded_model_average)
+    error_memory_model_average = np.mean(error_memory_model_average)
     train_loss_average = np.mean(train_loss_average)
     valid_loss_average = np.mean(valid_loss_average)
     best_valid_epoch_average = np.mean(best_valid_epoch_average)
@@ -206,10 +215,10 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     # visualize results
     draw_training_results(train_loss_list_average, valid_loss_list_average,
                           mean_loss_list_average,
-                          error_loaded_model_average, true_Y, predicted_Y_loaded_model, label,
+                          error_memory_model_average, true_Y, predicted_Y_loaded_model, label,
                           benchmark_name, graph_type,gathered_nodes_binary_classification_task,hyper_parameters)
     write_train_results_to_log(dataset, predicted_Y_loaded_model, train_loss_average,
-                               valid_loss_average, error_loaded_model, mean_loss_list, accuracy_average,
+                               valid_loss_average, error_memory_model, mean_loss_list, accuracy_average,
                                best_valid_epoch_average,hyper_parameters,
                                benchmark=benchmark_name, label=label, graph_type=graph_type)
 
@@ -260,7 +269,7 @@ def draw_training_results(train_loss_list_average, valid_loss_list_average,
 
         saving_path_confusion_matrix="trained_model/" + plot_name+ "-confusion_matrix.png"
         saving_path_roc = "trained_model/" + plot_name + "-ROC.png"
-        recall,precision,f1_score,false_positive_rate=get_recall_and_precision(true_Y,tf.math.round(predicted_Y_loaded_model),verbose=True)
+        recall,precision,f1_score,false_positive_rate=get_recall_and_precision(true_Y,my_round_fun(predicted_Y_loaded_model,threshold=hyper_parameters["threshold"]),verbose=True)
         plot_confusion_matrix(predicted_Y_loaded_model,true_Y,saving_path_confusion_matrix,recall=recall,precision=precision,f1_score=f1_score)
         plot_ROC(false_positive_rate,recall,saving_path_roc)
 
@@ -283,7 +292,7 @@ def draw_training_results(train_loss_list_average, valid_loss_list_average,
             true_Y) == float("-inf") or np.max(true_Y) == float("inf"):
         pass
     else:
-        error = predicted_Y_loaded_model - true_Y
+        error = np.array(predicted_Y_loaded_model) - np.array(true_Y)
         plt.hist(error, bins=25)
         plt.xlabel("Prediction Error [occurence]")
         _ = plt.ylabel("Count")
@@ -487,10 +496,10 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                             np.array(loaded_graph["AST_1Edges"]),
                             np.array(loaded_graph["AST_2Edges"]),
                             np.array(loaded_graph["templateEdges"]),
-                            #np.array(loaded_graph["binaryAdjacentList"]),
+                            np.array(loaded_graph["binaryAdjacentList"]),
                             np.array(loaded_graph["controlFlowHyperEdges"]),
-                            #np.array(loaded_graph["dataFlowHyperEdges"]),
-                            #np.array(loaded_graph["ternaryAdjacencyList"])
+                            np.array(loaded_graph["dataFlowHyperEdges"]),
+                            np.array(loaded_graph["ternaryAdjacencyList"])
                         ])
                     else:
                         #for layer horn graph
@@ -658,17 +667,19 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
         # node tokenization
         tokenized_node_label_ids=tokenize_symbols(token_map,node_symbols)
         # todo: try simple example
-        # tokenized_node_label_ids=[0,1,2,3,4,5,6,7,8,9,10]
-        # adjacency_lists=[np.array([[0,4],[1,2],[3,4],[4,5],[1,4],[5,6],[7,8],[9,10],[10,4],[9,5],[3,1],[8,6],[0,1],[1,4],[2,4],[4,7],[2,4],[8,6],[3,8],[1,10],[10,5],[9,5],[3,1],[6,8]])]
-        # node_indices=[3,3,3,3,4,4,4,4]
-        # learning_labels=[0,0,0,0,1,1,1,1]
-        node_indices=[0,1,2,3,4,5,6,7,8,9,10,11,12,13]
-        learning_labels = [0,0,1,0,0,0,0,0,0,0,0,0,0,0]
-        graphs_learning_labels=[learning_labels]
-        print("node_label_ids",len(node_label_ids),node_label_ids)
-        print("tokenized_node_label_ids",len(tokenized_node_label_ids),tokenized_node_label_ids)
-        print("node_indices",node_indices)
-        print("learning_labels",learning_labels)
+        tokenized_node_label_ids=[0,0,0,0,0,0,0,0,0,0,0]
+        adjacency_lists=[np.array([[0,1],[0,2],[1,3],[1,4],[1,5],[4,7],[4,8],[2,6],[6,9],[6,10]])]
+        node_indices=[0,1,2,3,4,5,6,7,8,9,10]
+        learning_labels=[0,0,0,1,0,1,0,1,1,1,1]
+        graphs_learning_labels = [learning_labels]
+
+        # node_indices=[0,1,2,3,4,5,6,7,8,9,10,11,12,13]
+        # learning_labels = [0,0,1,0,0,0,0,0,0,0,0,0,0,0]
+        # graphs_learning_labels=[learning_labels]
+        # print("node_label_ids",len(node_label_ids),node_label_ids)
+        # print("tokenized_node_label_ids",len(tokenized_node_label_ids),tokenized_node_label_ids)
+        # print("node_indices",node_indices)
+        # print("learning_labels",learning_labels)
 
 
 

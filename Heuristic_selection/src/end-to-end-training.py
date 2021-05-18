@@ -1,4 +1,5 @@
 import sys
+import time
 from typing import Dict, Any
 import tf2_gnn
 from tf2_gnn.data import DataFold, HornGraphSample, HornGraphDataset
@@ -17,7 +18,7 @@ import tensorflow as tf
 from tensorflow.keras import mixed_precision
 import gc
 def main():
-    for num_layers in [128]:#1,2,4,8,16,32,64,128
+    for num_layers in [8]:#1,2,4,8,16,32,64,128
         end_to_end_training(num_layers)
         gc.collect()
         tf.keras.backend.clear_session()
@@ -26,28 +27,28 @@ def end_to_end_training(num_layers):
     random_seed(1)
     tf.keras.backend.clear_session()
     # description: set hyper-parameters
-    params = {"benchmark": "mixed-three-fold-single-example",#lia-lin-extract, mixed-three-fold-single-example
+    params = {"benchmark": "lia-lin-extract",#lia-lin-extract, mixed-three-fold-single-example
               "label": "template_relevance",
               "force_read": True,
               "file_type": ".smt2",
               "graph_type": "hyperEdgeHornGraph",
               "form_label": True,
-              "GPU": False,
+              "GPU": True,
               "train_quiet": False,
               "test_quiet": False,
               "max_epochs": 500,
-              "patience": 500,
+              "patience": 100,
               "max_nodes_per_batch": 10000,
               "threshold": 0.5,
               "verbose":True,
-              "use_class_weight":False,
+              "use_class_weight":True,
               "gathered_nodes_binary_classification_task": ["predicate_occurrence_in_SCG",
                                                             "argument_lower_bound_existence",
                                                             "argument_upper_bound_existence",
                                                             "argument_occurrence_binary",
                                                             "template_relevance",
                                                             "clause_occurrence_in_counter_examples_binary"]}
-    hyper_parameters = {"nodeFeatureDim": 32, "num_layers": num_layers, "regression_hidden_layer_size": [32],"threshold": params["threshold"]}
+    hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers, "regression_hidden_layer_size": [64],"threshold": params["threshold"]}
 
     #description: generate horn graph if there is no horn graph file
     filtered_file_list,file_list_with_horn_graph,file_list = wrapped_generate_horn_graph(params["benchmark"], params["max_nodes_per_batch"], move_file=True,
@@ -57,8 +58,8 @@ def end_to_end_training(num_layers):
     trained_model_path, test_data, model, dataset,train_loss_list, valid_loss_list, best_valid_epoch = read_data_and_train(params, hyper_parameters)
 
     # description: predict with threshold
-    predicted_Y = predict_test_set_model_from_memory(params, test_data, model)
-    #predicted_Y = predict_test_set_model_from_file(params, test_data, trained_model_path, dataset)
+    #predicted_Y = predict_test_set_model_from_memory(params, test_data, model)
+    predicted_Y = predict_test_set_model_from_file(params, test_data, trained_model_path, dataset)
     #this should be performed in the folder "benchmark-unsolved"
     #trained_model_path = "trained_model/R-GCN_template_relevance__2021-04-23_20-47-42_best.pkl"
     #predicted_Y, dataset =predict_unseen_set(params, trained_model_path, file_list=filtered_file_list, set_max_nodes_per_batch=True)
@@ -68,43 +69,43 @@ def end_to_end_training(num_layers):
 
     #description: draw train-predict diagrams
     draw_train_predict_plots(params, dataset, test_data, predicted_Y, train_loss_list, valid_loss_list,best_valid_epoch, hyper_parameters)
-    #
-    # # description: get final measurement from Eldarica
-    # get_solvability_and_measurement_from_eldarica(filtered_file_list, thread_number=4,continuous_extracting=True,move_file=False)
-    #
-    # # description: In solvable set, draw time consumption
-    #
-    # out_of_test_set = False
-    # # description: read solvability results
-    # json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
-    #
-    # three_fild_name = ["empty", "predicted", "full"]
-    # solvability_name_fold = (lambda: three_fild_name if out_of_test_set == True else three_fild_name + ["true"])()
-    # solvability_json_name_fold = ["solvability" + x + "InitialPredicates" for x in solvability_name_fold]
-    # for name_fold in solvability_json_name_fold:
-    #     solvability = [1 if s[name_fold] == "true" else 0 for s in json_solvability_obj_list]
-    #     print(name_fold, str(sum(solvability)) + "/" + str(len(json_solvability_obj_list)))
-    #
-    # # description: read measurement JSON file
-    # scatter_plot_range = [0, 120]
-    # json_obj_list = read_measurement_from_JSON(filtered_file_list)
-    #
-    # get_analysis_for_predicted_labels(json_obj_list, out_of_test_set=out_of_test_set, time_unit=1000,
-    #                                   scatter_plot_range=scatter_plot_range)
-    # print("solvable file by predicted label:" + str(len(json_obj_list)) + "/" + str(len(filtered_file_list)))
-    #
-    # # description: print results
-    # print("-" * 10)
-    # print(file_list_with_horn_graph)
-    # print("max_nodes_per_batch", params["max_nodes_per_batch"])
-    # print("filtered_file_list by max_nodes_per_batch:" + str(len(filtered_file_list)) + "/" + str(len(file_list)))
-    #
-    # # description: statistic data
-    # get_statistic_data(filtered_file_list, params["benchmark"])
-    #
+
+    # description: get final measurement from Eldarica
+    get_solvability_and_measurement_from_eldarica(filtered_file_list, thread_number=4,continuous_extracting=True,move_file=False)
+
+    # description: In solvable set, draw time consumption
+
+    out_of_test_set = False
+    # description: read solvability results
+    json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
+
+    three_fild_name = ["empty", "predicted", "full"]
+    solvability_name_fold = (lambda: three_fild_name if out_of_test_set == True else three_fild_name + ["true"])()
+    solvability_json_name_fold = ["solvability" + x + "InitialPredicates" for x in solvability_name_fold]
+    for name_fold in solvability_json_name_fold:
+        solvability = [1 if s[name_fold] == "true" else 0 for s in json_solvability_obj_list]
+        print(name_fold, str(sum(solvability)) + "/" + str(len(json_solvability_obj_list)))
+
+    # description: read measurement JSON file
+    scatter_plot_range = [0, 120]
+    json_obj_list = read_measurement_from_JSON(filtered_file_list)
+
+    get_analysis_for_predicted_labels(json_obj_list, out_of_test_set=out_of_test_set, time_unit=1000,
+                                      scatter_plot_range=scatter_plot_range)
+    print("solvable file by predicted label:" + str(len(json_obj_list)) + "/" + str(len(filtered_file_list)))
+
+    # description: print results
+    print("-" * 10)
+    print(file_list_with_horn_graph)
+    print("max_nodes_per_batch", params["max_nodes_per_batch"])
+    print("filtered_file_list by max_nodes_per_batch:" + str(len(filtered_file_list)) + "/" + str(len(file_list)))
+
+    # description: statistic data
+    get_statistic_data(filtered_file_list, params["benchmark"])
+
     # # description: how many predicates used in end
-    # get_recall_scatter(solvability_name_fold, json_solvability_obj_list, filtered_file_list)
-    #
+    get_recall_scatter(solvability_name_fold, json_solvability_obj_list, filtered_file_list)
+
     #
     # print("------------unsolvable data----------------")
     #
@@ -258,7 +259,7 @@ def read_data_and_train(params, hyper_parameters):
 
     def log(msg):
         log_line(log_file, msg)
-
+    start=time.time()
     trained_model_path, train_loss_list, valid_loss_list, best_valid_epoch, train_metric_list, valid_metric_list = train(
         model=model,
         dataset=dataset,
@@ -269,6 +270,7 @@ def read_data_and_train(params, hyper_parameters):
         save_dir=save_dir,
         quiet=params["train_quiet"],
         aml_run=None)
+    print("train time consumption",time.time()-start)
 
     print("trained_model_path", trained_model_path)
 

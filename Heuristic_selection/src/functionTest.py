@@ -143,14 +143,98 @@ def get_weighted_binary_crossentropy(weight_class,true_y,predicted_y):
         # if (y == 0):
         #     ce = ce + tf.keras.losses.binary_crossentropy([y], [p],from_logits=False) * weight_class["weight_for_0"]
     return ce / len(true_y), ce_raw/len(true_y)
-def main():
 
-    d={"aa":1,"bb":2}
-    xx= {}
-    for dd in d:
-        xx=d.get(dd)
-    print(xx)
-    print(d.get("aa"))
+#
+# def binary_round(num, digits):
+#     if num < 0:
+#         return -binary_round(-num, digits)
+#     elif num == 0:
+#         return 0
+#     else:
+#         x = num
+#         shifted = digits
+#         while x > 1:
+#             shifted = shifted - 1
+#             x = x / 2
+#         while x < 0.5:
+#             shifted = shifted + 1
+#             x = x * 2
+#         r = round(x * (1 << digits))
+#         while shifted > 0:
+#             shifted = shifted - 1
+#             r = r / 2
+#         while shifted < 0:
+#             shifted = shifted + 1
+#             r = r * 2
+#         return r
+
+
+
+def binary_round_positive_case(num, digits):
+    x = num
+    shifted = digits
+
+    c = lambda aa,bb: tf.greater(bb,1)
+    #b = lambda aa,bb: (tf.subtract(aa,1),tf.divide(bb,2.0))
+    def b(aa,bb):
+        nonlocal shifted
+        nonlocal x
+        shifted=shifted-1
+        x=x/2
+    tf.while_loop(c,b,(shifted,x))
+    # while x > 1:
+    #     shifted = shifted - 1
+    #     x = x / 2
+
+    c = lambda aa,bb: tf.less(bb, 0.5)
+    b = lambda aa,bb: (tf.add(aa, 1), tf.multiply(bb, 2.0))
+    tf.while_loop(c,b,(shifted,x))
+
+    # while x < 0.5:
+    #     shifted = shifted + 1
+    #     x = x * 2
+    r = tf.round(x * (1 << digits))
+    c = lambda aa,bb: tf.greater(aa, 0)
+    b = lambda aa,bb: (tf.subtract(aa, 1), tf.divide(bb, 2.0))
+    tf.while_loop(c, b, (shifted,r))
+    # while shifted > 0:
+    #     shifted = shifted - 1
+    #     r = r / 2
+    c = lambda aa,bb: tf.less(aa, 0)
+    b = lambda aa,bb: (tf.add(aa, 1), tf.multiply(bb, 2.0))
+    tf.while_loop(c, b, (shifted,r))
+    # while shifted < 0:
+    #     shifted = shifted + 1
+    #     r = r * 2
+    return r
+def binary_round(num, digits=4):
+    if num == 0:
+        return tf.constant(0.0,dtype=tf.float32)
+    elif num < 0:
+        return -binary_round_positive_case(-num, digits)
+    else:
+        return binary_round_positive_case(num,digits)
+def row_deler(row):
+    return tf.map_fn(binary_round,row)
+def my_assign(x):
+    #tf.compat.v1.assign_add(x,1)
+    x.assign_add(1)
+def main():
+    print("rounding: round(0.03f, 4) = " + str(binary_round(0.03, 4)))
+    print("rounding: round(0.95f, 4) = " + str(binary_round(0.95, 4)))
+    print("rounding: round(0.98f, 4) = " + str(binary_round(0.98, 4)))
+    print("rounding: round(0.99f, 4) = " + str(binary_round(0.99, 4)))
+    print("rounding: round(8.03f, 4) = " + str(binary_round(8.03, 4)))
+    print("rounding: round(-18.03f, 4) = " + str(binary_round(-18.03, 4)))
+    print("rounding: round(-18.03f, 10) = " + str(binary_round(-18.03, 10)))
+    print("rounding: round(-18.032342342f, 4) = " + str(binary_round(-18.032342342, 4)))
+    x=tf.constant([[0.03,0.95,0.98],[0.99,8.03,-18.03]],tf.float32)
+    print(x.shape)
+    print(tf.map_fn(row_deler,x))
+
+
+
+
 
     #mnist_example()
 

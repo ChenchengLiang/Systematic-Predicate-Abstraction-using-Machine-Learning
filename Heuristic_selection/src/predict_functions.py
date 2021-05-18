@@ -7,6 +7,7 @@ from Miscellaneous import add_JSON_field
 from Miscellaneous import pickleRead,pickleWrite
 from horn_dataset import HornGraphDataset
 from horn_dataset import write_graph_to_pickle, form_GNN_inputs_and_labels
+from utils import my_round_fun
 
 
 def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score_list,graph_type=".layerHornGraph.JSON"):
@@ -98,9 +99,6 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
         new_filed_content = [[str(np.round(l,2)) for l in predicted_label]]
         add_JSON_field(file_name, graph_type, old_field, new_field, new_filed_content)
 
-
-def my_round_fun(num_list,threshold):
-    return  [float(1) if num>threshold else float(0) for num in num_list]
 
 def set_threshold_by_roundings(true_Y,predicted_Y_loaded_model):
     threshold_list=np.arange(0,1,0.1)

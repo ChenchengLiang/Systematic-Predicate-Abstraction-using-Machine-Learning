@@ -13,7 +13,7 @@ import sys
 
 def main():
     # description: parameter settings
-    benchmark = "lia-lin-extract-only-initial-predicates"#sys.argv[1]
+    benchmark = "lia-lin-extract"#sys.argv[1]
     #benchmark_fold = benchmark + "-" + "test"
     #benchmark_fold = benchmark + "-" + "predict"
     benchmark_fold = benchmark + "-" + "unsolved-fullLabel"#sys.argv[2]
@@ -22,7 +22,7 @@ def main():
     max_nodes_per_batch = 10000
 
     #/home/cheli243/PycharmProjects/HintsLearning/src/
-    trained_model_path="trained_model/R-GCN_template_relevance__2021-05-02_16-39-22_best.pkl"
+    trained_model_path="trained_model/R-GCN_template_relevance__2021-05-16_02-24-09_best.pkl"
     thread_number = 6
     continuous_extracting=True
     move_file = True

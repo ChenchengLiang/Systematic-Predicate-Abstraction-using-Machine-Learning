@@ -7,8 +7,6 @@ import glob
 import os
 import time
 import seaborn
-#import tensorflow as tf
-import sklearn
 from sklearn.metrics import confusion_matrix
 
 def get_solvability_and_measurement_from_eldarica(filtered_file_list,thread_number,continuous_extracting=True,move_file=True,checkSolvability="-checkSolvability",measurePredictedPredicates="-measurePredictedPredicates",onlyInitialPredicates=""):
@@ -89,8 +87,9 @@ def plot_scatter(true_Y,predicted_Y,name="",range=[0,0],x_label="True Values",y_
     plt.savefig("trained_model/" + name+ "-scatter.png")
     plt.clf()
 
-def plot_confusion_matrix(predicted_Y_loaded_model,true_Y,saving_path,recall=0,precision=0,f1_score=0):
-    predicted_Y_loaded_model =  list(map(np.round,predicted_Y_loaded_model))#tf.math.round(predicted_Y_loaded_model)
+def plot_confusion_matrix(predicted_Y_loaded_model,true_Y,saving_path,recall=0,precision=0,f1_score=0,threshold=0.5):
+    predicted_Y_loaded_model = my_round_fun(predicted_Y_loaded_model)
+    #predicted_Y_loaded_model =  list(map(my_round_fun,np.array(predicted_Y_loaded_model)))#tf.math.round(predicted_Y_loaded_model)
     cm = confusion_matrix(true_Y, predicted_Y_loaded_model)
     plt.figure(figsize=(5, 5))
     seaborn.heatmap(cm, annot=True, fmt="d")
@@ -112,18 +111,20 @@ def plot_ROC(FP_rate,TP_rate,saving_path):
     plt.savefig(saving_path)
     plt.clf()
 
-def run_eldarica_with_shell_pool(filePath, fun, eldarica_parameters,timeout=60,thread=4,countinous_extract=True):
+def run_eldarica_with_shell_pool(filePath, fun, eldarica_parameters,timeout=60,thread=4,countinous_extract=True,graphtype="hyperEdgeHornGraph"):
     file_list = []
     for root, subdirs, files in os.walk(filePath):
         if len(subdirs) == 0:
             if countinous_extract == True:
                 for file in glob.glob(root + "/*.smt2"):
-                    if not os.path.exists(file + ".circles.gv"):
+                    #if not os.path.exists(file + ".circles.gv"):
+                    if not os.path.exists(file + "."+graphtype+".JSON"):
                         file_list.append([file,eldarica_parameters,timeout])
             else:
                 for file in glob.glob(root + "/*.smt2"):
                     file_list.append([file,eldarica_parameters,timeout])
     run_eldarica_with_shell_pool_with_file_list(thread,fun,file_list)
+    return file_list
 
 def run_eldarica_with_shell_pool_with_file_list(thread,fun,file_list):
     pool = Pool(processes=thread)
@@ -299,4 +300,8 @@ def mutual_differences(set_1,set_2):
     set_1=set(set_1)
     set_2=set(set_2)
     return set_1.difference(set_2).union(set_2.difference(set_1))
+
+def my_round_fun(num_list,threshold=0.5):
+    return  [1.0 if num>threshold else 0.0 for num in num_list]
+
 
