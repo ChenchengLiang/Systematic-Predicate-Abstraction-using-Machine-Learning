@@ -11,4 +11,10 @@ pip install nltk
 pip install matplotlib
 pip install numba
 pip install seaborn
+pip install sklearn
+pip install multiprocessing
+pip install json
+pip install subprocess
+pip install numpy
+pip install tensorflow
 
