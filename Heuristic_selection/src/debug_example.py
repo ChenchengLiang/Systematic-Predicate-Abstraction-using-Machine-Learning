@@ -18,11 +18,11 @@ adjacency_lists = [np.array([[0, 1], [0, 2], [1, 3], [1, 4], [1, 5], [4, 7], [4,
 node_indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 learning_labels = [0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1]
 
-This graph is directly constructed in tg2_gnn/data/horn_graph_dataset.__load_data()
+This graph is directly constructed in tg2_gnn/data/horn_graph_dataset.__load_data(). You can customize the graph in __load_data() only.
 
 After training you can find the train-valid-test loss chart in src/trained_model.
 
-The zigzag behavior only occurs when num_layers>=4 
+The zigzag behavior only occurs when num_layers>=4. Increase num_layers will get more intensive zigzag behavior
 
 trauncating and rounding after unsorted_segment_sum can be found in tf2_gnn/layers/message_passing.py
 """
