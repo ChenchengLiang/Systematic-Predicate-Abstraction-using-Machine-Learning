@@ -2,19 +2,21 @@
 git clone https://github.com/ChenchengLiang/tf2-gnn
 cd tf2-gnn
 git checkout horn_graph_with_hyperedge
-pip3 install -e ./
+python3 -m pip install -e ./
 
-pip3 install networkx
-pip3 install graphviz
-pip3 install gensim
-pip3 install nltk
-pip3 install matplotlib
-pip3 install numba
-pip3 install seaborn
-pip3 install sklearn
-pip3 install multiprocessing
-pip3 install json
-pip3 install subprocess
-pip3 install numpy
-pip3 install tensorflow
+python3 -m pip install networkx
+python3 -m pip install graphviz
+python3 -m pip install gensim
+python3 -m pip install nltk
+python3 -m pip install matplotlib
+python3 -m pip install llvmpy
+python3 -m pip install cython
+python3 -m pip install numba
+python3 -m pip install seaborn
+python3 -m pip install sklearn
+python3 -m pip install multiprocessing
+python3 -m pip install json
+python3 -m pip install subprocess
+python3 -m pip install numpy
+python3 -m pip install tensorflow
 
