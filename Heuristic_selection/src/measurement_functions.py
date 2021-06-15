@@ -72,7 +72,7 @@ def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False,time_u
 
     print("------------")
     scatter_plot_range = [0,max(list(map(np.float,flattenList(measurement_list_all_files_map["timeConsumptionForCEGAR"]))))/1000]#scatter_plot_range
-    print("scatter_plot_range",scatter_plot_range)
+    print("scatter_plot_range (seconds)",scatter_plot_range)
     measurement_list_all_files_map["timeConsumptionForCEGAR_ms"]=measurement_list_all_files_map["timeConsumptionForCEGAR"].copy()
     measurement_list_all_files_map["predicateGeneratorTime_ms"]=measurement_list_all_files_map["predicateGeneratorTime"].copy()
     measurement_list_all_files_map["timeConsumptionForCEGAR"]=[[float(data)/time_unit for data in data_fold] for data_fold in measurement_list_all_files_map["timeConsumptionForCEGAR"]]
@@ -80,9 +80,10 @@ def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False,time_u
     extended_measurement_name_list=measurement_name_list + ["timeConsumptionForCEGAR_ms"] + ["predicateGeneratorTime_ms"]
 
     for fild_name in extended_measurement_name_list:
-        measurement_scatter(measurement_list_all_files_map[fild_name], scatter_plot_range,
+        temp_scatter_plot_range=(lambda : [0,scatter_plot_range[1]*100] if fild_name.find("_ms")>0 else scatter_plot_range)()
+        measurement_scatter(measurement_list_all_files_map[fild_name], temp_scatter_plot_range,
                             plot_name=fild_name + "-full_predicates", index=[1, 3])
-        measurement_scatter(measurement_list_all_files_map[fild_name], scatter_plot_range,
+        measurement_scatter(measurement_list_all_files_map[fild_name], temp_scatter_plot_range,
                             plot_name=fild_name + "-empty_predicates", index=[2, 3],
                             x_label="empty predicates")
 
@@ -101,11 +102,11 @@ def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False,time_u
         #                         x_label="empty predicates")
     else:
         for fild_name in extended_measurement_name_list:
-            measurement_scatter(measurement_list_all_files_map[fild_name], scatter_plot_range,
+            temp_scatter_plot_range = (
+                lambda: [0, scatter_plot_range[1] * 100] if fild_name.find("_ms") > 0 else scatter_plot_range)()
+            measurement_scatter(measurement_list_all_files_map[fild_name], temp_scatter_plot_range,
                                 plot_name=fild_name+"-true_predicates", index=[0, 3],
                                 x_label="true predicates")
-
-
 
 
     with open("trained_model/measurement.log", 'w') as outfile:

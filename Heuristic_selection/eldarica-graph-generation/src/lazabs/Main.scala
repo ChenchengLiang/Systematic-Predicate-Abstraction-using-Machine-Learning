@@ -61,11 +61,12 @@ class GlobalParameters extends Cloneable {
   var generateSimplePredicates=false
   var moveFile = false
   var maxNode=1000000
-  var threadTimeout = 300000
-  var solvabilityTimeout=300000
-  var mainTimeout=300000
+  var threadTimeout = 60*60*1000
+  var solvabilityTimeout=60*60*1000
+  var mainTimeout=60*60*1000
   var extractTemplates=false
   var extractPredicates=false
+  var separateByPredicates=false
   var measurePredictedPredicates=false
   var labelSimpleGeneratedPredicates=false
   var varyGeneratedPredicates=false
@@ -90,7 +91,7 @@ class GlobalParameters extends Cloneable {
   var slicing = true
   var intervals = true
   var prettyPrint = false
-  var smtPrettyPrint = false  
+  var smtPrettyPrint = false
 //  var interpolation = false
   var ntsPrint = false
   var printIntermediateClauseSets = false
@@ -112,6 +113,7 @@ class GlobalParameters extends Cloneable {
   var cegarHintsFile : String = ""
   var cegarPostHintsFile : String = ""
   var predicateOutputFile : String = ""
+  var finiteDomainPredBound : Int = 0
   var arithmeticMode : CCReader.ArithmeticMode.Value =
     CCReader.ArithmeticMode.Mathematical
   var arrayRemoval = false
@@ -127,6 +129,7 @@ class GlobalParameters extends Cloneable {
   var logCEX = false
   var logStat = false
   var printHornSimplified = false
+  var printHornSimplifiedSMT = false
   var dotSpec = false
   var dotFile : String = null
   var pngNo = true;
@@ -197,6 +200,7 @@ class GlobalParameters extends Cloneable {
     that.cegarHintsFile = this.cegarHintsFile
     that.cegarPostHintsFile = this.cegarPostHintsFile
     that.predicateOutputFile = this.predicateOutputFile
+    that.finiteDomainPredBound = this.finiteDomainPredBound
     that.arithmeticMode = this.arithmeticMode
     that.arrayRemoval = this.arrayRemoval
     that.princess = this.princess
@@ -210,6 +214,7 @@ class GlobalParameters extends Cloneable {
     that.logCEX = this.logCEX
     that.logStat = this.logStat
     that.printHornSimplified = this.printHornSimplified
+    that.printHornSimplifiedSMT = this.printHornSimplifiedSMT
     that.dotSpec = this.dotSpec
     that.dotFile = this.dotFile
     that.pngNo = this.pngNo
@@ -227,6 +232,7 @@ class GlobalParameters extends Cloneable {
     //that.printHints = this.printHints
     that.extractTemplates=this.extractTemplates
     that.extractPredicates=this.extractPredicates
+    that.separateByPredicates=this.separateByPredicates
     that.measurePredictedPredicates=this.measurePredictedPredicates
     that.labelSimpleGeneratedPredicates=this.labelSimpleGeneratedPredicates
     that.varyGeneratedPredicates=this.varyGeneratedPredicates
@@ -244,7 +250,7 @@ class GlobalParameters extends Cloneable {
   override def clone : GlobalParameters = {
     val res = new GlobalParameters
     this copyTo res
-    res    
+    res
   }
 
   def withAndWOTemplates : Seq[GlobalParameters] =
@@ -263,7 +269,7 @@ class GlobalParameters extends Cloneable {
       case _ => as
     }
   }
-  
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -275,6 +281,7 @@ object Main {
   object TimeoutException extends MainException("timeout")
   object MainTimeoutException extends MainException("mainTimeOut")
   object StoppedException extends MainException("stopped")
+  object PrintingFinishedException extends Exception
 
   def openInputFile {
     val params = GlobalParameters.parameters.value
@@ -307,7 +314,7 @@ object Main {
   def main(args: Array[String]) : Unit = doMain(args, false)
 
   //def main(args: Array[String]) : Unit = lazabs.horn.FatTest(args(0))
-  
+
 
   val greeting =
     "Eldarica v2.0.6.\n(C) Copyright 2012-2021 Hossein Hojjat and Philipp Ruemmer"
@@ -331,6 +338,7 @@ object Main {
       case "-p" :: rest => prettyPrint = true; arguments(rest)
       case "-extractTemplates" :: rest => extractTemplates = true; arguments(rest)
       case "-extractPredicates" :: rest => extractPredicates = true; arguments(rest)
+      case "-separateByPredicates" :: rest => separateByPredicates = true; arguments(rest)
       case "-measurePredictedPredicates" :: rest=> measurePredictedPredicates=true; arguments(rest)
       case "-labelSimpleGeneratedPredicates"::rest => labelSimpleGeneratedPredicates = true; arguments(rest)
       case "-varyGeneratedPredicates":: rest => varyGeneratedPredicates =true; arguments(rest)
@@ -529,6 +537,7 @@ object Main {
       case logOption :: rest if (logOption startsWith "-log:") =>
         setLogLevel((logOption drop 5).toInt); arguments(rest)
       case "-logSimplified" :: rest => printHornSimplified = true; arguments(rest)
+      case "-logSimplifiedSMT" :: rest => printHornSimplifiedSMT = true; arguments(rest)
       case "-dot" :: str :: rest => dotSpec = true; dotFile = str; arguments(rest)
       case "-pngNo" :: rest => pngNo = true; arguments(rest)
       case "-dotCEX" :: rest => pngNo = false; arguments(rest)
@@ -541,21 +550,21 @@ object Main {
           "General options:\n" +
           " -h\t\tShow this information\n" +
           " -assert\tEnable assertions in Eldarica\n" +
-          " -log\t\tDisplay progress and found invariants\n" + 
-          " -log:n\t\tDisplay progress with verbosity n (currently 0 <= n <= 3)\n" + 
-          " -statistics\tDisplay statistics (implied by -log)\n" + 
+          " -log\t\tDisplay progress and found invariants\n" +
+          " -log:n\t\tDisplay progress with verbosity n (currently 0 <= n <= 3)\n" +
+          " -statistics\tDisplay statistics (implied by -log)\n" +
           " -t:time\tSet timeout (in seconds)\n" +
-          " -cex\t\tShow textual counterexamples\n" + 
-          " -dotCEX\tOutput counterexample in dot format\n" + 
-          " -eogCEX\tDisplay counterexample using eog\n" + 
+          " -cex\t\tShow textual counterexamples\n" +
+          " -dotCEX\tOutput counterexample in dot format\n" +
+          " -eogCEX\tDisplay counterexample using eog\n" +
           " -m:func\tUse function func as entry point (default: main)\n" +
           "\n" +
           "Horn engine:\n" +
-          " -horn\t\tEnable this engine\n" + 
+          " -horn\t\tEnable this engine\n" +
           " -p\t\tPretty Print Horn clauses\n" +
-          " -sp\t\tPretty print the Horn clauses in SMT-LIB format\n" + 
-          " -sol\t\tShow solution in Prolog format\n" + 
-          " -ssol\t\tShow solution in SMT-LIB format\n" + 
+          " -sp\t\tPretty print the Horn clauses in SMT-LIB format\n" +
+          " -sol\t\tShow solution in Prolog format\n" +
+          " -ssol\t\tShow solution in SMT-LIB format\n" +
           " -disj\t\tUse disjunctive interpolation\n" +
           " -stac\t\tStatic acceleration of loops\n" +
           " -lbe\t\tDisable preprocessor (e.g., clause inlining)\n" +
@@ -574,9 +583,9 @@ object Main {
           " -abstractTO:t\tTimeout (s) for abstraction search (default: 2.0)\n" +
           " -abstractPO\tRun with and w/o interpolation abstraction in parallel\n" +
           " -splitClauses\tTurn clause constraints into pure inequalities\n" +
-          
+
           "\n" +
-          " -hin\t\tExpect input in Prolog Horn format\n" +  
+          " -hin\t\tExpect input in Prolog Horn format\n" +
           " -hsmt\t\tExpect input in Horn SMT-LIB format\n" +
           " -ints\t\tExpect input in integer NTS format\n" +
           " -conc\t\tExpect input in C/C++/TA format\n" +
@@ -590,6 +599,7 @@ object Main {
           " -pIntermediate\t Dump Horn clauses encoding concurrent programs\n"+
           " -extractTemplates\t extract templates training data\n"+
           " -extractPredicates\t extract predicates from CEGAR process\n"+
+          " -separateByPredicates\t separate horn graph by predicates\n"+
           " -measurePredictedPredicates\t output predicted predicate measurements\n"+
           " -labelSimpleGeneratedPredicates\t label simple generated predicates by selected predicates\n"+
           " -varyGeneratedPredicates\t vary generated predicates from CEGAR process without change of logic mearnings\n"+
@@ -637,7 +647,7 @@ object Main {
           throw StoppedException
       }
     }
-    
+
     GlobalParameters.get.setupApUtilDebug
 
     if(princess) Prover.setProver(lazabs.prover.TheoremProver.PRINCESS)
@@ -651,8 +661,8 @@ object Main {
         } else if (fileName endsWith ".nts") {
           format = InputFormat.Nts
           // then also choose -horn by default
-          horn = true         
-        } 
+          horn = true
+        }
 //        else if (fileName endsWith ".scala")
 //          format = InputFormat.Scala
 //        else if (fileName endsWith ".bip")
@@ -672,7 +682,7 @@ object Main {
     format match {
       case InputFormat.Prolog | InputFormat.SMTHorn //| InputFormat.Bip |
            //InputFormat.UppaalOG | InputFormat.UppaalRG |
-           //InputFormat.UppaalRelational 
+           //InputFormat.UppaalRelational
       =>
         // those formats can only be handled in Horn mode
         horn = true
@@ -681,14 +691,14 @@ object Main {
     }
 
     if (horn) {
-      
+
 /*      format match {
         case InputFormat.Bip =>
           // BIP mode
 //          lazabs.bip.HornBip.apply(fileName)
           return
         case InputFormat.UppaalRelational =>
-          // uses iterative relational encoding to solve the system 
+          // uses iterative relational encoding to solve the system
           lazabs.upp.Relational.apply(fileName, log)
           return
         case _ =>
@@ -725,17 +735,12 @@ object Main {
         println(HornSMTPrinter(clauseSet))
         return
       }
-      if(extractTemplates){
-        //do selection
-        lazabs.horn.TrainDataGeneratorSmt2(clauseSet, absMap, global, disjunctive,
-          drawRTree, lbe) //generate train data
-        return
-      }
+
       if (extractPredicates) {
         //do selection
         try {
           timeoutChecker()
-          lazabs.horn.TrainDataGeneratorPredicatesSmt2(clauseSet, absMap, global, disjunctive,
+          lazabs.horn.concurrency.TrainDataGeneratorPredicatesSmt2(clauseSet, absMap, global, disjunctive,
             drawRTree, lbe) //generate train data.  clauseSet error may caused by import package
         } catch {
           case x:Any => {
@@ -745,6 +750,7 @@ object Main {
         }
         return
       }
+
 
       if(solFileName != "") {
         val solution = lazabs.horn.parser.HornReader.apply(solFileName)
@@ -790,12 +796,6 @@ object Main {
 
       if(extractTemplates){
         val systemGraphs=new lazabs.horn.concurrency.TrainDataGenerator(smallSystem,system) //generate train data by templates
-        return
-      }
-      if(extractPredicates){
-
-        val predicateGenerator=new lazabs.horn.concurrency.TrainDataGeneratorPredicate(smallSystem,system) //generate train data by predicates
-
         return
       }
 

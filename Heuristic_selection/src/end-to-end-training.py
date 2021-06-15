@@ -1,4 +1,5 @@
 import sys
+from shutil import copy,rmtree,copytree
 import time
 from typing import Dict, Any
 import tf2_gnn
@@ -18,22 +19,102 @@ import tensorflow as tf
 from tensorflow.keras import mixed_precision
 import gc
 def main():
+    #different_num_layers_training()
+    #clean_k_fold_test_data(benchmark="chc-comp-LIA-Lin-2021-extract")
+    k_fold_training(benchmark="chc-comp21-benchmarks-main-all")
+    k_fold_data_collection(benchmark="chc-comp21-benchmarks-main-all")
+
+
+def k_fold_training(benchmark="chc-comp21-benchmarks-main-all-extract"):
+    # description: train in 5 fold
+    #end_to_end_training(benchmark=benchmark + "-" + str(4) + "-fold")
+    for i in range(5):
+        end_to_end_training(benchmark=benchmark + "-" + str(i) + "-fold")
+        gc.collect()
+        tf.keras.backend.clear_session()
+
+
+def clean_k_fold_test_data(benchmark="chc-comp-LIA-Lin-2021-extract"):
+    for i in range(5):
+        for file_type in [".solvability.JSON", ".measurement.JSON"]:
+            file_list = glob.glob("../benchmarks/" + benchmark + "-" + str(i) + "-fold/test_data/*.smt2" + file_type)
+            for f in file_list:
+                os.remove(f)
+
+
+
+
+def k_fold_data_collection(benchmark="chc-comp21-benchmarks-main-all-extract"):
+    max_nodes_per_batch = 10000
+    # description: merge all test results
+    k_fold_benchmark = benchmark + "-k-fold-measurement"
+    k_fold_benchmark_folder = os.path.join("../benchmarks", k_fold_benchmark)
+    k_fold_benchmark_test_folder = os.path.join(k_fold_benchmark_folder, "test_data")
+    if not os.path.exists(k_fold_benchmark_folder):
+        os.mkdir(k_fold_benchmark_folder)
+        os.mkdir(k_fold_benchmark_test_folder)
+    else:
+        for f in glob.glob(k_fold_benchmark_test_folder+"/*"):
+            os.remove(f)
+
+    for i in range(5):
+        file_list = glob.glob("../benchmarks/" + benchmark + "-" + str(i) + "-fold/test_data/*")
+        for file in file_list:
+            copy(file, k_fold_benchmark_test_folder)
+    print("total test file", len(glob.glob(k_fold_benchmark_test_folder + "/*.smt2")))
+    print("total test solvability file", len(glob.glob(k_fold_benchmark_test_folder + "/*.smt2.solvability.JSON")))
+    print("total test measurement file", len(glob.glob(k_fold_benchmark_test_folder + "/*.smt2.measurement.JSON")))
+    print("total test horn graph file",
+          len(glob.glob(k_fold_benchmark_test_folder + "/*.smt2.hyperEdgeHornGraph.JSON")))
+    filtered_file_list, file_list_with_horn_graph, file_list = wrapped_generate_horn_graph(k_fold_benchmark,
+                                                                                           max_nodes_per_batch,
+                                                                                           move_file=True,
+                                                                                           thread_number=4,
+                                                                                           data_fold=["test_data"])
+    out_of_test_set = False
+    # description: read solvability results
+    json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
+    three_fild_name = ["empty", "predicted", "full"]
+    solvability_name_fold = (lambda: three_fild_name if out_of_test_set == True else three_fild_name + ["true"])()
+    solvability_json_name_fold = ["solvability" + x + "InitialPredicates" for x in solvability_name_fold]
+    for name_fold in solvability_json_name_fold:
+        solvability = [1 if s[name_fold] == "true" else 0 for s in json_solvability_obj_list]
+        print(name_fold, str(sum(solvability)) + "/" + str(len(json_solvability_obj_list)))
+    # description: read measurement JSON file
+    scatter_plot_range = [0, 120]
+    json_obj_list = read_measurement_from_JSON(filtered_file_list, measurement=".measurement.JSON")
+    get_analysis_for_predicted_labels(json_obj_list, out_of_test_set=out_of_test_set, time_unit=1000,
+                                      scatter_plot_range=scatter_plot_range)
+    print("solvable file by predicted label:" + str(len(json_obj_list)) + "/" + str(len(filtered_file_list)))
+    # description: print results
+    print("-" * 10)
+    print(file_list_with_horn_graph)
+    print("max_nodes_per_batch", max_nodes_per_batch)
+    print("filtered_file_list by max_nodes_per_batch:" + str(len(filtered_file_list)) + "/" + str(len(file_list)))
+    # description: statistic data
+    get_statistic_data(filtered_file_list, k_fold_benchmark)
+    # # description: how many predicates used in end
+    # get_recall_scatter(solvability_name_fold, json_solvability_obj_list, filtered_file_list)
+
+
+def different_num_layers_training():
     for num_layers in [8]:#1,2,4,8,16,32,64,128
         end_to_end_training(num_layers)
         gc.collect()
         tf.keras.backend.clear_session()
 
-def end_to_end_training(num_layers):
+def end_to_end_training(num_layers=4,benchmark=""):
     random_seed(1)
     tf.keras.backend.clear_session()
     # description: set hyper-parameters
-    params = {"benchmark": "lia-lin-extract",#lia-lin-extract, mixed-three-fold-single-example
+    params = {"benchmark": benchmark,#lia-lin-extract, mixed-three-fold-single-example
               "label": "template_relevance",
               "force_read": True,
               "file_type": ".smt2",
               "graph_type": "hyperEdgeHornGraph",
               "form_label": True,
-              "GPU": True,
+              "pickle":True,
+              "GPU": False,
               "train_quiet": False,
               "test_quiet": False,
               "max_epochs": 500,
@@ -41,18 +122,18 @@ def end_to_end_training(num_layers):
               "max_nodes_per_batch": 10000,
               "threshold": 0.5,
               "verbose":True,
-              "use_class_weight":True,
+              "use_class_weight":False,
               "gathered_nodes_binary_classification_task": ["predicate_occurrence_in_SCG",
                                                             "argument_lower_bound_existence",
                                                             "argument_upper_bound_existence",
                                                             "argument_occurrence_binary",
                                                             "template_relevance",
                                                             "clause_occurrence_in_counter_examples_binary"]}
-    hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers, "regression_hidden_layer_size": [64],"threshold": params["threshold"]}
+    hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers, "regression_hidden_layer_size": [64,64],"threshold": params["threshold"]}
 
-    #description: generate horn graph if there is no horn graph file
+    #description: generate horn graph if there is no horn graph file in test set
     filtered_file_list,file_list_with_horn_graph,file_list = wrapped_generate_horn_graph(params["benchmark"], params["max_nodes_per_batch"], move_file=True,
-                                                     thread_number=4)
+                                                     thread_number=4,data_fold=["test_data"])
 
     # description: train
     trained_model_path, test_data, model, dataset,train_loss_list, valid_loss_list, best_valid_epoch = read_data_and_train(params, hyper_parameters)
@@ -70,7 +151,7 @@ def end_to_end_training(num_layers):
     #description: draw train-predict diagrams
     draw_train_predict_plots(params, dataset, test_data, predicted_Y, train_loss_list, valid_loss_list,best_valid_epoch, hyper_parameters)
 
-    # description: get final measurement from Eldarica
+    # description: get final measurement from Eldarica, if predicated predicate cannot solve the problem there is no measurement file
     get_solvability_and_measurement_from_eldarica(filtered_file_list, thread_number=4,continuous_extracting=True,move_file=False)
 
     # description: In solvable set, draw time consumption
@@ -88,7 +169,7 @@ def end_to_end_training(num_layers):
 
     # description: read measurement JSON file
     scatter_plot_range = [0, 120]
-    json_obj_list = read_measurement_from_JSON(filtered_file_list)
+    json_obj_list = read_measurement_from_JSON(filtered_file_list,measurement=".measurement.JSON")
 
     get_analysis_for_predicted_labels(json_obj_list, out_of_test_set=out_of_test_set, time_unit=1000,
                                       scatter_plot_range=scatter_plot_range)
@@ -152,7 +233,7 @@ def draw_train_predict_plots(params,dataset,test_data,predicted_Y,train_loss_lis
     parameters = pickleRead(params["benchmark"] + "-" + params["label"] + "-parameters", "../src/trained_model/")
     class_weight = {"weight_for_1": parameters["class_weight_fold"]["train"]["weight_for_1"] /
                                     parameters["class_weight_fold"]["train"]["weight_for_0"], "weight_for_0": 1}
-    from_logits=False
+    from_logits=True
     error_loaded_model = (lambda: tf.keras.losses.MSE(true_Y, predicted_Y) \
         if params["label"] not in params["gathered_nodes_binary_classification_task"] else
     get_test_loss_with_class_weight(class_weight,predicted_Y,true_Y,from_logits=from_logits))()
@@ -194,6 +275,7 @@ def read_data_and_train(params, hyper_parameters):
     parameters["gathered_nodes_binary_classification_task"] = gathered_nodes_binary_classification_task
     parameters["threshold"] = params["threshold"]
     parameters["GPU"]=params["GPU"]
+    parameters["pickle"]=params["pickle"]
     these_hypers: Dict[str, Any] = {
         "optimizer": "Adam",  # One of "SGD", "RMSProp", "Adam"
         "learning_rate": 0.001,#0.001
@@ -325,11 +407,7 @@ def get_predicted_results(params, model, test_data):
     _, _, test_results = model.run_one_epoch(test_data, training=False, quiet=params["test_quiet"])
     test_metric, test_metric_string = model.compute_epoch_metrics(test_results)
     predicted_Y = model.predict(test_data)
-    # print("predicted_Y-debug",predicted_Y)
-    # predicted_Y = model.predict(test_data)
-    # print("predicted_Y-debug", predicted_Y)
-    # predicted_Y = model.predict(test_data)
-    # print("predicted_Y-debug", predicted_Y)
+    predicted_Y=tf.math.sigmoid(predicted_Y)
     print_predicted_results(
         {"predicted_Y": predicted_Y, "test_metric_string": test_metric_string,"test_metric": test_metric})
     return predicted_Y

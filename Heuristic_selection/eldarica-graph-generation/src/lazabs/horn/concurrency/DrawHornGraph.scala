@@ -297,7 +297,7 @@ class GNNInput(clauseCollection:ClauseInfo) {
     if(nodeIds.size>GlobalParameters.get.maxNode){
       println(Console.RED + "-"*10 +"node number >= maxNode" + "-"*10)
       HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/exceed-max-node/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length))
-      HintsSelection.removeRelativeFiles(GlobalParameters.get.fileName)
+      //HintsSelection.removeRelativeFiles(GlobalParameters.get.fileName)
       sys.exit()
     }
     nodeIds :+= GNNNodeID
@@ -737,7 +737,8 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
   }
 
   def writeGNNInputToJSONFile(argumentIDList: ArrayBuffer[Int], argumentNameList: ArrayBuffer[String],
-                              argumentOccurrenceList: ArrayBuffer[Int],argumentBoundList:ArrayBuffer[(String, String)],argumentIndicesList:ArrayBuffer[Int],argumentBinaryOccurrenceList:ArrayBuffer[Int]): Unit = {
+                              argumentOccurrenceList: ArrayBuffer[Int],argumentBoundList:ArrayBuffer[(String, String)],
+                              argumentIndicesList:ArrayBuffer[Int],argumentBinaryOccurrenceList:ArrayBuffer[Int]): Unit = {
     println("Write GNNInput to file")
     var lastFiledFlag = false
     val writer = new PrintWriter(new File(file + "." + graphType + ".JSON"))
@@ -955,10 +956,10 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
         val templateNodeName=templateNodePrefix+gnn_input.templateCanonicalID.toString
         val templateNodeLabelName="predicate_"+gnn_input.templateCanonicalID.toString
         //templateNameList:+=templateNodeName
-        val hintLabel = if (hints.positiveHints.toInitialPredicates.keySet.map(_.toString).contains(hp.toString) && HintsSelection.wrappedContainsPred(t,hints.positiveHints.toInitialPredicates(hp))) true else false
+        val hintLabel = if (hints.positiveHints.toInitialPredicates.keySet.map(_.toString).contains(hp.toString) && HintsSelection.containsPred(t,hints.positiveHints.toInitialPredicates(hp))) true else false
         createNode(templateNodeName,templateNodeLabelName,"template",nodeShapeMap("template"),hintLabel=hintLabel)
         //drawAST(e,templateNodeName)
-        val existedSubGraphRoot = for ((s, f) <- quantifiedClauseGuardMap(hp) if (HintsSelection.wrappedContainsPred(t, Seq(f)))) yield s
+        val existedSubGraphRoot = for ((s, f) <- quantifiedClauseGuardMap(hp) if (HintsSelection.containsPred(t, Seq(f)))) yield s
         if (existedSubGraphRoot.isEmpty) {
           val predicateASTRootName=drawAST(t)
           addBinaryEdge(predicateASTRootName,templateNodeName,"templateAST")
@@ -979,7 +980,7 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
           for (t<-templates) yield {
             val predicateASTRootName=drawAST(t)
             //update JSON
-            val hintLabel = if (hints.positiveHints.toInitialPredicates.keySet.map(_.toString).contains(hp.toString) && HintsSelection.wrappedContainsPred(t,hints.positiveHints.toInitialPredicates(hp))) true else false
+            val hintLabel = if (hints.positiveHints.toInitialPredicates.keySet.map(_.toString).contains(hp.toString) && HintsSelection.containsPred(t,hints.positiveHints.toInitialPredicates(hp))) true else false
             gnn_input.updateTemplateIndicesAndNodeIds(predicateASTRootName,hintLabel)
             predicateASTRootName
           }

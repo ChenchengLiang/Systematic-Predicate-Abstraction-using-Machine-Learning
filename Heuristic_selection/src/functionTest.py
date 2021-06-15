@@ -219,147 +219,17 @@ def row_deler(row):
 def my_assign(x):
     #tf.compat.v1.assign_add(x,1)
     x.assign_add(1)
+def _traucate(x, decimals=0): #trauncate
+    multiplier = tf.constant(10 ** decimals, dtype=x.dtype)
+    return tf.cast(tf.cast(tf.round(x * multiplier),tf.int32),x.dtype) / multiplier
 def main():
-    print("rounding: round(0.03f, 4) = " + str(binary_round(0.03, 4)))
-    print("rounding: round(0.95f, 4) = " + str(binary_round(0.95, 4)))
-    print("rounding: round(0.98f, 4) = " + str(binary_round(0.98, 4)))
-    print("rounding: round(0.99f, 4) = " + str(binary_round(0.99, 4)))
-    print("rounding: round(8.03f, 4) = " + str(binary_round(8.03, 4)))
-    print("rounding: round(-18.03f, 4) = " + str(binary_round(-18.03, 4)))
-    print("rounding: round(-18.03f, 10) = " + str(binary_round(-18.03, 10)))
-    print("rounding: round(-18.032342342f, 4) = " + str(binary_round(-18.032342342, 4)))
-    x=tf.constant([[0.03,0.95,0.98],[0.99,8.03,-18.03]],tf.float32)
-    print(x.shape)
-    print(tf.map_fn(row_deler,x))
+    labels=[1.0]
+    predicted_y=[0.1]
+    print(tf.nn.weighted_cross_entropy_with_logits(labels, predicted_y, 1))
+    print(tf.nn.weighted_cross_entropy_with_logits(labels, predicted_y, 5))
+    print(tf.nn.weighted_cross_entropy_with_logits(labels, predicted_y, 10))
+    print(tf.nn.weighted_cross_entropy_with_logits(labels, predicted_y, 40))
 
 
-
-
-
-    #mnist_example()
-
-    # from horn_dataset import logit
-    # y=tf.constant([0],tf.float32)
-    # y_hat=tf.constant([0],tf.float32)
-    # logit_y_hat=tf.constant([logit(0)],tf.float32)
-    # weight=tf.constant([1],tf.float32)
-    # print("ce",tf.keras.losses.binary_crossentropy(y,logit_y_hat,from_logits=False))
-    # print("weighted_ce", tf.nn.weighted_cross_entropy_with_logits(y, logit_y_hat,weight))
-    #
-    # from utils import wrapped_generate_horn_graph
-    # move_file = True
-    # max_nodes_per_batch=10000
-    # thread_number=4
-    # filtered_file_list, file_list_with_horn_graph, file_list = wrapped_generate_horn_graph(os.path.join("../benchmarks/",sys.argv[1]),
-    #                                                                                        max_nodes_per_batch,
-    #                                                                                        move_file=move_file,
-    #                                                                                        thread_number=thread_number)
-    # from pandas import DataFrame
-    # from pandas import concat
-    # from keras.models import Sequential
-    # from keras.layers import Dense
-    # from sklearn.metrics import mean_squared_error
-    #
-    # # fit MLP to dataset and print error
-    # def fit_model(X, y):
-    #     # design network
-    #     model = Sequential()
-    #     model.add(Dense(10, input_dim=1))
-    #     model.add(Dense(1))
-    #     model.compile(loss='mean_squared_error', optimizer='adam')
-    #     # fit network
-    #     model.fit(X, y, epochs=100, batch_size=len(X), verbose=0)
-    #     return model
-    #
-    # # create sequence
-    # length = 10
-    # sequence = [i / float(length) for i in range(length)]
-    # # create X/y pairs
-    # df = DataFrame(sequence)
-    # df = concat([df.shift(1), df], axis=1)
-    # df.dropna(inplace=True)
-    # # convert to MLP friendly format
-    # values = df.values
-    # X, y = values[:, 0], values[:, 1]
-    # # repeat experiment
-    # repeats = 10
-    # model = fit_model(X, y)
-    # for _ in range(repeats):
-    #     print(sum(model.predict(X, verbose=0)))
-
-    #
-    # from utils import filter_file_list_by_max_node,get_statistic_data
-    # from measurement_functions import read_measurement_from_JSON,get_analysis_for_predicted_labels
-    #
-    # benchmark = "mixed-three-fold-noIntervals-only-initial-predicate"
-    # benchmark_fold = benchmark + "-" + "test"
-    # max_nodes_per_batch = 1000
-    # file_list = glob.glob("../benchmarks/" + benchmark_fold + "/test_data/*.smt2")
-    # trained_model_path="/home/cheli243/PycharmProjects/HintsLearning/src/trained_model/GNN_Argument_selection__2021-02-14_22-37-39_best.pkl"
-    # initial_file_number= len(file_list)
-    # thread_number = 4
-    # print("file_list " + str(initial_file_number))
-    # continuous_extracting=True
-    # move_file = True
-    # out_of_test_set=True
-    #
-    # file_list = [file if os.path.exists(file + ".hyperEdgeHornGraph.JSON") else None for file in file_list]
-    # file_list = list(filter(None, file_list))
-    # file_list_with_horn_graph = "file with horn graph " + str(len(file_list)) + "/" + str(initial_file_number)
-    # print("file_list_with_horn_graph", file_list_with_horn_graph)
-    #
-    # filtered_file_list = filter_file_list_by_max_node(file_list, max_nodes_per_batch)
-    #
-    # timeout = 1200000  # -measurePredictedPredicates
-    # check_solvability_parameter_list = "-checkSolvability  -measurePredictedPredicates -varyGeneratedPredicates -abstract -noIntervals -solvabilityTimeout:300 -mainTimeout:1200"
-    # file_list_with_parameters = (lambda: [
-    #     [file, check_solvability_parameter_list, timeout, move_file] if not os.path.exists(
-    #         file + ".solvability.JSON") else [] for
-    #     file in filtered_file_list] if continuous_extracting == True
-    # else [[file, check_solvability_parameter_list, timeout, move_file] for
-    #       file in filtered_file_list])()
-    # file_list_for_solvability_check=list(filter(lambda x: len(x) != 0, file_list_with_parameters))
-    # print("file_list_for_solvability_check",len(file_list_for_solvability_check))
-    #
-    #
-    # json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
-    #
-    # three_fild_name=["empty","predicted","full"]
-    # solvability_name_fold= (lambda : three_fild_name if out_of_test_set==True else three_fild_name + ["true"])()
-    # solvability_json_name_fold=[ "solvability"+x+"InitialPredicates" for x in solvability_name_fold]
-    # solvable_file_list = {name_fold: [] for name_fold in solvability_json_name_fold}
-    # for name_fold in solvability_json_name_fold:
-    #     solvability = [1 if s[name_fold] == "true" else 0 for s in json_solvability_obj_list]
-    #     print(name_fold, str(sum(solvability)) + "/" + str(len(json_solvability_obj_list)))
-    #     for i, (s, f) in enumerate(zip(solvability, json_solvability_obj_list)):
-    #         if s == 1:
-    #             # print(json_solvability_obj_list[i]["file_name"])
-    #             solvable_file_list[name_fold].append(json_solvability_obj_list[i]["file_name"])
-    # difference_betw_predicted_full=set(solvable_file_list["solvabilitypredictedInitialPredicates"]).difference(set(solvable_file_list["solvabilityfullInitialPredicates"]))
-    # difference_betw_predicted_empty = set(solvable_file_list["solvabilitypredictedInitialPredicates"]).difference(
-    #     set(solvable_file_list["solvabilityemptyInitialPredicates"]))
-    # difference_betw_full_empty = set(solvable_file_list["solvabilityfullInitialPredicates"]).difference(
-    #     set(solvable_file_list["solvabilityemptyInitialPredicates"]))
-    # print("difference_betw_predicted_full",len(difference_betw_predicted_full))
-    # print("difference_betw_predicted_empty", len(difference_betw_predicted_empty))
-    # print("difference_betw_full_empty", len(difference_betw_full_empty))
-    #
-    #
-    # # description: read measurement JSON file
-    # scatter_plot_range = [0, 120]
-    # json_obj_list = read_measurement_from_JSON(filtered_file_list)
-    #
-    # get_analysis_for_predicted_labels(json_obj_list, out_of_test_set=out_of_test_set, time_unit=1000,
-    #                                   scatter_plot_range=scatter_plot_range)
-    # print("solvable file by predicted label:" + str(len(json_obj_list)) + "/" + str(len(filtered_file_list)))
-    #
-    # # description: print results
-    # print("-" * 10)
-    # print(file_list_with_horn_graph)
-    # print("max_nodes_per_batch", max_nodes_per_batch)
-    # print("filtered_file_list by max_nodes_per_batch:" + str(len(filtered_file_list)) + "/" + str(len(file_list)))
-    #
-    # # description: statistic data
-    # get_statistic_data(filtered_file_list, benchmark_fold)
 
 main()

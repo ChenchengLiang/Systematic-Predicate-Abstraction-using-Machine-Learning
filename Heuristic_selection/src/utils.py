@@ -1,3 +1,4 @@
+import shutil
 import subprocess
 import json
 import matplotlib.pyplot as plt
@@ -10,7 +11,7 @@ import seaborn
 from sklearn.metrics import confusion_matrix
 
 def get_solvability_and_measurement_from_eldarica(filtered_file_list,thread_number,continuous_extracting=True,move_file=True,checkSolvability="-checkSolvability",measurePredictedPredicates="-measurePredictedPredicates",onlyInitialPredicates=""):
-    timeout = 3600  # -measurePredictedPredicates -varyGeneratedPredicates
+    timeout = 60*60  # -measurePredictedPredicates -varyGeneratedPredicates
     check_solvability_parameter_list = " "+checkSolvability+" "+measurePredictedPredicates+ " "+ onlyInitialPredicates +"  -abstract -noIntervals -solvabilityTimeout:300 -mainTimeout:1200"
     file_list_with_parameters = (lambda: [
         [file, check_solvability_parameter_list, timeout, move_file] if not os.path.exists(
@@ -22,13 +23,25 @@ def get_solvability_and_measurement_from_eldarica(filtered_file_list,thread_numb
     print("file_list_for_solvability_check", len(file_list_for_solvability_check))
     run_eldarica_with_shell_pool_with_file_list(thread_number, run_eldarica_with_shell, file_list_for_solvability_check)
 
-def wrapped_generate_horn_graph(benchmark_fold,max_nodes_per_batch,move_file=True,thread_number=4):
-    file_list = glob.glob("../benchmarks/" + benchmark_fold + "/test_data/*.smt2")
+def wrapped_generate_horn_graph(benchmark_fold,max_nodes_per_batch,move_file=True,thread_number=4,
+                                generateSimplePredicates="-generateSimplePredicates",data_fold=["train_data","valid_data","test_data"],horn_graph_folder=""):
+    file_list=[]
+    for fold in data_fold:
+        current_folder="../benchmarks/" + benchmark_fold + "/"+fold
+        current_file_list=glob.glob(current_folder+"/*.smt2")
+        file_list = file_list + current_file_list
+        if horn_graph_folder!="": #before continous genereate horn graphs, copy from prepared horn graph
+            for f in current_file_list:
+                graph_file=f+".hyperEdgeHornGraph.JSON"
+                if not os.path.exists(graph_file):
+                    shutil.copy(os.path.join("../benchmarks/",horn_graph_folder)+"/"+graph_file,current_folder)
+
     initial_file_number = len(file_list)
     print("file_list " + str(initial_file_number))
+
     # description: generate horn graph
     generate_horn_graph(file_list, max_nodes_per_batch=max_nodes_per_batch, move_file=move_file,
-                        thread_number=thread_number)
+                        thread_number=thread_number,generateSimplePredicates=generateSimplePredicates)
 
     file_list = [file if os.path.exists(file + ".hyperEdgeHornGraph.JSON") else None for file in file_list]
     file_list = list(filter(None, file_list))
@@ -39,12 +52,12 @@ def wrapped_generate_horn_graph(benchmark_fold,max_nodes_per_batch,move_file=Tru
     filtered_file_list = filter_file_list_by_max_node(file_list, max_nodes_per_batch)
     return filtered_file_list,file_list_with_horn_graph,file_list
 
-def generate_horn_graph(file_list,max_nodes_per_batch=1000,move_file=True,thread_number=4):
+def generate_horn_graph(file_list,max_nodes_per_batch=1000,move_file=True,thread_number=4,generateSimplePredicates="-generateSimplePredicates"):
     # description: generate horn graph
     timeout = 120 * 5  # second
     move_file_parameter_eldarica = (lambda: " -moveFile " if move_file == True else " ")()
     # todo: use intervals and abstract:off -varyGeneratedPredicates
-    eldarica_parameters = "-getHornGraph:hyperEdgeGraph -generateSimplePredicates   " + move_file_parameter_eldarica + " -maxNode:" + str(
+    eldarica_parameters = "-getHornGraph:hyperEdgeGraph "+generateSimplePredicates +" " + move_file_parameter_eldarica + " -maxNode:" + str(
         max_nodes_per_batch) + " -abstract -noIntervals -mainTimeout:1200"
     file_list_with_parameters = [
         [file, eldarica_parameters, timeout, move_file] if not os.path.exists(file + ".hyperEdgeHornGraph.JSON") else []
@@ -303,5 +316,10 @@ def mutual_differences(set_1,set_2):
 
 def my_round_fun(num_list,threshold=0.5):
     return  [1.0 if num>threshold else 0.0 for num in num_list]
+
+def print_multiple_object(d):
+    for k in d:
+        print(k,d[k])
+
 
 

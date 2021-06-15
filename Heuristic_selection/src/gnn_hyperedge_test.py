@@ -33,6 +33,7 @@ def main():
     model.add(tf.keras.layers.Embedding(numberOfNode,nodeFeatureDim))
     model.compile('rmsprop', 'mse')
     graph_node_ID_list_embedding = model.predict(tf.constant(graph_node_ID_list))
+    graph_node_ID_list_embedding=tf.math.sigmoid(graph_node_ID_list_embedding)
     graph_node_ID_list_embedding=tf.reshape(graph_node_ID_list_embedding,[numberOfNode,nodeFeatureDim])
     print("graph_node_ID_list_embedding",graph_node_ID_list_embedding)
 

@@ -25,6 +25,7 @@ After training you can find the train-valid-test loss chart in src/trained_model
 The zigzag behavior only occurs when num_layers>=4. Increase num_layers will get more intensive zigzag behavior
 
 trauncating and rounding after unsorted_segment_sum can be found in tf2_gnn/layers/message_passing.py
+
 """
 
 
@@ -95,25 +96,25 @@ def main():
     _, _, test_results = model.run_one_epoch(test_data, training=False, quiet=quiet)
     test_metric, test_metric_string = model.compute_epoch_metrics(test_results)
     predicted_Y_loaded_model_from_memory = model.predict(test_data)
-    rounded_predicted_Y_loaded_model_from_memory = my_round_fun(predicted_Y_loaded_model_from_memory,threshold=0.5)
+    sigmoid_predicted_Y_loaded_model_from_memory=tf.math.sigmoid(predicted_Y_loaded_model_from_memory)
+    rounded_predicted_Y_loaded_model_from_memory = my_round_fun(sigmoid_predicted_Y_loaded_model_from_memory,threshold=0.5)
 
     true_Y = []
     for data in iter(test_data):
         # print(data[0]) #input
         true_Y.extend(np.array(data[1]["node_labels"]))
 
-    class_weight = {"weight_for_1": 1, "weight_for_0": 1}
-    from_logits = False
+    class_weight = parameters["class_weight_fold"] ["train"]
 
-    error_memory_model = get_test_loss_with_class_weight(class_weight,predicted_Y_loaded_model_from_memory,true_Y,from_logits=from_logits)
-    mean_loss = get_test_loss_with_class_weight(class_weight, [np.mean(true_Y)] * len(true_Y), true_Y,from_logits=from_logits)
+    error_memory_model = get_test_loss_with_class_weight(class_weight,predicted_Y_loaded_model_from_memory,true_Y,from_logits=True)
+    mean_loss = get_test_loss_with_class_weight(class_weight, [np.mean(true_Y)] * len(true_Y), true_Y,from_logits=False)
 
     num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, rounded_predicted_Y_loaded_model_from_memory), tf.int32))
     accuracy = num_correct / len(rounded_predicted_Y_loaded_model_from_memory)
 
     draw_training_results(train_loss_list, valid_loss_list,
                           mean_loss,
-                          error_memory_model, true_Y, predicted_Y_loaded_model_from_memory, "template_relevance",
+                          error_memory_model, true_Y, sigmoid_predicted_Y_loaded_model_from_memory, "template_relevance",
                           "tree-leaf-identification", "tree")
 
 

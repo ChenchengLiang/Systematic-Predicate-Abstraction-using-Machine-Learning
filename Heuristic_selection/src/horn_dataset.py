@@ -16,7 +16,7 @@ from tf2_gnn.models import InvariantArgumentSelectionTask, InvariantNodeIdentify
 from Miscellaneous import pickleWrite, pickleRead, drawBinaryLabelPieChart
 from archived.dotToGraphInfo import parseArgumentsFromJson
 from utils import plot_confusion_matrix,get_recall_and_precision,plot_ROC,assemble_name,my_round_fun
-def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",json_type=".JSON",form_label=False,GPU=False,pickle=True,hyper_parameters={}):
+def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",json_type=".JSON",form_label=False,GPU=False,pickle=True,use_class_weight=False,hyper_parameters={}):
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
                                                  "argument_upper_bound_existence", "argument_occurrence_binary",
                                                  "template_relevance", "clause_occurrence_in_counter_examples_binary"]
@@ -48,8 +48,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters["GPU"]=GPU
     parameters["pickle"]=pickle
     max_epochs = 500
-    patience = 500
-    use_class_weight=False
+    patience = 100
     # parameters["add_self_loop_edges"]=False
     # parameters["tie_fwd_bkwd_edges"]=True
 
@@ -84,7 +83,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         dataset._use_worker_threads=False #solve Failed setting context: CUDA_ERROR_NOT_INITIALIZED: initialization error
     dataset.load_data([DataFold.TRAIN,DataFold.VALIDATION,DataFold.TEST])
     parameters["node_vocab_size"]=dataset._node_vocab_size
-    parameters["class_weight_fold"] = dataset._class_weight_fold
+    parameters["class_weight_fold"] = dataset._class_weight_fold["train"]
     def log(msg):
         log_line(log_file, msg)
 
@@ -145,11 +144,12 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         _, _, test_results = model.run_one_epoch(test_data, training=False, quiet=quiet)
         test_metric, test_metric_string = model.compute_epoch_metrics(test_results)
         predicted_Y_loaded_model_from_memory = model.predict(test_data)
-        rounded_predicted_Y_loaded_model_from_memory=my_round_fun(predicted_Y_loaded_model_from_memory,threshold=hyper_parameters["threshold"])
+        sigmoid_predicted_Y_loaded_model_from_memory=tf.math.sigmoid(predicted_Y_loaded_model_from_memory)
+        rounded_predicted_Y_loaded_model_from_memory=my_round_fun(sigmoid_predicted_Y_loaded_model_from_memory,threshold=hyper_parameters["threshold"])
         #predicted_Y_loaded_model_from_memory=tf.math.sigmoid(predicted_Y_loaded_model_from_memory)
         print("test_metric_string model from memory", test_metric_string)
         print("test_metric model from memory", test_metric)
-        print("predicted_Y_loaded_model_from_memory",predicted_Y_loaded_model_from_memory)
+        print("predicted_Y_loaded_model_from_memory",sigmoid_predicted_Y_loaded_model_from_memory)
         print("rounded_predicted_Y_loaded_model_from_memory",rounded_predicted_Y_loaded_model_from_memory)
 
         #load model from files
@@ -158,9 +158,10 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         test_metric, test_metric_string = loaded_model.compute_epoch_metrics(test_results)
 
         predicted_Y_loaded_model = loaded_model.predict(test_data)
-        rounded_predicted_Y_loaded_model=my_round_fun(predicted_Y_loaded_model,threshold=hyper_parameters["threshold"])
+        sigmoid_predicted_Y_loaded_model=tf.math.sigmoid(predicted_Y_loaded_model)
+        rounded_predicted_Y_loaded_model=my_round_fun(sigmoid_predicted_Y_loaded_model,threshold=hyper_parameters["threshold"])
         #predicted_Y_loaded_model=tf.math.sigmoid(predicted_Y_loaded_model)
-        print("predicted_Y_loaded_model",predicted_Y_loaded_model)
+        print("predicted_Y_loaded_model",sigmoid_predicted_Y_loaded_model)
         print("rounded_predicted_Y_loaded_model",rounded_predicted_Y_loaded_model)
 
         print("test_metric_string",test_metric_string)
@@ -171,8 +172,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             #print(data[0]) #input
             true_Y.extend(np.array(data[1]["node_labels"]))
 
-        class_weight={"weight_for_1":parameters["class_weight_fold"] ["train"]["weight_for_1"]/parameters["class_weight_fold"] ["train"]["weight_for_0"],"weight_for_0":1}
-        from_logits=False
+        class_weight={"weight_for_1":parameters["class_weight_fold"]["weight_for_1"]/parameters["class_weight_fold"]["weight_for_0"],"weight_for_0":1}
+        from_logits=True
         error_loaded_model = (lambda : tf.keras.losses.MSE(true_Y, predicted_Y_loaded_model) \
             if label not in gathered_nodes_binary_classification_task else get_test_loss_with_class_weight(class_weight,predicted_Y_loaded_model,true_Y,from_logits=from_logits))()
         print("\n error of loaded_model", error_loaded_model)
@@ -181,18 +182,19 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             if label not in gathered_nodes_binary_classification_task else get_test_loss_with_class_weight(class_weight,predicted_Y_loaded_model_from_memory,true_Y,from_logits=from_logits))()
         print("\n error of error_memory_model", error_memory_model)
 
-        mean_loss = (lambda : get_test_loss_with_class_weight(class_weight,[np.mean(true_Y)]*len(true_Y), true_Y,from_logits=from_logits) if label in gathered_nodes_binary_classification_task else tf.keras.losses.MSE([np.mean(true_Y)]*len(true_Y), true_Y))()
+        mean_loss = (lambda: tf.keras.losses.MSE([np.mean(true_Y)] * len(true_Y), true_Y) if label not in gathered_nodes_binary_classification_task else
+    tf.keras.losses.binary_crossentropy([np.mean(true_Y)] * len(true_Y), true_Y,from_logits=False))()
         print("\n mean_loss_Y_and_True_Y", mean_loss)
         mean_loss_list=mean_loss
         num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, rounded_predicted_Y_loaded_model),tf.int32))
         accuracy = num_correct / len(rounded_predicted_Y_loaded_model)
         accuracy_average.append(accuracy)
 
-        test_loss_list_average.append(predicted_Y_loaded_model)
+        #test_loss_list_average.append(predicted_Y_loaded_model)
         mean_loss_list_average.append(mean_loss_list)
         error_loaded_model_average.append(error_loaded_model)
         error_memory_model_average.append(error_memory_model)
-        test_loss_average.append(predicted_Y_loaded_model[-1])
+        #test_loss_average.append(predicted_Y_loaded_model[-1])
 
         train_loss_list_average.append(train_loss_list)
         valid_loss_list_average.append(valid_loss_list)
@@ -203,7 +205,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     # get aberage training performance
     train_loss_list_average = np.mean(train_loss_list_average, axis=0)
     valid_loss_list_average = np.mean(valid_loss_list_average, axis=0)
-    test_loss_list_average = np.mean(test_loss_list_average, axis=0)
+    #test_loss_list_average = np.mean(test_loss_list_average, axis=0)
     mean_loss_list_average = np.mean(mean_loss_list)
     error_loaded_model_average = np.mean(error_loaded_model_average)
     error_memory_model_average = np.mean(error_memory_model_average)
@@ -215,9 +217,9 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     # visualize results
     draw_training_results(train_loss_list_average, valid_loss_list_average,
                           mean_loss_list_average,
-                          error_memory_model_average, true_Y, predicted_Y_loaded_model, label,
+                          error_memory_model_average, true_Y, sigmoid_predicted_Y_loaded_model, label,
                           benchmark_name, graph_type,gathered_nodes_binary_classification_task,hyper_parameters)
-    write_train_results_to_log(dataset, predicted_Y_loaded_model, train_loss_average,
+    write_train_results_to_log(dataset, sigmoid_predicted_Y_loaded_model, train_loss_average,
                                valid_loss_average, error_memory_model, mean_loss_list, accuracy_average,
                                best_valid_epoch_average,hyper_parameters,
                                benchmark=benchmark_name, label=label, graph_type=graph_type)
@@ -410,17 +412,14 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
         graphs_label_indices = []
         graphs_learning_labels = []
         total_number_of_node = 0
-        file_type = file_type
         file_name_list = []
         skipped_file_list=[]
 
-        # for fileGraph, fileArgument in zip(sorted(glob.glob(path +df+"_data/"+ '*' + file_type + json_type)),
-        #                                    sorted(glob.glob(path +df+"_data/"+ '*' + file_type + '.arguments'))):
-        files_from_benchmark=set(sorted(glob.glob(path +df+"_data/"+ '*' + file_type + json_type)))
+        files_from_benchmark=set(sorted(glob.glob(path +df+"_data/"+ '*'  + json_type)))
         file_set=(lambda : [f+json_type for f in file_list] if len(file_list)>0 else files_from_benchmark)()
-        #fileSet=set(sorted(glob.glob(path +df+"_data/"+ '*' + file_type + json_type))) #all .smt2.hyperedge.JSON file
+        #print("file_set",file_set)
         for fileGraph in file_set:
-            fileName = fileGraph[:fileGraph.find(file_type + json_type) + len(file_type)]
+            fileName = fileGraph[:fileGraph.find( json_type)]
             fileName = fileName[fileName.rindex("/") + 1:]
             # read graph
             #print("read graph from",fileGraph)
@@ -504,29 +503,29 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                     else:
                         #for layer horn graph
                         graphs_adjacency_lists.append([
-                            np.array(loaded_graph["predicateArgumentEdges"]),
-                            np.array(loaded_graph["predicateInstanceEdges"]),
-                            np.array(loaded_graph["argumentInstanceEdges"]),
-                            np.array(loaded_graph["controlHeadEdges"]),
-                            np.array(loaded_graph["controlBodyEdges"]),
-                            np.array(loaded_graph["controlEdges"]),
-                            np.array(loaded_graph["controlArgumentEdges"]),
-                            np.array(loaded_graph["subTermEdges"]),
-                            np.array(loaded_graph["guardEdges"]),
-                            np.array(loaded_graph["dataEdges"]),
-                            np.array(loaded_graph["predicateInstanceHeadEdges"]),
-                            np.array(loaded_graph["predicateInstanceBodyEdges"]),
-                            np.array(loaded_graph["controlArgumentHeadEdges"]),
-                            np.array(loaded_graph["controlArgumentBodyEdges"]),
-                            np.array(loaded_graph["guardConstantEdges"]),
-                            np.array(loaded_graph["guardOperatorEdges"]),
-                            np.array(loaded_graph["guardScEdges"]),
-                            np.array(loaded_graph["dataConstantEdges"]),
-                            np.array(loaded_graph["dataOperatorEdges"]),
-                            np.array(loaded_graph["dataScEdges"]),
-                            np.array(loaded_graph["subTermConstantOperatorEdges"]),
-                            np.array(loaded_graph["subTermOperatorOperatorEdges"]),
-                            np.array(loaded_graph["subTermScOperatorEdges"]),
+                            # np.array(loaded_graph["predicateArgumentEdges"]),
+                            # np.array(loaded_graph["predicateInstanceEdges"]),
+                            # np.array(loaded_graph["argumentInstanceEdges"]),
+                            # np.array(loaded_graph["controlHeadEdges"]),
+                            # np.array(loaded_graph["controlBodyEdges"]),
+                            # np.array(loaded_graph["controlEdges"]),
+                            # np.array(loaded_graph["controlArgumentEdges"]),
+                            # np.array(loaded_graph["subTermEdges"]),
+                            # np.array(loaded_graph["guardEdges"]),
+                            # np.array(loaded_graph["dataEdges"]),
+                            # np.array(loaded_graph["predicateInstanceHeadEdges"]),
+                            # np.array(loaded_graph["predicateInstanceBodyEdges"]),
+                            # np.array(loaded_graph["controlArgumentHeadEdges"]),
+                            # np.array(loaded_graph["controlArgumentBodyEdges"]),
+                            # np.array(loaded_graph["guardConstantEdges"]),
+                            # np.array(loaded_graph["guardOperatorEdges"]),
+                            # np.array(loaded_graph["guardScEdges"]),
+                            # np.array(loaded_graph["dataConstantEdges"]),
+                            # np.array(loaded_graph["dataOperatorEdges"]),
+                            # np.array(loaded_graph["dataScEdges"]),
+                            # np.array(loaded_graph["subTermConstantOperatorEdges"]),
+                            # np.array(loaded_graph["subTermOperatorOperatorEdges"]),
+                            # np.array(loaded_graph["subTermScOperatorEdges"]),
                             np.array(loaded_graph["binaryAdjacentList"]),
                             #np.array(loaded_graph["unknownEdges"])
                         ])
@@ -667,11 +666,11 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
         # node tokenization
         tokenized_node_label_ids=tokenize_symbols(token_map,node_symbols)
         # todo: try simple example
-        tokenized_node_label_ids=[0,0,0,0,0,0,0,0,0,0,0]
-        adjacency_lists=[np.array([[0,1],[0,2],[1,3],[1,4],[1,5],[4,7],[4,8],[2,6],[6,9],[6,10]])]
-        node_indices=[0,1,2,3,4,5,6,7,8,9,10]
-        learning_labels=[0,0,0,1,0,1,0,1,1,1,1]
-        graphs_learning_labels = [learning_labels]
+        # tokenized_node_label_ids=[0,0,0,0,0,0,0,0,0,0,0]
+        # adjacency_lists=[np.array([[0,1],[0,2],[1,3],[1,4],[1,5],[4,7],[4,8],[2,6],[6,9],[6,10]])]
+        # node_indices=[0,1,2,3,4,5,6,7,8,9,10]
+        # learning_labels=[0,0,0,1,0,1,0,1,1,1,1]
+        # graphs_learning_labels = [learning_labels]
 
         # node_indices=[0,1,2,3,4,5,6,7,8,9,10,11,12,13]
         # learning_labels = [0,0,1,0,0,0,0,0,0,0,0,0,0,0]
@@ -1012,12 +1011,13 @@ def get_class_weight(pos, neg, total):
 def get_test_loss_with_class_weight(class_weight,task_output,labels,from_logits=True):
     #predicted_y = (lambda: task_output if from_logits == False else [logit(x) for x in task_output])()
     #predicted_y=task_output
-    predicted_y=[logit(x) for x in task_output]
+    predicted_y= task_output#tf.math.sigmoid(task_output)
     # description: implemented by exaggerating inputs
     # weighted_prediction = [y_hat * class_weight["weight_for_1"] if y == 1 else y_hat for y, y_hat in zip(labels, predicted_y)]
     # return tf.reduce_mean(tf.keras.losses.binary_crossentropy(labels,weighted_prediction,from_logits=from_logits))
     # description: implemented by weighted_cross_entropy_with_logits
     #print("class_weight",class_weight["weight_for_1"],class_weight["weight_for_0"])
+    #return (lambda : tf.reduce_mean(tf.losses.binary_crossentropy(labels,task_output,from_logits))if class_weight["weight_for_1"]==1 else tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(labels,predicted_y,class_weight["weight_for_1"])))()
     return tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(labels,predicted_y,class_weight["weight_for_1"]))
     # description: implemented by conditions
     # ce = []

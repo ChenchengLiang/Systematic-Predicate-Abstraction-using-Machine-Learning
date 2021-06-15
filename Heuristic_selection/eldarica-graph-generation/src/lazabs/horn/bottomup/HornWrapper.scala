@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2020 Hossein Hojjat and Philipp Ruemmer.
+ * Copyright (c) 2011-2021 Hossein Hojjat and Philipp Ruemmer.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,7 @@ import ap.SimpleAPI.ProverStatus
 import ap.types.MonoSortedPredicate
 import lazabs.GlobalParameters
 import lazabs.ParallelComputation
-import lazabs.Main.{StoppedException, TimeoutException}
+import lazabs.Main.{TimeoutException, StoppedException, PrintingFinishedException}
 import lazabs.horn.preprocessor.{DefaultPreprocessor, HornPreprocessor}
 import HornPreprocessor.BackTranslator
 import lazabs.horn.bottomup.HornClauses._
@@ -48,8 +48,10 @@ import PrincessWrapper._
 import lazabs.prover.Tree
 import lazabs.types.Type
 import Util._
-import HornPredAbs.RelationSymbol
-import lazabs.horn.abstractions.{AbsLattice, AbsReader, AbstractionRecord, EmptyVerificationHints, LoopDetector, StaticAbstractionBuilder, VerificationHints}
+
+import lazabs.horn.abstractions.{AbsLattice, AbsReader, LoopDetector,
+                                 StaticAbstractionBuilder, AbstractionRecord,
+                                 VerificationHints, EmptyVerificationHints}
 import AbstractionRecord.AbstractionMap
 import StaticAbstractionBuilder.AbstractionType
 import lazabs.horn.concurrency.ReaderMain
@@ -82,21 +84,37 @@ object HornWrapper {
           case Sort.MultipleValueBool =>
             // since we are making use of the equivalence
             // x == False <=> x != True, we need to add bounds on Boolean
+            // x == False <=> x != True, we need to add bounds on Boolean
             // variables (corresponding to the law of the excluded middle)
             !! (c >= 0 & c <= 1)
           case _ =>
           // nothing
         }
 
-        !! (constraint)
-        for (IAtom(pred, args) <- body)
-          !! (subst(fullSol(pred), args.toList, 0))
-        ?? (if (head.pred == HornClauses.FALSE)
-          i(false)
-        else
-          subst(fullSol(head.pred), head.args.toList, 0))
-        ??? == ProverStatus.Valid
-      }}})
+                !! (constraint)
+                for (IAtom(pred, args) <- body)
+                  !! (subst(fullSol(pred), args.toList, 0))
+                ?? (if (head.pred == HornClauses.FALSE)
+                      i(false)
+                    else
+                      subst(fullSol(head.pred), head.args.toList, 0))
+                ??? match {
+                  case ProverStatus.Valid => true // ok
+                  case ProverStatus.Invalid => {
+                    Console.err.println("Verification of clause failed, clause is not satisfied:")
+                    Console.err.println(clause.toPrologString)
+                    Console.err.println("Countermodel: " + partialModel)
+                    false
+                  }
+                  case s => {
+                    Console.err.println("Warning: Verification of clause was not possible:")
+                    Console.err.println(clause.toPrologString)
+                    Console.err.println("Checker said: " + s)
+                    true
+                  }
+                }
+              }}})
+
   }
 
   def verifyCEX(fullCEX : HornPreprocessor.CounterExample,
@@ -233,8 +251,35 @@ class HornWrapper(constraints: Seq[HornClause],
         //      println("-------------------------------")
       }
 
-      (simplifiedClauses, simpPreHints, backTranslator)
+
+    if (GlobalParameters.get.printHornSimplified) {
+//      println("-------------------------------")
+//      printClauses(simplifiedClauses)
+//      println("-------------------------------")
+
+      println("Clauses after preprocessing:")
+      for (c <- simplifiedClauses)
+        println(c.toPrologString)
+      throw PrintingFinishedException
+
+      //val aux = simplifiedClauses map (horn2Eldarica(_))
+//      val aux = horn2Eldarica(simplifiedClauses)
+//      println(lazabs.viewer.HornPrinter(aux))
+//      simplifiedClauses = aux map (transform(_))
+//      println("-------------------------------")
+//      printClauses(simplifiedClauses)
+//      println("-------------------------------")
     }
+
+    if (GlobalParameters.get.printHornSimplifiedSMT) {
+      println("Clauses after preprocessing (SMT-LIB):")
+      for (c <- simplifiedClauses)
+          println(c.toSMTString)
+      throw PrintingFinishedException
+    }
+
+    (simplifiedClauses, simpPreHints, backTranslator)
+  }
 
   private val postHints : VerificationHints = {
     val name2Pred =
@@ -407,19 +452,11 @@ class InnerHornWrapper(unsimplifiedClauses : Seq[Clause],
     Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName+".unlabeledPredicates.tpl")) {
       AbsReader.printHints(initialPredicates)}
     val clauseCollection = new ClauseInfo(simplifiedClausesForGraph,Seq())
-    val hintCollection=new VerificationHintsInfo(initialPredicates,VerificationHints(Map()),VerificationHints(Map()))
     val argumentList = (for (p <- HornClauses.allPredicates(simplifiedClausesForGraph)) yield (p, p.arity)).toArray.sortBy(_._1.name)
     val argumentInfo = HintsSelection.writeArgumentOccurrenceInHintsToFile(GlobalParameters.get.fileName, argumentList, simpHints,countOccurrence=false)
     //val argumentInfo = HintsSelection.getArgumentBoundForSmt(argumentList,disjunctive,simplifiedClausesForGraph,simpHints,predGenerator)
-    if (GlobalParameters.get.getAllHornGraph==true) {
-      GraphTranslator.drawAllHornGraph(clauseCollection, hintCollection,argumentInfo)
-    }
-    else{
-      GlobalParameters.get.hornGraphType match {
-        case HornGraphType.hyperEdgeGraph | HornGraphType.equivalentHyperedgeGraph|HornGraphType.concretizedHyperedgeGraph=> new DrawHyperEdgeHornGraph(GlobalParameters.get.fileName, clauseCollection, hintCollection,argumentInfo)
-        case _=> new DrawLayerHornGraph(GlobalParameters.get.fileName, clauseCollection, hintCollection,argumentInfo)
-      }
-    }
+    val hintCollection=new VerificationHintsInfo(initialPredicates,VerificationHints(Map()),VerificationHints(Map()))
+    GraphTranslator.drawAllHornGraph(clauseCollection, hintCollection,argumentInfo,GlobalParameters.get.fileName)
     sys.exit()
   }
   if(GlobalParameters.get.getSMT2==true){
@@ -442,16 +479,20 @@ class InnerHornWrapper(unsimplifiedClauses : Seq[Clause],
       HintsSelection.wrappedReadHints(simplifiedClausesForGraph,"labeledPredicates") else emptyInitialPredicates
       //VerificationHints(HintsSelection.wrappedReadHints(simplifiedClausesForGraph,"labeledPredicates").toInitialPredicates.mapValues(_.map(sp(_)).map(VerificationHints.VerifHintInitPred(_))))
     val counterexampleMethod =HintsSelection.getCounterexampleMethod(disjunctive)
-    val dataFold=Map("emptyInitialPredicates"->emptyInitialPredicates,
+    val dataFold= if (truePredicates.isEmpty)
+    Map("emptyInitialPredicates"->emptyInitialPredicates,
       "predictedInitialPredicates"->predictedPredicates,
-      "fullInitialPredicates"->fullInitialPredicates,
-      "trueInitialPredicates"->truePredicates
-    )
+      "fullInitialPredicates"->fullInitialPredicates)
+    else
+      Map("emptyInitialPredicates"->emptyInitialPredicates,
+        "predictedInitialPredicates"->predictedPredicates,
+        "fullInitialPredicates"->fullInitialPredicates,
+        "trueInitialPredicates"->truePredicates)
 
     val solvabilityList=(for((fieldName,initialPredicate)<-dataFold) yield{
       //val simplifiedInitialpredicates
       val solvabilityPredGenerator = if (GlobalParameters.get.onlyInitialPredicates==true) HintsSelection.getExceptionalPredicatedGenerator() else predGenerator
-      val (solveTime,predicateFromCegar,_)=HintsSelection.checkSolvability(simplifiedClausesForGraph,initialPredicate.toInitialPredicates,solvabilityPredGenerator,counterexampleMethod,moveFile = false,exit=false,coefficient=1)
+      val (solveTime,predicateFromCegar,_)=HintsSelection.checkSolvability(simplifiedClausesForGraph,initialPredicate.toInitialPredicates,solvabilityPredGenerator,counterexampleMethod,moveFile = GlobalParameters.get.moveFile,exit=false,coefficient=1)
       val solvability=if (solveTime>=(GlobalParameters.get.solvabilityTimeout/1000).toInt) false else true
       println("solveTime",solveTime)
       println("solvability",solvability)
@@ -470,7 +511,7 @@ class InnerHornWrapper(unsimplifiedClauses : Seq[Clause],
         ("initialPredicatesUsedInMinimizedPredicateFromCegar"+fieldName,initialPredicatesUsedInMinimizedPredicateFromCegar.values.flatten.size))
     }).flatten.toSeq
 
-    HintsSelection.writeSolvabilityToJSON(solvabilityList)
+    HintsSelection.writeInfoToJSON(solvabilityList,"solvability")
 
     if (GlobalParameters.get.measurePredictedPredicates==true){
       HintsSelection.measurePredicates(simplifiedClausesForGraph,predGenerator,counterexampleMethod,
@@ -506,9 +547,10 @@ class InnerHornWrapper(unsimplifiedClauses : Seq[Clause],
   val result : Either[Map[Predicate, IFormula], Dag[IAtom]] = {
     val counterexampleMethod =
       if (disjunctive)
-        HornPredAbs.CounterexampleMethod.AllShortest
+        CEGAR.CounterexampleMethod.AllShortest
       else
-        HornPredAbs.CounterexampleMethod.FirstBestShortest
+
+        CEGAR.CounterexampleMethod.FirstBestShortest
 
     val result = Console.withOut(outStream) {
       println

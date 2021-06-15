@@ -6,7 +6,7 @@ from utils import call_eldarica
 from Miscellaneous import add_JSON_field
 from Miscellaneous import pickleRead,pickleWrite
 from horn_dataset import HornGraphDataset
-from horn_dataset import write_graph_to_pickle, form_GNN_inputs_and_labels
+from horn_dataset import write_graph_to_pickle, form_GNN_inputs_and_labels,get_test_loss_with_class_weight
 from utils import my_round_fun
 
 
@@ -185,7 +185,7 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="templa
     _, _, test_results = loaded_model.run_one_epoch(test_data, training=False, quiet=quiet)
     test_metric, test_metric_string = loaded_model.compute_epoch_metrics(test_results)
     predicted_Y_loaded_model = loaded_model.predict(test_data)
-    #predicted_Y_loaded_model=tf.math.sigmoid(predicted_Y_loaded_model)
+    sigmoid_predicted_Y_loaded_model=tf.math.sigmoid(predicted_Y_loaded_model)
 
     print("test_metric_string", test_metric_string)
     print("test_metric", test_metric)
@@ -202,11 +202,15 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="templa
     for file_name in dataset._file_list["test"]:
         true_Y_file_list.append(file_name)
 
-    mse_loaded_model = tf.keras.losses.MSE(true_Y, predicted_Y_loaded_model)
-    print("\n mse_loaded_model_predicted_Y_and_True_Y", mse_loaded_model)
+    class_weight=parameters["class_weight_fold"]
+    from_logits=True
+    loss_loaded_model = (lambda : tf.keras.losses.MSE(true_Y, predicted_Y_loaded_model) \
+            if label not in gathered_nodes_binary_classification_task else get_test_loss_with_class_weight(class_weight,predicted_Y_loaded_model,true_Y,from_logits=from_logits))()
+    print("\n mse_loaded_model_predicted_Y_and_True_Y", loss_loaded_model)
 
 
-    mse_mean = tf.keras.losses.MSE([np.mean(true_Y)] * len(true_Y), true_Y)
+    mse_mean = (lambda: tf.keras.losses.MSE([np.mean(true_Y)] * len(true_Y), true_Y) if label not in gathered_nodes_binary_classification_task else
+    tf.keras.losses.binary_crossentropy([np.mean(true_Y)] * len(true_Y), true_Y,from_logits=False))()
     print("\n mse_mean_Y_and_True_Y", mse_mean)
     best_set_threshold = (lambda : hyper_parameter["best_threshold_set"] if hyper_parameter["read_best_threshold"] else write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,label,benchmark))()
     best_set_ranks = (lambda : {"top_percentage":0,"accuracy":0} if hyper_parameter["read_best_threshold"] else wrapped_set_threshold_by_ranks(true_Y, true_Y_by_file, predicted_Y_loaded_model, true_Y_file_list))()
@@ -229,7 +233,7 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="templa
           "better than random guess")
     return {"trained_model_path":trained_model_path,"best_set_threshold":best_set_threshold["accuracy"],"best_set_ranks":best_set_ranks["accuracy"],
             "benchmark_fold":benchmark_fold,"label":label,"hyper_parameter":hyper_parameter,"positive_label_percentage":positive_label_number / len(true_Y),
-            "negative_label_number":negative_label_number / len(true_Y),"dataset":dataset,"predicted_Y_loaded_model":predicted_Y_loaded_model,"best_threshold":best_set_threshold["threshold"]}
+            "negative_label_number":negative_label_number / len(true_Y),"dataset":dataset,"predicted_Y_loaded_model":sigmoid_predicted_Y_loaded_model,"best_threshold":best_set_threshold["threshold"]}
 
 
 

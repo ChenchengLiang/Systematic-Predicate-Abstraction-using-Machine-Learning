@@ -141,7 +141,9 @@ class PrincessWrapper {
    * converts a list of formulas in Eldarica format to a list of formulas in Princess format
    * returns both the formulas in Princess format and the symbols used in the formulas
    */
-  def formula2Princess(ts: List[Expression],initialSymbolMap: LinkedHashMap[String, ConstantTerm] = LinkedHashMap[String, ConstantTerm]().empty, 
+  def formula2Princess(ts: List[Expression],
+                       initialSymbolMap: LinkedHashMap[String, ConstantTerm] =
+                         LinkedHashMap[String, ConstantTerm]().empty,
                        keepReservoir: Boolean = false) 
     : (List[IExpression], LinkedHashMap[String, ConstantTerm]) = {
     val symbolMap = initialSymbolMap
@@ -383,11 +385,11 @@ class PrincessWrapper {
     import Sort.:::
     def rvT(t: ITerm): Expression = t match {
       case IPlus(e1, ITimes(ap.basetypes.IdealInt.MINUS_ONE, e2)) =>
-        lazabs.ast.ASTree.Subtraction(rvT(e1).stype(IntegerType()), rvT(e2).stype(IntegerType()))
+        lazabs.ast.ASTree.Subtraction(rvT(e1).stype(IntegerType()), rvT(e2).stype(IntegerType())).stype(IntegerType())
       case IPlus(ITimes(ap.basetypes.IdealInt.MINUS_ONE, e2), e1) =>
-        lazabs.ast.ASTree.Subtraction(rvT(e1).stype(IntegerType()), rvT(e2).stype(IntegerType()))
-      case IPlus(e1,e2) => lazabs.ast.ASTree.Addition(rvT(e1).stype(IntegerType()), rvT(e2).stype(IntegerType()))
-      case ITimes(e1,e2) => lazabs.ast.ASTree.Multiplication(rvT(e1).stype(IntegerType()), rvT(e2).stype(IntegerType()))
+        lazabs.ast.ASTree.Subtraction(rvT(e1).stype(IntegerType()), rvT(e2).stype(IntegerType())).stype(IntegerType())
+      case IPlus(e1,e2) => lazabs.ast.ASTree.Addition(rvT(e1).stype(IntegerType()), rvT(e2).stype(IntegerType())).stype(IntegerType())
+      case ITimes(e1,e2) => lazabs.ast.ASTree.Multiplication(rvT(e1).stype(IntegerType()), rvT(e2).stype(IntegerType())).stype(IntegerType())
 
       // Theory of sets (not really supported anymore ...)
       case IFunApp(`size`, arg) =>
@@ -528,7 +530,7 @@ class PrincessWrapper {
 
       // Constants and variables
 
-      case IConstant(cterm) ::: sort =>
+      case IConstant(cterm) ::: sort => {
         val pattern = """x(\d+)(\w+)""".r
         symMap(cterm) match {
           case pattern(cVersion,n) if (removeVersions) =>
@@ -536,9 +538,11 @@ class PrincessWrapper {
           case noVersion@_ =>
             lazabs.ast.ASTree.Variable(noVersion,None).stype(sort2Type(sort))
         }
+      }
       case IVariable(index) =>
         lazabs.ast.ASTree.Variable("_" + index,Some(index)).stype(IntegerType())      
-      case IIntLit(value) => lazabs.ast.ASTree.NumericalConst(value.bigIntValue)
+      case IIntLit(value) =>
+        lazabs.ast.ASTree.NumericalConst(value.bigIntValue).stype(IntegerType())
       case _ =>
         println("Error in conversion from Princess to Eldarica (ITerm): " + t + " subclass of " + t.getClass)
         BoolConst(false)

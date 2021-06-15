@@ -28,20 +28,21 @@ def main():
     force_read = True
     form_label = True
     file_type = ".smt2"
-    GPU=True
+    GPU=False
+    use_class_weight=False
     pickle = True
-    benchmark_name = "mixed-three-fold-single-example/"
+    benchmark_name = "single-layer-graph-example/"
 
     # random.seed(0)
     # np.random.seed(0)
     # tf.random.set_seed(0)
 
-    hyper_parameters={"nodeFeatureDim":32,"num_layers":8,"regression_hidden_layer_size":[32],"threshold":0.5,"max_nodes_per_batch":10000}
+    hyper_parameters={"nodeFeatureDim":64,"num_layers":2,"regression_hidden_layer_size":[64],"threshold":0.5,"max_nodes_per_batch":10000}
     for label in label_list:
-        parameter_list.append(
-            parameters(relative_path="../benchmarks/"+benchmark_name,
-                       absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
-                       json_type=".hyperEdgeHornGraph.JSON", label=label))
+        # parameter_list.append(
+        #     parameters(relative_path="../benchmarks/"+benchmark_name,
+        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
+        #                json_type=".hyperEdgeHornGraph.JSON", label=label))
         # parameter_list.append(
         #     parameters(relative_path="../benchmarks/" + benchmark_name,
         #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
@@ -50,10 +51,10 @@ def main():
         #     parameters(relative_path="../benchmarks/" + benchmark_name,
         #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
         #                json_type=".concretized-hyperedgeGraph.JSON", label=label))
-        # parameter_list.append(
-        #     parameters(relative_path="../benchmarks/" + benchmark_name,
-        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
-        #                json_type=".mono-layerHornGraph.JSON", label=label))
+        parameter_list.append(
+            parameters(relative_path="../benchmarks/" + benchmark_name,
+                       absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+                       json_type=".mono-layerHornGraph.JSON", label=label))
         # parameter_list.append(
         #     parameters(relative_path="../benchmarks/"+benchmark_name,
         #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
@@ -78,12 +79,12 @@ def main():
         if pickle==False:
             train_on_graphs(benchmark_name=param.absolute_path[param.absolute_path.find("/benchmarks/")+len("/benchmarks/"):-1], label=param.label, force_read=force_read,
                             train_n_times=1,path=param.absolute_path, file_type=file_type, form_label=form_label,
-                            json_type=param.json_type,GPU=GPU,pickle=pickle,hyper_parameters=hyper_parameters)
+                            json_type=param.json_type,GPU=GPU,pickle=pickle,use_class_weight=use_class_weight,hyper_parameters=hyper_parameters)
         else:
             train_on_graphs(benchmark_name=param.benchmark_name(),
                             label=param.label, force_read=force_read,
                             train_n_times=1, path=param.relative_path, file_type=file_type, form_label=form_label,
-                            json_type=param.json_type, GPU=GPU, pickle=pickle,hyper_parameters=hyper_parameters)
+                            json_type=param.json_type, GPU=GPU, pickle=pickle,use_class_weight=use_class_weight,hyper_parameters=hyper_parameters)
         tf.keras.backend.clear_session()
 
 class parameters():

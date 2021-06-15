@@ -149,29 +149,40 @@ def shuffle_data(rootdir,target_folder):
     for file,fold_name in zip([train_files,valid_files,test_files],["train_data","valid_data","test_data"]):
         os.mkdir("../benchmarks/"+target_folder+"/"+fold_name)
         print(fold_name+"_files", len(file))
+        final_target_folder=os.path.join("../benchmarks/"+target_folder+"/", fold_name)
         for f in file:
-            copy(f, os.path.join("../benchmarks/"+target_folder+"/", fold_name))
-    os.mkdir(os.path.join("../benchmarks/"+target_folder+"/", "test_data_simple_generator"))
-    for file in test_files:
-        copy(file, os.path.join("../benchmarks/"+target_folder+"/", "test_data_simple_generator"))
+            copy(f, final_target_folder)
+            copy_relative_data(f,final_target_folder)
+    # os.mkdir(os.path.join("../benchmarks/"+target_folder+"/", "test_data_simple_generator"))
+    # for file in test_files:
+    #     copy(file, os.path.join("../benchmarks/"+target_folder+"/", "test_data_simple_generator"))
 
+def copy_relative_data(f,target_folder):
+    try:
+        copy(f+".circles.gv",target_folder)
+        copy(f + ".HornGraph", target_folder)
+        copy(f + ".hyperEdgeHornGraph.gv", target_folder)
+        copy(f + ".labeledPredicates.tpl", target_folder)
+        copy(f + ".unlabeledPredicates.tpl", target_folder)
+        copy(f + ".hyperEdgeHornGraph.JSON", target_folder)
+        copy(f + ".predicateDistribution", target_folder)
+    except:
+        #print("no corresponding files")
+        pass
 
-
-def divide_data_to_threads(root,target_folder,three_fold=True):
-    chunk_number=5
+def divide_data_to_threads(benchmark="",target_folder="",three_fold=True,chunk_number=17,datafold_list=["train_data", "valid_data", "test_data"]):
+    root="../benchmarks/"+benchmark
     try:
         os.mkdir(os.path.join("../benchmarks",target_folder))
     except:
         print("path existed")
-    datafold_list = ["train_data", "valid_data", "test_data"]
-    datafold_files_list = [os.path.join(root, "train_data"), os.path.join(root, "valid_data"),
-                           os.path.join(root, "test_data")]
+    datafold_files_list = [os.path.join(root, d) for d in datafold_list]
     if three_fold==False:
         datafold_list=datafold_list+["test_data_simple_generator"]
         datafold_files_list=datafold_files_list+[os.path.join(root,"test_data_simple_generator")]
 
     for datafold,datafold_files in zip(datafold_list,datafold_files_list):
-        datafold_file_list=glob.glob(datafold_files+"/*")
+        datafold_file_list=glob.glob(datafold_files+"/*.smt2")
         print(datafold_files,len(datafold_file_list))
         chunk_size=int(len(datafold_file_list)/chunk_number)
         for i in range(0,chunk_number):
@@ -185,9 +196,11 @@ def divide_data_to_threads(root,target_folder,three_fold=True):
             except:
                 pass
             for file in datafold_file_list[i*chunk_size:(i+1)*chunk_size]:
-                copy(file, os.path.join(thread_dir,datafold))
+                copy_relative_files(file, os.path.join(thread_dir, datafold))
+                #copy(file, os.path.join(thread_dir,datafold))
         for file in datafold_file_list[chunk_number*chunk_size:]:
-            copy(file, os.path.join(thread_dir, datafold))
+            copy_relative_files(file, os.path.join(thread_dir, datafold))
+            #copy(file, os.path.join(thread_dir, datafold))
 
 
 
@@ -219,9 +232,6 @@ def gather_data_to_one_file(src,target):
                     shutil.move(os.path.join(root, f), target+"/"+renamed_f)
                     count=count+1
 
-
-
-
 class parameters():
     def __init__(self, root_dir,json_file_type,eldarica_parameters):
         self.root_dir=root_dir
@@ -252,9 +262,9 @@ def main():
 
 
     #extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
-    # gather_data_to_one_file(os.path.join("../benchmarks/","LIA-nonlin"),os.path.join("../benchmarks","shuffleFile"))
-    # shuffle_data("../benchmarks/shuffleFile","../benchmarks/shuffled_files")
-    #divide_data_to_threads("../benchmarks/extractable-three-fold-lin+nonlin","extractable-three-fold-lin+nonlin_divided",three_fold=True)
+    #gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
+    #shuffle_data("../benchmarks/all-LIA-Lin","../benchmarks/all-LIA-Lin-1")
+    #divide_data_to_threads("all-LIA-Lin","all-LIA-Lin-divided",three_fold=True)#datafold_list=["test_data"]
 
     #moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -262,9 +272,151 @@ def main():
     #benchmark_exceptions_analysis()
 
     #rebuild_exception_file()
+    # get_generated_horn_graph()
+    #clean_extracted_data("sv-comp-horn-graphs")
+    #align_extracted_data(benchmark="chc-comp21-benchmarks-main-all",folder_name="extracted_data")
+    #get_k_fold_train_data(benchmark="chc-comp21-benchmarks-main-all",folder_name="extracted_data")
+    #collect_unsolvable_data(horn_graph_folder="temp-horn",unsolvable_folder="temp-target",target_file="temp-unsolvable_with_horn_graphs")
 
-    #clean_extracted_data("mixed-three-fold-noIntervals-only-initial-unsolved/test")
-    get_generated_horn_graph()
+    analysis_guard_statistics(benchmark="temp",folder="extracted_data")
+    #analysis_graph_structure(benchmark="temp-train")
+
+def collect_unsolvable_data(horn_graph_folder="",unsolvable_folder="",target_file=""):
+    unsolvable_file_list=glob.glob("../benchmarks/"+unsolvable_folder+"/*.smt2")
+    horn_graph_file_list = glob.glob("../benchmarks/" + horn_graph_folder + "/*.smt2")
+    intersect_file_folder=os.path.join("../benchmarks",target_file)
+    unsolvable_file_name_list=[f[f.rfind("/")+1:] for f in unsolvable_file_list]
+    horn_graph_file_name_list=[f[f.rfind("/")+1:] for f in horn_graph_file_list]
+    print(unsolvable_file_name_list)
+    print(horn_graph_file_name_list)
+    try:
+        os.mkdir(intersect_file_folder)
+    except:
+        print("folder existed")
+    for f in unsolvable_file_name_list:
+        if f in horn_graph_file_name_list and os.path.exists("../benchmarks/" + horn_graph_folder+"/"+f+".hyperEdgeHornGraph.JSON"):
+            copy_relative_files("../benchmarks/"+horn_graph_folder+"/"+f,intersect_file_folder)
+            #print(f)
+
+def align_extracted_data(benchmark="chc-comp21-benchmarks-main-all",folder_name="extracted_data"):
+    file_list=glob.glob("../benchmarks/"+benchmark+"/"+folder_name+"/*.circles.gv")
+    #smt_file_list=glob.glob("../benchmarks/"+benchmark+"/exceptions/shell-timeout/*.smt2")
+    for f in file_list:
+        smt_file_path=f[:f.rfind(".circles.gv")]
+        smt_file_name=smt_file_path[smt_file_path.rfind("/")+1:]
+        if not os.path.exists(smt_file_path):
+            shutil.move("../benchmarks/"+benchmark+"/exceptions/shell-timeout/"+smt_file_name,"../benchmarks/"+benchmark+"/"+folder_name)
+
+def analysis_graph_structure(benchmark=""):
+    structure_d={"node_number":[],"predicate_number":[]}
+    file_list=[]
+    for fold in ["train"]:#["train","valid","test"]:
+        file_list=file_list+glob.glob("../benchmarks/"+benchmark+"/"+fold+"_data/*.hyperEdgeHornGraph.JSON")
+    print("file_list",len(file_list))
+    for file in file_list:
+        with open(file) as f:
+            loaded_graph = json.load(f)
+            structure_d["node_number"].append(len(loaded_graph["nodeIds"]))
+            structure_d["predicate_number"].append(len(loaded_graph["templateRelevanceLabel"]))
+
+    print("node_number","average",str(sum(structure_d["node_number"])/len(structure_d["node_number"])),structure_d["node_number"])
+    print("predicate_number","average",str(sum(structure_d["predicate_number"])/len(structure_d["predicate_number"])),structure_d["predicate_number"])
+
+
+def analysis_guard_statistics(benchmark="chc-comp21-benchmarks-main-all-extract",folder="extracted_data-only-initial-predicates"):
+    from utils import print_multiple_object
+    file_list=glob.glob(os.path.join("../benchmarks",os.path.join(benchmark,folder))+"/*.smt2.predicateDistribution.JSON")
+    statistics_d={"positive_guard_list":[],"total_guard_list":[],"positive_predicate_list":[],
+                  "total_initial_predicate_list":[],"positive_redundant_pairwise_predicate_list":[],
+                  "total_redundant_pairwise_predicate_list":[],"positive_constraint_predicate_list":[],
+                  "total_constraint_predicate_list":[]}
+
+    for json_file in file_list:
+        with open(json_file) as f:
+            loaded_graph = json.load(f)
+            statistics_d["positive_guard_list"].append(int(loaded_graph["positiveGuards"]))
+            statistics_d["total_guard_list"].append(int(loaded_graph["total guards"]))
+            statistics_d["positive_predicate_list"].append(int(loaded_graph["positiveSimpleGeneratedPredicates"]))
+            statistics_d["total_initial_predicate_list"].append(int(loaded_graph["simpleGeneratedPredicates"]))
+            statistics_d["positive_redundant_pairwise_predicate_list"].append(int(loaded_graph["positiveRedundantPairwisePredicate"]))
+            statistics_d["total_redundant_pairwise_predicate_list"].append(int(loaded_graph["redundantPairwisePredicate"]))
+            statistics_d["positive_constraint_predicate_list"].append(int(loaded_graph["positiveConstraintPredicates"]))
+            statistics_d["total_constraint_predicate_list"].append(int(loaded_graph["constraintPredicates"]))
+            print(json_file)
+    print("-"*10)
+    print_multiple_object(statistics_d)
+    print("-" * 10)
+    print("positive guard / positive predicates",str(sum(statistics_d["positive_guard_list"]))+"/"+
+          str(sum(statistics_d["positive_predicate_list"])))
+    print("positive guard / total guards", str(sum(statistics_d["positive_guard_list"])) + "/" +
+          str(sum(statistics_d["total_guard_list"])))
+    print("positive pairwise predicates / positive predicates", str(sum(statistics_d["positive_redundant_pairwise_predicate_list"])) + "/" +
+          str(sum(statistics_d["positive_predicate_list"])))
+    print("positive pairwise predicates / total pairwise predicates",
+          str(sum(statistics_d["positive_redundant_pairwise_predicate_list"])) + "/" +
+          str(sum(statistics_d["total_redundant_pairwise_predicate_list"])))
+    print("positive constraint predicates / positive predicates",
+          str(sum(statistics_d["positive_constraint_predicate_list"])) + "/" +
+          str(sum(statistics_d["positive_predicate_list"])))
+    print("positive constraint predicates / total constraint predicates",
+          str(sum(statistics_d["positive_constraint_predicate_list"])) + "/" +
+          str(sum(statistics_d["total_constraint_predicate_list"])))
+
+    print("total gaurd / total predicates",
+          str(sum(statistics_d["total_guard_list"])) + "/" +
+          str(sum(statistics_d["total_initial_predicate_list"])))
+    print("total pairwise predicates / total predicates",
+          str(sum(statistics_d["total_redundant_pairwise_predicate_list"])) + "/" +
+          str(sum(statistics_d["total_initial_predicate_list"])))
+
+
+
+
+
+def get_k_fold_train_data(fold=5, benchmark="chc-comp21-benchmarks-main-all",folder_name="extracted_data-only-initial-predicates"):
+    path = os.path.join("../benchmarks/", benchmark)
+    file_list = glob.glob(path + "/"+folder_name+"/*.smt2")
+    separating_length = int(len(file_list) / fold)
+    random.shuffle(file_list)
+    random.shuffle(file_list)
+    separated_file_list = [file_list[i * separating_length:min((i + 1) * separating_length, len(file_list))] for i in
+                           range(fold)]
+    for f in range(fold):
+        fold_folder = os.path.join(path, benchmark+"-"+str(f) + "-fold")
+        print("fold_folder",fold_folder)
+        try:
+            os.mkdir(fold_folder)
+            for df in ["train_data", "valid_data", "test_data"]:
+                os.mkdir(os.path.join(fold_folder, df))
+        except:
+            pass
+        for file in separated_file_list[f]:  # test
+            copy_relative_files(file, os.path.join(fold_folder, "test_data"))
+        for file in separated_file_list[(f + 1) % (fold - 1)]:  # valid
+            copy_relative_files(file, os.path.join(fold_folder, "valid_data"))
+        for file in separated_file_list[(f + 2) % (fold - 1)] + separated_file_list[(f + 3) % (fold - 1)] + \
+                    separated_file_list[(f + 4) % (fold - 1)]:  # train
+            copy_relative_files(file, os.path.join(fold_folder, "train_data"))
+
+def copy_relative_files(source,des):
+    try:
+        copy(source, des)
+        if os.path.exists(source + ".hyperEdgeHornGraph.JSON"):
+            copy(source+".hyperEdgeHornGraph.JSON", des)
+        if os.path.exists(source + ".unlabeledPredicates.tpl"):
+            copy(source + ".unlabeledPredicates.tpl", des)
+        if os.path.exists(source + ".labeledPredicates.tpl"):
+            copy(source + ".labeledPredicates.tpl", des)
+        if os.path.exists(source + ".circles.gv"):
+            copy(source + ".circles.gv", des)
+        if os.path.exists(source + ".HornGraph"):
+            copy(source + ".HornGraph", des)
+        if os.path.exists(source + ".hyperEdgeHornGraph.gv"):
+            copy(source + ".hyperEdgeHornGraph.gv", des)
+        if os.path.exists(source + ".predicateDistribution"):
+            copy(source + ".predicateDistribution", des)
+    except:
+        print("file existed")
 
 def get_generated_horn_graph(horn_graph_folder="lia-lin-horn_graphs",target_folder="lia-lin-extract-unsolved-fullLabel"):
     horn_graph_file_list=glob.glob("../benchmarks/"+horn_graph_folder+"/*.hyperEdgeHornGraph.JSON")
@@ -307,6 +459,20 @@ def clean_extracted_data(benchmark):
 
     circle_file_list = glob.glob("../benchmarks/" + benchmark + "/*.circles.gv")
     file_list=[f[:-len(".circles.gv")] for f in circle_file_list]
+    #print(file_list)
+    for f in file_list:
+        if not os.path.exists(f):
+            if os.path.exists(f + ".HornGraph"):
+                os.remove(f + ".HornGraph")
+            if os.path.exists(f + ".circles.gv"):
+                os.remove(f + ".circles.gv")
+            if os.path.exists(f + ".hyperEdgeHornGraph.gv"):
+                os.remove(f + ".hyperEdgeHornGraph.gv")
+            if os.path.exists(f + ".unlabeledPredicates.tpl"):
+                os.remove(f + ".unlabeledPredicates.tpl")
+
+    unlabel_file_list = glob.glob("../benchmarks/" + benchmark + "/*.unlabeledPredicates.tpl")
+    file_list = [f[:-len(".unlabeledPredicates.tpl")] for f in unlabel_file_list]
     print(file_list)
     for f in file_list:
         if not os.path.exists(f):
