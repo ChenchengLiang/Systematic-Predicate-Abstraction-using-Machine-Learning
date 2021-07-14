@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import tensorflow as tf
 import tf2_gnn
@@ -8,7 +10,8 @@ from Miscellaneous import pickleRead,pickleWrite
 from horn_dataset import HornGraphDataset
 from horn_dataset import write_graph_to_pickle, form_GNN_inputs_and_labels,get_test_loss_with_class_weight
 from utils import my_round_fun
-
+from Miscellaneous import GPU_switch, pickleRead
+from utils import file_compress,unzip_file
 
 def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score_list,graph_type=".layerHornGraph.JSON"):
     # write predicted_argument_score to JSON file
@@ -83,14 +86,22 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
             print("corrected label:" + str(corrected_label) + "/" + str(len(g._node_label)))
 
         old_field = ["nodeIds", "nodeSymbolList", "falseIndices", "argumentIndices", "controlLocationIndices",
-                     "binaryAdjacentList", "ternaryAdjacencyList", "unknownEdges", "argumentIDList", "argumentNameList",
-                     "argumentEdges", "guardASTEdges", "dataFlowASTEdges","ASTEdges","AST_1Edges","AST_2Edges", "controlFlowHyperEdges",
-                     "dataFlowHyperEdges",
+                     "unknownEdges", "argumentIDList", "argumentNameList",
                      "argumentOccurrence", "predicateIndices", "predicateOccurrenceInClause",
                      "predicateStrongConnectedComponent",
                      "argumentBoundList", "argumentBinaryOccurrenceList", "templateIndices", "templateRelevanceLabel",
-                     "clauseIndices",
-                     "clauseBinaryOccurrenceInCounterExampleList", "templateASTEdges", "templateEdges", "dummyFiled"]
+                     "clauseIndices","clauseBinaryOccurrenceInCounterExampleList",
+                     "argumentEdges", "guardASTEdges", "dataFlowASTEdges",
+                     "templateASTEdges","ASTEdges","AST_1Edges","AST_2Edges", "templateEdges","verifHintTplEqTermEdges","verifHintTplInEqTermEdges",
+                     "binaryAdjacentList",
+                     "controlFlowHyperEdges","dataFlowHyperEdges",
+                     "ternaryAdjacencyList",
+                     "dummyFiled"]
+        json_file_name=file_name+graph_type
+        if os.path.exists(json_file_name + ".zip"):
+            unzip_file(json_file_name + ".zip")
+            os.remove(json_file_name + ".zip")
+
         new_field = ["predictedLabel"]
         new_filed_content=[transfomed_predicted_label]
         add_JSON_field(file_name,graph_type,old_field,new_field,new_filed_content)
@@ -98,6 +109,9 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
         new_field = ["predictedLabelLogit"]
         new_filed_content = [[str(np.round(l,2)) for l in predicted_label]]
         add_JSON_field(file_name, graph_type, old_field, new_field, new_filed_content)
+
+        file_compress([json_file_name],json_file_name+".zip")
+        os.remove(json_file_name)
 
 
 def set_threshold_by_roundings(true_Y,predicted_Y_loaded_model):
@@ -155,7 +169,8 @@ def write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,la
 
 def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="template_relevance",force_read=True,form_label=True,
                        json_type=".hyperEdgeHornGraph.JSON",graph_type="hyperEdgeHornGraph",
-                       gathered_nodes_binary_classification_task=["template_relevance"],hyper_parameter={},set_max_nodes_per_batch=False,file_list=[]):
+                       gathered_nodes_binary_classification_task=["template_relevance"],hyper_parameter={},
+                       set_max_nodes_per_batch=False,file_list=[]):
 
     path = "../benchmarks/" + benchmark_fold + "/"
     benchmark_name = path[len("../benchmarks/"):-1]
@@ -237,4 +252,30 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="templa
 
 
 
+
+
+def predict_label(benchmark,max_nodes_per_batch,benchmark_fold,file_list,trained_model_path,use_test_threshold,separateByPredicates="",verbose=True):
+    if separateByPredicates:
+        file_list=[]
+    label = "template_relevance"
+    # read best threshold from pickle
+    parameters = pickleRead(benchmark + "-" + label + "-parameters", "../src/trained_model/")
+    hyper_parameter = {"max_nodes_per_batch": max_nodes_per_batch,
+                       "best_threshold_set": (lambda : parameters["best_threshold_set"] if use_test_threshold== True else {"threshold":0.5,"accuracy":0})(),
+                       "read_best_threshold": True}
+    trained_model_path = trained_model_path
+    json_type = ".hyperEdgeHornGraph.JSON"
+    graph_type = json_type[1:json_type.find(".JSON")]
+    gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
+                                                 "argument_upper_bound_existence", "argument_occurrence_binary",
+                                                 "template_relevance", "clause_occurrence_in_counter_examples_binary"]
+    force_read = True
+    form_label = True
+    GPU_switch(False)
+    result_dir = wrapped_prediction(trained_model_path, benchmark, benchmark_fold, label, force_read, form_label,
+                                    json_type, graph_type, gathered_nodes_binary_classification_task, hyper_parameter,
+                                    True,file_list=file_list)
+    write_predicted_label_to_JSON_file(result_dir["dataset"], result_dir["predicted_Y_loaded_model"], json_type,
+                                       result_dir["best_threshold"],verbose=verbose)
+    return result_dir["predicted_Y_loaded_model"]
 

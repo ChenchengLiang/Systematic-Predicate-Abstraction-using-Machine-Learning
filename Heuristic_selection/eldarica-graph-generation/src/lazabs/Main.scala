@@ -57,8 +57,10 @@ object GlobalParameters {
 class GlobalParameters extends Cloneable {
   //var printHints=VerificationHints(Map())
   var checkSolvability=false
+  var rdm=false
   var onlyInitialPredicates=false
   var generateSimplePredicates=false
+  var generateTemplates=false
   var moveFile = false
   var maxNode=1000000
   var threadTimeout = 60*60*1000
@@ -126,6 +128,7 @@ class GlobalParameters extends Cloneable {
   var dumpInterpolationQuery = false
   var babarew = false
   var log = false
+  var debugLog= false
   var logCEX = false
   var logStat = false
   var printHornSimplified = false
@@ -138,6 +141,7 @@ class GlobalParameters extends Cloneable {
   var simplifiedCEX = false;
   var assertions = false
   var verifyInterpolants = false
+  var minePredicates = false
   var timeoutChecker : () => Unit = () => ()
 
   def needFullSolution = assertions || displaySolutionProlog || displaySolutionSMT
@@ -210,6 +214,7 @@ class GlobalParameters extends Cloneable {
     that.template = this.template
     that.dumpInterpolationQuery = this.dumpInterpolationQuery
     that.babarew = this.babarew
+    that.debugLog=this.debugLog
     that.log = this.log
     that.logCEX = this.logCEX
     that.logStat = this.logStat
@@ -242,8 +247,10 @@ class GlobalParameters extends Cloneable {
     that.getAllHornGraph=this.getAllHornGraph
     that.getLabelFromCounterExample=this.getLabelFromCounterExample
     that.generateSimplePredicates=this.generateSimplePredicates
+    that.generateTemplates=this.generateTemplates
     that.onlyInitialPredicates=this.onlyInitialPredicates
     that.checkSolvability=this.checkSolvability
+    that.rdm=this.rdm
     that.moveFile = this.moveFile
   }
 
@@ -343,11 +350,14 @@ object Main {
       case "-labelSimpleGeneratedPredicates"::rest => labelSimpleGeneratedPredicates = true; arguments(rest)
       case "-varyGeneratedPredicates":: rest => varyGeneratedPredicates =true; arguments(rest)
       case "-generateSimplePredicates" :: rest => generateSimplePredicates = true; arguments(rest)
+      case "-generateTemplates" :: rest => generateTemplates = true; arguments(rest)
       case "-onlyInitialPredicates" :: rest => onlyInitialPredicates = true; arguments(rest)
       case "-moveFile" :: rest => moveFile = true; arguments(rest)
       case "-checkSolvability" :: rest => checkSolvability = true; arguments(rest)
+      case "-rdm" :: rest => rdm = true; arguments(rest)
       case "-readHints" :: rest => readHints = true; arguments(rest)
       case "-getSMT2" :: rest => getSMT2 = true; arguments(rest)
+      case "-debugLog" :: rest => debugLog = true; arguments(rest)
       case "-getLabelFromCE":: rest =>getLabelFromCounterExample = true; arguments(rest)
       case "-getHornGraph" :: rest => {
         getHornGraph = true
@@ -414,6 +424,11 @@ object Main {
 
       case "-abstract" :: rest => templateBasedInterpolation = true; arguments(rest)
       case "-abstractPO" :: rest => templateBasedInterpolationPortfolio = true; arguments(rest)
+      case "-abstract:empty" :: rest => {
+        templateBasedInterpolation = true
+        templateBasedInterpolationType = AbstractionType.Empty
+        arguments(rest)
+      }
       case "-abstract:manual" :: rest => {
         templateBasedInterpolation = true
         templateBasedInterpolationType = AbstractionType.Empty
@@ -488,6 +503,8 @@ object Main {
 
       case "-pHints" :: rest => templateBasedInterpolationPrint = true; arguments(rest)
 
+      case "-minePredicates" :: rest => minePredicates = true; arguments(rest)
+
       case "-splitClauses" :: rest => splitClauses = true; arguments(rest)
 
       case arithMode :: rest if (arithMode startsWith "-arithMode:") => {
@@ -551,6 +568,7 @@ object Main {
           " -h\t\tShow this information\n" +
           " -assert\tEnable assertions in Eldarica\n" +
           " -log\t\tDisplay progress and found invariants\n" +
+          " -debugLog\t\tDisplay debug info\n" +
           " -log:n\t\tDisplay progress with verbosity n (currently 0 <= n <= 3)\n" +
           " -statistics\tDisplay statistics (implied by -log)\n" +
           " -t:time\tSet timeout (in seconds)\n" +
@@ -604,9 +622,11 @@ object Main {
           " -labelSimpleGeneratedPredicates\t label simple generated predicates by selected predicates\n"+
           " -varyGeneratedPredicates\t vary generated predicates from CEGAR process without change of logic mearnings\n"+
           " -generateSimplePredicates\t generate simple predicates\n"+
+          " -generateTemplates\t generate templates\n"+
           " -onlyInitialPredicates\t extract predicates using initial predicates only\n"+
           " -moveFile\t if exception occur, move file to excepion directory\n"+
           " -checkSolvability \t check solvability for different initial predicate settings\n"+
+          " -rdm \t random label initial templates\n"+
           " -absTimeout:time\t set timeout for labeling hints\n"+
           " -solvabilityTimeout:time\t set timeout for solvability\n"+
           " -rank:n\t use top n or score above n ranked hints read from file\n"+
@@ -737,10 +757,20 @@ object Main {
       }
 
       if (extractPredicates) {
-        //do selection
         try {
-          timeoutChecker()
           lazabs.horn.concurrency.TrainDataGeneratorPredicatesSmt2(clauseSet, absMap, global, disjunctive,
+            drawRTree, lbe) //generate train data.  clauseSet error may caused by import package
+        } catch {
+          case x:Any => {
+            println(Console.RED + x.toString)
+            throw MainTimeoutException
+          }
+        }
+        return
+      }
+      if (extractTemplates) {
+        try {
+          lazabs.horn.concurrency.TrainDataGeneratorTemplatesSmt2(clauseSet, absMap, global, disjunctive,
             drawRTree, lbe) //generate train data.  clauseSet error may caused by import package
         } catch {
           case x:Any => {
@@ -794,10 +824,10 @@ object Main {
         return
       }
 
-      if(extractTemplates){
-        val systemGraphs=new lazabs.horn.concurrency.TrainDataGenerator(smallSystem,system) //generate train data by templates
-        return
-      }
+//      if(extractTemplates){
+//        val systemGraphs=new lazabs.horn.concurrency.TrainDataGenerator(smallSystem,system) //generate train data by templates
+//        return
+//      }
 
 
       val result = try {
@@ -878,6 +908,7 @@ object Main {
     }
     case t : Exception =>{
       printError(t.getMessage, GlobalParameters.get.format)
+      t.printStackTrace()
       HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/other-error/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length))
     }
     case x:Any=>{
@@ -885,6 +916,7 @@ object Main {
       println(Console.RED + x.toString)
       HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/other-error/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length))
     }
+
 
   }
 

@@ -192,10 +192,9 @@ class DrawLayerHornGraph(file: String, clausesCollection: ClauseInfo, hints: Ver
   }
 
   astEdgeType = "templateAST"
-  //val templateNameList = drawTemplates()
-  val templateNameList=drawPredicate()
+  val templateNameList=if(GlobalParameters.get.extractPredicates) drawPredicate() else drawTemplates()
   for ((head,templateNodeNameList)<-templateNameList;templateNodeName<-templateNodeNameList)
-    addBinaryEdge(predicateNameMap(head).predicateCanonicalName,templateNodeName,"template")
+    addBinaryEdge(predicateNameMap(head).predicateCanonicalName,templateNodeName._1,templateNodeName._2)
 
   writerGraph.write("}" + "\n")
   writerGraph.close()

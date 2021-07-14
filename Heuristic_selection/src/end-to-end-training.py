@@ -8,7 +8,7 @@ from horn_dataset import write_graph_to_pickle, form_GNN_inputs_and_labels
 from tf2_gnn.cli_utils.training_utils import train, log_line, make_run_id
 from tf2_gnn.models import InvariantArgumentSelectionTask, InvariantNodeIdentifyTask
 import os
-from predict_functions import my_round_fun,write_predicted_label_to_JSON_file
+from predict_functions import my_round_fun,write_predicted_label_to_JSON_file,predict_label
 from Miscellaneous import pickleRead,pickleWrite,GPU_switch
 import glob
 from measurement_functions import read_measurement_from_JSON,get_analysis_for_predicted_labels
@@ -19,23 +19,25 @@ import tensorflow as tf
 from tensorflow.keras import mixed_precision
 import gc
 def main():
+    fold=5
     #different_num_layers_training()
     #clean_k_fold_test_data(benchmark="chc-comp-LIA-Lin-2021-extract")
-    k_fold_training(benchmark="chc-comp21-benchmarks-main-all")
-    k_fold_data_collection(benchmark="chc-comp21-benchmarks-main-all")
+    k_fold_training(benchmark="LIA-Lin+sv-comp-LIA-Lin+sv-comp-train-templates",fold=fold)
+    # k_fold_data_collection(benchmark="temp",
+    #                        separateByPredicates="-separateByPredicates",fold=fold)#-separateByPredicates
 
 
-def k_fold_training(benchmark="chc-comp21-benchmarks-main-all-extract"):
+def k_fold_training(benchmark="chc-comp21-benchmarks-main-all-extract",fold=5):
     # description: train in 5 fold
     #end_to_end_training(benchmark=benchmark + "-" + str(4) + "-fold")
-    for i in range(5):
+    for i in range(0,fold):
         end_to_end_training(benchmark=benchmark + "-" + str(i) + "-fold")
         gc.collect()
         tf.keras.backend.clear_session()
 
 
-def clean_k_fold_test_data(benchmark="chc-comp-LIA-Lin-2021-extract"):
-    for i in range(5):
+def clean_k_fold_test_data(benchmark="chc-comp-LIA-Lin-2021-extract",fold=5):
+    for i in range(fold):
         for file_type in [".solvability.JSON", ".measurement.JSON"]:
             file_list = glob.glob("../benchmarks/" + benchmark + "-" + str(i) + "-fold/test_data/*.smt2" + file_type)
             for f in file_list:
@@ -44,7 +46,7 @@ def clean_k_fold_test_data(benchmark="chc-comp-LIA-Lin-2021-extract"):
 
 
 
-def k_fold_data_collection(benchmark="chc-comp21-benchmarks-main-all-extract"):
+def k_fold_data_collection(benchmark="chc-comp21-benchmarks-main-all-extract",separateByPredicates="",fold=5):
     max_nodes_per_batch = 10000
     # description: merge all test results
     k_fold_benchmark = benchmark + "-k-fold-measurement"
@@ -57,7 +59,7 @@ def k_fold_data_collection(benchmark="chc-comp21-benchmarks-main-all-extract"):
         for f in glob.glob(k_fold_benchmark_test_folder+"/*"):
             os.remove(f)
 
-    for i in range(5):
+    for i in range(fold):
         file_list = glob.glob("../benchmarks/" + benchmark + "-" + str(i) + "-fold/test_data/*")
         for file in file_list:
             copy(file, k_fold_benchmark_test_folder)
@@ -66,11 +68,13 @@ def k_fold_data_collection(benchmark="chc-comp21-benchmarks-main-all-extract"):
     print("total test measurement file", len(glob.glob(k_fold_benchmark_test_folder + "/*.smt2.measurement.JSON")))
     print("total test horn graph file",
           len(glob.glob(k_fold_benchmark_test_folder + "/*.smt2.hyperEdgeHornGraph.JSON")))
-    filtered_file_list, file_list_with_horn_graph, file_list = wrapped_generate_horn_graph(k_fold_benchmark,
-                                                                                           max_nodes_per_batch,
-                                                                                           move_file=True,
-                                                                                           thread_number=4,
-                                                                                           data_fold=["test_data"])
+    wrapped_generate_horn_graph_params = {"benchmark_fold": k_fold_benchmark, "max_nodes_per_batch": max_nodes_per_batch,
+                                          "separateByPredicates": separateByPredicates,
+                                          "abstract": "-abstract:empty", "move_file": True, "thread_number": 4,
+                                          "generateSimplePredicates": "",
+                                          "generateTemplates": "-generateTemplates", "data_fold": ["test_data"],
+                                          "horn_graph_folder": "", "noIntervals": ""}
+    filtered_file_list, file_list_with_horn_graph, file_list = wrapped_generate_horn_graph(wrapped_generate_horn_graph_params)
     out_of_test_set = False
     # description: read solvability results
     json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
@@ -92,7 +96,7 @@ def k_fold_data_collection(benchmark="chc-comp21-benchmarks-main-all-extract"):
     print("max_nodes_per_batch", max_nodes_per_batch)
     print("filtered_file_list by max_nodes_per_batch:" + str(len(filtered_file_list)) + "/" + str(len(file_list)))
     # description: statistic data
-    get_statistic_data(filtered_file_list, k_fold_benchmark)
+    #get_statistic_data(filtered_file_list, k_fold_benchmark,separateByPredicates=separateByPredicates)
     # # description: how many predicates used in end
     # get_recall_scatter(solvability_name_fold, json_solvability_obj_list, filtered_file_list)
 
@@ -103,12 +107,14 @@ def different_num_layers_training():
         gc.collect()
         tf.keras.backend.clear_session()
 
-def end_to_end_training(num_layers=4,benchmark=""):
+def end_to_end_training(num_layers=8,benchmark=""):
     random_seed(1)
     tf.keras.backend.clear_session()
+    gc.collect()
     # description: set hyper-parameters
     params = {"benchmark": benchmark,#lia-lin-extract, mixed-three-fold-single-example
               "label": "template_relevance",
+              "num_node_target_labels":2,
               "force_read": True,
               "file_type": ".smt2",
               "graph_type": "hyperEdgeHornGraph",
@@ -120,6 +126,9 @@ def end_to_end_training(num_layers=4,benchmark=""):
               "max_epochs": 500,
               "patience": 100,
               "max_nodes_per_batch": 10000,
+              "separateByPredicates":"",#-separateByPredicates
+              "generateTemplates":"-generateTemplates",
+              "abstract":"-abstract:empty",
               "threshold": 0.5,
               "verbose":True,
               "use_class_weight":False,
@@ -129,30 +138,49 @@ def end_to_end_training(num_layers=4,benchmark=""):
                                                             "argument_occurrence_binary",
                                                             "template_relevance",
                                                             "clause_occurrence_in_counter_examples_binary"]}
-    hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers, "regression_hidden_layer_size": [64,64],"threshold": params["threshold"]}
+    hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers, "regression_hidden_layer_size": [64],"threshold": params["threshold"]}
 
     #description: generate horn graph if there is no horn graph file in test set
-    filtered_file_list,file_list_with_horn_graph,file_list = wrapped_generate_horn_graph(params["benchmark"], params["max_nodes_per_batch"], move_file=True,
-                                                     thread_number=4,data_fold=["test_data"])
+    wrapped_generate_horn_graph_params = {"benchmark_fold": params["benchmark"],
+                                          "max_nodes_per_batch": params["max_nodes_per_batch"],
+                                          "separateByPredicates": params["separateByPredicates"],
+                                          "abstract": "-abstract:empty", "move_file": True, "thread_number": 4,
+                                          "generateSimplePredicates": "",
+                                          "generateTemplates": "-generateTemplates", "data_fold": ["test_data"],
+                                          "horn_graph_folder": "", "noIntervals": ""}
+    filtered_file_list,file_list_with_horn_graph,file_list = wrapped_generate_horn_graph(wrapped_generate_horn_graph_params)
 
     # description: train
-    trained_model_path, test_data, model, dataset,train_loss_list, valid_loss_list, best_valid_epoch = read_data_and_train(params, hyper_parameters)
+    trained_model_path, test_data, model, dataset,train_loss_list, valid_loss_list, best_valid_epoch = \
+        read_data_and_train(params, hyper_parameters)
 
     # description: predict with threshold
-    #predicted_Y = predict_test_set_model_from_memory(params, test_data, model)
-    predicted_Y = predict_test_set_model_from_file(params, test_data, trained_model_path, dataset)
-    #this should be performed in the folder "benchmark-unsolved"
-    #trained_model_path = "trained_model/R-GCN_template_relevance__2021-04-23_20-47-42_best.pkl"
-    #predicted_Y, dataset =predict_unseen_set(params, trained_model_path, file_list=filtered_file_list, set_max_nodes_per_batch=True)
-
-    write_predicted_label_to_JSON_file(dataset, predicted_Y, "."+params["graph_type"]+".JSON", params["threshold"],verbose=params["verbose"])
-
-
+    # #predicted_Y = predict_test_set_model_from_memory(params, test_data, model)
+    # predicted_Y = predict_test_set_model_from_file(params, test_data, trained_model_path, dataset)
+    # #this should be performed in the folder "benchmark-unsolved"
+    # #trained_model_path = "trained_model/R-GCN_template_relevance__2021-04-23_20-47-42_best.pkl"
+    # #predicted_Y, dataset =predict_unseen_set(params, trained_model_path, file_list=filtered_file_list, set_max_nodes_per_batch=True)
+    # write_predicted_label_to_JSON_file(dataset, predicted_Y, "."+params["graph_type"]+".JSON", params["threshold"],verbose=params["verbose"])
+    predicted_Y=predict_label(benchmark, 10000, benchmark, filtered_file_list, trained_model_path, use_test_threshold=False,
+                  separateByPredicates=params["separateByPredicates"])  # file_list
     #description: draw train-predict diagrams
     draw_train_predict_plots(params, dataset, test_data, predicted_Y, train_loss_list, valid_loss_list,best_valid_epoch, hyper_parameters)
 
     # description: get final measurement from Eldarica, if predicated predicate cannot solve the problem there is no measurement file
-    get_solvability_and_measurement_from_eldarica(filtered_file_list, thread_number=4,continuous_extracting=True,move_file=False)
+    tf.keras.backend.clear_session()
+    gc.collect()
+    get_solvability_and_measurement_from_eldarica_params = {"filtered_file_list": filtered_file_list,
+                                                            "thread_number": 4,
+                                                                "continuous_extracting": True,
+                                                            "move_file": False,
+                                                            "checkSolvability": "-checkSolvability",
+                                                            "generateTemplates": params["generateTemplates"],
+                                                            "measurePredictedPredicates": "-measurePredictedPredicates",
+                                                            "onlyInitialPredicates": "", "abstract": params["abstract"],
+                                                            "noIntervals": "",
+                                                            "separateByPredicates": params["separateByPredicates"],
+                                                            "solvabilityTimeout": "3600","timeout":4000}
+    get_solvability_and_measurement_from_eldarica(get_solvability_and_measurement_from_eldarica_params)#3600
 
     # description: In solvable set, draw time consumption
 
@@ -182,10 +210,10 @@ def end_to_end_training(num_layers=4,benchmark=""):
     print("filtered_file_list by max_nodes_per_batch:" + str(len(filtered_file_list)) + "/" + str(len(file_list)))
 
     # description: statistic data
-    get_statistic_data(filtered_file_list, params["benchmark"])
+    #get_statistic_data(filtered_file_list, params["benchmark"])
 
     # # description: how many predicates used in end
-    get_recall_scatter(solvability_name_fold, json_solvability_obj_list, filtered_file_list)
+    #get_recall_scatter(solvability_name_fold, json_solvability_obj_list, filtered_file_list)
 
     #
     # print("------------unsolvable data----------------")
@@ -231,8 +259,8 @@ def draw_train_predict_plots(params,dataset,test_data,predicted_Y,train_loss_lis
         true_Y.extend(np.array(data[1]["node_labels"]))
 
     parameters = pickleRead(params["benchmark"] + "-" + params["label"] + "-parameters", "../src/trained_model/")
-    class_weight = {"weight_for_1": parameters["class_weight_fold"]["train"]["weight_for_1"] /
-                                    parameters["class_weight_fold"]["train"]["weight_for_0"], "weight_for_0": 1}
+    class_weight = {"weight_for_1": parameters["class_weight_fold"]["weight_for_1"] /
+                                    parameters["class_weight_fold"]["weight_for_0"], "weight_for_0": 1}
     from_logits=True
     error_loaded_model = (lambda: tf.keras.losses.MSE(true_Y, predicted_Y) \
         if params["label"] not in params["gathered_nodes_binary_classification_task"] else
@@ -276,6 +304,7 @@ def read_data_and_train(params, hyper_parameters):
     parameters["threshold"] = params["threshold"]
     parameters["GPU"]=params["GPU"]
     parameters["pickle"]=params["pickle"]
+    parameters["num_node_target_labels"]=params["num_node_target_labels"]
     these_hypers: Dict[str, Any] = {
         "optimizer": "Adam",  # One of "SGD", "RMSProp", "Adam"
         "learning_rate": 0.001,#0.001
@@ -316,8 +345,7 @@ def read_data_and_train(params, hyper_parameters):
         GPU_switch(False)
     dataset.load_data([DataFold.TRAIN, DataFold.VALIDATION, DataFold.TEST])
     parameters["node_vocab_size"] = dataset._node_vocab_size
-    #parameters["class_weight"] = dataset._class_weight["train"]
-    parameters["class_weight_fold"] = dataset._class_weight_fold
+    parameters["class_weight_fold"] = dataset._class_weight_fold["train"]
 
     # description:get model
     model = None

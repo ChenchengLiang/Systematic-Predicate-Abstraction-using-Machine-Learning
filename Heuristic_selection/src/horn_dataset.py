@@ -11,11 +11,11 @@ import tensorflow as tf
 import tf2_gnn
 from tf2_gnn.cli_utils.training_utils import train, log_line, make_run_id
 from tf2_gnn.data import DataFold, HornGraphSample, HornGraphDataset
-from tf2_gnn.models import InvariantArgumentSelectionTask, InvariantNodeIdentifyTask
+from tf2_gnn.models import InvariantArgumentSelectionTask, InvariantNodeIdentifyTask,InvariantNodeMultiClassTask
 
-from Miscellaneous import pickleWrite, pickleRead, drawBinaryLabelPieChart
+from Miscellaneous import pickleWrite, pickleRead, drawLabelPieChart
 from archived.dotToGraphInfo import parseArgumentsFromJson
-from utils import plot_confusion_matrix,get_recall_and_precision,plot_ROC,assemble_name,my_round_fun
+from utils import plot_confusion_matrix,get_recall_and_precision,plot_ROC,assemble_name,my_round_fun,unzip_file
 def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",json_type=".JSON",form_label=False,GPU=False,pickle=True,use_class_weight=False,hyper_parameters={}):
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
                                                  "argument_upper_bound_existence", "argument_occurrence_binary",
@@ -47,8 +47,9 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters["threshold"]=hyper_parameters["threshold"]
     parameters["GPU"]=GPU
     parameters["pickle"]=pickle
-    max_epochs = 500
-    patience = 100
+    parameters["num_node_target_labels"]=hyper_parameters["num_node_target_labels"]
+    max_epochs = hyper_parameters["max_epochs"]
+    patience = hyper_parameters["patience"]
     # parameters["add_self_loop_edges"]=False
     # parameters["tie_fwd_bkwd_edges"]=True
 
@@ -104,6 +105,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         # initial different models by different training task
         if label == "argument_identify" or label == "control_location_identify" or label == "argument_identify_no_batchs": #all nodes binary classification task
             model = InvariantNodeIdentifyTask(parameters, dataset)
+        elif label=="node_multiclass":
+            model = InvariantNodeMultiClassTask(parameters, dataset)
         elif label=="predicate_occurrence_in_clauses" or label=="argument_lower_bound" or label=="argument_upper_bound":#gathered nodes single output regression task
             model = InvariantArgumentSelectionTask(parameters, dataset)
         elif label in gathered_nodes_binary_classification_task: #gathered nodes binary classification task
@@ -150,7 +153,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         print("test_metric_string model from memory", test_metric_string)
         print("test_metric model from memory", test_metric)
         print("predicted_Y_loaded_model_from_memory",sigmoid_predicted_Y_loaded_model_from_memory)
-        print("rounded_predicted_Y_loaded_model_from_memory",rounded_predicted_Y_loaded_model_from_memory)
+        print("rounded_predicted_Y_loaded_model_from_memory head",rounded_predicted_Y_loaded_model_from_memory[:10])
 
         #load model from files
         loaded_model = tf2_gnn.cli_utils.model_utils.load_model_for_prediction(trained_model_path, dataset)
@@ -174,16 +177,12 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
 
         class_weight={"weight_for_1":parameters["class_weight_fold"]["weight_for_1"]/parameters["class_weight_fold"]["weight_for_0"],"weight_for_0":1}
         from_logits=True
-        error_loaded_model = (lambda : tf.keras.losses.MSE(true_Y, predicted_Y_loaded_model) \
-            if label not in gathered_nodes_binary_classification_task else get_test_loss_with_class_weight(class_weight,predicted_Y_loaded_model,true_Y,from_logits=from_logits))()
+
+        error_loaded_model = compute_loss(label, true_Y, predicted_Y_loaded_model, class_weight, from_logits,gathered_nodes_binary_classification_task)
         print("\n error of loaded_model", error_loaded_model)
-
-        error_memory_model = (lambda: tf.keras.losses.MSE(true_Y, predicted_Y_loaded_model) \
-            if label not in gathered_nodes_binary_classification_task else get_test_loss_with_class_weight(class_weight,predicted_Y_loaded_model_from_memory,true_Y,from_logits=from_logits))()
+        error_memory_model = compute_loss(label, true_Y, predicted_Y_loaded_model_from_memory, class_weight, from_logits,gathered_nodes_binary_classification_task)
         print("\n error of error_memory_model", error_memory_model)
-
-        mean_loss = (lambda: tf.keras.losses.MSE([np.mean(true_Y)] * len(true_Y), true_Y) if label not in gathered_nodes_binary_classification_task else
-    tf.keras.losses.binary_crossentropy([np.mean(true_Y)] * len(true_Y), true_Y,from_logits=False))()
+        mean_loss = compute_loss(label, true_Y, [np.mean(true_Y)] * len(true_Y), class_weight, from_logits,gathered_nodes_binary_classification_task)
         print("\n mean_loss_Y_and_True_Y", mean_loss)
         mean_loss_list=mean_loss
         num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, rounded_predicted_Y_loaded_model),tf.int32))
@@ -249,7 +248,7 @@ def draw_training_results(train_loss_list_average, valid_loss_list_average,
     plt.plot([mean_loss_list_average] * len(train_loss_list_average), color="red")
     plt.plot([mse_loaded_model_average] * len(train_loss_list_average), color="black")
     y_range=[0,max(max(train_loss_list_average),max(valid_loss_list_average))]
-    upper_bound=1#max(y_range)
+    upper_bound=1#max(y_range)#1
     grid=upper_bound/10
     plt.ylim([min(y_range), upper_bound])
     plt.yticks(np.arange(min(y_range), upper_bound, grid))
@@ -268,13 +267,15 @@ def draw_training_results(train_loss_list_average, valid_loss_list_average,
     # plt.show()
 
     if label in gathered_nodes_binary_classification_task: # confusion matrix on true y and predicted y
-
         saving_path_confusion_matrix="trained_model/" + plot_name+ "-confusion_matrix.png"
         saving_path_roc = "trained_model/" + plot_name + "-ROC.png"
         recall,precision,f1_score,false_positive_rate=get_recall_and_precision(true_Y,my_round_fun(predicted_Y_loaded_model,threshold=hyper_parameters["threshold"]),verbose=True)
         plot_confusion_matrix(predicted_Y_loaded_model,true_Y,saving_path_confusion_matrix,recall=recall,precision=precision,f1_score=f1_score)
         plot_ROC(false_positive_rate,recall,saving_path_roc)
-
+    elif label=="node_multiclass":
+        saving_path_confusion_matrix = "trained_model/" + plot_name + "-confusion_matrix.png"
+        plot_confusion_matrix(predicted_Y_loaded_model, true_Y, saving_path_confusion_matrix, recall="-",
+                              precision="-", f1_score="-")
 
     else:
         # scatter on true y and predicted y
@@ -414,16 +415,21 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
         total_number_of_node = 0
         file_name_list = []
         skipped_file_list=[]
+        files_from_benchmark=glob.glob(path +df+"_data/"+ '*'  + json_type)
+        if len(files_from_benchmark)==0:
+            zipped_files = set(sorted(glob.glob(path + df + "_data/" + '*' + json_type + ".zip")))
+            for zf in zipped_files:
+                unzip_file(zf)
+            files_from_benchmark = glob.glob(path + df + "_data/" + '*' + json_type)
 
-        files_from_benchmark=set(sorted(glob.glob(path +df+"_data/"+ '*'  + json_type)))
         file_set=(lambda : [f+json_type for f in file_list] if len(file_list)>0 else files_from_benchmark)()
-        #print("file_set",file_set)
         for fileGraph in file_set:
+
             fileName = fileGraph[:fileGraph.find( json_type)]
             fileName = fileName[fileName.rindex("/") + 1:]
             # read graph
-            #print("read graph from",fileGraph)
-            #print("file_name",fileName)
+            if os.path.exists(fileGraph+".zip"):
+                unzip_file(fileGraph+".zip")
             with open(fileGraph) as f:
                 loaded_graph = json.load(f)
                 #debug check all field if equal to empty
@@ -434,7 +440,7 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                     #     shutil.copy(f, "../benchmarks/problem_cases/")
                     #     os.remove(f)
                 elif len(loaded_graph["nodeIds"]) >= max_nodes_per_batch: #
-                    #print("more than " + str(max_nodes_per_batch) + " nodes","skip",fileName)
+                    print("more than " + str(max_nodes_per_batch) + " nodes","skip",fileName)
                     skipped_file_list.append(fileName)
                 # if len(loaded_graph["argumentEdges"]) == 0:
                 #     print("argumentEdges==0",fileName)
@@ -495,6 +501,11 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                             np.array(loaded_graph["AST_1Edges"]),
                             np.array(loaded_graph["AST_2Edges"]),
                             np.array(loaded_graph["templateEdges"]),
+                            # np.array(loaded_graph["verifHintTplPredEdges"]),
+                            # np.array(loaded_graph["verifHintTplPredPosNegEdges"]),
+                            np.array(loaded_graph["verifHintTplEqTermEdges"]),
+                            np.array(loaded_graph["verifHintTplInEqTermEdges"]),
+                            #np.array(loaded_graph["verifHintTplInEqTermPosNegEdges"]),
                             np.array(loaded_graph["binaryAdjacentList"]),
                             np.array(loaded_graph["controlFlowHyperEdges"]),
                             np.array(loaded_graph["dataFlowHyperEdges"]),
@@ -530,8 +541,8 @@ def write_graph_to_pickle(benchmark,  data_fold=["train", "valid", "test"], labe
                             #np.array(loaded_graph["unknownEdges"])
                         ])
                     total_number_of_node += len(loaded_graph["nodeIds"])
-
-
+            if os.path.exists(fileGraph + ".zip"):
+                os.remove(fileGraph)
         pickle_data=parsed_graph_data(graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
                                       graphs_argument_scores,total_number_of_node,graphs_control_location_indices,file_name_list,skipped_file_list,
                                       parsed_arguments,graphs_node_symbols,graphs_label_indices,graphs_learning_labels,vocabulary_set, token_map)
@@ -543,7 +554,7 @@ def form_GNN_inputs_and_labels(label="occurrence", datafold=["train", "valid", "
     benchmark_name = benchmark.replace("/", "-")
     for df in datafold:
         parsed_dot_file = pickleRead("train-" +label+"-"+ graph_type +"-"+benchmark_name + "-gnnInput_" + df + "_data")
-        if label in gathered_nodes_binary_classification_task or label=="predicate_occurrence_in_clauses" or label=="argument_lower_bound" or label=="argument_upper_bound":
+        if label in gathered_nodes_binary_classification_task or label=="predicate_occurrence_in_clauses" or label=="argument_lower_bound" or label=="argument_upper_bound" or label=="node_multiclass":
             form_predicate_occurrence_related_label_graph_sample(parsed_dot_file.graphs_node_label_ids,
                                                                     parsed_dot_file.graphs_node_symbols,
                                                                     parsed_dot_file.graphs_adjacency_lists,
@@ -652,7 +663,9 @@ def form_predicate_occurrence_related_label_graph_sample(graphs_node_label_ids,g
                                                                                                 graphs_adjacency_lists,
                                                                                                 file_name_list, label)
     if label in gathered_nodes_binary_classification_task:
-        drawBinaryLabelPieChart(graphs_learning_labels, label, graph_type, benchmark,df)
+        drawLabelPieChart(graphs_learning_labels, label, graph_type, benchmark,df)
+    if label == "node_multiclass":
+        drawLabelPieChart(graphs_learning_labels, label, graph_type, benchmark, df,multi_label=5)
     all_one_label=0
     one_one_label=0
     other_distribution=0
@@ -1030,3 +1043,12 @@ def get_test_loss_with_class_weight(class_weight,task_output,labels,from_logits=
     # return tf.reduce_mean(ce)
 def logit(p):
     return tf.cast(tf.math.log(p/(1-p)),tf.float32)
+
+
+def compute_loss(label, true_Y, predicted_Y_loaded_model, class_weight, from_logits,gathered_nodes_binary_classification_task):
+    if label in gathered_nodes_binary_classification_task:
+        return get_test_loss_with_class_weight(class_weight,predicted_Y_loaded_model,true_Y,from_logits=from_logits)
+    elif label == "node_multiclass":
+        return tf.nn.sigmoid_cross_entropy_with_logits(logits=true_Y, labels=predicted_Y_loaded_model)
+    else:
+        return tf.keras.losses.MSE(true_Y, predicted_Y_loaded_model)

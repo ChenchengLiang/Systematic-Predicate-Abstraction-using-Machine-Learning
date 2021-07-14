@@ -22,6 +22,7 @@ def main():
     # label_list.append("argument_upper_bound")
     #label_list.append("argument_occurrence_binary")
     label_list.append("template_relevance")
+    #label_list.append("node_multiclass")
     #label = "clause_occurrence_in_counter_examples_binary"
     # json_type = ".hyperEdgeHornGraph.JSON"
     # json_type = ".layerHornGraph.JSON"
@@ -31,18 +32,21 @@ def main():
     GPU=False
     use_class_weight=False
     pickle = True
-    benchmark_name = "single-layer-graph-example/"
+    benchmark_name = "LIA-Lin+sv-comp-train-templates/"
+    num_node_target_labels=2
 
     # random.seed(0)
     # np.random.seed(0)
     # tf.random.set_seed(0)
 
-    hyper_parameters={"nodeFeatureDim":64,"num_layers":2,"regression_hidden_layer_size":[64],"threshold":0.5,"max_nodes_per_batch":10000}
+    hyper_parameters={"nodeFeatureDim":64,"num_layers":8,"regression_hidden_layer_size":[64],"threshold":0.5,"max_nodes_per_batch":10000,
+                      "max_epochs":500,"patience":100,"num_node_target_labels":num_node_target_labels}
+
     for label in label_list:
-        # parameter_list.append(
-        #     parameters(relative_path="../benchmarks/"+benchmark_name,
-        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
-        #                json_type=".hyperEdgeHornGraph.JSON", label=label))
+        parameter_list.append(
+            parameters(relative_path="../benchmarks/"+benchmark_name,
+                       absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
+                       json_type=".hyperEdgeHornGraph.JSON", label=label))
         # parameter_list.append(
         #     parameters(relative_path="../benchmarks/" + benchmark_name,
         #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
@@ -51,10 +55,10 @@ def main():
         #     parameters(relative_path="../benchmarks/" + benchmark_name,
         #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
         #                json_type=".concretized-hyperedgeGraph.JSON", label=label))
-        parameter_list.append(
-            parameters(relative_path="../benchmarks/" + benchmark_name,
-                       absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
-                       json_type=".mono-layerHornGraph.JSON", label=label))
+        # parameter_list.append(
+        #     parameters(relative_path="../benchmarks/" + benchmark_name,
+        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+        #                json_type=".mono-layerHornGraph.JSON", label=label))
         # parameter_list.append(
         #     parameters(relative_path="../benchmarks/"+benchmark_name,
         #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,

@@ -20,14 +20,17 @@ def GPU_switch(GPU):
         for gpu in gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
 
-def drawBinaryLabelPieChart(learning_label,label,graph_type,benchmark_name,df):
+def drawLabelPieChart(learning_label,label,graph_type,benchmark_name,df,multi_label=2):
     flat_list = [item for sublist in learning_label for item in sublist]
-    positive_label_number =sum(flat_list)
-    negative_label_number=len(flat_list)-positive_label_number
+    # positive_label_number =flat_list.count(1)
+    # negative_label_number=flat_list.count(0)
+    # sizes = [positive_label_number, negative_label_number]
+    # labels = '1', "0"
+    # explode = (0, 0)  # only "explode" the 2nd slice (i.e. 'Hogs')
     # Pie chart, where the slices will be ordered and plotted counter-clockwise:
-    labels = '1', "0"
-    sizes = [positive_label_number, negative_label_number]
-    explode = (0, 0)  # only "explode" the 2nd slice (i.e. 'Hogs')
+    labels = [str(i) for i in range(0,multi_label)]
+    sizes = [flat_list.count(i) for i in range(0,multi_label)]
+    explode = [0 for i in range(0,multi_label)]
     fig1, ax1 = plt.subplots()
     ax1.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%',
             shadow=True, startangle=90)

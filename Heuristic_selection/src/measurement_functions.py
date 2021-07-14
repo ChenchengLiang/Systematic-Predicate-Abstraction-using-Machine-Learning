@@ -3,7 +3,7 @@ from multiprocessing import Pool
 from utils import call_eldarica,plot_scatter
 import json
 import numpy as np
-from utils import flattenList
+from utils import flattenList,unzip_file
 def get_evaluations_from_eldarica_pool(fun,file_list,parameters,countinous=True):
     parameter_list=[]
     if countinous == True:
@@ -27,8 +27,9 @@ def read_measurement_from_JSON(file_list,measurement=".measurement.JSON"):
     json_obj_list = []
     for file in file_list:
         json_file = file + measurement
-        #check json_file existence
-        if(os.path.exists(json_file)==True):
+        #unzip file
+        unzip_file(json_file + ".zip")
+        if os.path.exists(json_file):
             json_obj = {}
             json_obj["file_name"] = json_file
             with open(json_file) as f:
@@ -37,6 +38,10 @@ def read_measurement_from_JSON(file_list,measurement=".measurement.JSON"):
                     # print(bcolors.GRENN + str(field) + str(loaded_graph[field]) + bcolors.RESET)
                     json_obj[str(field)] = str(loaded_graph[field])
             json_obj_list.append(json_obj)
+
+        #delete unziped file
+        if os.path.exists(json_file+".zip"):
+            os.remove(json_file)
     return json_obj_list
 
 
@@ -82,10 +87,10 @@ def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False,time_u
     for fild_name in extended_measurement_name_list:
         temp_scatter_plot_range=(lambda : [0,scatter_plot_range[1]*100] if fild_name.find("_ms")>0 else scatter_plot_range)()
         measurement_scatter(measurement_list_all_files_map[fild_name], temp_scatter_plot_range,
-                            plot_name=fild_name + "-full_predicates", index=[1, 3])
+                            plot_name=fild_name + "-full_label", index=[1, 3])
         measurement_scatter(measurement_list_all_files_map[fild_name], temp_scatter_plot_range,
-                            plot_name=fild_name + "-empty_predicates", index=[2, 3],
-                            x_label="empty predicates")
+                            plot_name=fild_name + "-empty_label", index=[2, 3],
+                            x_label="empty label")
 
     if out_of_test_set==True:
         for fild_name in measurement_name_list:
@@ -105,8 +110,8 @@ def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False,time_u
             temp_scatter_plot_range = (
                 lambda: [0, scatter_plot_range[1] * 100] if fild_name.find("_ms") > 0 else scatter_plot_range)()
             measurement_scatter(measurement_list_all_files_map[fild_name], temp_scatter_plot_range,
-                                plot_name=fild_name+"-true_predicates", index=[0, 3],
-                                x_label="true predicates")
+                                plot_name=fild_name+"-true_label", index=[0, 3],
+                                x_label="true label")
 
 
     with open("trained_model/measurement.log", 'w') as outfile:
@@ -116,7 +121,7 @@ def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False,time_u
             outfile.write(write_content+"\n")
             #print(fild_name,measurement_list_all_files_map[fild_name])
 
-def measurement_scatter(measurement_list_all_files,scatter_plot_range=[0,0],plot_name="",index=[1,3],x_label="full predicates",y_label="predicted predicates"):
+def measurement_scatter(measurement_list_all_files,scatter_plot_range=[0,0],plot_name="",index=[1,3],x_label="full label",y_label="predicted label"):
     measurement_list_all_files_full_label = [float(v[index[0]]) for v in measurement_list_all_files]
     measurement_list_all_files_predicted_label = [float(v[index[1]]) for v in measurement_list_all_files]
     plot_scatter(measurement_list_all_files_full_label,

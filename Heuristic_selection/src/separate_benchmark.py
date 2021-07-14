@@ -2,7 +2,7 @@ import os
 from utils import run_eldarica_with_shell,run_eldarica_with_shell_pool
 import sys
 import json
-import collections
+import glob
 def main():
     command_input=sys.argv[1]
     if command_input =="merge":
@@ -28,16 +28,16 @@ def main():
         for t in range(0,int(sys.argv[2])+1):
             json_file='../benchmarks/exceptions/benchmark_info_' + "thread_"+str(t) + '.JSON'
             os.remove(json_file)
-
-
+        #compress files in exceptions
+        compress_files_in_exceptions()
+    elif command_input=="compress":
+        compress_files_in_exceptions()
     else:
         benchmark_name = os.path.join("../benchmarks/", command_input)
-        thread_number = 4  # 16
-        timeout = 1200
-        eldarica_parameters = " -moveFile -abstract -noIntervals -generateSimplePredicates"#-onlyInitialPredicates -generateSimplePredicates
-        # todo: use generateSimplePredicates =  full label
-        #todo: not use generateSimplePredicates =  empty label
-        #todo: with or without -abstract
+        thread_number = 8  # 16
+        timeout = 300#3600
+        #eldarica_parameters = " -moveFile -abstract:off -noIntervals -generateSimplePredicates"#-onlyInitialPredicates -generateSimplePredicates
+        eldarica_parameters = " -moveFile -abstract:empty" #-generateTemplates
         data_fold=["train_data","valid_data","test_data"]
         for fold in data_fold:
             run_eldarica_with_shell_pool(os.path.join(benchmark_name, fold), run_eldarica_with_shell,
@@ -62,6 +62,18 @@ def main():
             json.dump(solvability_dict_with_number,f,indent=4)
 
 
+def compress_files_in_exceptions():
+    print("compressing ...")
+    folder = ["exceed-max-node", "lia-lin-multiple-predicates-in-body", "no-initial-predicates",
+              "no-predicates-selected", "no-simplified-clauses", "other-error", "out-of-memory",
+              "shell-timeout", "solvability-timeout", "stack-overflow", "test-timeout", "time-out-exception",
+              "unsat"]
+    benckmarks = ["../benchmarks/exceptions/" + f for f in folder]
+    for benchmark in benckmarks:
+        from utils import file_compress
+        for f in glob.glob("../benchmarks/" + benchmark + "/*"):
+            file_compress([f], f + ".zip")
+            os.remove(f)
 
 def get_exceptions_folder_names():
     folder_name_list=[]

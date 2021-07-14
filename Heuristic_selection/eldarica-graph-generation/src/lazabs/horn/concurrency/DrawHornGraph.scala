@@ -33,11 +33,13 @@ import ap.basetypes.IdealInt
 import ap.parser.IExpression._
 import ap.parser.{IExpression, _}
 import lazabs.GlobalParameters
-import lazabs.horn.abstractions.VerificationHints.VerifHintInitPred
+import lazabs.horn.abstractions.TemplateType
+import lazabs.horn.abstractions.TemplateType.TplPred
+import lazabs.horn.abstractions.VerificationHints.{VerifHintInitPred, VerifHintTplEqTerm, VerifHintTplInEqTerm}
 import lazabs.horn.bottomup.HornClauses.{Clause, FALSE}
 import lazabs.horn.preprocessor.HornPreprocessor.{Clauses, VerificationHints}
 import lazabs.horn.concurrency.DrawHornGraph.{HornGraphType, addQuotes, isNumeric}
-import lazabs.horn.concurrency.HintsSelection.{detectIfAJSONFieldExists, spAPI}
+import lazabs.horn.concurrency.HintsSelection.{detectIfAJSONFieldExists, getParametersFromVerifHintElement, spAPI}
 
 import scala.collection.mutable.{ArrayBuffer, HashMap => MHashMap, Map => MuMap}
 
@@ -119,6 +121,11 @@ class GNNInput(clauseCollection:ClauseInfo) {
   val AST_2Edges = new Adjacency("AST_2Edges", 2)
   val templateASTEdges = new Adjacency("templateASTEdge", 2)
   val templateEdges = new Adjacency("templateEdge", 2)
+  val verifHintTplPredEdges = new Adjacency("verifHintTplPredEdges", 2)
+  val verifHintTplPredPosNegEdges = new Adjacency("verifHintTplPredPosNegEdges", 2)
+  val verifHintTplEqTermEdges =new Adjacency("verifHintTplEqTermEdges", 2)
+  val verifHintTplInEqTermEdges = new Adjacency("verifHintTplInEqTermEdges", 2)
+  val verifHintTplInEqTermPosNegEdges = new Adjacency("verifHintTplInEqTermPosNegEdges", 2)
   //val dataFlowEdges = new Adjacency("dataFlowEdge", 2)
   val argumentEdges = new Adjacency("argumentEdge", 2)
   val controlFlowHyperEdges = new Adjacency("controlFlowHyperEdge", 3)
@@ -169,6 +176,17 @@ class GNNInput(clauseCollection:ClauseInfo) {
   val predicateOccurrenceInClauseLabel=learningLabel.getPredicateOccurenceInClauses()
   val predicateStrongConnectedComponentLabel=learningLabel.getStrongConnectedComponentPredicateList()
 
+  def incrementTemplates(element:String,fromID:Int,toID:Int): Unit ={
+    element match {
+      case "verifHintTplPred"=>verifHintTplPredEdges.incrementBinaryEdge(fromID, toID)
+      case "verifHintTplPredPosNeg" =>verifHintTplPredPosNegEdges.incrementBinaryEdge(fromID, toID)
+      case "verifHintTplEqTerm" => verifHintTplEqTermEdges.incrementBinaryEdge(fromID, toID)
+      case "verifHintTplInEqTerm" => verifHintTplInEqTermEdges.incrementBinaryEdge(fromID, toID)
+      case "verifHintTplInEqTermPosNeg" => verifHintTplInEqTermPosNegEdges.incrementBinaryEdge(fromID, toID)
+      case _ =>
+    }
+    templateEdges.incrementBinaryEdge(fromID, toID)
+  }
   def incrementBinaryEdge(from: String, to: String, label: String): Unit = {
     val fromID = nodeNameToIDMap(from)
     val toID = nodeNameToIDMap(to)
@@ -183,6 +201,11 @@ class GNNInput(clauseCollection:ClauseInfo) {
           case "AST_2" => AST_2Edges.incrementBinaryEdge(fromID, toID)
           case "templateAST" => templateASTEdges.incrementBinaryEdge(fromID, toID)
           case "template" => templateEdges.incrementBinaryEdge(fromID, toID)
+          case "verifHintTplPred" => incrementTemplates("verifHintTplPred",fromID, toID)
+          case "verifHintTplPredPosNeg" => incrementTemplates("verifHintTplPredPosNeg",fromID, toID)
+          case "verifHintTplEqTerm" => incrementTemplates("verifHintTplEqTerm",fromID, toID)
+          case "verifHintTplInEqTerm" => incrementTemplates("verifHintTplInEqTerm",fromID, toID)
+          case "verifHintTplInEqTermPosNeg" => incrementTemplates("verifHintTplInEqTermPosNeg",fromID, toID)
           case "argument" => argumentEdges.incrementBinaryEdge(fromID, toID)
           case "clause" => clauseEdges.incrementBinaryEdge(fromID,toID)
           case "controlFlowHyperEdge"=> controlFlowHyperEdges.incrementBinaryEdge(fromID,toID)
@@ -723,7 +746,14 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
         drawAST(right, previousNodeName)
         drawAST(left, previousNodeName)
       }
-      case ITimes(coeff, subterm) => drawASTBinaryRelation("*", previousNodeName, subterm, coeff,astArity)
+      case ITimes(coeff, subterm) => {
+        if(coeff.intValue == -1)
+          drawASTUnaryRelation("-", previousNodeName, subterm,astArity)
+        else if (coeff.intValue == 1)
+          drawAST(subterm, previousNodeName)
+        else
+          drawASTBinaryRelation("*", previousNodeName, subterm, coeff,astArity)
+      }
       case IVariable(index) => drawASTEndNode("_"+index.toString(), previousNodeName, "symbolicConstant")//constant////add _ to differentiate index with other constants
       case Difference(t1, t2) => drawASTBinaryRelation("-", previousNodeName, t1, t2,astArity)
       case INamedPart(pname, subformula) => drawASTUnaryRelation(pname.toString, previousNodeName, subformula,astArity)
@@ -772,6 +802,11 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
         writeGNNInputFieldToJSONFile("AST_2Edges", PairArray(gnn_input.AST_2Edges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("templateASTEdges", PairArray(gnn_input.templateASTEdges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("templateEdges", PairArray(gnn_input.templateEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("verifHintTplPredEdges", PairArray(gnn_input.verifHintTplPredEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("verifHintTplPredPosNegEdges", PairArray(gnn_input.verifHintTplPredPosNegEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("verifHintTplEqTermEdges", PairArray(gnn_input.verifHintTplEqTermEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("verifHintTplInEqTermEdges", PairArray(gnn_input.verifHintTplInEqTermEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("verifHintTplInEqTermPosNegEdges", PairArray(gnn_input.verifHintTplInEqTermPosNegEdges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("dataFlowASTEdges", PairArray(gnn_input.dataFlowASTEdges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("controlFlowHyperEdges", TripleArray(gnn_input.controlFlowHyperEdges.ternaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("dataFlowHyperEdges", TripleArray(gnn_input.dataFlowHyperEdges.ternaryEdge), writer, lastFiledFlag)
@@ -941,13 +976,12 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
     }
     writer.write("]")
   }
-  def drawTemplates(clauseGuardMap: Map[Predicate, Seq[Tuple2[String,IFormula]]]=Map()): Seq[(String,Seq[String])] ={
+  def drawPredicatesWithNode(clauseGuardMap: Map[Predicate, Seq[Tuple2[String,IFormula]]]=Map()): Seq[(String,Seq[String])] ={ //with template node
     val quantifiedClauseGuardMap = {
       for ((k, v) <- clauseGuardMap) yield k -> {
         for (p <- v) yield Tuple2(p._1,HintsSelection.predicateQuantify(p._2))
       }.filter(!_._2.isTrue).filter(!_._2.isFalse)
     }
-
     val tempHeadMap=
     for((hp,templates)<-hints.initialHints.toInitialPredicates.toSeq.sortBy(_._1.name)) yield {
       constantNodeSetInOneClause.clear()
@@ -972,7 +1006,7 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
     tempHeadMap
   }
 
-  def drawPredicate(): Seq[(String,Seq[String])] ={
+  def drawPredicate(): Seq[(String,Seq[(String,String)])] ={
     val tempHeadMap=
       for((hp,templates)<-hints.initialHints.toInitialPredicates.toSeq.sortBy(_._1.name)) yield {
         constantNodeSetInOneClause.clear()
@@ -982,11 +1016,47 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
             //update JSON
             val hintLabel = if (hints.positiveHints.toInitialPredicates.keySet.map(_.toString).contains(hp.toString) && HintsSelection.containsPred(t,hints.positiveHints.toInitialPredicates(hp))) true else false
             gnn_input.updateTemplateIndicesAndNodeIds(predicateASTRootName,hintLabel)
-            predicateASTRootName
+            (predicateASTRootName,"template")
           }
         hp.name->templateNameList
       }
     tempHeadMap
+  }
+  def drawTemplates(): Seq[(String,Seq[(String,String)])]={
+    val unlabeledTemplates = hints.initialHints.predicateHints.transform((k,v)=>v.map(getParametersFromVerifHintElement(_))).toSeq.sortBy(_._1.name)
+    val positiveTemplates = hints.positiveHints.predicateHints.transform((k,v)=>v.map(getParametersFromVerifHintElement(_)))
+    val tempHeadMap=
+      for((hp,templates)<-unlabeledTemplates) yield {
+        constantNodeSetInOneClause.clear()
+        //positiveTemplates(hp).foreach(println)
+        //println("------")
+        val templateNameList=
+          for (t<-templates) yield {
+            val predicateASTRootName=drawAST(t._1)
+            val hintLabel = if (positiveTemplates.keySet.map(_.toString).contains(hp.toString)
+              && termContains(positiveTemplates(hp),t)) true else false//positiveTemplates(hp).contains(t)
+            //println(t,hintLabel)
+            gnn_input.updateTemplateIndicesAndNodeIds(predicateASTRootName,hintLabel)//update JSON
+            (predicateASTRootName,"verifHint"+t._3.toString)
+          }
+        hp.name->templateNameList
+      }
+    tempHeadMap
+  }
+  def termContains(termList: Seq[(ITerm, Int, TemplateType.Value)], term: (ITerm, Int, TemplateType.Value)): Boolean = {
+    var r = false
+    for (t <- termList; if t._3 == term._3) {
+      t._3 match {
+        case TemplateType.TplInEqTerm => {
+          if (HintsSelection.equalTerms(t._1, term._1)) r = true
+        }
+        case TemplateType.TplEqTerm => {
+          if (HintsSelection.equalTerms(t._1, term._1) || HintsSelection.equalMinusTerms(t._1, term._1))
+            r = true
+        }
+      }
+    }
+    r
   }
 
   def updateArgumentInfoHornGraphList(pre:String,tempID:Int,argumentnodeName:String,arg:ITerm): Unit ={

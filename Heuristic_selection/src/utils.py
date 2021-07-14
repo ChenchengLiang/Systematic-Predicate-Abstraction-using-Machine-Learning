@@ -10,61 +10,73 @@ import time
 import seaborn
 from sklearn.metrics import confusion_matrix
 
-def get_solvability_and_measurement_from_eldarica(filtered_file_list,thread_number,continuous_extracting=True,move_file=True,checkSolvability="-checkSolvability",measurePredictedPredicates="-measurePredictedPredicates",onlyInitialPredicates=""):
-    timeout = 60*60  # -measurePredictedPredicates -varyGeneratedPredicates
-    check_solvability_parameter_list = " "+checkSolvability+" "+measurePredictedPredicates+ " "+ onlyInitialPredicates +"  -abstract -noIntervals -solvabilityTimeout:300 -mainTimeout:1200"
+def get_solvability_and_measurement_from_eldarica(params):
+
+    # -measurePredictedPredicates -varyGeneratedPredicates
+    check_solvability_parameter_list=params["checkSolvability"] + " " + params["separateByPredicates"] + " " + params["measurePredictedPredicates"] \
+                                     + " " + params["onlyInitialPredicates"] + " " + params["generateTemplates"] + " " + params["abstract"] + " " + \
+                                     params["noIntervals"] + " -solvabilityTimeout:" + params["solvabilityTimeout"]
+
     file_list_with_parameters = (lambda: [
-        [file, check_solvability_parameter_list, timeout, move_file] if not os.path.exists(
-            file + ".solvability.JSON") else [] for
-        file in filtered_file_list] if continuous_extracting == True
-    else [[file, check_solvability_parameter_list, timeout, move_file] for
-          file in filtered_file_list])()
+        [file, check_solvability_parameter_list, params["timeout"], params["move_file"]] if not os.path.exists(
+            file + ".solvability.JSON.zip") else [] for
+        file in params["filtered_file_list"]] if params["continuous_extracting"] == True
+    else [[file, check_solvability_parameter_list, params["timeout"], params["move_file"]] for
+          file in params["filtered_file_list"]])()
     file_list_for_solvability_check = list(filter(lambda x: len(x) != 0, file_list_with_parameters))
     print("file_list_for_solvability_check", len(file_list_for_solvability_check))
-    run_eldarica_with_shell_pool_with_file_list(thread_number, run_eldarica_with_shell, file_list_for_solvability_check)
+    run_eldarica_with_shell_pool_with_file_list(params["thread_number"], run_eldarica_with_shell, file_list_for_solvability_check)
 
-def wrapped_generate_horn_graph(benchmark_fold,max_nodes_per_batch,move_file=True,thread_number=4,
-                                generateSimplePredicates="-generateSimplePredicates",data_fold=["train_data","valid_data","test_data"],horn_graph_folder=""):
+def wrapped_generate_horn_graph(params):
     file_list=[]
-    for fold in data_fold:
-        current_folder="../benchmarks/" + benchmark_fold + "/"+fold
-        current_file_list=glob.glob(current_folder+"/*.smt2")
+    for fold in params["data_fold"]:
+        current_folder="../benchmarks/" + params["benchmark_fold"] + "/"+fold
+        current_file_list=glob.glob(current_folder+"/*.smt2.zip")
         file_list = file_list + current_file_list
-        if horn_graph_folder!="": #before continous genereate horn graphs, copy from prepared horn graph
-            for f in current_file_list:
-                graph_file=f+".hyperEdgeHornGraph.JSON"
-                if not os.path.exists(graph_file):
-                    shutil.copy(os.path.join("../benchmarks/",horn_graph_folder)+"/"+graph_file,current_folder)
+        # if horn_graph_folder!="": #before continous genereate horn graphs, copy from prepared horn graph
+        #     for f in current_file_list:
+        #         graph_file=f+".hyperEdgeHornGraph.JSON"
+        #         if not os.path.exists(graph_file):
+        #             shutil.copy(os.path.join("../benchmarks/",horn_graph_folder)+"/"+graph_file,current_folder)
 
     initial_file_number = len(file_list)
     print("file_list " + str(initial_file_number))
+    file_list=[f[:-len(".zip")] for f in file_list]
 
     # description: generate horn graph
-    generate_horn_graph(file_list, max_nodes_per_batch=max_nodes_per_batch, move_file=move_file,
-                        thread_number=thread_number,generateSimplePredicates=generateSimplePredicates)
-
-    file_list = [file if os.path.exists(file + ".hyperEdgeHornGraph.JSON") else None for file in file_list]
+    generate_horn_graph_params={"file_list":file_list,"max_nodes_per_batch":params["max_nodes_per_batch"],"move_file":params["move_file"],
+                                "thread_number":params["thread_number"],"generateSimplePredicates":params["generateSimplePredicates"],
+                                "generateTemplates":params["generateTemplates"],"separateByPredicates":params["separateByPredicates"],
+                                "abstract":params["abstract"],"noIntervals":params["noIntervals"]}
+    generate_horn_graph(generate_horn_graph_params)
+    suffix = (lambda: "-0" if params["separateByPredicates"] else "")()
+    file_list = [file if os.path.exists(file +suffix + ".hyperEdgeHornGraph.JSON.zip") else None for file in file_list]
     file_list = list(filter(None, file_list))
     file_list_with_horn_graph = "file with horn graph " + str(len(file_list)) + "/" + str(initial_file_number)
     print("file_list_with_horn_graph", file_list_with_horn_graph)
-
     # description: filter files by max_nodes_per_batch
-    filtered_file_list = filter_file_list_by_max_node(file_list, max_nodes_per_batch)
+    filtered_file_list = filter_file_list_by_max_node(file_list, params["max_nodes_per_batch"],separateByPredicates=params["separateByPredicates"],
+                                                      benchmark_fold=params["benchmark_fold"],data_fold=params["data_fold"])
+    print("filtered_file_list",len(filtered_file_list))
     return filtered_file_list,file_list_with_horn_graph,file_list
 
-def generate_horn_graph(file_list,max_nodes_per_batch=1000,move_file=True,thread_number=4,generateSimplePredicates="-generateSimplePredicates"):
+def generate_horn_graph(params):
     # description: generate horn graph
-    timeout = 120 * 5  # second
-    move_file_parameter_eldarica = (lambda: " -moveFile " if move_file == True else " ")()
+    timeout = 60*60  # second
+    move_file_parameter_eldarica = (lambda: " -moveFile " if params["move_file"] == True else " ")()
     # todo: use intervals and abstract:off -varyGeneratedPredicates
-    eldarica_parameters = "-getHornGraph:hyperEdgeGraph "+generateSimplePredicates +" " + move_file_parameter_eldarica + " -maxNode:" + str(
-        max_nodes_per_batch) + " -abstract -noIntervals -mainTimeout:1200"
+    eldarica_parameters = "-getHornGraph:hyperEdgeGraph "+params["separateByPredicates"]+" "+\
+                          params["generateSimplePredicates"] +" "+params["generateTemplates"]+" " + move_file_parameter_eldarica + " -maxNode:" + str(
+        params["max_nodes_per_batch"]) + " "+params["abstract"] +" "+params["noIntervals"]+" -mainTimeout:3600"
+    suffix = (lambda: "-0" if params["separateByPredicates"] else "")()
+
     file_list_with_parameters = [
-        [file, eldarica_parameters, timeout, move_file] if not os.path.exists(file + ".hyperEdgeHornGraph.JSON") else []
-        for file in file_list]
+        [file, eldarica_parameters, timeout, params["move_file"]] if not os.path.exists(file+suffix + ".hyperEdgeHornGraph.JSON.zip") else []
+        for file in params["file_list"]]
+
     file_list_for_horn_graph_generation = list(filter(lambda x: len(x) != 0, file_list_with_parameters))
     print("file_list_for_horn_graph_generation", len(file_list_for_horn_graph_generation))
-    run_eldarica_with_shell_pool_with_file_list(thread_number, run_eldarica_with_shell, file_list_for_horn_graph_generation) #continuous extracting
+    run_eldarica_with_shell_pool_with_file_list(params["thread_number"], run_eldarica_with_shell, file_list_for_horn_graph_generation) #continuous extracting
 
 def call_eldarica(file,parameter_list,message="",supplementary_command=[]):
     print("call eldarica for " + message,file)
@@ -77,14 +89,27 @@ def call_eldarica_in_batch(file_list,parameter_list=["-abstract", "-noIntervals"
     for file in file_list:
         call_eldarica(file, parameter_list)
 
-def filter_file_list_by_max_node(file_list,max_nodes_per_batch):
+def filter_file_list_by_max_node(file_list,max_nodes_per_batch,separateByPredicates="",benchmark_fold="",data_fold=["test_data"]):
+    suffix=""
+    if separateByPredicates:
+        file_list = []
+        for df in data_fold:
+            file_list=file_list+glob.glob("../benchmarks/"+benchmark_fold+"/"+df+"/*.hyperEdgeHornGraph.JSON.zip")
+        file_list = [file[:-len(".zip")] for file in file_list]
+    else:
+        suffix=".hyperEdgeHornGraph.JSON"
     filtered_file_list=[]
     for file in file_list:
-        with open(file+".hyperEdgeHornGraph.JSON") as f:
+        file_name=file + suffix
+        unzip_file(file_name+".zip")
+        with open(file_name) as f:
             loaded_graph = json.load(f)
-            if len(loaded_graph["nodeIds"]) <max_nodes_per_batch:
-                filtered_file_list.append(file)
-    return filtered_file_list
+            if len(loaded_graph["nodeIds"]) < max_nodes_per_batch:
+                filtered_file_list.append(file[:file.rfind("smt2") + 4])
+        if os.path.exists(file_name+".zip"):
+            os.remove(file_name)
+
+    return list(set(filtered_file_list))
 
 def plot_scatter(true_Y,predicted_Y,name="",range=[0,0],x_label="True Values",y_label="Predictions"):
     a = plt.axes(aspect='equal')
@@ -128,13 +153,20 @@ def run_eldarica_with_shell_pool(filePath, fun, eldarica_parameters,timeout=60,t
     file_list = []
     for root, subdirs, files in os.walk(filePath):
         if len(subdirs) == 0:
+
+            if len(glob.glob(root + "/*.smt2"))!=0:
+                for f in glob.glob(root + "/*.smt2"):
+                    file_compress([f], f + ".zip")
+                    os.remove(f)
+
             if countinous_extract == True:
-                for file in glob.glob(root + "/*.smt2"):
+                for file in glob.glob(root + "/*.smt2.zip"):
                     #if not os.path.exists(file + ".circles.gv"):
-                    if not os.path.exists(file + "."+graphtype+".JSON"):
-                        file_list.append([file,eldarica_parameters,timeout])
+                    file_name=file[:-len(".zip")]
+                    if not os.path.exists(file_name +".circles.gv.zip") :
+                        file_list.append([file_name,eldarica_parameters,timeout])
             else:
-                for file in glob.glob(root + "/*.smt2"):
+                for file in glob.glob(root + "/*.smt2.zip"):
                     file_list.append([file,eldarica_parameters,timeout])
     run_eldarica_with_shell_pool_with_file_list(thread,fun,file_list)
     return file_list
@@ -147,6 +179,9 @@ def run_eldarica_with_shell_pool_with_file_list(thread,fun,file_list):
 def run_eldarica_with_shell(file_and_param):
     move_file= (lambda : file_and_param[3] if len(file_and_param)>3 else True)()
     file = file_and_param[0]
+    for f in glob.glob(file+"*"):
+        unzip_file(f)
+        os.remove(f)
     eldarica = "../eldarica-graph-generation/eld "
     # file = "../benchmarks/ulimit-test/Problem19_label06_true-unreach-call.c.flat_000.smt2"
     file_name = file[file.rfind("/") + 1:]
@@ -172,21 +207,41 @@ def run_eldarica_with_shell(file_and_param):
     # subprocess.call(supplementary_command)
     os.remove(shell_file_name)
 
-    if used_time>timeout and os.path.exists(file) and move_file==True:
+    if used_time>timeout and os.path.exists(file) and (not os.path.exists(file+"circles.gv")) and move_file==True:
         os.rename(file,"../benchmarks/exceptions/shell-timeout/"+file_name)
         print("extracting " + file_name + " failed due to time out, move file to shell-timeout")
 
+    # compress files
+    if os.path.exists(file):
+        file_list = glob.glob(file + "*")
+        for f in file_list:
+            file_compress([f], f + ".zip")
+            os.remove(f)
 
-def get_statistic_data(file_list,benchmark_fold=""):
+
+def file_compress(inp_file_names, out_zip_file):
+    import zipfile
+    compression = zipfile.ZIP_DEFLATED
+    zf = zipfile.ZipFile(out_zip_file, mode="w")
+    try:
+        for file_to_write in inp_file_names:
+            zf.write(file_to_write, os.path.basename(out_zip_file)[:-len(".zip")], compress_type=compression)
+    except FileNotFoundError as e:
+        print(f' *** Exception occurred during zip process - {e}')
+    finally:
+        zf.close()
+def get_statistic_data(file_list,benchmark_fold="",separateByPredicates="",max_nodes_per_batch=10000):
     true_label = []
     predicted_label = []
     predicted_label_logit=[]
+    file_list=glob.glob("../benchmarks/"+benchmark_fold+"/test_data/*.hyperEdgeHornGraph.JSON")
     for file in file_list:
-        with open(file + ".hyperEdgeHornGraph.JSON") as f:
+        with open(file) as f:
             loaded_graph = json.load(f)
-            predicted_label.append(loaded_graph["predictedLabel"])
-            true_label.append(loaded_graph["templateRelevanceLabel"])
-            predicted_label_logit.append(loaded_graph["predictedLabelLogit"])
+            if len(loaded_graph["nodeIds"])< max_nodes_per_batch:
+                predicted_label.append(loaded_graph["predictedLabel"])
+                true_label.append(loaded_graph["templateRelevanceLabel"])
+                predicted_label_logit.append(loaded_graph["predictedLabelLogit"])
     true_label = flattenList(true_label)
     predicted_label = flattenList(predicted_label)
     predicted_label_logit = flattenList(predicted_label_logit)
@@ -315,11 +370,19 @@ def mutual_differences(set_1,set_2):
     return set_1.difference(set_2).union(set_2.difference(set_1))
 
 def my_round_fun(num_list,threshold=0.5):
-    return  [1.0 if num>threshold else 0.0 for num in num_list]
+    return np.where(num_list > threshold, 1, 0)
 
 def print_multiple_object(d):
     for k in d:
         print(k,d[k])
+
+def unzip_file(zip_file):
+    if os.path.exists(zip_file):
+        import zipfile
+        with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+            zip_ref.extractall(os.path.dirname(zip_file))
+    else:
+        print("zip file "+zip_file+" not existed")
 
 
 

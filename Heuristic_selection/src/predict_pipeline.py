@@ -9,38 +9,52 @@ from utils import filter_file_list_by_max_node, run_eldarica_with_shell_pool, ru
 from utils import plot_scatter,generate_horn_graph,wrapped_generate_horn_graph,get_solvability_and_measurement_from_eldarica,get_recall_scatter,mutual_differences
 import os
 import sys
-
-
+from predict_functions import predict_label
 def main():
+    fold_number_list=[0]
+    for fold in fold_number_list:
+        predict_pipeline(fold)
+
+def predict_pipeline(fold_number=0):
     # description: parameter settings
-    benchmark = "chc-comp-2021-use-only-initial-predicates-predict"#sys.argv[1]
+    benchmark = "LIA-Lin+sv-comp-train-templates"#sys.argv[1]
 
     #benchmark_fold = benchmark + "-" + "unsolvable"#sys.argv[2]
 
-    benchmark_fold = benchmark + "-" + "unsolvable-predicted"#sys.argv[2]
+    benchmark_fold = benchmark + "-unsolvable-predicted-"+str(fold_number)#sys.argv[2]
 
     max_nodes_per_batch = 10000
 
     #/home/cheli243/PycharmProjects/HintsLearning/src/
-    trained_model_path="trained_model/GNN_Argument_selection__2021-06-07_14-12-03_best.pkl"
+    trained_model_path="trained_model/GNN_Argument_selection__2021-07-12_03-08-52_best.pkl"
     thread_number = 4
     continuous_extracting=True
-    move_file = True
+    move_file = False
     out_of_test_set=True
     use_test_threshold=False
+    separateByPredicates=""#-separateByPredicates
+    generateSimplePredicates=""#-generateSimplePredicates
+    generateTemplates="-generateTemplates"#-generateTemplates
+    abstract = "-abstract:empty"#empty
+    noIntervals=""
+    verbose=False
 
-    filtered_file_list,file_list_with_horn_graph,file_list=wrapped_generate_horn_graph(benchmark_fold, max_nodes_per_batch,
-                                                                                       move_file=move_file, thread_number=thread_number,
-                                                                                       data_fold=["test_data"],horn_graph_folder="")
+    wrapped_generate_horn_graph_params={"benchmark_fold":benchmark_fold,"max_nodes_per_batch":max_nodes_per_batch,"separateByPredicates":separateByPredicates,
+                                        "abstract":abstract,"move_file":move_file,"thread_number":thread_number,"generateSimplePredicates":generateSimplePredicates,
+                                        "generateTemplates":generateTemplates,"data_fold":["test_data"],"horn_graph_folder":"","noIntervals":noIntervals}
+    filtered_file_list, file_list_with_horn_graph, file_list = \
+        wrapped_generate_horn_graph(wrapped_generate_horn_graph_params)
 
 
     # description: predict label
-    predict_label(benchmark, max_nodes_per_batch, benchmark_fold, filtered_file_list,trained_model_path,use_test_threshold)#file_list
-
+    predict_label(benchmark, max_nodes_per_batch, benchmark_fold, filtered_file_list,trained_model_path,use_test_threshold,separateByPredicates,verbose=verbose)#file_list
 
     # description: get solvability and measurement info with different predicate setting for unseen data
-    get_solvability_and_measurement_from_eldarica(filtered_file_list, thread_number, continuous_extracting=continuous_extracting,move_file=move_file,
-                                                   checkSolvability="-checkSolvability",measurePredictedPredicates=" ",onlyInitialPredicates="")
+    get_solvability_and_measurement_from_eldarica_params={"filtered_file_list":filtered_file_list,"thread_number":thread_number,"continuous_extracting":continuous_extracting,
+                                                          "move_file":move_file,"checkSolvability":"-checkSolvability","generateTemplates":generateTemplates,
+                                                          "measurePredictedPredicates":"","onlyInitialPredicates":"","abstract":abstract,"noIntervals":noIntervals,
+                                                          "separateByPredicates":separateByPredicates,"solvabilityTimeout":"300","timeout":300*6}#"solvabilityTimeout":"3600","timeout":60*60*4
+    get_solvability_and_measurement_from_eldarica(get_solvability_and_measurement_from_eldarica_params)
 
     # description: read solvability results
     json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
@@ -110,30 +124,6 @@ def main():
 
 
 
-
-
-def predict_label(benchmark,max_nodes_per_batch,benchmark_fold,file_list,trained_model_path,use_test_threshold):
-
-    label = "template_relevance"
-    # read best threshold from pickle
-    parameters = pickleRead(benchmark + "-" + label + "-parameters", "../src/trained_model/")
-    hyper_parameter = {"max_nodes_per_batch": max_nodes_per_batch,
-                       "best_threshold_set": (lambda : parameters["best_threshold_set"] if use_test_threshold== True else {"threshold":0.5,"accuracy":0})(),
-                       "read_best_threshold": True}
-    trained_model_path = trained_model_path
-    json_type = ".hyperEdgeHornGraph.JSON"
-    graph_type = json_type[1:json_type.find(".JSON")]
-    gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
-                                                 "argument_upper_bound_existence", "argument_occurrence_binary",
-                                                 "template_relevance", "clause_occurrence_in_counter_examples_binary"]
-    force_read = True
-    form_label = True
-    GPU_switch(False)
-    result_dir = wrapped_prediction(trained_model_path, benchmark, benchmark_fold, label, force_read, form_label,
-                                    json_type, graph_type, gathered_nodes_binary_classification_task, hyper_parameter,
-                                    True,file_list=file_list)
-    write_predicted_label_to_JSON_file(result_dir["dataset"], result_dir["predicted_Y_loaded_model"], json_type,
-                                       result_dir["best_threshold"])
 
 
 main()
