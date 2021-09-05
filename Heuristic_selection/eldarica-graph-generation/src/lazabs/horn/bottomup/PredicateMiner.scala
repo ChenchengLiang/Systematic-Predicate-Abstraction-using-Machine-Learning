@@ -293,9 +293,43 @@ class PredicateMiner[CC <% HornClauses.ConstraintClause]
 
   //////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * Translate templates over Boolean terms to correct predicate templates.
+   */
+  private def toPredTemplates(hints : VerificationHints) : VerificationHints = {
+    import IExpression._
+    import Sort.:::
+
+    val newPredHints =
+      for ((p, hs) <- hints.predicateHints) yield {
+        val newHS =
+          for (h <- hs) yield h match {
+            case VerifHintTplEqTerm(t ::: Sort.AnyBool(_), cost) =>
+              VerifHintTplPredPosNeg(EqZ(t), cost)
+            case VerifHintTplInEqTerm(t ::: Sort.AnyBool(_), cost) =>
+              VerifHintTplPred(~EqZ(t), cost)
+            case VerifHintTplInEqTerm(ITimes(IdealInt.MINUS_ONE,
+                                             t ::: Sort.AnyBool(_)), cost) =>
+              VerifHintTplPred(EqZ(t), cost)
+            case VerifHintTplEqTerm(Difference(s ::: Sort.AnyBool(_),
+                                               t ::: Sort.AnyBool(_)), cost) =>
+              VerifHintTplPredPosNeg(s === t, cost)
+            case VerifHintTplInEqTerm(Difference(s ::: Sort.AnyBool(_),
+                                                 t ::: Sort.AnyBool(_)), cost) =>
+              VerifHintTplPred(EqZ(s) ==> EqZ(t), cost)
+            case h => h
+          }
+        (p -> newHS)
+      }
+
+    VerificationHints(newPredHints)
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+
   def extractTemplates(mode : TemplateExtraction.Value)
                      : VerificationHints =
-    mergeTemplates(
+    toPredTemplates(mergeTemplates(
       VerificationHints.union(
         (nonRedundantPredicates map {
            p => extractTemplates(p, mode,
@@ -307,7 +341,7 @@ class PredicateMiner[CC <% HornClauses.ConstraintClause]
                                    5)
          }) ++ List(defaultTemplates(context.relationSymbols.keys filterNot (
                                        _ == HornClauses.FALSE), 20))
-      ))
+      )))
 
   def defaultTemplates(preds : Iterable[Predicate],
                        cost : Int)
@@ -379,6 +413,12 @@ class PredicateMiner[CC <% HornClauses.ConstraintClause]
 
   //////////////////////////////////////////////////////////////////////////////
 
+  private def arithSort(s : IExpression.Sort) : Boolean = s match {
+    case IExpression.Sort.Numeric(_) => true
+    case _ : ap.theories.ModuloArithmetic.ModSort => true
+    case _ => false
+  }
+
   private def computeUTVTemplates(allConsts : Seq[IExpression.ConstantTerm],
                                   f : Conjunction,
                                   costFactor : Int) : Seq[VerifHintElement] = {
@@ -389,37 +429,62 @@ class PredicateMiner[CC <% HornClauses.ConstraintClause]
       for ((c, n) <- allConsts.zipWithIndex;
            if fConsts contains c;
            va = v(n, Sort sortOf c);
-           h <- List(VerifHintTplEqTerm(va, EqVarCost * costFactor),
-                     VerifHintTplInEqTerm(va, InEqVarCost * costFactor),
-                     VerifHintTplInEqTerm(-va, InEqVarCost * costFactor)))
+           h <- List(VerifHintTplEqTerm(va, EqVarCost * costFactor)) ++
+                (if (arithSort(Sort sortOf c))
+                   List(VerifHintTplInEqTerm(va, InEqVarCost * costFactor),
+                        VerifHintTplInEqTerm(-va, InEqVarCost * costFactor))
+                else
+                  List()))
       yield h
 
-    val baseConst =
-      (for (c <- allConsts.iterator;
-            if (Sort sortOf c) == Sort.Integer)
+    val baseIntConst =
+      (for (c <- allConsts.iterator; if arithSort(Sort sortOf c))
        yield c).toStream.headOption getOrElse allConsts.head
-    val baseVar =
-      v(allConsts indexOf baseConst, Sort sortOf baseConst)
+    val baseIntVar =
+      v(allConsts indexOf baseIntConst, Sort sortOf baseIntConst)
 
     val rawHints2 =
       for (n <- 0 until allConsts.size;
            if fConsts contains allConsts(n);
+           if arithSort(Sort sortOf allConsts(n));
            c = v(n, Sort sortOf allConsts(n));
-           if c != baseVar;
-           h <- List(VerifHintTplEqTerm(c + baseVar,
+           if c != baseIntVar;
+           h <- List(VerifHintTplEqTerm(c + baseIntVar,
                                         EqVarSumCost * costFactor),
-                     VerifHintTplEqTerm(c - baseVar,
+                     VerifHintTplEqTerm(c - baseIntVar,
                                         EqVarDiffCost * costFactor),
-                     VerifHintTplInEqTerm(c + baseVar,
+                     VerifHintTplInEqTerm(c + baseIntVar,
                                           InEqVarSumCost * costFactor),
-                     VerifHintTplInEqTerm(c - baseVar,
+                     VerifHintTplInEqTerm(c - baseIntVar,
                                           InEqVarDiffCost * costFactor),
-                     VerifHintTplInEqTerm(-c - baseVar,
+                     VerifHintTplInEqTerm(-c - baseIntVar,
                                           InEqVarSumCost * costFactor),
-                     VerifHintTplInEqTerm(baseVar - c,
+                     VerifHintTplInEqTerm(baseIntVar - c,
                                           InEqVarDiffCost * costFactor)))
       yield h
 
+/*
+    val baseBoolConst =
+      (for (c <- allConsts.iterator;
+            if Sort.AnyBool.unapply(Sort sortOf c).isDefined)
+       yield c).toStream.headOption getOrElse allConsts.head
+    val baseBoolVar =
+      v(allConsts indexOf baseBoolConst, Sort sortOf baseBoolConst)
+
+    val rawHints3 =
+      for (n <- 0 until allConsts.size;
+           if fConsts contains allConsts(n);
+           if Sort.AnyBool.unapply(Sort sortOf allConsts(n)).isDefined;
+           c = v(n, Sort sortOf allConsts(n));
+           if c != baseBoolVar;
+           h <- List(VerifHintTplEqTerm(c - baseBoolVar,
+                                        EqVarDiffCost * costFactor),
+                     VerifHintTplInEqTerm(c - baseBoolVar,
+                                          InEqVarDiffCost * costFactor),
+                     VerifHintTplInEqTerm(baseBoolVar - c,
+                                          InEqVarDiffCost * costFactor)))
+      yield h
+ */
     filterVerificationHints(f, allConsts, rawHints1 ++ rawHints2)
   }
 
@@ -640,24 +705,44 @@ class PredicateMiner[CC <% HornClauses.ConstraintClause]
     VerificationHints(newPredHints)
   }
 
-  private def equalTerms(s : ITerm, t : ITerm) : Boolean = (s, t) match {
-    case (s, t)
-        if s == t => true
-    case (Difference(s1, s2), Difference(t1, t2))
-        if equalTerms(s1, t1) && equalTerms(s2, t2) => true
-    case _ =>
-        false
+  /**
+   * Check whether the two given integer terms are equal modulo
+   * simplification.
+   */
+  def equalTerms(s : ITerm, t : ITerm) : Boolean = {
+    noConstantTerm(s) && noConstantTerm(t) &&
+    (symbols(s + t) forall { c => constVarCoeff(s, c) == constVarCoeff(t, c) })
   }
 
-  private def equalMinusTerms(s : ITerm, t : ITerm) : Boolean = (s, t) match {
-    case (ITimes(IdealInt.MINUS_ONE, s), t)
-        if equalTerms(s, t) => true
-    case (s, ITimes(IdealInt.MINUS_ONE, t))
-        if equalTerms(s, t) => true
-    case (Difference(s1, s2), Difference(t1, t2))
-        if equalTerms(s1, t2) && equalTerms(s2, t1) => true
-    case _ =>
-        false
+  /**
+   * Check whether the two given integer terms are the negation of each other,
+   * modulo simplification.
+   */
+  def equalMinusTerms(s : ITerm, t : ITerm) : Boolean = {
+    noConstantTerm(s) && noConstantTerm(t) &&
+    (symbols(s + t) forall { c => constVarCoeff(s, c) == -constVarCoeff(t, c) })
+  }
+
+  private def symbols(t : ITerm) : Set[ITerm] = {
+    val (vars, consts, _) = SymbolCollector varsConstsPreds t
+    (consts.toSet map IConstant) ++ vars.toSet
+  }
+
+  private def constVarCoeff(t : ITerm, c : ITerm) : IdealInt = {
+    assert(c.isInstanceOf[IConstant] || c.isInstanceOf[IVariable])
+    import IExpression._
+    val Sum = SymbolSum(c)
+    t match {
+      case Sum(coeff, _) => coeff
+      case _ => 0
+    }
+  }
+
+  private def noConstantTerm(t : ITerm) : Boolean = t match {
+    case _ : IIntLit                   => false
+    case IPlus(a, b)                   => noConstantTerm(a) && noConstantTerm(b)
+    case ITimes(_, s)                  => noConstantTerm(s)
+    case _ : IConstant | _ : IVariable => true
   }
 
 }

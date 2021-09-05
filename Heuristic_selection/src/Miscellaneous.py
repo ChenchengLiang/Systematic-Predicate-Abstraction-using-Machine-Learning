@@ -21,16 +21,18 @@ def GPU_switch(GPU):
             tf.config.experimental.set_memory_growth(gpu, True)
 
 def drawLabelPieChart(learning_label,label,graph_type,benchmark_name,df,multi_label=2):
+    label_list=[x for x in range(multi_label)]
     flat_list = [item for sublist in learning_label for item in sublist]
-    # positive_label_number =flat_list.count(1)
-    # negative_label_number=flat_list.count(0)
-    # sizes = [positive_label_number, negative_label_number]
-    # labels = '1', "0"
-    # explode = (0, 0)  # only "explode" the 2nd slice (i.e. 'Hogs')
-    # Pie chart, where the slices will be ordered and plotted counter-clockwise:
-    labels = [str(i) for i in range(0,multi_label)]
-    sizes = [flat_list.count(i) for i in range(0,multi_label)]
-    explode = [0 for i in range(0,multi_label)]
+    if multi_label==2:
+        positive_label_number =flat_list.count(1)
+        negative_label_number=flat_list.count(0)
+        sizes = [positive_label_number, negative_label_number]
+        labels = '1', "0"
+        explode = (0, 0)  # only "explode" the 2nd slice (i.e. 'Hogs')
+    else:
+        labels = [str(i) for i in range(0,multi_label)]
+        sizes = [flat_list.count(i) for i in label_list]
+        explode = [0 for i in range(0,multi_label)]
     fig1, ax1 = plt.subplots()
     ax1.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%',
             shadow=True, startangle=90)
@@ -48,7 +50,7 @@ def add_JSON_field(fileName="",file_type=".layerHornGraph.JSON",old_field=[],new
             json_obj[field] = loaded_graph[field]
     # add more field
     with open(json_file) as f:
-        loaded_graph = json.load(f)
+        #loaded_graph = json.load(f)
         for field,content in zip(new_field,new_field_content):
             json_obj[field] = content
     # write json object to JSON file

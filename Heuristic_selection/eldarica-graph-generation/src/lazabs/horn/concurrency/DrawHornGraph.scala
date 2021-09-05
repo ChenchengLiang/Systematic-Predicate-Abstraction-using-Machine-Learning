@@ -88,6 +88,12 @@ class Adjacency(edge_name: String, edge_number: Int) {
   def incrementTernaryEdge(from: Int, to1: Int, to2: Int): Unit =
     ternaryEdge :+= Tuple3(from, to1, to2)
 }
+case class NodeInfo(canonicalName:String,labelName:String,className:String,shape:String){
+  var labelList:Seq[Int]=Seq()
+  var predictedLabelList:Seq[Int]=Seq()
+  var color="black"
+  var fillColor="white"
+}
 
 class GNNInput(clauseCollection:ClauseInfo) {
   val simpClauses=clauseCollection.simplifiedClause
@@ -106,7 +112,7 @@ class GNNInput(clauseCollection:ClauseInfo) {
 
   //canonical node category for both graph
   var templateCanonicalID=0
-
+  var nodeInfoList=Map[String,NodeInfo]()
   var nodeIds = Array[Int]()
   //var nodeSymbols = new ListBuffer[String]()
   var nodeSymbols = Array[String]()
@@ -164,6 +170,7 @@ class GNNInput(clauseCollection:ClauseInfo) {
   var argumentIndices = Array[Int]()
   var templateIndices = Array[Int]()
   var templateRelevanceLabel = Array[Int]()
+  var templateCostLabel = Array[Int]()
   var clauseIndices = Array[Int]()
   var predicateIndices = Array[Int]()
   var predicateOccurrenceInClause = Array[Int]()
@@ -270,20 +277,34 @@ class GNNInput(clauseCollection:ClauseInfo) {
     argumentIndices :+= GNNNodeID
     incrementNodeIds(nodeUniqueName, nodeClass, nodeName)
   }
-  def incrementTemplateIndicesAndNodeIds(nodeUniqueName: String, nodeClass: String, nodeName: String,hintLabel:Boolean): Unit = {
-    templateIndices :+= GNNNodeID
-    hintLabel match {
-      case true =>templateRelevanceLabel:+=1
-      case false =>templateRelevanceLabel:+=0
+  def modifyTemplateLabel(hintLabel:Int,cost:Int,nodeUniqueName:String): Unit = hintLabel match {
+    case 0 => {
+      nodeInfoList(nodeUniqueName).color="red"
+      nodeInfoList(nodeUniqueName).labelList:+=0
+      templateRelevanceLabel:+=0
+      templateCostLabel:+=cost
     }
+    case 1 =>{
+      nodeInfoList(nodeUniqueName).color="green"
+      nodeInfoList(nodeUniqueName).labelList:+=1
+      templateRelevanceLabel:+=1
+      templateCostLabel:+=100
+    }
+    case 2 =>{
+      nodeInfoList(nodeUniqueName).color="blue"
+      nodeInfoList(nodeUniqueName).labelList:+=2
+      templateRelevanceLabel:+=2
+      templateCostLabel:+=100
+    }
+  }
+  def incrementTemplateIndicesAndNodeIds(nodeUniqueName: String, nodeClass: String, nodeName: String,hintLabel:Int,cost:Int=0): Unit = {
+    templateIndices :+= GNNNodeID
+    modifyTemplateLabel(hintLabel,cost,nodeUniqueName)
     incrementNodeIds(nodeUniqueName, nodeClass, nodeName)
   }
-  def updateTemplateIndicesAndNodeIds(nodeUniqueName:String,hintLabel:Boolean): Unit ={
+  def updateTemplateIndicesAndNodeIds(nodeUniqueName:String,hintLabel:Int,cost:Int=0): Unit ={ //use operator node as template node
     templateIndices :+= nodeNameToIDMap(nodeUniqueName)
-    hintLabel match {
-      case true =>templateRelevanceLabel:+=1
-      case false =>templateRelevanceLabel:+=0
-    }
+    modifyTemplateLabel(hintLabel,cost,nodeUniqueName)
     templateCanonicalID += 1
   }
   def incrementClauseIndicesAndNodeIds(nodeUniqueName: String, nodeClass: String, nodeName: String,clauseInfo:Clauses): Unit ={
@@ -442,14 +463,14 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
   val gnn_input = new GNNInput(clausesCollection)
   val writerGraph = new PrintWriter(new File(file + "." + graphType + ".gv"))
 
-  edgeNameMap += ("templateAST"->"pAST")
+  edgeNameMap += ("templateAST"->"tplAST")
   edgeNameMap += ("template"->"predicate")
   edgeDirectionMap += ("templateAST"->false)
   edgeDirectionMap += ("template" -> false)
   nodeShapeMap += ("template" -> "component")
 
-  writerGraph.write("digraph dag {" + "\n")
-
+  writerGraph.write("digraph dag { " +"graph [pad=\"1\", nodesep=\"0.5\", ranksep=\"1\"]; splines=\"true\";"+ "\n")
+  //writerGraph.write("digraph dag { " + "\n")
 
   def addBinaryEdge(from: String, to: String, label: String, biDirection: Boolean = false): Unit =
     biDirection match {
@@ -667,9 +688,10 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
     }
   }
 
-  def createNode(canonicalName: String, labelName: String, className: String, shape: String, clauseLabelInfo:Clauses=Seq(),hintLabel:Boolean=false): Unit = {
-    writerGraph.write(addQuotes(canonicalName) +
-      " [label=" + addQuotes(labelName) + " nodeName=" + addQuotes(canonicalName) + " class=" + className + " shape=" + addQuotes(shape) + "];" + "\n")
+  def createNode(canonicalName: String, labelName: String, className: String, shape: String, clauseLabelInfo:Clauses=Seq(),hintLabel:Int=0): Unit = {
+    gnn_input.nodeInfoList+=(canonicalName->new NodeInfo(canonicalName,labelName,className,shape))
+//    writerGraph.write(addQuotes(canonicalName) +
+//      " [label=" + addQuotes(labelName) + " nodeName=" + addQuotes(canonicalName) + " class=" + className + " shape=" + addQuotes(shape) + "];" + "\n")
     className match {
       case "predicateArgument" => gnn_input.incrementArgumentIndicesAndNodeIds(canonicalName, className, labelName)
       case "CONTROL" => gnn_input.incrementControlLocationIndicesAndNodeIds(canonicalName, className, labelName)
@@ -782,6 +804,7 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
     writeGNNInputFieldToJSONFile("argumentOccurrence", IntArray(argumentOccurrenceList.toArray), writer, lastFiledFlag)
     writeGNNInputFieldToJSONFile("templateIndices", IntArray(gnn_input.templateIndices), writer, lastFiledFlag)
     writeGNNInputFieldToJSONFile("templateRelevanceLabel", IntArray(gnn_input.templateRelevanceLabel), writer, lastFiledFlag)
+    writeGNNInputFieldToJSONFile("templateCostLabel", IntArray(gnn_input.templateCostLabel), writer, lastFiledFlag)
     writeGNNInputFieldToJSONFile("clauseIndices", IntArray(gnn_input.clauseIndices), writer, lastFiledFlag)
     writeGNNInputFieldToJSONFile("clauseBinaryOccurrenceInCounterExampleList", IntArray(gnn_input.clausesOccurrenceInCounterExample), writer, lastFiledFlag)
     writeGNNInputFieldToJSONFile("controlLocationIndices", IntArray(gnn_input.controlLocationIndices), writer, lastFiledFlag)
@@ -990,7 +1013,7 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
         val templateNodeName=templateNodePrefix+gnn_input.templateCanonicalID.toString
         val templateNodeLabelName="predicate_"+gnn_input.templateCanonicalID.toString
         //templateNameList:+=templateNodeName
-        val hintLabel = if (hints.positiveHints.toInitialPredicates.keySet.map(_.toString).contains(hp.toString) && HintsSelection.containsPred(t,hints.positiveHints.toInitialPredicates(hp))) true else false
+        val hintLabel = if (hints.positiveHints.toInitialPredicates.keySet.map(_.toString).contains(hp.toString) && HintsSelection.containsPred(t,hints.positiveHints.toInitialPredicates(hp))) 1 else 0
         createNode(templateNodeName,templateNodeLabelName,"template",nodeShapeMap("template"),hintLabel=hintLabel)
         //drawAST(e,templateNodeName)
         val existedSubGraphRoot = for ((s, f) <- quantifiedClauseGuardMap(hp) if (HintsSelection.containsPred(t, Seq(f)))) yield s
@@ -1014,7 +1037,7 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
           for (t<-templates) yield {
             val predicateASTRootName=drawAST(t)
             //update JSON
-            val hintLabel = if (hints.positiveHints.toInitialPredicates.keySet.map(_.toString).contains(hp.toString) && HintsSelection.containsPred(t,hints.positiveHints.toInitialPredicates(hp))) true else false
+            val hintLabel = if (hints.positiveHints.toInitialPredicates.keySet.map(_.toString).contains(hp.toString) && HintsSelection.containsPred(t,hints.positiveHints.toInitialPredicates(hp))) 1 else 0
             gnn_input.updateTemplateIndicesAndNodeIds(predicateASTRootName,hintLabel)
             (predicateASTRootName,"template")
           }
@@ -1025,38 +1048,82 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
   def drawTemplates(): Seq[(String,Seq[(String,String)])]={
     val unlabeledTemplates = hints.initialHints.predicateHints.transform((k,v)=>v.map(getParametersFromVerifHintElement(_))).toSeq.sortBy(_._1.name)
     val positiveTemplates = hints.positiveHints.predicateHints.transform((k,v)=>v.map(getParametersFromVerifHintElement(_)))
+    val predictedTemplates = hints.predictedHints.predicateHints.transform((k, v) => v.map(getParametersFromVerifHintElement(_)))
     val tempHeadMap=
       for((hp,templates)<-unlabeledTemplates) yield {
         constantNodeSetInOneClause.clear()
-        //positiveTemplates(hp).foreach(println)
-        //println("------")
         val templateNameList=
           for (t<-templates) yield {
-            val predicateASTRootName=drawAST(t._1)
-            val hintLabel = if (positiveTemplates.keySet.map(_.toString).contains(hp.toString)
-              && termContains(positiveTemplates(hp),t)) true else false//positiveTemplates(hp).contains(t)
-            //println(t,hintLabel)
-            gnn_input.updateTemplateIndicesAndNodeIds(predicateASTRootName,hintLabel)//update JSON
-            (predicateASTRootName,"verifHint"+t._3.toString)
+            val templateASTRootName=drawAST(t._1)
+            val (hintLabel,cost) = getHintLabelAndCost(positiveTemplates,t,hp)
+
+            gnn_input.updateTemplateIndicesAndNodeIds(templateASTRootName,hintLabel,cost = cost)//update JSON
+            //println(t._1,hintLabel)
+            //draw template label color
+            //0:useless:red, 1:EqTerm useful;green, 2:InEqTerm useful:blue
+            val (predictedTemplateLabel,predictedCost) = getHintLabelAndCost(predictedTemplates,t,hp)
+            predictedTemplateLabel match {
+              case 0=>gnn_input.nodeInfoList(templateASTRootName).predictedLabelList :+= 0
+              case 1=>gnn_input.nodeInfoList(templateASTRootName).predictedLabelList :+= 1
+              case 2=>gnn_input.nodeInfoList(templateASTRootName).predictedLabelList :+= 2
+            }
+
+            (templateASTRootName,"verifHint"+t._3.toString)
           }
         hp.name->templateNameList
       }
     tempHeadMap
   }
-  def termContains(termList: Seq[(ITerm, Int, TemplateType.Value)], term: (ITerm, Int, TemplateType.Value)): Boolean = {
-    var r = false
-    for (t <- termList; if t._3 == term._3) {
-      t._3 match {
-        case TemplateType.TplInEqTerm => {
-          if (HintsSelection.equalTerms(t._1, term._1)) r = true
-        }
-        case TemplateType.TplEqTerm => {
-          if (HintsSelection.equalTerms(t._1, term._1) || HintsSelection.equalMinusTerms(t._1, term._1))
-            r = true
-        }
+
+  def drawTemplatesWithNode(): Seq[(String,Seq[(String,String)])]={
+    val unlabeledTemplates = hints.initialHints.predicateHints.transform((k,v)=>v.map(getParametersFromVerifHintElement(_))).toSeq.sortBy(_._1.name)
+    val positiveTemplates = hints.positiveHints.predicateHints.transform((k,v)=>v.map(getParametersFromVerifHintElement(_)))
+    val predictedTemplates = hints.predictedHints.predicateHints.transform((k, v) => v.map(getParametersFromVerifHintElement(_)))
+    val tempHeadMap=
+      for((hp,templates)<-unlabeledTemplates) yield {
+        constantNodeSetInOneClause.clear()
+        val templateNameList=
+          for (t<-templates) yield {
+            val templateASTRootName=drawAST(t._1)
+            val (hintLabel,cost) = getHintLabelAndCost(positiveTemplates,t,hp)
+
+
+            val templateNodeName=templateNodePrefix+gnn_input.templateCanonicalID.toString
+            val templateNodeLabelName="template_"+gnn_input.templateCanonicalID.toString
+            createNode(templateNodeName,templateNodeLabelName,"template",nodeShapeMap("template"),hintLabel=hintLabel)
+            addBinaryEdge(templateASTRootName,templateNodeName,"templateAST")
+
+
+            //            gnn_input.updateTemplateIndicesAndNodeIds(templateASTRootName,hintLabel,cost = cost)//update JSON
+            //            //println(t._1,hintLabel)
+            //            //draw predicted label color
+            //            val (predictedHintLabel,predictedCost) = getHintLabelAndCost(predictedTemplates,t,hp)
+            //            if (predictedHintLabel)
+            //              gnn_input.nodeInfoList(templateASTRootName).fillColor = "green"
+
+            //(templateASTRootName,"verifHint"+t._3.toString)
+            (templateNodeName,"verifHint"+t._3.toString)
+          }
+        hp.name->templateNameList
       }
+    tempHeadMap
+  }
+  def getHintLabelAndCost(tpl: Map[Predicate, Seq[(IExpression, Int, TemplateType.Value)]],t:(IExpression, Int, TemplateType.Value),
+                          hp:Predicate): (Int,Int) ={
+    //0:useless, 1:EqTerm useful, 2:InEqTerm useful
+    if (tpl.keySet.map(_.toString).contains(hp.toString)) {
+      val (b, c) = HintsSelection.termContains(tpl(hp), t)
+      b match {
+        case true=>
+          t._3 match {
+            case TemplateType.TplEqTerm=>(1, c)
+            case TemplateType.TplInEqTerm=>(2,c)
+          }
+        case false=>(0, 100)
+      }
+    } else {
+      (0, 100)
     }
-    r
   }
 
   def updateArgumentInfoHornGraphList(pre:String,tempID:Int,argumentnodeName:String,arg:ITerm): Unit ={

@@ -5,13 +5,11 @@ import tensorflow as tf
 import tf2_gnn
 from tf2_gnn.data import DataFold
 from utils import call_eldarica
-from Miscellaneous import add_JSON_field
-from Miscellaneous import pickleRead,pickleWrite
-from horn_dataset import HornGraphDataset
-from horn_dataset import write_graph_to_pickle, form_GNN_inputs_and_labels,get_test_loss_with_class_weight
+from Miscellaneous import add_JSON_field,pickleRead,pickleWrite
+from horn_dataset import write_graph_to_pickle, form_GNN_inputs_and_labels,get_test_loss_with_class_weight,compute_loss,HornGraphDataset
 from utils import my_round_fun
 from Miscellaneous import GPU_switch, pickleRead
-from utils import file_compress,unzip_file
+from utils import file_compress,unzip_file,decode_one_hot
 
 def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score_list,graph_type=".layerHornGraph.JSON"):
     # write predicted_argument_score to JSON file
@@ -19,7 +17,7 @@ def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score
                      "binaryAdjacentList", "ternaryAdjacencyList","unknownEdges","argumentIDList", "argumentNameList",
                      "argumentEdges","guardASTEdges","dataFlowASTEdges","controlFlowHyperEdges","dataFlowHyperEdges",
                      "argumentOccurrence","predicateIndices","predicateOccurrenceInClause","predicateStrongConnectedComponent",
-                 "argumentBoundList","argumentBinaryOccurrenceList","templateIndices","templateRelevanceLabel","clauseIndices",
+                 "argumentBoundList","argumentBinaryOccurrenceList","templateIndices","templateRelevanceLabel","clauseIndices", #"templateCostLabel",
                  "clauseBinaryOccurrenceInCounterExampleList","templateASTEdges","templateEdges","dummyFiled"]
     new_field = ["predictedLabel"]
     for file, predicted_argument_score in zip(dataset._file_list["test"], predicted_argument_score_list):
@@ -63,25 +61,29 @@ def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score
         # clear_file(json_file)
         # with open(json_file, 'w') as f:
         #     json.dump(json_obj, f,indent=4)
-def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_type,threshold,verbose=True):
+def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_type,threshold,verbose=True,label=""):
     current_positon=0
     for g,file_name in zip(dataset._loaded_data[DataFold.TEST],dataset._file_list["test"]):
         predicted_label=predicted_Y_loaded_model[current_positon:current_positon+len(g._node_label)]
         current_positon=current_positon+len(g._node_label)
-
-
-        transfomed_predicted_label = [(lambda l : 1 if l>threshold else 0) (l) for l in predicted_label]
-
         corrected_label = 0
-        for true_Y, predicted_Y in zip(g._node_label, transfomed_predicted_label):
-            if true_Y == predicted_Y:
+        true_Y_list=np.array(g._node_label)
+        transfored_predicted_Y_loaded_model=predicted_Y_loaded_model
+
+        if label == "node_multiclass":
+            true_Y_list=[np.argmax(y) for y in true_Y_list]
+            transfored_predicted_Y_loaded_model=[np.argmax(y) for y in transfored_predicted_Y_loaded_model]
+        for y, predicted_Y in zip(true_Y_list, transfored_predicted_Y_loaded_model):
+            if y == predicted_Y:
                 corrected_label = corrected_label + 1
+
+        print("true_Y_list", true_Y_list)
+        print("transfored_predicted_Y_loaded_model", transfored_predicted_Y_loaded_model)
         if verbose==True:
             print("file_name", file_name)
             # print("g.node_indices", len(g._node_indices),g._node_indices)
-            print("g.node_label", len(g._node_label), g._node_label)
-            print("predicted_label", predicted_label)
-            print("rounded predicted_label", transfomed_predicted_label)
+            print("g.node_label", len(true_Y_list), true_Y_list)
+            print("predicted_label", transfored_predicted_Y_loaded_model)
             print("threshold", threshold)
             print("corrected label:" + str(corrected_label) + "/" + str(len(g._node_label)))
 
@@ -89,7 +91,7 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
                      "unknownEdges", "argumentIDList", "argumentNameList",
                      "argumentOccurrence", "predicateIndices", "predicateOccurrenceInClause",
                      "predicateStrongConnectedComponent",
-                     "argumentBoundList", "argumentBinaryOccurrenceList", "templateIndices", "templateRelevanceLabel",
+                     "argumentBoundList", "argumentBinaryOccurrenceList", "templateIndices", "templateRelevanceLabel", #"templateCostLabel",
                      "clauseIndices","clauseBinaryOccurrenceInCounterExampleList",
                      "argumentEdges", "guardASTEdges", "dataFlowASTEdges",
                      "templateASTEdges","ASTEdges","AST_1Edges","AST_2Edges", "templateEdges","verifHintTplEqTermEdges","verifHintTplInEqTermEdges",
@@ -103,7 +105,8 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
             os.remove(json_file_name + ".zip")
 
         new_field = ["predictedLabel"]
-        new_filed_content=[transfomed_predicted_label]
+        new_filed_content=[[int(x) for x in transfored_predicted_Y_loaded_model]]
+        print("new_filed_content",new_filed_content)
         add_JSON_field(file_name,graph_type,old_field,new_field,new_filed_content)
         old_field=old_field+["predictedLabel"]
         new_field = ["predictedLabelLogit"]
@@ -167,10 +170,10 @@ def write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,la
     pickleWrite(parameters, benchmark+"-"+label+"-parameters","../src/trained_model/")
     return best_set_threshold
 
-def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="template_relevance",force_read=True,form_label=True,
+def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",label="template_relevance",force_read=True,form_label=True,
                        json_type=".hyperEdgeHornGraph.JSON",graph_type="hyperEdgeHornGraph",
                        gathered_nodes_binary_classification_task=["template_relevance"],hyper_parameter={},
-                       set_max_nodes_per_batch=False,file_list=[]):
+                       set_max_nodes_per_batch=False,file_list=[],num_node_target_labels=2):
 
     path = "../benchmarks/" + benchmark_fold + "/"
     benchmark_name = path[len("../benchmarks/"):-1]
@@ -182,15 +185,18 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="templa
 
 
     if force_read == True:
-        write_graph_to_pickle(benchmark_name, data_fold=["test"], label=label, path=path,
-                              file_type=".smt2",  graph_type=graph_type,
-                              max_nodes_per_batch=parameters['max_nodes_per_batch'], vocabulary_name=benchmark,file_list=file_list)
+        params_write_graph_to_pickle={"benchmark":benchmark_name,"data_fold":["test"],"label":label,"path":path,"graph_type":graph_type,
+                                      "max_nodes_per_batch":parameters['max_nodes_per_batch'],"vocabulary_name":benchmark,
+                                      "file_list":file_list,"file_type":".smt2","label_field":hyper_parameter["label_field"]}
+        write_graph_to_pickle(params_write_graph_to_pickle)
     else:
         print("Use pickle data for training")
     # if form_label == True and not os.path.isfile("../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):
     if form_label == True:
-        form_GNN_inputs_and_labels(label=label, datafold=["test"], benchmark=benchmark_name, graph_type=graph_type,
-                                   gathered_nodes_binary_classification_task=gathered_nodes_binary_classification_task,use_class_weight=False)
+        params_form_GNN_inputs_and_labels={"label":label,"datafold":["test"],"benchmark":benchmark_name,"graph_type":graph_type,
+                                           "gathered_nodes_binary_classification_task":gathered_nodes_binary_classification_task,
+                                           "use_class_weight":False,"num_node_target_labels":num_node_target_labels}
+        form_GNN_inputs_and_labels(params_form_GNN_inputs_and_labels)
 
     quiet = False
     dataset = HornGraphDataset(parameters)
@@ -200,7 +206,12 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="templa
     _, _, test_results = loaded_model.run_one_epoch(test_data, training=False, quiet=quiet)
     test_metric, test_metric_string = loaded_model.compute_epoch_metrics(test_results)
     predicted_Y_loaded_model = loaded_model.predict(test_data)
-    sigmoid_predicted_Y_loaded_model=tf.math.sigmoid(predicted_Y_loaded_model)
+
+    sigmoid_predicted_Y_loaded_model = tf.math.sigmoid(predicted_Y_loaded_model)
+    rounded_predicted_Y_loaded_model = my_round_fun(sigmoid_predicted_Y_loaded_model,threshold=0.5, label=label)
+    print("label",label)
+    print("predicted_Y_loaded_model",predicted_Y_loaded_model)
+    print("rounded_predicted_Y_loaded_model",rounded_predicted_Y_loaded_model)
 
     print("test_metric_string", test_metric_string)
     print("test_metric", test_metric)
@@ -219,50 +230,49 @@ def wrapped_prediction(trained_model_path,benchmark,benchmark_fold,label="templa
 
     class_weight=parameters["class_weight_fold"]
     from_logits=True
-    loss_loaded_model = (lambda : tf.keras.losses.MSE(true_Y, predicted_Y_loaded_model) \
-            if label not in gathered_nodes_binary_classification_task else get_test_loss_with_class_weight(class_weight,predicted_Y_loaded_model,true_Y,from_logits=from_logits))()
-    print("\n mse_loaded_model_predicted_Y_and_True_Y", loss_loaded_model)
 
 
-    mse_mean = (lambda: tf.keras.losses.MSE([np.mean(true_Y)] * len(true_Y), true_Y) if label not in gathered_nodes_binary_classification_task else
-    tf.keras.losses.binary_crossentropy([np.mean(true_Y)] * len(true_Y), true_Y,from_logits=False))()
-    print("\n mse_mean_Y_and_True_Y", mse_mean)
-    best_set_threshold = (lambda : hyper_parameter["best_threshold_set"] if hyper_parameter["read_best_threshold"] else write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,label,benchmark))()
-    best_set_ranks = (lambda : {"top_percentage":0,"accuracy":0} if hyper_parameter["read_best_threshold"] else wrapped_set_threshold_by_ranks(true_Y, true_Y_by_file, predicted_Y_loaded_model, true_Y_file_list))()
+    error_loaded_model = compute_loss(label, true_Y, predicted_Y_loaded_model, class_weight, from_logits,
+                                      gathered_nodes_binary_classification_task)
+    print("error_loaded_model",error_loaded_model)
+    if label in gathered_nodes_binary_classification_task:
+        best_set_threshold = (lambda : hyper_parameter["best_threshold_set"] if hyper_parameter["read_best_threshold"] else write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,label,benchmark))()
+        best_set_ranks = (lambda : {"top_percentage":0,"accuracy":0} if hyper_parameter["read_best_threshold"] else wrapped_set_threshold_by_ranks(true_Y, true_Y_by_file, predicted_Y_loaded_model, true_Y_file_list))()
+        print("----------", benchmark_fold, "-----", label, "----------")
+        print(hyper_parameter)
+        positive_label_number = sum(true_Y)
+        negative_label_number = len(true_Y) - positive_label_number
 
-    print("----------", benchmark_fold, "-----", label, "----------")
-    print(hyper_parameter)
-    positive_label_number = sum(true_Y)
-    negative_label_number = len(true_Y) - positive_label_number
+        print("best_set_threshold",best_set_threshold)
+        print("positive_label_percentage", positive_label_number / len(true_Y))
+        print("negative_label_number", negative_label_number / len(true_Y))
+        print("best_set_threshold", "threshold value:", best_set_threshold["threshold"], "accuracy:",
+              best_set_threshold["accuracy"])
+        print("best_set_ranks", "top_percentage:", best_set_ranks["top_percentage"], "accuracy:",
+              best_set_ranks["accuracy"])
+        random_guess_accuracy = max(positive_label_number / len(true_Y), negative_label_number / len(true_Y))
+        print("{0:.2%}".format(max(best_set_threshold["accuracy"], best_set_ranks["accuracy"]) - random_guess_accuracy),
+              "better than random guess")
 
-    print("best_set_threshold",best_set_threshold)
-    print("positive_label_percentage", positive_label_number / len(true_Y))
-    print("negative_label_number", negative_label_number / len(true_Y))
-    print("best_set_threshold", "threshold value:", best_set_threshold["threshold"], "accuracy:",
-          best_set_threshold["accuracy"])
-    print("best_set_ranks", "top_percentage:", best_set_ranks["top_percentage"], "accuracy:",
-          best_set_ranks["accuracy"])
-
-    random_guess_accuracy = max(positive_label_number / len(true_Y), negative_label_number / len(true_Y))
-    print("{0:.2%}".format(max(best_set_threshold["accuracy"], best_set_ranks["accuracy"]) - random_guess_accuracy),
-          "better than random guess")
-    return {"trained_model_path":trained_model_path,"best_set_threshold":best_set_threshold["accuracy"],"best_set_ranks":best_set_ranks["accuracy"],
-            "benchmark_fold":benchmark_fold,"label":label,"hyper_parameter":hyper_parameter,"positive_label_percentage":positive_label_number / len(true_Y),
-            "negative_label_number":negative_label_number / len(true_Y),"dataset":dataset,"predicted_Y_loaded_model":sigmoid_predicted_Y_loaded_model,"best_threshold":best_set_threshold["threshold"]}
-
+        return {"trained_model_path":trained_model_path,"best_set_threshold":best_set_threshold["accuracy"],"best_set_ranks":best_set_ranks["accuracy"],
+                "benchmark_fold":benchmark_fold,"label":label,"hyper_parameter":hyper_parameter,"positive_label_percentage":positive_label_number / len(true_Y),
+                "negative_label_number":negative_label_number / len(true_Y),"dataset":dataset,"predicted_Y_loaded_model":rounded_predicted_Y_loaded_model,"best_threshold":best_set_threshold["threshold"]}
+    else:
+        return {"trained_model_path": trained_model_path,"dataset":dataset,
+                "benchmark_fold": benchmark_fold, "label": label, "hyper_parameter": hyper_parameter,
+                "predicted_Y_loaded_model": rounded_predicted_Y_loaded_model,"best_threshold":0.5}
 
 
-
-
-def predict_label(benchmark,max_nodes_per_batch,benchmark_fold,file_list,trained_model_path,use_test_threshold,separateByPredicates="",verbose=True):
+def predict_label(benchmark,max_nodes_per_batch,benchmark_fold,file_list,trained_model_path,use_test_threshold,label = "template_relevance",
+                  separateByPredicates="",verbose=True,num_node_target_labels=2):
     if separateByPredicates:
         file_list=[]
-    label = "template_relevance"
     # read best threshold from pickle
     parameters = pickleRead(benchmark + "-" + label + "-parameters", "../src/trained_model/")
+    print("parameters",parameters)
     hyper_parameter = {"max_nodes_per_batch": max_nodes_per_batch,
                        "best_threshold_set": (lambda : parameters["best_threshold_set"] if use_test_threshold== True else {"threshold":0.5,"accuracy":0})(),
-                       "read_best_threshold": True}
+                       "read_best_threshold": True,"label_field":parameters["label_field"]}
     trained_model_path = trained_model_path
     json_type = ".hyperEdgeHornGraph.JSON"
     graph_type = json_type[1:json_type.find(".JSON")]
@@ -272,10 +282,11 @@ def predict_label(benchmark,max_nodes_per_batch,benchmark_fold,file_list,trained
     force_read = True
     form_label = True
     GPU_switch(False)
-    result_dir = wrapped_prediction(trained_model_path, benchmark, benchmark_fold, label, force_read, form_label,
-                                    json_type, graph_type, gathered_nodes_binary_classification_task, hyper_parameter,
-                                    True,file_list=file_list)
+    result_dir = wrapped_prediction(trained_model_path=trained_model_path, benchmark=benchmark, benchmark_fold=benchmark_fold, force_read=force_read, form_label=form_label,
+                                    json_type=json_type, graph_type=graph_type, gathered_nodes_binary_classification_task=gathered_nodes_binary_classification_task, hyper_parameter=hyper_parameter,label=label,
+                                    set_max_nodes_per_batch=True,file_list=file_list,num_node_target_labels=num_node_target_labels)
     write_predicted_label_to_JSON_file(result_dir["dataset"], result_dir["predicted_Y_loaded_model"], json_type,
-                                       result_dir["best_threshold"],verbose=verbose)
+                                       result_dir["best_threshold"],verbose=verbose,label=label)
     return result_dir["predicted_Y_loaded_model"]
+
 

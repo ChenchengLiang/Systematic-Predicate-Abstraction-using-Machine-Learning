@@ -1,5 +1,5 @@
 import os
-from utils import run_eldarica_with_shell,run_eldarica_with_shell_pool
+from utils_1 import run_eldarica_with_shell,run_eldarica_with_shell_pool
 import sys
 import json
 import glob
@@ -7,10 +7,11 @@ def main():
     command_input=sys.argv[1]
     if command_input =="merge":
         #merge threads
+        command_input2 = sys.argv[2]
         benchmark_folds,_=get_exceptions_folder_names()
         benchmark_folds=benchmark_folds+["solvable-file"]
         new_dict={}
-        for t in range(0,int(sys.argv[2])+1):
+        for t in range(0,int(command_input2)+1):
             json_file='../benchmarks/exceptions/benchmark_info_' + "thread_"+str(t) + '.JSON'
             print(json_file)
             with open(json_file) as f:
@@ -25,7 +26,7 @@ def main():
         sorted_dict.update(new_dict)
         with open('../benchmarks/exceptions/benchmark_info_merged.JSON', 'w') as f:
             json.dump(sorted_dict,f,indent=4)
-        for t in range(0,int(sys.argv[2])+1):
+        for t in range(0,int(command_input2)+1):
             json_file='../benchmarks/exceptions/benchmark_info_' + "thread_"+str(t) + '.JSON'
             os.remove(json_file)
         #compress files in exceptions
@@ -34,24 +35,25 @@ def main():
         compress_files_in_exceptions()
     else:
         benchmark_name = os.path.join("../benchmarks/", command_input)
-        thread_number = 8  # 16
-        timeout = 300#3600
+        thread_number = 4  # 16
+        timeout = 30#3600
+        runtime=3
         #eldarica_parameters = " -moveFile -abstract:off -noIntervals -generateSimplePredicates"#-onlyInitialPredicates -generateSimplePredicates
-        eldarica_parameters = " -moveFile -abstract:empty" #-generateTemplates
+        #eldarica_parameters = " -moveFile -abstract:empty -generateTemplates -readTemplates" #-generateTemplates  -rdm
+        eldarica_parameters = " -moveFile -abstract:term"  # -generateTemplates  -rdm
         data_fold=["train_data","valid_data","test_data"]
         for fold in data_fold:
-            run_eldarica_with_shell_pool(os.path.join(benchmark_name, fold), run_eldarica_with_shell,
-                                         eldarica_parameters, timeout=timeout, thread=thread_number)
+            run_eldarica_with_shell_pool(os.path.join(benchmark_name, fold), run_eldarica_with_shell, eldarica_parameters,
+                                         timeout=timeout, thread=thread_number,runtime=runtime)
 
         # get sovability file logs
         solvability_dict={}
         benchmark_name=os.path.join("../benchmarks/",  command_input)
-        file_list = []
-        for root, subdirs, files in os.walk(benchmark_name):
-            if len(subdirs) == 0:
-                file_list.append(files)
-        solvable_file_list= [item for files in file_list for item in files]
-        solvability_dict["solvable-file"]=solvable_file_list
+        solvable_file_list=[]
+        for fold in data_fold:
+            solvable_file_list=solvable_file_list+glob.glob(benchmark_name + "/"+fold+"/*.smt2.zip")
+        solvable_file_list=[os.path.basename(f) for f in solvable_file_list]
+        solvability_dict["solvable-file"] = solvable_file_list
         folder_name_list,file_list=get_exceptions_folder_names()
         for folder_name,files in zip(folder_name_list,file_list):
             solvability_dict[folder_name]=files

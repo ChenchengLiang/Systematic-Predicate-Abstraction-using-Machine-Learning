@@ -32,7 +32,7 @@ def main():
                                                             "onlyInitialPredicates": "", "abstract": abstract,
                                                             "noIntervals": noIntervals,
                                                             "separateByPredicates": separateByPredicates,
-                                                            "solvabilityTimeout": "3600", "timeout": 60 * 60 * 4}
+                                                            "solvabilityTimeout": "300", "timeout": 300* 6}
     get_solvability_and_measurement_from_eldarica(get_solvability_and_measurement_from_eldarica_params)
 
 main()

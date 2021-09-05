@@ -187,7 +187,7 @@ def divide_data_to_threads(benchmark="", target_folder="", three_fold=True, chun
         datafold_files_list = datafold_files_list + [os.path.join(root, "test_data_simple_generator")]
 
     for datafold, datafold_files in zip(datafold_list, datafold_files_list):
-        datafold_file_list = glob.glob(datafold_files + "/*.smt2")
+        datafold_file_list = glob.glob(datafold_files + "/*.smt2.zip")
         print(datafold_files, len(datafold_file_list))
         chunk_size = int(len(datafold_file_list) / chunk_number)
         for i in range(0, chunk_number):
@@ -201,9 +201,11 @@ def divide_data_to_threads(benchmark="", target_folder="", three_fold=True, chun
             except:
                 pass
             for file in datafold_file_list[i * chunk_size:(i + 1) * chunk_size]:
+                file=file[:-len(".zip")]
                 copy_relative_files(file, os.path.join(thread_dir, datafold))
                 # copy(file, os.path.join(thread_dir,datafold))
         for file in datafold_file_list[chunk_number * chunk_size:]:
+            file = file[:-len(".zip")]
             copy_relative_files(file, os.path.join(thread_dir, datafold))
             # copy(file, os.path.join(thread_dir, datafold))
 
@@ -265,23 +267,28 @@ def main():
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
     # shuffle_data("../benchmarks/LIA-Lin+sv-comp/sv-comp+LIA-Lin-train-with-CEGAR",
     #              "../benchmarks/LIA-Lin+sv-comp/sv-comp+LIA-Lin-train-with-CEGAR-shuffled")
-    # divide_data_to_threads("LIA-Lin+sv-comp",
-    #                        "LIA-Lin+sv-comp-divided",three_fold=True)#datafold_list=["test_data"]
+    divide_data_to_threads("all-LIA-Lin-common-unsolvable-set",
+                           "all-LIA-Lin-common-unsolvable-set-divided",three_fold=True,datafold_list=["test_data"])#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
     # analysis benchmark
     # benchmark_exceptions_analysis("LIA-Lin+sv-comp/exception-LIA-Lin+sv-comp-empty-label-template-selection",
     #                               "LIA-Lin+sv-comp/exception-LIA-Lin+sv-comp-full-label-template-selection")
+    # collect_unsolvable_cases(["all-LIA-lin-abstract-empty-solvability","all-LIA-lin-abstract-term-solvability",
+    #                                              "all-LIA-lin-abstract-oct-solvability","all-LIA-lin-abstract-relEqs-solvability",
+    #                           "all-LIA-lin-abstract-relIneqs-solvability","all-LIA-lin-abstract-off-solvability",
+    #                           "all-LIA-lin-abstract-comb-solvability"]
+    #                                             ,["empty","term","oct","relEqs","relIneqs","off","comb"])
 
-    # rebuild_exception_file()
+    #rebuild_exception_file("exception-LIA-Lin+sv-comp-predicted",["solvable-file"])
     # get_generated_horn_graph()
     # for fold in ["train_data","valid_data","test_data"]:
     #     clean_extracted_data("thread_1/"+fold)
     #clean_extracted_data("LIA-Lin+sv-comp-template-unsolvable-horn-graph/test_data")
 
     #align_extracted_data(benchmark="LIA-Lin+sv-comp",folder_name="sv-comp+LIA-Lin-train-with-CEGAR")
-    get_k_fold_train_data(benchmark="LIA-Lin+sv-comp",folder_name="LIA-Lin+sv-comp-train-templates")
+    #get_k_fold_train_data(benchmark="LIA-Lin+sv-comp",folder_name="LIA-Lin+sv-comp-train-templates")
     # collect_unsolvable_data(horn_graph_folder="all-LIA-Lin/extractable-horn-hraph"
     #                         ,unsolvable_folder="exception-all-LIA-Lin-full-label-with-CEGAR/shell-timeout",
     #                         target_file="all-LIA-Lin-train-fixed-size-unsolvable-predicted")
@@ -297,16 +304,21 @@ def main():
     #find_deduplicate_benchmarks(benchmarks="temp")#all-LIA-Lin/extractable-horn-hraph
     #separate_extracted_and_left_data("LIA-Lin+sv-comp/all-LIA-Lin-shell-timeout-horn-graphs","train_data")
     #file_compress(["../benchmarks/test/chc-LIA-lin_003.smt2"],"../benchmarks/test/chc-LIA-lin_003.smt2.zip")
-    # separate_unsolvable_horn_graphs("LIA-Lin+sv-comp-template-unsolvable-horn-graph","test_data",trunck_number=6)
+    #separate_unsolvable_horn_graphs("LIA-Lin+sv-comp-template-unsolvable-horn-graph","test_data",trunck_number=6,train_folder="LIA-Lin+sv-comp-train-templates")
 
     # for i in range(0,17):
     #     for fold in ["train_data","valid_data","test_data"]:
     #         compress_all_file_folder("LIA-Lin+sv-comp/LIA-Lin+sv-comp-divided/thread_"+str(i)+"/"+fold)
-
+    # for fold in ["test_data"]:
+    #     compress_all_file_folder("all-LIA-Lin-common-unsolvable-set"+"/"+fold)
     #
     # for i in range(0,17):
     #     rename_files_in_benchmarks("LIA-Lin+sv-comp/LIA-Lin+sv-comp-divided/thread_"+str(i))
     #compress_exception("LIA-Lin+sv-comp-train-templates/exceptions")
+
+
+def get_json_filed_files(benchmark=""):
+    pass
 
 def compress_exception(benchmark=""):
     folder = ["exceed-max-node", "lia-lin-multiple-predicates-in-body", "no-initial-predicates",
@@ -346,15 +358,16 @@ def compress_all_file_folder(benchmark=""):
         file_compress([f],f+".zip")
         os.remove(f)
 
-def separate_unsolvable_horn_graphs(benchmarks="",folder="",trunck_number=5):
+def separate_unsolvable_horn_graphs(benchmarks="",folder="",trunck_number=5,train_folder=""):
     file_list=glob.glob("../benchmarks/"+benchmarks+"/"+folder+"/*.smt2.zip")
     file_list = [f[:-len(".zip")] for f in file_list]
     trunck_number=trunck_number
     batch_size=int(len(file_list)/trunck_number)
+    folder_name=train_folder+"-unsolvable-predicted-"
     try:
         for t in range(trunck_number):
-            os.mkdir("../benchmarks/"+benchmarks+"-"+str(t))
-            os.mkdir("../benchmarks/"+benchmarks+"-"+str(t)+"/test_data")
+            os.mkdir("../benchmarks/"+folder_name+str(t))
+            os.mkdir("../benchmarks/"+folder_name+str(t)+"/test_data")
     except:
         print("folder existed")
     trunck=-1
@@ -367,7 +380,7 @@ def separate_unsolvable_horn_graphs(benchmarks="",folder="",trunck_number=5):
                 trunck=trunck_number-1
         print(file,trunck)
         for f in glob.glob(file+"*"):
-            copy(f,"../benchmarks/"+benchmarks+"-"+str(trunck)+"/test_data")
+            copy(f,"../benchmarks/"+folder_name+str(trunck)+"/test_data")
             os.remove(f)
 
 
@@ -589,7 +602,10 @@ def analysis_data_statistics(benchmark="chc-comp21-benchmarks-main-all-extract",
 def get_k_fold_train_data(fold=5, benchmark="chc-comp21-benchmarks-main-all",
                           folder_name="extracted_data-only-initial-predicates"):
     path = os.path.join("../benchmarks/", benchmark)
-    file_list = glob.glob(path + "/" + folder_name + "/*.smt2.zip")
+    file_list=[]
+    for fo in ["train_data","valid_data","test_data"]:
+        file_list = file_list + glob.glob(path + "/" + folder_name + "/"+fo+"/*.smt2.zip")
+    #file_list = glob.glob(path + "/" + folder_name + "/*.smt2.zip")
     file_list=[f[:-len(".zip")] for f in file_list]
     print("file_list",file_list)
     separating_length = int(len(file_list) / fold)
@@ -659,15 +675,13 @@ def get_generated_horn_graph(horn_graph_folder="lia-lin-horn_graphs",
             os.remove(f)
 
 
-def rebuild_exception_file():
-    folder_name = "lia-lin-exceptions-noIntervals-abstractOn-emptyLabel-only-initial-predicates"
-    field_list = ["solvability-timeout", "shell-timeout"]
-    loaded_fields = read_benchmark_exception_json(folder_name)
+def rebuild_exception_file(benchmark="",field_list=["solvability-timeout", "shell-timeout"]):
+    loaded_fields = read_benchmark_exception_json(benchmark)
     for filed in field_list:
-        new_folder = "../benchmarks/" + folder_name + "/" + filed
+        new_folder = "../benchmarks/" + benchmark + "/" + filed
         os.mkdir(new_folder)
         for f in loaded_fields[filed]:
-            file_name = "../benchmarks/lia-lin/" + f
+            file_name = "../benchmarks/LIA-Lin+sv-comp/LIA-Lin+sv-comp-templates-unsolvables/test_data/" + f
             shutil.copyfile(file_name, new_folder + "/" + f)
 
 
@@ -716,6 +730,27 @@ def clean_extracted_data(benchmark,separated_predicates=False):
             for file in glob.glob(f + "*"):
                 if os.path.exists(file):
                     os.remove(file)
+
+
+def collect_unsolvable_cases(benchmarks=[],abstract_list=[]):
+    filed = "shell-timeout"
+    loaded_jsons=[read_benchmark_exception_json(b) for b in benchmarks]
+    common_timeout_files = set(loaded_jsons[0][filed])
+    for a,j in zip(abstract_list,loaded_jsons):
+        print("abstract:",a,len(j[filed]))
+        print(j[filed])
+        common_timeout_files=common_timeout_files.intersection(set(j[filed]))
+
+    print("common_timeout_files",len(common_timeout_files))
+    print(common_timeout_files)
+    try:
+        os.mkdir("../benchmarks/all-LIA-Lin/common-unsolvable-set")
+        os.mkdir("../benchmarks/all-LIA-Lin/common-unsolvable-set/train_data")
+    except:
+        print("folder existed")
+    for f in common_timeout_files:
+        copy("../benchmarks/all-LIA-Lin/raw/"+f,"../benchmarks/all-LIA-Lin/common-unsolvable-set/train_data")
+
 
 
 

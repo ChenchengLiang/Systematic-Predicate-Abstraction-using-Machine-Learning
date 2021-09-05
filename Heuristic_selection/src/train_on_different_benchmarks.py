@@ -21,8 +21,8 @@ def main():
     # label_list.append("argument_lower_bound")
     # label_list.append("argument_upper_bound")
     #label_list.append("argument_occurrence_binary")
-    label_list.append("template_relevance")
-    #label_list.append("node_multiclass")
+    #label_list.append("template_relevance")
+    label_list.append("node_multiclass")
     #label = "clause_occurrence_in_counter_examples_binary"
     # json_type = ".hyperEdgeHornGraph.JSON"
     # json_type = ".layerHornGraph.JSON"
@@ -32,21 +32,21 @@ def main():
     GPU=False
     use_class_weight=False
     pickle = True
-    benchmark_name = "LIA-Lin+sv-comp-train-templates/"
-    num_node_target_labels=2
+    benchmark_name = "temp-multiclass-anu/"
+    num_node_target_labels=3# 7
 
     # random.seed(0)
     # np.random.seed(0)
     # tf.random.set_seed(0)
 
-    hyper_parameters={"nodeFeatureDim":64,"num_layers":8,"regression_hidden_layer_size":[64],"threshold":0.5,"max_nodes_per_batch":10000,
-                      "max_epochs":500,"patience":100,"num_node_target_labels":num_node_target_labels}
+    hyper_parameters={"nodeFeatureDim":64,"num_layers":12,"regression_hidden_layer_size":[64,64,64],"threshold":0.5,"max_nodes_per_batch":10000,
+                      "max_epochs":500,"patience":500,"num_node_target_labels":num_node_target_labels}
 
     for label in label_list:
         parameter_list.append(
             parameters(relative_path="../benchmarks/"+benchmark_name,
                        absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
-                       json_type=".hyperEdgeHornGraph.JSON", label=label))
+                       json_type=".hyperEdgeHornGraph.JSON", label=label,label_field="templateRelevanceLabel"))#templateRelevanceLabel,templateCostLabel
         # parameter_list.append(
         #     parameters(relative_path="../benchmarks/" + benchmark_name,
         #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
@@ -83,20 +83,23 @@ def main():
         if pickle==False:
             train_on_graphs(benchmark_name=param.absolute_path[param.absolute_path.find("/benchmarks/")+len("/benchmarks/"):-1], label=param.label, force_read=force_read,
                             train_n_times=1,path=param.absolute_path, file_type=file_type, form_label=form_label,
-                            json_type=param.json_type,GPU=GPU,pickle=pickle,use_class_weight=use_class_weight,hyper_parameters=hyper_parameters)
+                            json_type=param.json_type,GPU=GPU,pickle=pickle,use_class_weight=use_class_weight,label_field=param.label_field,
+                            hyper_parameters=hyper_parameters)
         else:
             train_on_graphs(benchmark_name=param.benchmark_name(),
                             label=param.label, force_read=force_read,
                             train_n_times=1, path=param.relative_path, file_type=file_type, form_label=form_label,
-                            json_type=param.json_type, GPU=GPU, pickle=pickle,use_class_weight=use_class_weight,hyper_parameters=hyper_parameters)
+                            json_type=param.json_type, GPU=GPU, pickle=pickle,use_class_weight=use_class_weight,label_field=param.label_field,
+                            hyper_parameters=hyper_parameters)
         tf.keras.backend.clear_session()
 
 class parameters():
-    def __init__(self, relative_path,absolute_path,json_type,label):
+    def __init__(self, relative_path,absolute_path,json_type,label,label_field):
         self.relative_path=relative_path
         self.absolute_path=absolute_path
         self.json_type=json_type
         self.label=label
+        self.label_field=label_field
     def benchmark_name(self):
         return self.absolute_path[self.absolute_path.find("/benchmarks/") + len("/benchmarks/"):-1]
 main()

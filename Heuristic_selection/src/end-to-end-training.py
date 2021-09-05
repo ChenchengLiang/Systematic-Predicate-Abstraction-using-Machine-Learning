@@ -13,24 +13,24 @@ from Miscellaneous import pickleRead,pickleWrite,GPU_switch
 import glob
 from measurement_functions import read_measurement_from_JSON,get_analysis_for_predicted_labels
 from utils import get_statistic_data,get_recall_scatter,wrapped_generate_horn_graph,get_solvability_and_measurement_from_eldarica
-from horn_dataset import draw_training_results,write_train_results_to_log,get_test_loss_with_class_weight,logit
+from horn_dataset import draw_training_results,write_train_results_to_log,get_test_loss_with_class_weight,logit,compute_loss
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import mixed_precision
 import gc
 def main():
-    fold=5
+    fold=[4]#[0,1,2,3,4]
     #different_num_layers_training()
     #clean_k_fold_test_data(benchmark="chc-comp-LIA-Lin-2021-extract")
-    k_fold_training(benchmark="LIA-Lin+sv-comp-LIA-Lin+sv-comp-train-templates",fold=fold)
-    # k_fold_data_collection(benchmark="temp",
-    #                        separateByPredicates="-separateByPredicates",fold=fold)#-separateByPredicates
+    #k_fold_training(benchmark="LIA-Lin+sv-comp-train-templates",fold=fold)
+    k_fold_data_collection(benchmark="LIA-Lin+sv-comp-train-templates",
+                           separateByPredicates="",fold=5)#-separateByPredicates
 
 
-def k_fold_training(benchmark="chc-comp21-benchmarks-main-all-extract",fold=5):
+def k_fold_training(benchmark="chc-comp21-benchmarks-main-all-extract",fold=[0]):
     # description: train in 5 fold
     #end_to_end_training(benchmark=benchmark + "-" + str(4) + "-fold")
-    for i in range(0,fold):
+    for i in fold:
         end_to_end_training(benchmark=benchmark + "-" + str(i) + "-fold")
         gc.collect()
         tf.keras.backend.clear_session()
@@ -63,11 +63,11 @@ def k_fold_data_collection(benchmark="chc-comp21-benchmarks-main-all-extract",se
         file_list = glob.glob("../benchmarks/" + benchmark + "-" + str(i) + "-fold/test_data/*")
         for file in file_list:
             copy(file, k_fold_benchmark_test_folder)
-    print("total test file", len(glob.glob(k_fold_benchmark_test_folder + "/*.smt2")))
-    print("total test solvability file", len(glob.glob(k_fold_benchmark_test_folder + "/*.smt2.solvability.JSON")))
-    print("total test measurement file", len(glob.glob(k_fold_benchmark_test_folder + "/*.smt2.measurement.JSON")))
+    print("total test file", len(glob.glob(k_fold_benchmark_test_folder + "/*.smt2.zip")))
+    print("total test solvability file", len(glob.glob(k_fold_benchmark_test_folder + "/*.smt2.solvability.JSON.zip")))
+    print("total test measurement file", len(glob.glob(k_fold_benchmark_test_folder + "/*.smt2.measurement.JSON.zip")))
     print("total test horn graph file",
-          len(glob.glob(k_fold_benchmark_test_folder + "/*.smt2.hyperEdgeHornGraph.JSON")))
+          len(glob.glob(k_fold_benchmark_test_folder + "/*.smt2.hyperEdgeHornGraph.JSON.zip")))
     wrapped_generate_horn_graph_params = {"benchmark_fold": k_fold_benchmark, "max_nodes_per_batch": max_nodes_per_batch,
                                           "separateByPredicates": separateByPredicates,
                                           "abstract": "-abstract:empty", "move_file": True, "thread_number": 4,
@@ -114,7 +114,7 @@ def end_to_end_training(num_layers=8,benchmark=""):
     # description: set hyper-parameters
     params = {"benchmark": benchmark,#lia-lin-extract, mixed-three-fold-single-example
               "label": "template_relevance",
-              "num_node_target_labels":2,
+              "num_node_target_labels":2, #7
               "force_read": True,
               "file_type": ".smt2",
               "graph_type": "hyperEdgeHornGraph",
@@ -130,7 +130,7 @@ def end_to_end_training(num_layers=8,benchmark=""):
               "generateTemplates":"-generateTemplates",
               "abstract":"-abstract:empty",
               "threshold": 0.5,
-              "verbose":True,
+              "verbose":False,
               "use_class_weight":False,
               "gathered_nodes_binary_classification_task": ["predicate_occurrence_in_SCG",
                                                             "argument_lower_bound_existence",
@@ -162,7 +162,7 @@ def end_to_end_training(num_layers=8,benchmark=""):
     # #predicted_Y, dataset =predict_unseen_set(params, trained_model_path, file_list=filtered_file_list, set_max_nodes_per_batch=True)
     # write_predicted_label_to_JSON_file(dataset, predicted_Y, "."+params["graph_type"]+".JSON", params["threshold"],verbose=params["verbose"])
     predicted_Y=predict_label(benchmark, 10000, benchmark, filtered_file_list, trained_model_path, use_test_threshold=False,
-                  separateByPredicates=params["separateByPredicates"])  # file_list
+                  separateByPredicates=params["separateByPredicates"],verbose=params["verbose"])  # file_list
     #description: draw train-predict diagrams
     draw_train_predict_plots(params, dataset, test_data, predicted_Y, train_loss_list, valid_loss_list,best_valid_epoch, hyper_parameters)
 
@@ -262,14 +262,13 @@ def draw_train_predict_plots(params,dataset,test_data,predicted_Y,train_loss_lis
     class_weight = {"weight_for_1": parameters["class_weight_fold"]["weight_for_1"] /
                                     parameters["class_weight_fold"]["weight_for_0"], "weight_for_0": 1}
     from_logits=True
-    error_loaded_model = (lambda: tf.keras.losses.MSE(true_Y, predicted_Y) \
-        if params["label"] not in params["gathered_nodes_binary_classification_task"] else
-    get_test_loss_with_class_weight(class_weight,predicted_Y,true_Y,from_logits=from_logits))()
+    error_loaded_model = compute_loss(params["label"], true_Y, predicted_Y, class_weight, from_logits,
+                 params["gathered_nodes_binary_classification_task"])
     print("\n error of loaded_model", error_loaded_model)
 
-    mean_loss = (lambda: get_test_loss_with_class_weight(class_weight,[np.mean(true_Y)] * len(true_Y),true_Y,from_logits=from_logits)if params["label"] not in params[
-        "gathered_nodes_binary_classification_task"] else tf.keras.losses.MSE(
-        [np.mean(true_Y)] * len(true_Y), true_Y))()
+    mean_label=np.full(np.array(predicted_Y).shape,np.mean(true_Y))
+    mean_loss = compute_loss(params["label"], true_Y, mean_label, class_weight, from_logits,
+                 params["gathered_nodes_binary_classification_task"])
     print("\n mean_loss_Y_and_True_Y", mean_loss)
     num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, tf.math.round(predicted_Y)), tf.int32))
     accuracy = num_correct / len(predicted_Y)

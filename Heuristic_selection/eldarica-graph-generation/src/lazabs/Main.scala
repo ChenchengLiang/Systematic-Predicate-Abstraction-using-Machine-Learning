@@ -56,7 +56,9 @@ object GlobalParameters {
 
 class GlobalParameters extends Cloneable {
   //var printHints=VerificationHints(Map())
+  var withoutGraphJSON=false
   var checkSolvability=false
+  var readCost=false
   var rdm=false
   var onlyInitialPredicates=false
   var generateSimplePredicates=false
@@ -73,6 +75,7 @@ class GlobalParameters extends Cloneable {
   var labelSimpleGeneratedPredicates=false
   var varyGeneratedPredicates=false
   var readHints=false
+  var readTemplates=false
   var rank=0.0
   var getSMT2=false
   var getHornGraph=false
@@ -242,6 +245,7 @@ class GlobalParameters extends Cloneable {
     that.labelSimpleGeneratedPredicates=this.labelSimpleGeneratedPredicates
     that.varyGeneratedPredicates=this.varyGeneratedPredicates
     that.readHints=this.readHints
+    that.readTemplates=this.readTemplates
     that.getSMT2=this.getSMT2
     that.getHornGraph=this.getHornGraph
     that.getAllHornGraph=this.getAllHornGraph
@@ -250,6 +254,8 @@ class GlobalParameters extends Cloneable {
     that.generateTemplates=this.generateTemplates
     that.onlyInitialPredicates=this.onlyInitialPredicates
     that.checkSolvability=this.checkSolvability
+    that.withoutGraphJSON=this.withoutGraphJSON
+    that.readCost=this.readCost
     that.rdm=this.rdm
     that.moveFile = this.moveFile
   }
@@ -354,8 +360,11 @@ object Main {
       case "-onlyInitialPredicates" :: rest => onlyInitialPredicates = true; arguments(rest)
       case "-moveFile" :: rest => moveFile = true; arguments(rest)
       case "-checkSolvability" :: rest => checkSolvability = true; arguments(rest)
+      case "-withoutGraphJSON" :: rest => withoutGraphJSON = true; arguments(rest)
+      case "-readCost" :: rest => readCost = true; arguments(rest)
       case "-rdm" :: rest => rdm = true; arguments(rest)
       case "-readHints" :: rest => readHints = true; arguments(rest)
+      case "-readTemplates" :: rest => readTemplates = true; arguments(rest)
       case "-getSMT2" :: rest => getSMT2 = true; arguments(rest)
       case "-debugLog" :: rest => debugLog = true; arguments(rest)
       case "-getLabelFromCE":: rest =>getLabelFromCounterExample = true; arguments(rest)
@@ -427,6 +436,11 @@ object Main {
       case "-abstract:empty" :: rest => {
         templateBasedInterpolation = true
         templateBasedInterpolationType = AbstractionType.Empty
+        arguments(rest)
+      }
+      case "-abstract:all" :: rest => {
+        templateBasedInterpolation = true
+        templateBasedInterpolationType = AbstractionType.All
         arguments(rest)
       }
       case "-abstract:manual" :: rest => {
@@ -626,6 +640,8 @@ object Main {
           " -onlyInitialPredicates\t extract predicates using initial predicates only\n"+
           " -moveFile\t if exception occur, move file to excepion directory\n"+
           " -checkSolvability \t check solvability for different initial predicate settings\n"+
+          " -withoutGraphJSON \t don't output JSON file for graph\n"+
+          " -readCost \t read template cost from file\n"+
           " -rdm \t random label initial templates\n"+
           " -absTimeout:time\t set timeout for labeling hints\n"+
           " -solvabilityTimeout:time\t set timeout for solvability\n"+

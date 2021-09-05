@@ -222,17 +222,13 @@ def my_assign(x):
 def _traucate(x, decimals=0): #trauncate
     multiplier = tf.constant(10 ** decimals, dtype=x.dtype)
     return tf.cast(tf.cast(tf.round(x * multiplier),tf.int32),x.dtype) / multiplier
+
+def decode_one_hot(predicted_Y_loaded_model):
+    return [np.argmax(y)  for y in predicted_Y_loaded_model]
 def main():
-    logits=tf.constant([[3,0,0,0,0],[0,0,-2,0,0]],dtype=tf.float32)
-    node_labels=tf.constant([[0,0,1,0,0],[0,0,1,0,0]],dtype=tf.float32)
-    per_node_losses = tf.nn.sigmoid_cross_entropy_with_logits(
-        logits=logits, labels=node_labels)
-    print("per_node_losses",per_node_losses)
-    sigmoid_logits=tf.math.sigmoid(logits)
-    print("sigmoid_logits", sigmoid_logits)
-    print("rounded_logits",np.where(sigmoid_logits > 0.4, 1, 0))
-    loss = tf.reduce_mean(tf.reduce_sum(per_node_losses, axis=-1))  # Compute mean loss _per node_
-    print("loss",loss)
+    predicted_Y_loaded_model=np.array([100, 100, 100, 100, 100, 100, 7, 100, 100, 3, 100, 100])
+    x=np.where(predicted_Y_loaded_model==3,1,predicted_Y_loaded_model)
+    print(x)
 
 
 main()
