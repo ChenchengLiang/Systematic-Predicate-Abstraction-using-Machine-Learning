@@ -68,7 +68,7 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
         current_positon=current_positon+len(g._node_label)
         corrected_label = 0
         true_Y_list=np.array(g._node_label)
-        transfored_predicted_Y_loaded_model=predicted_Y_loaded_model
+        transfored_predicted_Y_loaded_model=predicted_label
 
         if label == "node_multiclass":
             true_Y_list=[np.argmax(y) for y in true_Y_list]
@@ -94,7 +94,7 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
                      "argumentBoundList", "argumentBinaryOccurrenceList", "templateIndices", "templateRelevanceLabel", #"templateCostLabel",
                      "clauseIndices","clauseBinaryOccurrenceInCounterExampleList",
                      "argumentEdges", "guardASTEdges", "dataFlowASTEdges",
-                     "templateASTEdges","ASTEdges","AST_1Edges","AST_2Edges", "templateEdges","verifHintTplEqTermEdges","verifHintTplInEqTermEdges",
+                     "templateASTEdges","ASTEdges","AST_1Edges","AST_2Edges", "templateEdges","verifHintTplEqTermEdges","verifHintTplInEqTermEdges","verifHintTplPredPosNegEdges",
                      "binaryAdjacentList",
                      "controlFlowHyperEdges","dataFlowHyperEdges",
                      "ternaryAdjacencyList",
@@ -117,12 +117,12 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
         os.remove(json_file_name)
 
 
-def set_threshold_by_roundings(true_Y,predicted_Y_loaded_model):
+def set_threshold_by_roundings(true_Y,predicted_Y_loaded_model,label):
     threshold_list=np.arange(0,1,0.1)
     #threshold_list=[1e-13,1e-12,1e-11,1e-10,1e-9,1e-8,1e-7,1e-6,1e-5,0.00005,1e-4,0.0005,1e-3,1e-2,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99,0.999,0.9999,0.99999]
     best_set={"threshold":0,"accuracy":0,"num_correct":0}
     for i in threshold_list:
-        num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, my_round_fun(predicted_Y_loaded_model,i)), tf.int32))
+        num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, my_round_fun(predicted_Y_loaded_model,i,label)), tf.int32))
         accuracy = num_correct / len(predicted_Y_loaded_model)
         #print("threshold", i,"accuracy",float(accuracy))
         if num_correct>best_set["num_correct"]:
@@ -165,7 +165,7 @@ def set_threshold_by_ranks(true_Y,true_Y_by_file,predicted_Y_loaded_model,true_Y
     return {"top_percentage":top_percentage,"accuracy":float(accuracy)}
 
 def write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,label,benchmark):
-    best_set_threshold=set_threshold_by_roundings(true_Y, predicted_Y_loaded_model)
+    best_set_threshold=set_threshold_by_roundings(true_Y, predicted_Y_loaded_model,label)
     parameters["best_threshold_set"]=best_set_threshold
     pickleWrite(parameters, benchmark+"-"+label+"-parameters","../src/trained_model/")
     return best_set_threshold
@@ -201,6 +201,7 @@ def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",labe
     quiet = False
     dataset = HornGraphDataset(parameters)
     dataset.load_data([DataFold.TEST])
+
     test_data = dataset.get_tensorflow_dataset(DataFold.TEST)
     loaded_model = tf2_gnn.cli_utils.model_utils.load_model_for_prediction(trained_model_path, dataset)
     _, _, test_results = loaded_model.run_one_epoch(test_data, training=False, quiet=quiet)
@@ -212,6 +213,7 @@ def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",labe
     print("label",label)
     print("predicted_Y_loaded_model",predicted_Y_loaded_model)
     print("rounded_predicted_Y_loaded_model",rounded_predicted_Y_loaded_model)
+    print("dataset._label_list",dataset._label_list)
 
     print("test_metric_string", test_metric_string)
     print("test_metric", test_metric)
@@ -273,7 +275,6 @@ def predict_label(benchmark,max_nodes_per_batch,benchmark_fold,file_list,trained
     hyper_parameter = {"max_nodes_per_batch": max_nodes_per_batch,
                        "best_threshold_set": (lambda : parameters["best_threshold_set"] if use_test_threshold== True else {"threshold":0.5,"accuracy":0})(),
                        "read_best_threshold": True,"label_field":parameters["label_field"]}
-    trained_model_path = trained_model_path
     json_type = ".hyperEdgeHornGraph.JSON"
     graph_type = json_type[1:json_type.find(".JSON")]
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",

@@ -269,7 +269,7 @@ def draw_training_results(train_loss_list_average, valid_loss_list_average,
     plt.plot([mean_loss_list_average] * len(train_loss_list_average), color="red")
     plt.plot([mse_loaded_model_average] * len(train_loss_list_average), color="black")
     y_range=[0,max(max(train_loss_list_average),max(valid_loss_list_average))]
-    upper_bound=1#max(y_range)#1
+    upper_bound=2#max(y_range)#1
     grid=upper_bound/10
     plt.ylim([min(y_range), upper_bound])
     plt.yticks(np.arange(min(y_range), upper_bound, grid))
@@ -282,7 +282,8 @@ def draw_training_results(train_loss_list_average, valid_loss_list_average,
     mean_loss_legend = mpatches.Patch(color='red', label='mean_loss')
     test_loss_legend = mpatches.Patch(color='black', label='test_loss')
     plt.legend(handles=[train_loss_legend, valid_loss_legend, mean_loss_legend, test_loss_legend])
-    plot_name=assemble_name(label,graph_type,benchmark_name,"nodeFeatureDim",str(hyper_parameters["nodeFeatureDim"]),"num_layers",str(hyper_parameters["num_layers"]),"regression_hidden_layer_size",str(hyper_parameters["regression_hidden_layer_size"]),"threshold",str(hyper_parameters["threshold"]))
+    regression_hidden_layer_size_name=str(len(hyper_parameters["regression_hidden_layer_size"]))+"x" +str(hyper_parameters["regression_hidden_layer_size"][0])
+    plot_name=assemble_name(label,graph_type,benchmark_name,"nodeFeatureDim",str(hyper_parameters["nodeFeatureDim"]),"num_layers",str(hyper_parameters["num_layers"]),"regression_hidden_layer_size",regression_hidden_layer_size_name,"threshold",str(hyper_parameters["threshold"]))
     plt.savefig("trained_model/" + plot_name + ".png")
     plt.clf()
     # plt.show()
@@ -327,10 +328,11 @@ def write_train_results_to_log(dataset, predicted_Y_loaded_model, train_loss, va
     mean_loss_list_average = np.mean(mean_loss_list)
     mse_loaded_model_average = np.mean(mse_loaded_model_list)
     mean_accuracy = np.mean(accuracy_list)
+    regression_hidden_layer_size_name=str(len(hyper_parameters["regression_hidden_layer_size"]))+"x"+str(hyper_parameters["regression_hidden_layer_size"][0])
     log_name = assemble_name(label, graph_type, benchmark, "nodeFeatureDim",
                               str(hyper_parameters["nodeFeatureDim"]), "num_layers",
                               str(hyper_parameters["num_layers"]), "regression_hidden_layer_size",
-                              str(hyper_parameters["regression_hidden_layer_size"]))
+                              regression_hidden_layer_size_name)
     with open("trained_model/" + log_name+ ".log", 'a') as out_file:
         out_file.write("best_valid_epoch:" + str(best_valid_epoch) + "\n")
         out_file.write("train loss:" + str(train_loss) + "\n")
@@ -344,19 +346,27 @@ def write_train_results_to_log(dataset, predicted_Y_loaded_model, train_loss, va
         out_file.write("accuracy list:" + str(accuracy_list) + "\n")
         out_file.write("mean accuracy:" + str(mean_accuracy) + "\n")
 
-        predicted_argument_lists = get_predicted_label_list_divided_by_file(dataset, predicted_Y_loaded_model)
+        predicted_label_lists = get_predicted_label_list_divided_by_file(dataset, predicted_Y_loaded_model[0])
+        true_label_list= dataset._label_list["test"]
+
         mse_list = []
-        for predicted_label, arguments, file_name in zip(predicted_argument_lists, dataset._label_list["test"],
+        for predicted_label, true_label, file_name in zip(predicted_label_lists, true_label_list,
                                                          dataset._file_list["test"]):
+            if label=="node_multiclass":
+                predicted_label=[predicted_label]
+            print("file_name", file_name)
+            print("true_label", true_label)
+            print("predicted_label", predicted_label)
+
             out_file.write("-------" + "\n")
             out_file.write(file_name + "\n")
-            out_file.write("true label:" + str(arguments) + "\n")
-            out_file.write("true label rank:" + str(ss.rankdata(arguments, method="dense")) + "\n")
+            out_file.write("true label:" + str(true_label) + "\n")
+            out_file.write("true label rank:" + str(ss.rankdata(true_label, method="dense")) + "\n")
             out_file.write("predicted label:" + str(predicted_label) + "\n")
-            out_file.write("rounded label:" + str(tf.math.round(predicted_label)) + "\n")
+            out_file.write("rounded label:" + str(my_round_fun(predicted_label,threshold=0.5,label=label)) + "\n")
             out_file.write(
                 "predicted label rank:" + str(ss.rankdata(tf.math.round(predicted_label), method="dense")) + "\n")
-            mse = tf.keras.losses.MSE(arguments, predicted_label) if not label=="node_multiclass" else 0
+            mse = tf.keras.losses.MSE(true_label, predicted_label) if not label=="node_multiclass" else 0
             out_file.write("mse:" + str(mse) + "\n")
             mse_list.append(mse)
 
@@ -684,7 +694,6 @@ def form_predicate_occurrence_related_label_graph_sample(params):
                           params["df"],multi_label=params["num_node_target_labels"],)
 
     if params["label"]=="node_multiclass":
-        #todo:transform to one-hot
         graphs_learning_labels_temp = []
         for one_graph_learning_labels in params["graphs_learning_labels"]:
             one_graph_learning_labels=np.array(one_graph_learning_labels)
@@ -694,8 +703,8 @@ def form_predicate_occurrence_related_label_graph_sample(params):
             # one_graph_learning_labels = np.where(one_graph_learning_labels == 100, 3, one_graph_learning_labels)
             indices = one_graph_learning_labels
             depth = params["num_node_target_labels"]
-            print("indices",indices,"depth",depth)
-            print("one-hot",tf.one_hot(indices, depth))
+            # print("indices",indices,"depth",depth)
+            # print("one-hot",tf.one_hot(indices, depth))
             graphs_learning_labels_temp.append(tf.one_hot(indices, depth))
         params["graphs_learning_labels"]=graphs_learning_labels_temp
 
@@ -813,6 +822,8 @@ def form_predicate_occurrence_related_label_graph_sample(params):
         #     print("\n node_indices ", len(node_indices))
         #     print("learning_labels", len(learning_labels))
 
+
+        #print("token_map",params["token_map"])
         final_graphs.append(
             HornGraphSample(
                 adjacency_lists=adjacency_lists,
@@ -829,11 +840,11 @@ def form_predicate_occurrence_related_label_graph_sample(params):
     all_label=[item for sublist in params["graphs_learning_labels"] for item in sublist]
     print("total files", str(total_files)+"/"+str(len(params["skipped_file_list"])+total_files))
     print("total label size", raw_data_graph.label_size)
-    print("positive label",sum(all_label)/len(all_label))
-    print("negative label",1-(sum(all_label)/len(all_label)))
-    print("all_one_label", all_one_label, "percentage", all_one_label / total_files)
-    print("one_one_label", one_one_label, "percentage", one_one_label / total_files)
-    print("other_distribution", other_distribution, "percentage", other_distribution / total_files)
+    # print("positive label",sum(all_label)/len(all_label))
+    # print("negative label",1-(sum(all_label)/len(all_label)))
+    # print("all_one_label", all_one_label, "percentage", all_one_label / total_files)
+    # print("one_one_label", one_one_label, "percentage", one_one_label / total_files)
+    # print("other_distribution", other_distribution, "percentage", other_distribution / total_files)
     weight_for_0, weight_for_1 = 1,1
     if params["df"]=="train" and params["use_class_weight"]==True:
         weight_for_0,weight_for_1=get_class_weight(sum(all_label),len(all_label)-sum(all_label),len(all_label))
@@ -1140,8 +1151,17 @@ def compute_loss(label, true_Y, predicted_Y_loaded_model, class_weight, from_log
         return get_test_loss_with_class_weight(class_weight,predicted_Y_loaded_model,true_Y,from_logits=from_logits)
     elif label == "node_multiclass":
         predicted_Y_loaded_model=np.array(predicted_Y_loaded_model[0])
-        per_node_losses= tf.nn.sigmoid_cross_entropy_with_logits(logits=true_Y, labels=predicted_Y_loaded_model)
+        per_node_losses= tf.nn.sigmoid_cross_entropy_with_logits(logits=predicted_Y_loaded_model, labels=true_Y)
         loss = tf.reduce_mean(tf.reduce_sum(per_node_losses, axis=-1))  # Compute mean loss _per node_
         return loss
     else:
         return tf.keras.losses.MSE(true_Y, predicted_Y_loaded_model)
+class parameters():
+    def __init__(self, relative_path,absolute_path,json_type,label,label_field):
+        self.relative_path=relative_path
+        self.absolute_path=absolute_path
+        self.json_type=json_type
+        self.label=label
+        self.label_field=label_field
+    def benchmark_name(self):
+        return self.absolute_path[self.absolute_path.find("/benchmarks/") + len("/benchmarks/"):-1]

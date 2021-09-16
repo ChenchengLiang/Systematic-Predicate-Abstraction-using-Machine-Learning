@@ -11,7 +11,7 @@ import subprocess
 import json
 from multiprocessing import Pool
 import shutil
-
+from utils import unzip_file
 
 def generate_JSON_field(rootdir, json_file_type=".layerHornGraph.JSON", eldarica_parameters="-getHornGraph"):
     for root, subdirs, files in os.walk(rootdir):
@@ -268,7 +268,7 @@ def main():
     # shuffle_data("../benchmarks/LIA-Lin+sv-comp/sv-comp+LIA-Lin-train-with-CEGAR",
     #              "../benchmarks/LIA-Lin+sv-comp/sv-comp+LIA-Lin-train-with-CEGAR-shuffled")
     divide_data_to_threads("all-LIA-Lin-common-unsolvable-set",
-                           "all-LIA-Lin-common-unsolvable-set-divided",three_fold=True,datafold_list=["test_data"])#datafold_list=["test_data"]
+                           "all-LIA-Lin-common-unsolvable-set-divided",three_fold=True,datafold_list=["train_data"])#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -301,6 +301,7 @@ def main():
     #                                                             "fullInitialPredicates",
     #                                                             "trueInitialPredicates"])  # solvability
     # analysis_graph_structure(benchmark="temp-train")
+    #analysis_template_distribution(benchmark="all-LIA-Lin-distribution")
     #find_deduplicate_benchmarks(benchmarks="temp")#all-LIA-Lin/extractable-horn-hraph
     #separate_extracted_and_left_data("LIA-Lin+sv-comp/all-LIA-Lin-shell-timeout-horn-graphs","train_data")
     #file_compress(["../benchmarks/test/chc-LIA-lin_003.smt2"],"../benchmarks/test/chc-LIA-lin_003.smt2.zip")
@@ -309,7 +310,7 @@ def main():
     # for i in range(0,17):
     #     for fold in ["train_data","valid_data","test_data"]:
     #         compress_all_file_folder("LIA-Lin+sv-comp/LIA-Lin+sv-comp-divided/thread_"+str(i)+"/"+fold)
-    # for fold in ["test_data"]:
+    # for fold in ["train_data"]:
     #     compress_all_file_folder("all-LIA-Lin-common-unsolvable-set"+"/"+fold)
     #
     # for i in range(0,17):
@@ -317,8 +318,6 @@ def main():
     #compress_exception("LIA-Lin+sv-comp-train-templates/exceptions")
 
 
-def get_json_filed_files(benchmark=""):
-    pass
 
 def compress_exception(benchmark=""):
     folder = ["exceed-max-node", "lia-lin-multiple-predicates-in-body", "no-initial-predicates",
@@ -509,6 +508,32 @@ def analysis_graph_structure(benchmark=""):
           str(sum(structure_d["predicate_number"]) / len(structure_d["predicate_number"])),
           structure_d["predicate_number"])
 
+def load_JSON_fields_to_dict(file_list,structure_d):
+    for file in file_list:
+        unzip_file(file)
+        with open(file[:-len(".zip")]) as f:
+            loaded_graph = json.load(f)
+            for k in structure_d:
+                structure_d[k].append(int(loaded_graph[k]))
+                if k=="numberOfBooleanTermsFromMinedTemplates" and int(loaded_graph[k])>0:
+                    print(file)
+        os.remove(file[:-len(".zip")])
+
+    return structure_d
+
+def analysis_template_distribution(benchmark):
+    structure_d = {"numberOfIntegerEqOccurenceInMinedTemplates": [], "numberOfIntegerTermsFromInitialTemplates": [],
+                   "numberOfBooleanTermsFromInitialTemplates": [],"numberOfIntegerTermsFromMinedTemplates": [],
+                   "numberOfBooleanTermsFromMinedTemplates": []}
+    file_list = []
+    for fold in ["train"]:  # ["train","valid","test"]:
+        file_list = file_list + glob.glob("../benchmarks/" + benchmark + "/" + fold + "_data/*.TemplatesDistribution.JSON.zip")
+    print("file_list", len(file_list))
+    loaded_structure=load_JSON_fields_to_dict(file_list,structure_d)
+    print("loaded_structure",loaded_structure)
+    print("number of positive integer terms in all single integer terms",str(sum(loaded_structure["numberOfIntegerTermsFromMinedTemplates"]))+"/"+str(sum(loaded_structure["numberOfIntegerTermsFromInitialTemplates"])))
+    print("number of positive boolean terms in all single boolean terms",str(sum(loaded_structure["numberOfBooleanTermsFromMinedTemplates"]))+"/"+str(sum(loaded_structure["numberOfBooleanTermsFromInitialTemplates"])))
+    print("number of positive Eq integer terms in all single integer terms",str(sum(loaded_structure["numberOfIntegerEqOccurenceInMinedTemplates"]))+"/"+str(sum(loaded_structure["numberOfIntegerTermsFromInitialTemplates"])))
 
 def analysis_data_statistics(benchmark="chc-comp21-benchmarks-main-all-extract",
                              folder="extracted_data-only-initial-predicates",

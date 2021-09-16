@@ -10,7 +10,7 @@ def main():
 
 def predict_pipeline(fold_number=0):
     # description: parameter settings
-    benchmark = "temp-multiclass-11"#sys.argv[1]
+    benchmark = "temp-multiclass-12"#sys.argv[1]
 
     #benchmark_fold = benchmark + "-" + "unsolvable"#sys.argv[2]
 
@@ -19,7 +19,7 @@ def predict_pipeline(fold_number=0):
     max_nodes_per_batch = 10000
 
     #/home/cheli243/PycharmProjects/HintsLearning/src/
-    trained_model_path="trained_model/GNN_Argument_selection__2021-09-03_19-38-19_best.pkl"
+    trained_model_path="trained_model/GNN_Argument_selection__2021-09-05_16-30-16_best.pkl"
     thread_number = 4
     continuous_extracting=True
     move_file = False

@@ -1,5 +1,5 @@
 import tensorflow as tf
-
+from horn_dataset import parameters
 from Miscellaneous import GPU_switch
 from horn_dataset import train_on_graphs
 
@@ -32,7 +32,7 @@ def main():
     GPU=False
     use_class_weight=False
     pickle = True
-    benchmark_name = "temp-multiclass-anu/"
+    benchmark_name = "temp-multiclass-12/"
     num_node_target_labels=3# 7
 
     # random.seed(0)
@@ -93,13 +93,4 @@ def main():
                             hyper_parameters=hyper_parameters)
         tf.keras.backend.clear_session()
 
-class parameters():
-    def __init__(self, relative_path,absolute_path,json_type,label,label_field):
-        self.relative_path=relative_path
-        self.absolute_path=absolute_path
-        self.json_type=json_type
-        self.label=label
-        self.label_field=label_field
-    def benchmark_name(self):
-        return self.absolute_path[self.absolute_path.find("/benchmarks/") + len("/benchmarks/"):-1]
 main()

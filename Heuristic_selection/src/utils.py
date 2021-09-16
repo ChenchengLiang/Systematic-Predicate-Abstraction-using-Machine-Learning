@@ -126,10 +126,9 @@ def plot_scatter(true_Y,predicted_Y,name="",range=[0,0],x_label="True Values",y_
     plt.clf()
 
 def plot_confusion_matrix(predicted_Y_loaded_model,true_Y,saving_path,recall=0,precision=0,f1_score=0,threshold=0.5,label="template_relevance"):
-    predicted_Y_loaded_model = my_round_fun(predicted_Y_loaded_model)
+    predicted_Y_loaded_model = my_round_fun(np.array(predicted_Y_loaded_model),label=label)
     #predicted_Y_loaded_model =  list(map(my_round_fun,np.array(predicted_Y_loaded_model)))#tf.math.round(predicted_Y_loaded_model)
     if label=="node_multiclass":
-        predicted_Y_loaded_model=predicted_Y_loaded_model[0]
         predicted_Y_loaded_model=[np.argmax(x) for x in predicted_Y_loaded_model]
         true_Y = [np.argmax(x) for x in true_Y]
         cm = confusion_matrix(true_Y, predicted_Y_loaded_model)
@@ -386,7 +385,7 @@ def mutual_differences(set_1,set_2):
 
 def my_round_fun(num_list,threshold=0.5,label="template_relevance"):
     if label=="node_multiclass":
-        num_list=num_list[0]
+        num_list=np.array(num_list[0])
         return [np.where(r==max(r),1,0)for r in num_list]
     else:
         return list(np.where(num_list > threshold, 1, 0))
