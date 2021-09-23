@@ -14,11 +14,11 @@ from tf2_gnn.data import DataFold, HornGraphSample, HornGraphDataset
 from tf2_gnn.models import InvariantArgumentSelectionTask, InvariantNodeIdentifyTask,InvariantNodeMultiClassTask
 from Miscellaneous import pickleWrite, pickleRead, drawLabelPieChart
 from archived.dotToGraphInfo import parseArgumentsFromJson
-from utils import plot_confusion_matrix,get_recall_and_precision,plot_ROC,assemble_name,my_round_fun,unzip_file,decode_one_hot
+from utils import plot_confusion_matrix,get_recall_and_precision,plot_ROC,assemble_name,my_round_fun,unzip_file
 
 
 def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",
-                    json_type=".JSON",form_label=False,GPU=False,pickle=True,use_class_weight=False,label_field="templateRelevanceLabel",
+                    json_type=".JSON",form_label=False,GPU=False,pickle=True,use_class_weight=False,label_field="templateRelevanceLabel",verbose=False,
                     hyper_parameters={}):
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
                                                  "argument_upper_bound_existence", "argument_occurrence_binary",
@@ -158,10 +158,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         print("test_metric model from memory", test_metric)
 
         predicted_Y_loaded_model_from_memory = model.predict(test_data)
-        transformed_predicted_Y_loaded_model_from_memory=decode_one_hot(predicted_Y_loaded_model_from_memory)
         sigmoid_predicted_Y_loaded_model_from_memory=tf.math.sigmoid(predicted_Y_loaded_model_from_memory)
         rounded_predicted_Y_loaded_model_from_memory=my_round_fun(sigmoid_predicted_Y_loaded_model_from_memory,threshold=hyper_parameters["threshold"],label=label)
-        # print("transformed_predicted_Y_loaded_model_from_memory", transformed_predicted_Y_loaded_model_from_memory)
         # print("predicted_Y_loaded_model_from_memory",sigmoid_predicted_Y_loaded_model_from_memory)
         # print("rounded_predicted_Y_loaded_model_from_memory head",rounded_predicted_Y_loaded_model_from_memory[:10])
 
@@ -171,12 +169,12 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         test_metric, test_metric_string = loaded_model.compute_epoch_metrics(test_results)
 
         predicted_Y_loaded_model = loaded_model.predict(test_data)
-        transformed_predicted_Y_loaded_model = decode_one_hot(predicted_Y_loaded_model)
         sigmoid_predicted_Y_loaded_model=tf.math.sigmoid(predicted_Y_loaded_model)
         rounded_predicted_Y_loaded_model=my_round_fun(sigmoid_predicted_Y_loaded_model,threshold=hyper_parameters["threshold"],label=label)
-        print("transformed_predicted_Y_loaded_model", transformed_predicted_Y_loaded_model)
-        print("predicted_Y_loaded_model",sigmoid_predicted_Y_loaded_model)
-        print("rounded_predicted_Y_loaded_model",rounded_predicted_Y_loaded_model)
+
+        #print("predicted_Y_loaded_model",sigmoid_predicted_Y_loaded_model)
+        if verbose==True:
+            print("rounded_predicted_Y_loaded_model",len(rounded_predicted_Y_loaded_model),rounded_predicted_Y_loaded_model)
 
         print("test_metric_string",test_metric_string)
         print("test_metric",test_metric)
@@ -324,7 +322,7 @@ def draw_training_results(train_loss_list_average, valid_loss_list_average,
     #     plt.clf()
 
 def write_train_results_to_log(dataset, predicted_Y_loaded_model, train_loss, valid_loss, mse_loaded_model_list,
-                               mean_loss_list, accuracy_list,best_valid_epoch, hyper_parameters,benchmark="unknown", label="rank", graph_type="hyperEdgeHornGraph"):
+                               mean_loss_list, accuracy_list,best_valid_epoch, hyper_parameters,benchmark="unknown", label="rank", graph_type="hyperEdgeHornGraph",verbose=False):
     mean_loss_list_average = np.mean(mean_loss_list)
     mse_loaded_model_average = np.mean(mse_loaded_model_list)
     mean_accuracy = np.mean(accuracy_list)
@@ -354,9 +352,9 @@ def write_train_results_to_log(dataset, predicted_Y_loaded_model, train_loss, va
                                                          dataset._file_list["test"]):
             if label=="node_multiclass":
                 predicted_label=[predicted_label]
-            print("file_name", file_name)
-            print("true_label", true_label)
-            print("predicted_label", predicted_label)
+            # print("file_name", file_name)
+            # print("true_label", true_label)
+            # print("predicted_label", predicted_label)
 
             out_file.write("-------" + "\n")
             out_file.write(file_name + "\n")

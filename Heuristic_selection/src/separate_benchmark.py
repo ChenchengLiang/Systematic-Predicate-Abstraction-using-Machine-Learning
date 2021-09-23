@@ -40,7 +40,7 @@ def main():
         runtime=3
         #eldarica_parameters = " -moveFile -abstract:off -noIntervals -generateSimplePredicates"#-onlyInitialPredicates -generateSimplePredicates
         #eldarica_parameters = " -moveFile -abstract:empty -generateTemplates -readTemplates" #-generateTemplates  -rdm
-        eldarica_parameters = " -moveFile -abstract:relIneqs"  # -abstract:term -generateTemplates  -rdm
+        eldarica_parameters = " -moveFile -abstract:empty "  # -abstract:term -generateTemplates  -rdm
         data_fold=["train_data","valid_data","test_data"]
         for fold in data_fold:
             run_eldarica_with_shell_pool(os.path.join(benchmark_name, fold), run_eldarica_with_shell, eldarica_parameters,
@@ -69,7 +69,7 @@ def compress_files_in_exceptions():
     folder = ["exceed-max-node", "lia-lin-multiple-predicates-in-body", "no-initial-predicates",
               "no-predicates-selected", "no-simplified-clauses", "other-error", "out-of-memory",
               "shell-timeout", "solvability-timeout", "stack-overflow", "test-timeout", "time-out-exception",
-              "unsat"]
+              "unsat","loop-head-empty"]
     benckmarks = ["../benchmarks/exceptions/" + f for f in folder]
     for benchmark in benckmarks:
         from utils import file_compress

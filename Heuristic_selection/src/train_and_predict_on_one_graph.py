@@ -5,45 +5,59 @@ from utils import wrapped_generate_horn_graph
 from predict_functions import predict_label
 
 def main():
+    num_layers_list=[2]
+    # benchmark_list=["temp-multiclass-344","temp-multiclass-06",
+    #                 "temp-multiclass-08","temp-multiclass-10","temp-multiclass-13",
+    #                 "temp-multiclass-14","temp-multiclass-15","temp-multiclass-178"]
+    benchmark_list=["temp-multiclass-anu"]
+    for b in benchmark_list:
+        for num_layers in num_layers_list:
+            wrapped_train_and_predict_on_one_graph(b,num_layers)
+
+
+def wrapped_train_and_predict_on_one_graph(benchmark,num_layers):
     parameter_list = []
-    label="node_multiclass"
+    label = "node_multiclass"
     force_read = True
     form_label = True
     file_type = ".smt2"
-    GPU=False
-    use_class_weight=False
+    GPU = False
+    use_class_weight = False
     pickle = True
-    benchmark="temp-multiclass-anu-separated-labels"
-    benchmark_name = benchmark+"/"
-    num_node_target_labels=5# 7
-    hyper_parameters={"nodeFeatureDim":64,"num_layers":8,"regression_hidden_layer_size":[64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64],"threshold":0.5,"max_nodes_per_batch":10000,
-                      "max_epochs":500,"patience":500,"num_node_target_labels":num_node_target_labels}
+    benchmark_name = benchmark + "/"
+    num_node_target_labels = 5  # 7
+    hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers,
+                        "regression_hidden_layer_size": [64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+                                                         64, 64], "threshold": 0.5,
+                        "max_nodes_per_batch": 10000,
+                        "max_epochs": 500, "patience": 500, "num_node_target_labels": num_node_target_labels}
 
     parameter_list.append(
-        parameters(relative_path="../benchmarks/"+benchmark_name,
-                   absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
-                   json_type=".hyperEdgeHornGraph.JSON", label=label,label_field="templateRelevanceLabel"))#templateRelevanceLabel,templateCostLabel
+        parameters(relative_path="../benchmarks/" + benchmark_name,
+                   absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+                   json_type=".hyperEdgeHornGraph.JSON", label=label,
+                   label_field="templateRelevanceLabel"))  # templateRelevanceLabel,templateCostLabel
 
     GPU_switch(GPU)
 
-    trained_model_path=""
+    trained_model_path = ""
     for param in parameter_list:
-        trained_model_path=train_on_graphs(benchmark_name=param.benchmark_name(),
-                        label=param.label, force_read=force_read,
-                        train_n_times=1, path=param.relative_path, file_type=file_type, form_label=form_label,
-                        json_type=param.json_type, GPU=GPU, pickle=pickle,use_class_weight=use_class_weight,label_field=param.label_field,
-                        hyper_parameters=hyper_parameters)
+        trained_model_path = train_on_graphs(benchmark_name=param.benchmark_name(),
+                                             label=param.label, force_read=force_read,
+                                             train_n_times=1, path=param.relative_path, file_type=file_type,
+                                             form_label=form_label,
+                                             json_type=param.json_type, GPU=GPU, pickle=pickle,
+                                             use_class_weight=use_class_weight, label_field=param.label_field,
+                                             hyper_parameters=hyper_parameters)
         tf.keras.backend.clear_session()
 
-
-
-    #fold_number="test"
-    #benchmark_fold = benchmark + "-unsolvable-predicted-" + str(fold_number)  # sys.argv[2]
-    benchmark_fold=benchmark
+    # fold_number="test"
+    # benchmark_fold = benchmark + "-unsolvable-predicted-" + str(fold_number)  # sys.argv[2]
+    benchmark_fold = benchmark
     max_nodes_per_batch = 10000
 
     # /home/cheli243/PycharmProjects/HintsLearning/src/
-    #trained_model_path = "trained_model/GNN_Argument_selection__2021-09-05_16-30-16_best.pkl"
+    # trained_model_path = "trained_model/GNN_Argument_selection__2021-09-05_16-30-16_best.pkl"
     thread_number = 4
     move_file = False
     use_test_threshold = False

@@ -402,8 +402,6 @@ def unzip_file(zip_file):
     else:
         print("zip file "+zip_file+" not existed")
 
-def decode_one_hot(predicted_Y_loaded_model):
-    return [np.argmax(y)  for y in predicted_Y_loaded_model]
 
 
 

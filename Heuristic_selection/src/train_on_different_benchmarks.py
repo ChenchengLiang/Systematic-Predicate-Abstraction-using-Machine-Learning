@@ -32,14 +32,14 @@ def main():
     GPU=False
     use_class_weight=False
     pickle = True
-    benchmark_name = "temp-multiclass-12/"
-    num_node_target_labels=3# 7
+    benchmark_name = "all-LIA-Lin-train/"
+    num_node_target_labels=5
 
     # random.seed(0)
     # np.random.seed(0)
     # tf.random.set_seed(0)
 
-    hyper_parameters={"nodeFeatureDim":64,"num_layers":12,"regression_hidden_layer_size":[64,64,64],"threshold":0.5,"max_nodes_per_batch":10000,
+    hyper_parameters={"nodeFeatureDim":64,"num_layers":2,"regression_hidden_layer_size":[64,64,64,64,64,64,64,64,64],"threshold":0.5,"max_nodes_per_batch":10000,
                       "max_epochs":500,"patience":500,"num_node_target_labels":num_node_target_labels}
 
     for label in label_list:

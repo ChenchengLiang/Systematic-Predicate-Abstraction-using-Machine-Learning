@@ -9,7 +9,7 @@ from Miscellaneous import add_JSON_field,pickleRead,pickleWrite
 from horn_dataset import write_graph_to_pickle, form_GNN_inputs_and_labels,get_test_loss_with_class_weight,compute_loss,HornGraphDataset
 from utils import my_round_fun
 from Miscellaneous import GPU_switch, pickleRead
-from utils import file_compress,unzip_file,decode_one_hot
+from utils import file_compress,unzip_file
 
 def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score_list,graph_type=".layerHornGraph.JSON"):
     # write predicted_argument_score to JSON file
@@ -106,7 +106,7 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
 
         new_field = ["predictedLabel"]
         new_filed_content=[[int(x) for x in transfored_predicted_Y_loaded_model]]
-        print("new_filed_content",new_filed_content)
+        #print("new_filed_content",new_filed_content)
         add_JSON_field(file_name,graph_type,old_field,new_field,new_filed_content)
         old_field=old_field+["predictedLabel"]
         new_field = ["predictedLabelLogit"]
@@ -171,7 +171,7 @@ def write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,la
     return best_set_threshold
 
 def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",label="template_relevance",force_read=True,form_label=True,
-                       json_type=".hyperEdgeHornGraph.JSON",graph_type="hyperEdgeHornGraph",
+                       json_type=".hyperEdgeHornGraph.JSON",graph_type="hyperEdgeHornGraph",verbose=False,
                        gathered_nodes_binary_classification_task=["template_relevance"],hyper_parameter={},
                        set_max_nodes_per_batch=False,file_list=[],num_node_target_labels=2):
 
@@ -211,9 +211,10 @@ def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",labe
     sigmoid_predicted_Y_loaded_model = tf.math.sigmoid(predicted_Y_loaded_model)
     rounded_predicted_Y_loaded_model = my_round_fun(sigmoid_predicted_Y_loaded_model,threshold=0.5, label=label)
     print("label",label)
-    print("predicted_Y_loaded_model",predicted_Y_loaded_model)
-    print("rounded_predicted_Y_loaded_model",rounded_predicted_Y_loaded_model)
-    print("dataset._label_list",dataset._label_list)
+    if verbose==True:
+        print("predicted_Y_loaded_model",predicted_Y_loaded_model)
+        print("rounded_predicted_Y_loaded_model",rounded_predicted_Y_loaded_model)
+        print("dataset._label_list",dataset._label_list)
 
     print("test_metric_string", test_metric_string)
     print("test_metric", test_metric)

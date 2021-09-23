@@ -6,13 +6,14 @@ def main():
     thread_number = 4
     continuous_extracting = True
     move_file = True
-    max_nodes_per_batch = 10000
+    max_nodes_per_batch = 100000
     separateByPredicates=""#-separateByPredicates
     generateTemplates="-generateTemplates"
     abstract="-abstract:empty"
     generateSimplePredicates=""
     noIntervals=""
     out_of_test_set = True
+    timeout= 300* 10 if generateTemplates=="-generateTemplates" else 300*6
     wrapped_generate_horn_graph_params = {"benchmark_fold": benchmark_fold, "max_nodes_per_batch": max_nodes_per_batch,
                                           "separateByPredicates": separateByPredicates,
                                           "abstract": abstract, "move_file": move_file, "thread_number": thread_number,
@@ -32,7 +33,7 @@ def main():
                                                             "onlyInitialPredicates": "", "abstract": abstract,
                                                             "noIntervals": noIntervals,
                                                             "separateByPredicates": separateByPredicates,
-                                                            "solvabilityTimeout": "300", "timeout": 300* 6}
+                                                            "solvabilityTimeout": "300", "timeout": timeout}
     get_solvability_and_measurement_from_eldarica(get_solvability_and_measurement_from_eldarica_params)
 
 main()

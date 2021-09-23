@@ -267,8 +267,8 @@ def main():
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
     # shuffle_data("../benchmarks/LIA-Lin+sv-comp/sv-comp+LIA-Lin-train-with-CEGAR",
     #              "../benchmarks/LIA-Lin+sv-comp/sv-comp+LIA-Lin-train-with-CEGAR-shuffled")
-    divide_data_to_threads("all-LIA-Lin-common-unsolvable-set",
-                           "all-LIA-Lin-common-unsolvable-set-divided",three_fold=True,datafold_list=["train_data"])#datafold_list=["test_data"]
+    divide_data_to_threads("all-LIA-Lin-train-unsolvable-predicted-test",
+                           "all-LIA-Lin-train-unsolvable-predicted-test-divided",three_fold=True,datafold_list=["test_data"],chunk_number=16)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -280,6 +280,7 @@ def main():
     #                           "all-LIA-lin-abstract-relIneqs-solvability","all-LIA-lin-abstract-off-solvability",
     #                           "all-LIA-lin-abstract-comb-solvability"]
     #                                             ,["empty","term","oct","relEqs","relIneqs","off","comb"])
+    #collect_unsolvable_cases(["all-LIA-lin-abstract-empty-solvability"], ["empty"], filed="solvable-file")
 
     #rebuild_exception_file("exception-LIA-Lin+sv-comp-predicted",["solvable-file"])
     # get_generated_horn_graph()
@@ -310,9 +311,9 @@ def main():
     # for i in range(0,17):
     #     for fold in ["train_data","valid_data","test_data"]:
     #         compress_all_file_folder("LIA-Lin+sv-comp/LIA-Lin+sv-comp-divided/thread_"+str(i)+"/"+fold)
-    # for fold in ["train_data"]:
-    #     compress_all_file_folder("all-LIA-Lin-common-unsolvable-set"+"/"+fold)
-    #
+    # for fold in ["test_data","temp"]:
+    #     compress_all_file_folder("all-LIA-Lin-train-unsolvable-predicted-test"+"/"+fold)
+
     # for i in range(0,17):
     #     rename_files_in_benchmarks("LIA-Lin+sv-comp/LIA-Lin+sv-comp-divided/thread_"+str(i))
     #compress_exception("LIA-Lin+sv-comp-train-templates/exceptions")
@@ -322,7 +323,7 @@ def main():
 def compress_exception(benchmark=""):
     folder = ["exceed-max-node", "lia-lin-multiple-predicates-in-body", "no-initial-predicates",
               "no-predicates-selected", "no-simplified-clauses", "other-error", "out-of-memory",
-              "shell-timeout", "solvability-timeout", "stack-overflow", "test-timeout", "time-out-exception", "unsat"]
+              "shell-timeout", "solvability-timeout", "stack-overflow", "test-timeout", "time-out-exception", "unsat","loop-head-empty"]
     benckmarks = ["../benchmarks/"+benchmark+"/" + f for f in folder]
     for b in benckmarks:
         from utils import file_compress
@@ -757,24 +758,23 @@ def clean_extracted_data(benchmark,separated_predicates=False):
                     os.remove(file)
 
 
-def collect_unsolvable_cases(benchmarks=[],abstract_list=[]):
-    filed = "shell-timeout"
+def collect_unsolvable_cases(benchmarks=[],abstract_list=[],filed = "shell-timeout"):
     loaded_jsons=[read_benchmark_exception_json(b) for b in benchmarks]
-    common_timeout_files = set(loaded_jsons[0][filed])
+    common_files = set(loaded_jsons[0][filed])
     for a,j in zip(abstract_list,loaded_jsons):
         print("abstract:",a,len(j[filed]))
         print(j[filed])
-        common_timeout_files=common_timeout_files.intersection(set(j[filed]))
+        common_files=common_files.intersection(set(j[filed]))
 
-    print("common_timeout_files",len(common_timeout_files))
-    print(common_timeout_files)
+    print("common_files",len(common_files))
+    print(common_files)
     try:
-        os.mkdir("../benchmarks/all-LIA-Lin/common-unsolvable-set")
-        os.mkdir("../benchmarks/all-LIA-Lin/common-unsolvable-set/train_data")
+        os.mkdir("../benchmarks/all-LIA-Lin/common-set")
+        os.mkdir("../benchmarks/all-LIA-Lin/common-set/train_data")
     except:
         print("folder existed")
-    for f in common_timeout_files:
-        copy("../benchmarks/all-LIA-Lin/raw/"+f,"../benchmarks/all-LIA-Lin/common-unsolvable-set/train_data")
+    for f in common_files:
+        copy("../benchmarks/all-LIA-Lin/raw/train_data/"+f,"../benchmarks/all-LIA-Lin/common-set/train_data")
 
 
 

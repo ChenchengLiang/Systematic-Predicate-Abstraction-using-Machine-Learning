@@ -214,7 +214,7 @@ object TrainDataGeneratorTemplatesSmt2 {
 
       val loopDetector = new LoopDetector(simplifiedClauses)
       if(loopDetector.loopHeads.isEmpty){
-        HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/no-predicates-selected/"+fileName,"loopHeads is empty")
+        HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/loop-head-empty/"+fileName,"loopHeads is empty")
         sys.exit()
       }
 
@@ -307,7 +307,7 @@ object TrainDataGeneratorTemplatesSmt2 {
           k->ps.filter(getParametersFromVerifHintElement(_)._2<20)
         }).filterNot(_._2.isEmpty))
         if (GlobalParameters.get.debugLog){
-          println("positiveTemplates")
+          println("unitTwoVariableTemplates")
           positiveTemplates.pretyPrintHints()
           println("filteredPositiveTemplates")
           filteredPositiveTemplates.pretyPrintHints()
@@ -322,8 +322,14 @@ object TrainDataGeneratorTemplatesSmt2 {
       }
       //todo: reconstruct labels
       //val unlabeledTemplates=VerificationHints(combinationTemplates.predicateHints.mapValues(x=>x.slice(2,3)++x.slice(8,9)))//2-8,3-10
-      val unlabeledTemplates=VerificationHints(combinationTemplates.predicateHints.mapValues(x=>x.slice(5,6)++x.slice(7,8)++x.slice(9,10)++x.slice(11,12)++x.slice(23,24)++x.slice(27,28)++x.slice(31,32)++x.slice(35,36)))
-      //val unlabeledTemplates=combinationTemplates
+      //val unlabeledTemplates=VerificationHints(combinationTemplates.predicateHints.mapValues(x=>x.slice(5,13)++x.slice(5,13)++x.slice(18,39)))
+      //val unlabeledTemplates=VerificationHints(combinationTemplates.predicateHints.mapValues(x=>x.slice(5,6)++x.slice(7,8)++x.slice(9,10)++x.slice(11,12)++x.slice(23,24)++x.slice(27,28)++x.slice(31,32)++x.slice(35,36)))
+      //val unlabeledTemplates=VerificationHints(combinationTemplates.predicateHints.mapValues(x=>x.slice(0,23)++x.slice(23,24)++x.slice(27,28)++x.slice(31,32)++x.slice(35,36)))
+//      val unlabeledTemplates=VerificationHints(
+//        Map(combinationTemplates.predicateHints.toSeq.head._1->combinationTemplates.predicateHints.toSeq.head._2.slice(5,10)) ++
+//          Map(combinationTemplates.predicateHints.toSeq.tail.head._1->combinationTemplates.predicateHints.toSeq.tail.head._2.slice(5,10)))
+
+      val unlabeledTemplates=combinationTemplates
       val (positiveTemplates,labeledTemplates)=labelTemplates(unlabeledTemplates)
       //val labeledTemplates=randomLabelTemplates(unlabeledTemplates,0.5)
       println("-"*10+"unlabeledTemplates"+"-"*10)
