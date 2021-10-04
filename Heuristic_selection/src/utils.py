@@ -10,6 +10,7 @@ import time
 import seaborn
 from sklearn.metrics import confusion_matrix,multilabel_confusion_matrix
 
+
 def get_solvability_and_measurement_from_eldarica(params):
 
     # -measurePredictedPredicates -varyGeneratedPredicates
@@ -222,6 +223,7 @@ def run_eldarica_with_shell(file_and_param):
         for f in file_list:
             file_compress([f], f + ".zip")
             os.remove(f)
+
 
 def call_Eldarica_one_time(file_name,parameter_list,supplementary_command,runtime_progress):
     print("extracting " + file_name, parameter_list,runtime_progress)

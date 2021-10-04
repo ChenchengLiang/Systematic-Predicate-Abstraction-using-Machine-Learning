@@ -259,11 +259,12 @@ def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",labe
 
         return {"trained_model_path":trained_model_path,"best_set_threshold":best_set_threshold["accuracy"],"best_set_ranks":best_set_ranks["accuracy"],
                 "benchmark_fold":benchmark_fold,"label":label,"hyper_parameter":hyper_parameter,"positive_label_percentage":positive_label_number / len(true_Y),
-                "negative_label_number":negative_label_number / len(true_Y),"dataset":dataset,"predicted_Y_loaded_model":rounded_predicted_Y_loaded_model,"best_threshold":best_set_threshold["threshold"]}
+                "negative_label_number":negative_label_number / len(true_Y),"dataset":dataset,"predicted_Y_loaded_model":predicted_Y_loaded_model,
+                "best_threshold":best_set_threshold["threshold"],"rounded_predicted_Y_loaded_model":rounded_predicted_Y_loaded_model}
     else:
         return {"trained_model_path": trained_model_path,"dataset":dataset,
                 "benchmark_fold": benchmark_fold, "label": label, "hyper_parameter": hyper_parameter,
-                "predicted_Y_loaded_model": rounded_predicted_Y_loaded_model,"best_threshold":0.5}
+                "rounded_predicted_Y_loaded_model":rounded_predicted_Y_loaded_model,"predicted_Y_loaded_model": predicted_Y_loaded_model,"best_threshold":0.5}
 
 
 def predict_label(benchmark,max_nodes_per_batch,benchmark_fold,file_list,trained_model_path,use_test_threshold,label = "template_relevance",
@@ -287,7 +288,7 @@ def predict_label(benchmark,max_nodes_per_batch,benchmark_fold,file_list,trained
     result_dir = wrapped_prediction(trained_model_path=trained_model_path, benchmark=benchmark, benchmark_fold=benchmark_fold, force_read=force_read, form_label=form_label,
                                     json_type=json_type, graph_type=graph_type, gathered_nodes_binary_classification_task=gathered_nodes_binary_classification_task, hyper_parameter=hyper_parameter,label=label,
                                     set_max_nodes_per_batch=True,file_list=file_list,num_node_target_labels=num_node_target_labels)
-    write_predicted_label_to_JSON_file(result_dir["dataset"], result_dir["predicted_Y_loaded_model"], json_type,
+    write_predicted_label_to_JSON_file(result_dir["dataset"], result_dir["rounded_predicted_Y_loaded_model"], json_type,
                                        result_dir["best_threshold"],verbose=verbose,label=label)
     return result_dir["predicted_Y_loaded_model"]
 

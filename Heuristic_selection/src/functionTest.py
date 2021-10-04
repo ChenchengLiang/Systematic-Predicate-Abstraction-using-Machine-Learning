@@ -226,8 +226,8 @@ def _traucate(x, decimals=0): #trauncate
 def decode_one_hot(predicted_Y_loaded_model):
     return [np.argmax(y)  for y in predicted_Y_loaded_model]
 def main():
-    predicted_Y_loaded_model=np.array([100, 100, 100, 100, 100, 100, 7, 100, 100, 3, 100, 100])
-    x=np.where(predicted_Y_loaded_model==3,1,predicted_Y_loaded_model)
+    x = os.path.dirname("../benchmarks/thread_0/train_data/sjsjs.smt2")
+
     print(x)
 
 

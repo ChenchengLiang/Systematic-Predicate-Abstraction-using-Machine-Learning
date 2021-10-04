@@ -148,6 +148,8 @@ def shuffle_data(rootdir, target_folder):
     shuffle files in rootdir to shuffled_files
     '''
     file_list = glob.glob(rootdir + "/*.smt2")
+    if len(file_list)==0:
+        file_list = glob.glob(rootdir + "/*.smt2.zip")
     print("total file ", len(file_list))
     random.shuffle(file_list)
     random.shuffle(file_list)
@@ -160,12 +162,16 @@ def shuffle_data(rootdir, target_folder):
     except:
         print("../benchmarks/" + target_folder + " existed")
     for file, fold_name in zip([train_files, valid_files, test_files], ["train_data", "valid_data", "test_data"]):
-        os.mkdir("../benchmarks/" + target_folder + "/" + fold_name)
+        try:
+            os.mkdir("../benchmarks/" + target_folder + "/" + fold_name)
+        except:
+            print("../benchmarks/" + target_folder + "/" + fold_name,"existed")
         print(fold_name + "_files", len(file))
         final_target_folder = os.path.join("../benchmarks/" + target_folder + "/", fold_name)
         for f in file:
             #copy(f, final_target_folder)
-            copy_relative_files(f, final_target_folder)
+            print(f[:-len(".zip")])
+            copy_relative_files(f[:-len(".zip")], final_target_folder)
     # os.mkdir(os.path.join("../benchmarks/"+target_folder+"/", "test_data_simple_generator"))
     # for file in test_files:
     #     copy(file, os.path.join("../benchmarks/"+target_folder+"/", "test_data_simple_generator"))
@@ -265,10 +271,10 @@ def main():
 
     # extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
-    # shuffle_data("../benchmarks/LIA-Lin+sv-comp/sv-comp+LIA-Lin-train-with-CEGAR",
-    #              "../benchmarks/LIA-Lin+sv-comp/sv-comp+LIA-Lin-train-with-CEGAR-shuffled")
-    divide_data_to_threads("all-LIA-Lin-train-unsolvable-predicted-test",
-                           "all-LIA-Lin-train-unsolvable-predicted-test-divided",three_fold=True,datafold_list=["test_data"],chunk_number=16)#datafold_list=["test_data"]
+    # shuffle_data("../benchmarks/Linear-dataset/Linear-dataset-train",
+    #              "../benchmarks/Linear-dataset/Linear-dataset-train-shuffled")
+    # divide_data_to_threads("Linear-dataset-train-unsolvable-predicted-test",
+    #                        "Linear-dataset-train-unsolvable-predicted-test/test_data-divided",three_fold=True,datafold_list=["test_data"],chunk_number=17)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -289,7 +295,7 @@ def main():
     #clean_extracted_data("LIA-Lin+sv-comp-template-unsolvable-horn-graph/test_data")
 
     #align_extracted_data(benchmark="LIA-Lin+sv-comp",folder_name="sv-comp+LIA-Lin-train-with-CEGAR")
-    #get_k_fold_train_data(benchmark="LIA-Lin+sv-comp",folder_name="LIA-Lin+sv-comp-train-templates")
+    get_k_fold_train_data(benchmark="Linear-dataset",folder_name="Linear-dataset-extracted")
     # collect_unsolvable_data(horn_graph_folder="all-LIA-Lin/extractable-horn-hraph"
     #                         ,unsolvable_folder="exception-all-LIA-Lin-full-label-with-CEGAR/shell-timeout",
     #                         target_file="all-LIA-Lin-train-fixed-size-unsolvable-predicted")
@@ -311,8 +317,14 @@ def main():
     # for i in range(0,17):
     #     for fold in ["train_data","valid_data","test_data"]:
     #         compress_all_file_folder("LIA-Lin+sv-comp/LIA-Lin+sv-comp-divided/thread_"+str(i)+"/"+fold)
-    # for fold in ["test_data","temp"]:
-    #     compress_all_file_folder("all-LIA-Lin-train-unsolvable-predicted-test"+"/"+fold)
+
+    # for i in range(0,17):
+    #     for fold in ["train_data"]:
+    #         unzip_all_file_folder("all-LIA-Lin-train-unsolvable-predicted-measurement-2/temp-1-divided/thread_"+str(i)+"/"+fold)
+
+    # for fold in ["train_data"]:
+    #     compress_all_file_folder("all-LIA-Lin-train-unsolvable-predicted-measurement-2/temp-1"+"/"+fold)
+
 
     # for i in range(0,17):
     #     rename_files_in_benchmarks("LIA-Lin+sv-comp/LIA-Lin+sv-comp-divided/thread_"+str(i))
@@ -356,6 +368,13 @@ def compress_all_file_folder(benchmark=""):
     from utils import file_compress
     for f in glob.glob("../benchmarks/"+benchmark+"/*"):
         file_compress([f],f+".zip")
+        os.remove(f)
+
+def unzip_all_file_folder(benchmark=""):
+    import zipfile
+    for f in glob.glob("../benchmarks/"+benchmark+"/*"):
+        with zipfile.ZipFile(f, 'r') as zip_ref:
+            zip_ref.extractall(os.path.join("../benchmarks/",benchmark))
         os.remove(f)
 
 def separate_unsolvable_horn_graphs(benchmarks="",folder="",trunck_number=5,train_folder=""):

@@ -32,7 +32,7 @@ def main():
     GPU=False
     use_class_weight=False
     pickle = True
-    benchmark_name = "all-LIA-Lin-train/"
+    benchmark_name = "Linear-dataset-train/"
     num_node_target_labels=5
 
     # random.seed(0)

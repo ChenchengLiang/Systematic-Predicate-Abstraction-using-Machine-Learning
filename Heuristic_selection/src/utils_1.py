@@ -6,6 +6,36 @@ import glob
 import os
 import time
 
+
+def get_solvability_log(data_fold, command_input):
+    solvability_dict = {}
+    benchmark_name = os.path.join("../benchmarks/", command_input)
+    solvable_file_list = []
+    for fold in data_fold:
+        solvable_file_list = solvable_file_list + glob.glob(benchmark_name + "/" + fold + "/*.smt2.zip")
+    solvable_file_list = [os.path.basename(f) for f in solvable_file_list]
+    solvability_dict["solvable-file"] = solvable_file_list
+    folder_name_list, file_list = get_exceptions_folder_names()
+    for folder_name, files in zip(folder_name_list, file_list):
+        solvability_dict[folder_name] = files
+
+    solvability_dict_with_number = {"number-of-" + k: len(solvability_dict[k]) for k in solvability_dict}
+    solvability_dict_with_number.update(solvability_dict)
+    with open('../benchmarks/exceptions/benchmark_info_' + command_input + '.JSON', 'w') as f:
+        json.dump(solvability_dict_with_number, f, indent=4)
+
+
+def get_exceptions_folder_names():
+    folder_name_list = []
+    file_list = []
+    benchmark_name_excepiton = os.path.join("../benchmarks/", "exceptions")
+    for root, subdirs, files in os.walk(benchmark_name_excepiton):
+        if len(subdirs) == 0:
+            folder_name_list.append(root[root.rfind("/") + 1:])
+            file_list.append(files)
+    return folder_name_list, file_list
+
+
 def get_solvability_and_measurement_from_eldarica(params):
 
     # -measurePredictedPredicates -varyGeneratedPredicates
@@ -170,6 +200,66 @@ def run_eldarica_with_shell(file_and_param):
     if used_time>timeout and os.path.exists(file) and (not os.path.exists(file+"circles.gv")) and move_file==True:
         os.rename(file,"../benchmarks/exceptions/shell-timeout/"+file_name)
         print("extracting " + file_name + " failed due to time out, move file to shell-timeout")
+
+    # compress files
+    if os.path.exists(file):
+        file_list = glob.glob(file + "*")
+        for f in file_list:
+            file_compress([f], f + ".zip")
+            os.remove(f)
+
+
+
+def run_eldarica_with_shell_get_solvability(file_and_param):
+    move_file= (lambda : file_and_param[3] if len(file_and_param)>3 else True)()
+    runtime = (lambda: file_and_param[4] if len(file_and_param) > 4 else 1)()
+    file = file_and_param[0]
+    file_dir_name=os.path.dirname(file)
+    for f in glob.glob(file+"*"):
+        unzip_file(f)
+        os.remove(f)
+    eldarica = "../eldarica-graph-generation/eld "
+    # file = "../benchmarks/ulimit-test/Problem19_label06_true-unreach-call.c.flat_000.smt2"
+    file_name = file[file.rfind("/") + 1:]
+    # parameter_list = file_and_param[1]
+    # print("parameter_list",parameter_list)
+    solvability_params_fold=["full","empty","predicted","random","term","oct","relEqs","relIneqs"]
+    solvability_str={}
+    for fold in solvability_params_fold:
+        if fold in ["empty","term","oct","relEqs","relIneqs"]:
+            parameter_list=" -abstract:"+fold
+        elif fold in ["full"]:
+            parameter_list = " -abstract:empty -generateTemplates"
+        elif fold in ["random"]:
+            parameter_list = " -abstract:empty -generateTemplates -rdm"
+        elif fold in ["predicted"]:
+            parameter_list = " -abstract:empty -generateTemplates -readTemplates"
+
+        timeout=file_and_param[2]
+        shell_file_name = "run-ulimit" + "-" + file_name + ".sh"
+        timeout_command = "timeout "+str(timeout)
+        f = open(shell_file_name, "w")
+        f.write("#!/bin/sh\n")
+        f.write(timeout_command + " " + eldarica + " " + file + " " + parameter_list + "\n")
+        f.close()
+        supplementary_command = ["sh", shell_file_name]
+        used_time=0
+        for i in range(runtime):
+            if os.path.exists(file): #not moved by Eldarica
+                used_time=used_time+call_Eldarica_one_time(file_name,parameter_list,supplementary_command,str(i+1)+"/"+str(runtime))
+        used_time=used_time/runtime
+        # subprocess.call(supplementary_command)
+        os.remove(shell_file_name)
+
+        solvability_str["solveTime"+fold+"InitialPredicates"]=used_time
+        if used_time>timeout:
+            solvability_str["solvability"+fold+"InitialPredicates"]="false"
+        else:
+            solvability_str["solvability"+fold+"InitialPredicates"] = "true"
+
+
+    with open(file_dir_name+'/'+ file_name + '.solvability.JSON', 'w') as f:
+        json.dump(solvability_str, f, indent=4)
 
     # compress files
     if os.path.exists(file):

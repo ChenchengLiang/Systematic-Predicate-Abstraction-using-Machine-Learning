@@ -1,5 +1,5 @@
 import os
-from utils_1 import run_eldarica_with_shell,run_eldarica_with_shell_pool
+from utils_1 import run_eldarica_with_shell,run_eldarica_with_shell_pool,get_exceptions_folder_names,get_solvability_log
 import sys
 import json
 import glob
@@ -36,33 +36,18 @@ def main():
     else:
         benchmark_name = os.path.join("../benchmarks/", command_input)
         thread_number = 4  # 16
-        timeout = 300#3600
-        runtime=3
+        timeout = 900
+        runtime=1
         #eldarica_parameters = " -moveFile -abstract:off -noIntervals -generateSimplePredicates"#-onlyInitialPredicates -generateSimplePredicates
         #eldarica_parameters = " -moveFile -abstract:empty -generateTemplates -readTemplates" #-generateTemplates  -rdm
-        eldarica_parameters = " -moveFile -abstract:empty "  # -abstract:term -generateTemplates  -rdm
+        eldarica_parameters = " -moveFile -abstract:off "  # -abstract:term -generateTemplates  -rdm
         data_fold=["train_data","valid_data","test_data"]
         for fold in data_fold:
             run_eldarica_with_shell_pool(os.path.join(benchmark_name, fold), run_eldarica_with_shell, eldarica_parameters,
                                          timeout=timeout, thread=thread_number,runtime=runtime)
 
         # get sovability file logs
-        solvability_dict={}
-        benchmark_name=os.path.join("../benchmarks/",  command_input)
-        solvable_file_list=[]
-        for fold in data_fold:
-            solvable_file_list=solvable_file_list+glob.glob(benchmark_name + "/"+fold+"/*.smt2.zip")
-        solvable_file_list=[os.path.basename(f) for f in solvable_file_list]
-        solvability_dict["solvable-file"] = solvable_file_list
-        folder_name_list,file_list=get_exceptions_folder_names()
-        for folder_name,files in zip(folder_name_list,file_list):
-            solvability_dict[folder_name]=files
-
-        solvability_dict_with_number={ "number-of-"+k:len(solvability_dict[k]) for k in solvability_dict}
-        solvability_dict_with_number.update(solvability_dict)
-        with open('../benchmarks/exceptions/benchmark_info_'+command_input+'.JSON', 'w') as f:
-            json.dump(solvability_dict_with_number,f,indent=4)
-
+        get_solvability_log(data_fold,command_input)
 
 def compress_files_in_exceptions():
     print("compressing ...")
@@ -76,16 +61,6 @@ def compress_files_in_exceptions():
         for f in glob.glob("../benchmarks/" + benchmark + "/*"):
             file_compress([f], f + ".zip")
             os.remove(f)
-
-def get_exceptions_folder_names():
-    folder_name_list=[]
-    file_list=[]
-    benchmark_name_excepiton = os.path.join("../benchmarks/", "exceptions")
-    for root, subdirs, files in os.walk(benchmark_name_excepiton):
-        if len(subdirs) == 0:
-            folder_name_list.append(root[root.rfind("/") + 1:])
-            file_list.append(files)
-    return folder_name_list,file_list
 
 
 

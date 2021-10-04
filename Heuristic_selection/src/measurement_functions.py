@@ -51,9 +51,10 @@ def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False,time_u
     first_obj_str.pop("file_name")
     for i, k in enumerate(first_obj_str):
         int_field_map[i] = k
-
-    measurement_count_map = {"measurementWithTrueLabel": 0, "measurementWithFullLabel": 0,
-                             "measurementWithEmptyLabel": 0, "measurementWithPredictedLabel": 0}
+    measurement_fold = ["true", "full", "empty", "predicted", "random","term", "oct", "relEqs", "relIneqs"]
+    measurement_count_map = {("measurementWith" + x + "Label"):0 for x in measurement_fold}
+    # measurement_count_map = {"measurementWithtrueLabel": 0, "measurementWithfullLabel": 0,
+    #                          "measurementWithemptyLabel": 0, "measurementWithpredictedLabel": 0,}
     measurement_name_list=["timeConsumptionForCEGAR","itearationNumber","generatedPredicateNumber",
                      "averagePredicateSize","predicateGeneratorTime"]
     measurement_best_count_map = {x:measurement_count_map.copy() for x in measurement_name_list}
@@ -66,14 +67,14 @@ def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False,time_u
             measurementStr = json_obj[field].replace('\'', '\"')
             #print(field, "\t", json_obj[field])
             measurementDir = json.loads(measurementStr)
-            for fild_name in measurement_name_list:
-                measurement_list_map[fild_name].append(measurementDir[fild_name])
+            for field_name in measurement_name_list:
+                measurement_list_map[field_name].append(measurementDir[field_name])
 
-        for fild_name in measurement_name_list:
-            measurement_list_all_files_map[fild_name].append(measurement_list_map[fild_name])
+        for field_name in measurement_name_list:
+            measurement_list_all_files_map[field_name].append(measurement_list_map[field_name])
 
-        for fild_name in measurement_name_list:
-            get_best_measurement(int_field_map, measurement_list_map[fild_name], measurement_best_count_map[fild_name])
+        for field_name in measurement_name_list:
+            get_best_measurement(int_field_map, measurement_list_map[field_name], measurement_best_count_map[field_name],field_name=field_name)
 
     print("------------")
     scatter_plot_range = [0,max(list(map(np.float,flattenList(measurement_list_all_files_map["timeConsumptionForCEGAR"]))))/1000]#scatter_plot_range
@@ -86,11 +87,17 @@ def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False,time_u
 
     for fild_name in extended_measurement_name_list:
         temp_scatter_plot_range=(lambda : [0,scatter_plot_range[1]*100] if fild_name.find("_ms")>0 else scatter_plot_range)()
-        measurement_scatter(measurement_list_all_files_map[fild_name], temp_scatter_plot_range,
-                            plot_name=fild_name + "-full_label", index=[1, 3])
-        measurement_scatter(measurement_list_all_files_map[fild_name], temp_scatter_plot_range,
-                            plot_name=fild_name + "-empty_label", index=[2, 3],
-                            x_label="empty label")
+        for plot_fold in ["full", "empty", "random","term", "oct", "relEqs", "relIneqs"]:
+            measurement_scatter(measurement_list_all_files_map[fild_name], temp_scatter_plot_range,
+                                plot_name=fild_name + "-"+plot_fold+"_label",
+                                index=[measurement_fold.index(plot_fold), measurement_fold.index("predicted")],
+                                x_label=plot_fold+" label")
+        # measurement_scatter(measurement_list_all_files_map[fild_name], temp_scatter_plot_range,
+        #                     plot_name=fild_name + "-full_label", index=[measurement_fold.index("full"), measurement_fold.index("predicted")],
+        #                     x_label="full label")
+        # measurement_scatter(measurement_list_all_files_map[fild_name], temp_scatter_plot_range,
+        #                     plot_name=fild_name + "-empty_label", index=[measurement_fold.index("full"), measurement_fold.index("predicted")],
+        #                     x_label="empty label")
 
     if out_of_test_set==True:
         for fild_name in measurement_name_list:
@@ -110,7 +117,7 @@ def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False,time_u
             temp_scatter_plot_range = (
                 lambda: [0, scatter_plot_range[1] * 100] if fild_name.find("_ms") > 0 else scatter_plot_range)()
             measurement_scatter(measurement_list_all_files_map[fild_name], temp_scatter_plot_range,
-                                plot_name=fild_name+"-true_label", index=[0, 3],
+                                plot_name=fild_name+"-true_label", index=[measurement_fold.index("true"), measurement_fold.index("predicted")],
                                 x_label="true label")
 
 
@@ -134,11 +141,14 @@ def merge_measurementWithTrueLabel_and_measurementWithEmptyLabel(dir):
     del (dir["measurementWithTrueLabel"])
 
 
-def get_best_measurement(int_field_map,measurement_list,best_measurement_count):
+def get_best_measurement(int_field_map,measurement_list,best_measurement_count,field_name=""):
     #todo:receive different measurement function min, max ...
+    measurement_list=[float(x) for x in measurement_list]
     best_measurement_value = min(measurement_list)
     best_measurement_value_index_list=[int_field_map[i] if best_measurement_value==v else None for i,v in enumerate(measurement_list)]
     best_measurement_value_index_list = list(filter(None, best_measurement_value_index_list))
+    if len(best_measurement_value_index_list)>1 and field_name=="timeConsumptionForCEGAR":
+        print("more than one option have the same consumed time",field_name,best_measurement_value_index_list,measurement_list)
     for best_measurement in best_measurement_value_index_list:
         best_measurement_count[best_measurement] = best_measurement_count[best_measurement] + 1/len(best_measurement_value_index_list)
 

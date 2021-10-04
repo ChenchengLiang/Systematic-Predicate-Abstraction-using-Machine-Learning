@@ -7,7 +7,7 @@ import psutil
 import random
 from shutil import copy
 import sys
-from utils import run_eldarica_with_shell,run_eldarica_with_shell_pool
+from utils_1 import run_eldarica_with_shell,run_eldarica_with_shell_pool,get_exceptions_folder_names,get_solvability_log
 
 def separate_sat_unsat_dataset(file):
     print(file)
@@ -106,16 +106,19 @@ def main():
 
 
     # extract data by shell
-    benchmark_name = os.path.join("../benchmarks/",sys.argv[1])#sys.argv[1]
+    data_fold=["train_data","test_data","valid_data"]
+    command_input=sys.argv[1]
+    benchmark_name = os.path.join("../benchmarks/",command_input)#sys.argv[1]
     thread_number=4 #16
-    timeout=400
+    timeout=1000
     #not use -abstract:all but try them separately
-    eldarica_parameters="-moveFile -extractTemplates -abstract:empty -getHornGraph:hyperEdgeGraph -solvabilityTimeout:300 -mainTimeout:300 -t:400"#-abstract:all
+    eldarica_parameters="-moveFile -extractTemplates -abstract:empty -getHornGraph:hyperEdgeGraph -solvabilityTimeout:900 -mainTimeout:900 -t:900"#-abstract:all
     #-onlyInitialPredicates -noIntervals -separateByPredicates  -generateTemplates
     #eldarica_parameters = "-moveFile -generateSimplePredicates -separateByPredicates -extractPredicates -noIntervals -labelSimpleGeneratedPredicates -getHornGraph:hyperEdgeGraph  -abstract:off -solvabilityTimeout:3600 -mainTimeout:3600 -t:4000"
-    run_eldarica_with_shell_pool(os.path.join(benchmark_name,"train_data"), run_eldarica_with_shell, eldarica_parameters,timeout=timeout,thread=thread_number)
-    run_eldarica_with_shell_pool(os.path.join(benchmark_name, "valid_data"), run_eldarica_with_shell,eldarica_parameters,timeout=timeout,thread=thread_number)
-    run_eldarica_with_shell_pool(os.path.join(benchmark_name, "test_data"), run_eldarica_with_shell,eldarica_parameters,timeout=timeout,thread=thread_number)
+    for df in data_fold:
+        run_eldarica_with_shell_pool(os.path.join(benchmark_name,df), run_eldarica_with_shell, eldarica_parameters,timeout=timeout,thread=thread_number)
+
+    get_solvability_log(data_fold, command_input)
 
 main()
 

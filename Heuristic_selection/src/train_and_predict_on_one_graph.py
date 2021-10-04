@@ -5,8 +5,8 @@ from utils import wrapped_generate_horn_graph
 from predict_functions import predict_label
 
 def main():
-    num_layers_list=[2]
-    # benchmark_list=["temp-multiclass-344","temp-multiclass-06",
+    num_layers_list=[8]
+    # benchmark_list=["temp-multiclass-anu","temp-multiclass-344","temp-multiclass-06",
     #                 "temp-multiclass-08","temp-multiclass-10","temp-multiclass-13",
     #                 "temp-multiclass-14","temp-multiclass-15","temp-multiclass-178"]
     benchmark_list=["temp-multiclass-anu"]
@@ -25,12 +25,11 @@ def wrapped_train_and_predict_on_one_graph(benchmark,num_layers):
     use_class_weight = False
     pickle = True
     benchmark_name = benchmark + "/"
-    num_node_target_labels = 5  # 7
+    num_node_target_labels = 5
     hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers,
-                        "regression_hidden_layer_size": [64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-                                                         64, 64], "threshold": 0.5,
+                        "regression_hidden_layer_size": [64,64,64,64,64,64,64,64,64], "threshold": 0.5,
                         "max_nodes_per_batch": 10000,
-                        "max_epochs": 500, "patience": 500, "num_node_target_labels": num_node_target_labels}
+                        "max_epochs": 5, "patience": 5, "num_node_target_labels": num_node_target_labels}
 
     parameter_list.append(
         parameters(relative_path="../benchmarks/" + benchmark_name,

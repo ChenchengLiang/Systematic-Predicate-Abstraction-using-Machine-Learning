@@ -6,7 +6,7 @@ import tf2_gnn
 from tf2_gnn.data import DataFold, HornGraphSample, HornGraphDataset
 from horn_dataset import write_graph_to_pickle, form_GNN_inputs_and_labels
 from tf2_gnn.cli_utils.training_utils import train, log_line, make_run_id
-from tf2_gnn.models import InvariantArgumentSelectionTask, InvariantNodeIdentifyTask
+from tf2_gnn.models import InvariantArgumentSelectionTask, InvariantNodeIdentifyTask,InvariantNodeMultiClassTask
 import os
 from predict_functions import my_round_fun,write_predicted_label_to_JSON_file,predict_label
 from Miscellaneous import pickleRead,pickleWrite,GPU_switch
@@ -19,19 +19,18 @@ import tensorflow as tf
 from tensorflow.keras import mixed_precision
 import gc
 def main():
-    fold=[4]#[0,1,2,3,4]
+    fold=[0,1,2,3,4]#[0,1,2,3,4]
     #different_num_layers_training()
     #clean_k_fold_test_data(benchmark="chc-comp-LIA-Lin-2021-extract")
-    #k_fold_training(benchmark="LIA-Lin+sv-comp-train-templates",fold=fold)
-    k_fold_data_collection(benchmark="LIA-Lin+sv-comp-train-templates",
-                           separateByPredicates="",fold=5)#-separateByPredicates
+    #k_fold_training(benchmark="Linear-dataset-extracted",fold=fold)
+    k_fold_data_collection(benchmark="Linear-dataset-extracted",separateByPredicates="",fold=len(fold))#-separateByPredicates
 
 
 def k_fold_training(benchmark="chc-comp21-benchmarks-main-all-extract",fold=[0]):
     # description: train in 5 fold
     #end_to_end_training(benchmark=benchmark + "-" + str(4) + "-fold")
     for i in fold:
-        end_to_end_training(benchmark=benchmark + "-" + str(i) + "-fold")
+        end_to_end_training(benchmark=benchmark + "-" + str(i) + "-fold",num_layers=2)
         gc.collect()
         tf.keras.backend.clear_session()
 
@@ -42,8 +41,6 @@ def clean_k_fold_test_data(benchmark="chc-comp-LIA-Lin-2021-extract",fold=5):
             file_list = glob.glob("../benchmarks/" + benchmark + "-" + str(i) + "-fold/test_data/*.smt2" + file_type)
             for f in file_list:
                 os.remove(f)
-
-
 
 
 def k_fold_data_collection(benchmark="chc-comp21-benchmarks-main-all-extract",separateByPredicates="",fold=5):
@@ -77,13 +74,13 @@ def k_fold_data_collection(benchmark="chc-comp21-benchmarks-main-all-extract",se
     filtered_file_list, file_list_with_horn_graph, file_list = wrapped_generate_horn_graph(wrapped_generate_horn_graph_params)
     out_of_test_set = False
     # description: read solvability results
-    json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
-    three_fild_name = ["empty", "predicted", "full"]
-    solvability_name_fold = (lambda: three_fild_name if out_of_test_set == True else three_fild_name + ["true"])()
-    solvability_json_name_fold = ["solvability" + x + "InitialPredicates" for x in solvability_name_fold]
-    for name_fold in solvability_json_name_fold:
-        solvability = [1 if s[name_fold] == "true" else 0 for s in json_solvability_obj_list]
-        print(name_fold, str(sum(solvability)) + "/" + str(len(json_solvability_obj_list)))
+    # json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
+    # three_fild_name = ["empty", "predicted", "full"]
+    # solvability_name_fold = (lambda: three_fild_name if out_of_test_set == True else three_fild_name + ["true"])()
+    # solvability_json_name_fold = ["solvability" + x + "InitialPredicates" for x in solvability_name_fold]
+    # for name_fold in solvability_json_name_fold:
+    #     solvability = [1 if s[name_fold] == "true" else 0 for s in json_solvability_obj_list]
+    #     print(name_fold, str(sum(solvability)) + "/" + str(len(json_solvability_obj_list)))
     # description: read measurement JSON file
     scatter_plot_range = [0, 120]
     json_obj_list = read_measurement_from_JSON(filtered_file_list, measurement=".measurement.JSON")
@@ -102,7 +99,7 @@ def k_fold_data_collection(benchmark="chc-comp21-benchmarks-main-all-extract",se
 
 
 def different_num_layers_training():
-    for num_layers in [8]:#1,2,4,8,16,32,64,128
+    for num_layers in [2]:#1,2,4,8,16,32,64,128
         end_to_end_training(num_layers)
         gc.collect()
         tf.keras.backend.clear_session()
@@ -113,8 +110,8 @@ def end_to_end_training(num_layers=8,benchmark=""):
     gc.collect()
     # description: set hyper-parameters
     params = {"benchmark": benchmark,#lia-lin-extract, mixed-three-fold-single-example
-              "label": "template_relevance",
-              "num_node_target_labels":2, #7
+              "label": "node_multiclass",
+              "num_node_target_labels":5, #7
               "force_read": True,
               "file_type": ".smt2",
               "graph_type": "hyperEdgeHornGraph",
@@ -124,7 +121,7 @@ def end_to_end_training(num_layers=8,benchmark=""):
               "train_quiet": False,
               "test_quiet": False,
               "max_epochs": 500,
-              "patience": 100,
+              "patience": 500,
               "max_nodes_per_batch": 10000,
               "separateByPredicates":"",#-separateByPredicates
               "generateTemplates":"-generateTemplates",
@@ -132,13 +129,14 @@ def end_to_end_training(num_layers=8,benchmark=""):
               "threshold": 0.5,
               "verbose":False,
               "use_class_weight":False,
+              "label_field":"templateRelevanceLabel",
               "gathered_nodes_binary_classification_task": ["predicate_occurrence_in_SCG",
                                                             "argument_lower_bound_existence",
                                                             "argument_upper_bound_existence",
                                                             "argument_occurrence_binary",
                                                             "template_relevance",
                                                             "clause_occurrence_in_counter_examples_binary"]}
-    hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers, "regression_hidden_layer_size": [64],"threshold": params["threshold"]}
+    hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers, "regression_hidden_layer_size": [64,64,64,64,64,64,64,64,64],"threshold": params["threshold"]}
 
     #description: generate horn graph if there is no horn graph file in test set
     wrapped_generate_horn_graph_params = {"benchmark_fold": params["benchmark"],
@@ -162,7 +160,7 @@ def end_to_end_training(num_layers=8,benchmark=""):
     # #predicted_Y, dataset =predict_unseen_set(params, trained_model_path, file_list=filtered_file_list, set_max_nodes_per_batch=True)
     # write_predicted_label_to_JSON_file(dataset, predicted_Y, "."+params["graph_type"]+".JSON", params["threshold"],verbose=params["verbose"])
     predicted_Y=predict_label(benchmark, 10000, benchmark, filtered_file_list, trained_model_path, use_test_threshold=False,
-                  separateByPredicates=params["separateByPredicates"],verbose=params["verbose"])  # file_list
+                  separateByPredicates=params["separateByPredicates"],verbose=params["verbose"],label=params["label"],num_node_target_labels=params["num_node_target_labels"])  # file_list
     #description: draw train-predict diagrams
     draw_train_predict_plots(params, dataset, test_data, predicted_Y, train_loss_list, valid_loss_list,best_valid_epoch, hyper_parameters)
 
@@ -173,7 +171,7 @@ def end_to_end_training(num_layers=8,benchmark=""):
                                                             "thread_number": 4,
                                                                 "continuous_extracting": True,
                                                             "move_file": False,
-                                                            "checkSolvability": "-checkSolvability",
+                                                            "checkSolvability": "",
                                                             "generateTemplates": params["generateTemplates"],
                                                             "measurePredictedPredicates": "-measurePredictedPredicates",
                                                             "onlyInitialPredicates": "", "abstract": params["abstract"],
@@ -186,28 +184,28 @@ def end_to_end_training(num_layers=8,benchmark=""):
 
     out_of_test_set = False
     # description: read solvability results
-    json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
-
-    three_fild_name = ["empty", "predicted", "full"]
-    solvability_name_fold = (lambda: three_fild_name if out_of_test_set == True else three_fild_name + ["true"])()
-    solvability_json_name_fold = ["solvability" + x + "InitialPredicates" for x in solvability_name_fold]
-    for name_fold in solvability_json_name_fold:
-        solvability = [1 if s[name_fold] == "true" else 0 for s in json_solvability_obj_list]
-        print(name_fold, str(sum(solvability)) + "/" + str(len(json_solvability_obj_list)))
+    # json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
+    #
+    # three_fild_name = ["empty", "predicted", "full"]
+    # solvability_name_fold = (lambda: three_fild_name if out_of_test_set == True else three_fild_name + ["true"])()
+    # solvability_json_name_fold = ["solvability" + x + "InitialPredicates" for x in solvability_name_fold]
+    # for name_fold in solvability_json_name_fold:
+    #     solvability = [1 if s[name_fold] == "true" else 0 for s in json_solvability_obj_list]
+    #     print(name_fold, str(sum(solvability)) + "/" + str(len(json_solvability_obj_list)))
 
     # description: read measurement JSON file
-    scatter_plot_range = [0, 120]
-    json_obj_list = read_measurement_from_JSON(filtered_file_list,measurement=".measurement.JSON")
-
-    get_analysis_for_predicted_labels(json_obj_list, out_of_test_set=out_of_test_set, time_unit=1000,
-                                      scatter_plot_range=scatter_plot_range)
-    print("solvable file by predicted label:" + str(len(json_obj_list)) + "/" + str(len(filtered_file_list)))
-
-    # description: print results
-    print("-" * 10)
-    print(file_list_with_horn_graph)
-    print("max_nodes_per_batch", params["max_nodes_per_batch"])
-    print("filtered_file_list by max_nodes_per_batch:" + str(len(filtered_file_list)) + "/" + str(len(file_list)))
+    # scatter_plot_range = [0, 120]
+    # json_obj_list = read_measurement_from_JSON(filtered_file_list,measurement=".measurement.JSON")
+    #
+    # get_analysis_for_predicted_labels(json_obj_list, out_of_test_set=out_of_test_set, time_unit=1000,
+    #                                   scatter_plot_range=scatter_plot_range)
+    # print("solvable file by predicted label:" + str(len(json_obj_list)) + "/" + str(len(filtered_file_list)))
+    #
+    # # description: print results
+    # print("-" * 10)
+    # print(file_list_with_horn_graph)
+    # print("max_nodes_per_batch", params["max_nodes_per_batch"])
+    # print("filtered_file_list by max_nodes_per_batch:" + str(len(filtered_file_list)) + "/" + str(len(file_list)))
 
     # description: statistic data
     #get_statistic_data(filtered_file_list, params["benchmark"])
@@ -304,6 +302,7 @@ def read_data_and_train(params, hyper_parameters):
     parameters["GPU"]=params["GPU"]
     parameters["pickle"]=params["pickle"]
     parameters["num_node_target_labels"]=params["num_node_target_labels"]
+    parameters["label_field"]=params["label_field"]
     these_hypers: Dict[str, Any] = {
         "optimizer": "Adam",  # One of "SGD", "RMSProp", "Adam"
         "learning_rate": 0.001,#0.001
@@ -323,17 +322,21 @@ def read_data_and_train(params, hyper_parameters):
     # description: read dataset
     dataset = HornGraphDataset(parameters)
     if params["force_read"] == True:
-        write_graph_to_pickle(benchmark=params["benchmark"], data_fold=["train", "valid", "test"],
-                              label=params["label"], path="../benchmarks/" + params["benchmark"] + "/",
-                              file_type=params["file_type"],
-                              max_nodes_per_batch=parameters['max_nodes_per_batch'], graph_type=params["graph_type"])
+        params_for_write_graph_to_pickle={"benchmark":params["benchmark"],"data_fold":["train", "valid", "test"],
+                                          "label":params["label"],"path":"../benchmarks/" + params["benchmark"] + "/",
+                                          "file_type":params["file_type"],"max_nodes_per_batch":parameters['max_nodes_per_batch'],
+                                          "graph_type":params["graph_type"],"file_list":[],"vocabulary_name":"","label_field":params["label_field"]}
+        write_graph_to_pickle(params_for_write_graph_to_pickle)
     else:
         print("Use pickle data for training")
     if params["form_label"] == True:
-        form_GNN_inputs_and_labels(label=params["label"], datafold=["train", "valid", "test"],
-                                   benchmark=params["benchmark"],
-                                   graph_type=params["graph_type"],
-                                   gathered_nodes_binary_classification_task=gathered_nodes_binary_classification_task,use_class_weight=params["use_class_weight"])
+        params_for_form_GNN_inputs_and_labels = {"label": params["label"], "datafold": ["train", "valid", "test"],
+                                                 "benchmark": params["benchmark"],
+                                                 "graph_type": params["graph_type"],
+                                                 "gathered_nodes_binary_classification_task": gathered_nodes_binary_classification_task,
+                                                 "use_class_weight": params["use_class_weight"],
+                                                 "num_node_target_labels": params["num_node_target_labels"]}
+        form_GNN_inputs_and_labels(params_for_form_GNN_inputs_and_labels)
     else:
         print("Use label in pickle data for training")
 
@@ -351,6 +354,8 @@ def read_data_and_train(params, hyper_parameters):
     if params["label"] in ["argument_identify", "control_location_identify",
                            "argument_identify_no_batchs"]:  # all nodes binary classification task
         model = InvariantNodeIdentifyTask(parameters, dataset)
+    elif params["label"]=="node_multiclass":
+        model = InvariantNodeMultiClassTask(parameters, dataset)
     elif params["label"] in ["predicate_occurrence_in_clauses", "argument_lower_bound",
                              "argument_upper_bound"]:  # gathered nodes single output regression task
         model = InvariantArgumentSelectionTask(parameters, dataset)
@@ -362,7 +367,10 @@ def read_data_and_train(params, hyper_parameters):
         model = InvariantArgumentSelectionTask(parameters, dataset)
 
     # description: train
-    run_id = make_run_id(model_name="R-GCN", task_name=params["label"])
+    quiet = False
+    model_name = "GNN"
+    task_name = "Argument_selection"
+    run_id = make_run_id(model_name, task_name)
     save_dir = os.path.abspath("trained_model")
     log_file = os.path.join(save_dir, f"{run_id}.log")
 

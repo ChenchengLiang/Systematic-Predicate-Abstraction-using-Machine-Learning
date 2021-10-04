@@ -1,9 +1,9 @@
 import os
 import sys
 def main():
-    from utils import wrapped_generate_horn_graph
+    from utils_1 import wrapped_generate_horn_graph
     move_file = True
-    max_nodes_per_batch=10000
+    max_nodes_per_batch=100000
     thread_number=4
     generateSimplePredicates=""
     separateByPredicates=""
