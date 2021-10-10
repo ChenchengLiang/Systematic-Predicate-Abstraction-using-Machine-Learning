@@ -273,8 +273,8 @@ def main():
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
     # shuffle_data("../benchmarks/Linear-dataset/Linear-dataset-train",
     #              "../benchmarks/Linear-dataset/Linear-dataset-train-shuffled")
-    # divide_data_to_threads("Linear-dataset-train-unsolvable-predicted-test",
-    #                        "Linear-dataset-train-unsolvable-predicted-test/test_data-divided",three_fold=True,datafold_list=["test_data"],chunk_number=17)#datafold_list=["test_data"]
+    # divide_data_to_threads("Linear-dataset/raw",
+    #                        "Linear-dataset/raw-divided",three_fold=True,datafold_list=["train_data"],chunk_number=17)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -295,7 +295,7 @@ def main():
     #clean_extracted_data("LIA-Lin+sv-comp-template-unsolvable-horn-graph/test_data")
 
     #align_extracted_data(benchmark="LIA-Lin+sv-comp",folder_name="sv-comp+LIA-Lin-train-with-CEGAR")
-    get_k_fold_train_data(benchmark="Linear-dataset",folder_name="Linear-dataset-extracted")
+    # get_k_fold_train_data(benchmark="Linear-dataset",folder_name="Linear-dataset-extracted")
     # collect_unsolvable_data(horn_graph_folder="all-LIA-Lin/extractable-horn-hraph"
     #                         ,unsolvable_folder="exception-all-LIA-Lin-full-label-with-CEGAR/shell-timeout",
     #                         target_file="all-LIA-Lin-train-fixed-size-unsolvable-predicted")
@@ -317,7 +317,7 @@ def main():
     # for i in range(0,17):
     #     for fold in ["train_data","valid_data","test_data"]:
     #         compress_all_file_folder("LIA-Lin+sv-comp/LIA-Lin+sv-comp-divided/thread_"+str(i)+"/"+fold)
-
+    compress_all_file_folder("Linear-dataset/separated_benchmark-abstract-oct/exceptions/shell-timeout")
     # for i in range(0,17):
     #     for fold in ["train_data"]:
     #         unzip_all_file_folder("all-LIA-Lin-train-unsolvable-predicted-measurement-2/temp-1-divided/thread_"+str(i)+"/"+fold)

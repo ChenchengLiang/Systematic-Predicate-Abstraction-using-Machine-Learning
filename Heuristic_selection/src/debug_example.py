@@ -60,7 +60,7 @@ def main():
         "learning_rate_decay": 0.98,
         "momentum": 0.85,
         "gradient_clip_value": 1,  # 1
-        "use_intermediate_gnn_results": False,
+        "use_intermediate_gnn_results": True,
     }
     parameters.update(these_hypers)
     # initiate dataset

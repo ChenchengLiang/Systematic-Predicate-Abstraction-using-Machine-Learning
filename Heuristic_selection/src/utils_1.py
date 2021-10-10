@@ -193,13 +193,15 @@ def run_eldarica_with_shell(file_and_param):
     for i in range(runtime):
         if os.path.exists(file): #not moved by Eldarica
             used_time=used_time+call_Eldarica_one_time(file_name,parameter_list,supplementary_command,str(i+1)+"/"+str(runtime))
+
     used_time=used_time/runtime
     # subprocess.call(supplementary_command)
     os.remove(shell_file_name)
 
-    if used_time>timeout and os.path.exists(file) and (not os.path.exists(file+"circles.gv")) and move_file==True:
-        os.rename(file,"../benchmarks/exceptions/shell-timeout/"+file_name)
-        print("extracting " + file_name + " failed due to time out, move file to shell-timeout")
+    if move_file==True:
+        if used_time>timeout and os.path.exists(file) and (not os.path.exists(file+"circles.gv")):
+            os.rename(file,"../benchmarks/exceptions/shell-timeout/"+file_name)
+            print("extracting " + file_name + " failed due to time out, move file to shell-timeout")
 
     # compress files
     if os.path.exists(file):
@@ -215,9 +217,11 @@ def run_eldarica_with_shell_get_solvability(file_and_param):
     runtime = (lambda: file_and_param[4] if len(file_and_param) > 4 else 1)()
     file = file_and_param[0]
     file_dir_name=os.path.dirname(file)
+    unzip_file_list=[]
     for f in glob.glob(file+"*"):
         unzip_file(f)
-        os.remove(f)
+        unzip_file_list.append(f)
+        #os.remove(f)
     eldarica = "../eldarica-graph-generation/eld "
     # file = "../benchmarks/ulimit-test/Problem19_label06_true-unreach-call.c.flat_000.smt2"
     file_name = file[file.rfind("/") + 1:]
@@ -227,13 +231,13 @@ def run_eldarica_with_shell_get_solvability(file_and_param):
     solvability_str={}
     for fold in solvability_params_fold:
         if fold in ["empty","term","oct","relEqs","relIneqs"]:
-            parameter_list=" -abstract:"+fold
+            parameter_list=" -abstract:"+fold + " -moveFile"
         elif fold in ["full"]:
-            parameter_list = " -abstract:empty -generateTemplates"
+            parameter_list = " -abstract:empty -generateTemplates -moveFile"
         elif fold in ["random"]:
-            parameter_list = " -abstract:empty -generateTemplates -rdm"
+            parameter_list = " -abstract:empty -generateTemplates -rdm -moveFile"
         elif fold in ["predicted"]:
-            parameter_list = " -abstract:empty -generateTemplates -readTemplates"
+            parameter_list = " -abstract:empty -generateTemplates -readTemplates -moveFile"
 
         timeout=file_and_param[2]
         shell_file_name = "run-ulimit" + "-" + file_name + ".sh"
@@ -245,23 +249,26 @@ def run_eldarica_with_shell_get_solvability(file_and_param):
         supplementary_command = ["sh", shell_file_name]
         used_time=0
         for i in range(runtime):
-            if os.path.exists(file): #not moved by Eldarica
-                used_time=used_time+call_Eldarica_one_time(file_name,parameter_list,supplementary_command,str(i+1)+"/"+str(runtime))
+            used_time=used_time+call_Eldarica_one_time(file_name,parameter_list,supplementary_command,str(i+1)+"/"+str(runtime))
+            if not os.path.exists(file): #if moved by Eldarica zip it back
+                unzip_file(file + ".zip")
         used_time=used_time/runtime
         # subprocess.call(supplementary_command)
         os.remove(shell_file_name)
 
         solvability_str["solveTime"+fold+"InitialPredicates"]=used_time
-        if used_time>timeout:
-            solvability_str["solvability"+fold+"InitialPredicates"]="false"
+        if used_time<timeout and os.path.exists(file):
+            solvability_str["solvability"+fold+"InitialPredicates"]="true"
         else:
-            solvability_str["solvability"+fold+"InitialPredicates"] = "true"
+            solvability_str["solvability"+fold+"InitialPredicates"] = "false"
 
 
     with open(file_dir_name+'/'+ file_name + '.solvability.JSON', 'w') as f:
         json.dump(solvability_str, f, indent=4)
 
     # compress files
+    for f in unzip_file_list:
+        os.remove(f)
     if os.path.exists(file):
         file_list = glob.glob(file + "*")
         for f in file_list:

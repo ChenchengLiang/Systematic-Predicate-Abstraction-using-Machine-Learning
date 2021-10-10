@@ -309,7 +309,7 @@ def read_data_and_train(params, hyper_parameters):
         "learning_rate_decay": 0.98,#0.98
         "momentum": 0.85,
         "gradient_clip_value": 1,  # 1
-        "use_intermediate_gnn_results": False,
+        "use_intermediate_gnn_results": True,
         # "global_exchange_dropout_rate":0,
         # "layer_input_dropout_rate": 0,
         # "gnn_layer_input_dropout_rate": 0,

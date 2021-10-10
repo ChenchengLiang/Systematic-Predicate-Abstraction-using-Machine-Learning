@@ -26,10 +26,11 @@ def wrapped_train_and_predict_on_one_graph(benchmark,num_layers):
     pickle = True
     benchmark_name = benchmark + "/"
     num_node_target_labels = 5
+    regression_layers=[64 for i in range(2)]
     hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers,
-                        "regression_hidden_layer_size": [64,64,64,64,64,64,64,64,64], "threshold": 0.5,
+                        "regression_hidden_layer_size": regression_layers, "threshold": 0.5,
                         "max_nodes_per_batch": 10000,
-                        "max_epochs": 5, "patience": 5, "num_node_target_labels": num_node_target_labels}
+                        "max_epochs": 500, "patience": 500, "num_node_target_labels": num_node_target_labels}
 
     parameter_list.append(
         parameters(relative_path="../benchmarks/" + benchmark_name,
