@@ -31,15 +31,21 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters['graph_type'] = graph_type  # hyperEdgeHornGraph or layerHornGraph
     #parameters["message_calculation_class"]="rgcn"#rgcn,ggnn,rgat
     #parameters['num_heads'] = 2
-    #parameters["global_exchange_dropout_rate"]=0
-    #parameters["layer_input_dropout_rate"]=0
-    #parameters["gnn_layer_input_dropout_rate"]=0
-    #parameters["graph_aggregation_dropout_rate"]=0
-    #parameters["regression_mlp_dropout"]=0
-    #parameters["scoring_mlp_dropout_rate"]=0
+    parameters["global_exchange_dropout_rate"]=0
+    parameters["layer_input_dropout_rate"]=0
+    parameters["gnn_layer_input_dropout_rate"]=0
+    parameters["graph_aggregation_dropout_rate"]=0
+    parameters["regression_mlp_dropout"]=0
+    parameters["scoring_mlp_dropout_rate"]=0
     #parameters["residual_every_num_layers"]=10000000
     parameters['hidden_dim'] = nodeFeatureDim #64
     #parameters["num_edge_MLP_hidden_layers"]
+
+    parameters["use_inter_layer_layernorm"]=True
+    parameters["dense_every_num_layers"] = 32
+    # parameters["residual_every_num_layers"] = 32
+    # parameters["global_exchange_every_num_layers"] = 32
+
     parameters['num_layers'] = hyper_parameters["num_layers"]
     parameters['node_label_embedding_size'] = nodeFeatureDim
     parameters['max_nodes_per_batch']=hyper_parameters["max_nodes_per_batch"] #todo: _batch_would_be_too_full(), need to extend _finalise_batch() to deal with hyper-edge
@@ -63,7 +69,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         "learning_rate_decay": 0.98,
         "momentum": 0.85,
         "gradient_clip_value": 1, #1
-        "use_intermediate_gnn_results": True,
+        "use_intermediate_gnn_results": False,
     }
     parameters.update(these_hypers)
     #get dataset
@@ -93,8 +99,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     dataset.load_data([DataFold.TRAIN,DataFold.VALIDATION,DataFold.TEST])
     parameters["node_vocab_size"]=dataset._node_vocab_size
     parameters["class_weight_fold"] = dataset._class_weight_fold["train"]
-    def log(msg):
-        log_line(log_file, msg)
+    # def log(msg):
+    #     log_line(log_file, msg)
 
     train_loss_list_average = []
     valid_loss_list_average = []
@@ -132,6 +138,9 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         run_id = make_run_id(model_name, task_name)
         save_dir=os.path.abspath("trained_model")
         log_file = os.path.join(save_dir, f"{run_id}.log")
+
+        def log(msg):
+            log_line(log_file, msg)
         # import multiprocessing
         # process_train = multiprocessing.Process(train, args=(model,dataset,log,run_id,200,20,save_dir,quiet,None))
         # process_train.start()
@@ -146,9 +155,10 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
             save_dir=save_dir,
             quiet=quiet,
             aml_run=None)
+
+
         #predict
         print("trained_model_path", trained_model_path)
-
         test_data = dataset.get_tensorflow_dataset(DataFold.TEST)
 
         # use model in memory
@@ -225,7 +235,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     # visualize results
     draw_training_results(train_loss_list_average, valid_loss_list_average,
                           mean_loss_list_average,
-                          error_memory_model_average, true_Y, sigmoid_predicted_Y_loaded_model, label,
+                          error_loaded_model_average, true_Y, sigmoid_predicted_Y_loaded_model, label,
                           benchmark_name, graph_type,gathered_nodes_binary_classification_task,hyper_parameters)
     write_train_results_to_log(dataset, sigmoid_predicted_Y_loaded_model, train_loss_average,
                                valid_loss_average, error_memory_model, mean_loss_list, accuracy_average,

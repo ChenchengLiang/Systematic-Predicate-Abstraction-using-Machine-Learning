@@ -12,6 +12,7 @@ import json
 from multiprocessing import Pool
 import shutil
 from utils import unzip_file
+import zipfile
 
 def generate_JSON_field(rootdir, json_file_type=".layerHornGraph.JSON", eldarica_parameters="-getHornGraph"):
     for root, subdirs, files in os.walk(rootdir):
@@ -182,6 +183,7 @@ def shuffle_data(rootdir, target_folder):
 
 def divide_data_to_threads(benchmark="", target_folder="", three_fold=True, chunk_number=17,
                            datafold_list=["train_data", "valid_data", "test_data"]):
+    target_folder=target_folder+"-"+str(chunk_number)
     root = "../benchmarks/" + benchmark
     try:
         os.mkdir(os.path.join("../benchmarks", target_folder))
@@ -214,6 +216,27 @@ def divide_data_to_threads(benchmark="", target_folder="", three_fold=True, chun
             file = file[:-len(".zip")]
             copy_relative_files(file, os.path.join(thread_dir, datafold))
             # copy(file, os.path.join(thread_dir, datafold))
+    #compress
+    target_folder=os.path.join("../benchmarks",target_folder)
+    dir_list=[target_folder+"/thread_"+str(i) for i in range(chunk_number)]
+    zipit(dir_list,target_folder+".zip")
+    shutil.rmtree(target_folder)
+
+
+
+def zipdir(path, ziph):
+    # ziph is zipfile handle
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            ziph.write(os.path.join(root, file),
+                       os.path.relpath(os.path.join(root, file),
+                                       os.path.join(path, '..')))
+
+def zipit(dir_list, zip_name):
+    zipf = zipfile.ZipFile(zip_name, 'w', zipfile.ZIP_DEFLATED)
+    for dir in dir_list:
+        zipdir(dir, zipf)
+    zipf.close()
 
 
 def moveIncompletedExtractionsToTemp(rootdir):
@@ -273,8 +296,8 @@ def main():
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
     # shuffle_data("../benchmarks/Linear-dataset/Linear-dataset-train",
     #              "../benchmarks/Linear-dataset/Linear-dataset-train-shuffled")
-    # divide_data_to_threads("Linear-dataset/raw",
-    #                        "Linear-dataset/raw-divided",three_fold=True,datafold_list=["train_data"],chunk_number=17)#datafold_list=["test_data"]
+    divide_data_to_threads("Linear-dataset/separated_benchmark-abstract-empty/unsolvable",
+                           "Linear-dataset/separated_benchmark-abstract-empty/unsolvable-dividied",three_fold=True,datafold_list=["test_data"],chunk_number=5)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -317,7 +340,7 @@ def main():
     # for i in range(0,17):
     #     for fold in ["train_data","valid_data","test_data"]:
     #         compress_all_file_folder("LIA-Lin+sv-comp/LIA-Lin+sv-comp-divided/thread_"+str(i)+"/"+fold)
-    compress_all_file_folder("Linear-dataset/separated_benchmark-abstract-oct/exceptions/shell-timeout")
+    # compress_all_file_folder("Linear-dataset/separated_benchmark-abstract-oct/exceptions/shell-timeout")
     # for i in range(0,17):
     #     for fold in ["train_data"]:
     #         unzip_all_file_folder("all-LIA-Lin-train-unsolvable-predicted-measurement-2/temp-1-divided/thread_"+str(i)+"/"+fold)

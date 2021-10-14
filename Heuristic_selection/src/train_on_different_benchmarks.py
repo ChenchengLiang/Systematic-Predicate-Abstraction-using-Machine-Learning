@@ -39,8 +39,8 @@ def main():
     # np.random.seed(0)
     # tf.random.set_seed(0)
 
-    hyper_parameters={"nodeFeatureDim":64,"num_layers":2,"regression_hidden_layer_size":[64,64,64,64,64,64,64,64,64],"threshold":0.5,"max_nodes_per_batch":10000,
-                      "max_epochs":500,"patience":500,"num_node_target_labels":num_node_target_labels}
+    hyper_parameters={"nodeFeatureDim":64,"num_layers":8,"regression_hidden_layer_size":[64,64,64],"threshold":0.5,"max_nodes_per_batch":10000,
+                      "max_epochs":1000,"patience":1000,"num_node_target_labels":num_node_target_labels}
 
     for label in label_list:
         parameter_list.append(

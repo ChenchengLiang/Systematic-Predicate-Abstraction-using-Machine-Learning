@@ -23,7 +23,7 @@ def main():
     #different_num_layers_training()
     #clean_k_fold_test_data(benchmark="chc-comp-LIA-Lin-2021-extract")
     #k_fold_training(benchmark="Linear-dataset-extracted",fold=fold)
-    k_fold_data_collection(benchmark="Linear-dataset-extracted",separateByPredicates="",fold=len(fold))#-separateByPredicates
+    k_fold_data_collection(benchmark="temp-debug",separateByPredicates="",fold=len(fold))#-separateByPredicates
 
 
 def k_fold_training(benchmark="chc-comp21-benchmarks-main-all-extract",fold=[0]):

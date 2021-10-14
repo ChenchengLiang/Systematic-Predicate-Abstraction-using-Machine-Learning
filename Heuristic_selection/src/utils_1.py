@@ -88,7 +88,7 @@ def wrapped_generate_horn_graph(params):
 
 def generate_horn_graph(params):
     # description: generate horn graph
-    timeout = 60*60  # second
+    timeout = 60*15  # second
     move_file_parameter_eldarica = (lambda: " -moveFile " if params["move_file"] == True else " ")()
     # todo: use intervals and abstract:off -varyGeneratedPredicates
     eldarica_parameters = "-getHornGraph:hyperEdgeGraph "+params["separateByPredicates"]+" "+\
@@ -205,6 +205,75 @@ def run_eldarica_with_shell(file_and_param):
 
     # compress files
     if os.path.exists(file):
+        file_list = glob.glob(file + "*")
+        for f in file_list:
+            file_compress([f], f + ".zip")
+            os.remove(f)
+
+
+def run_eldarica_with_shell_get_measurement(file_and_param):
+    move_file= (lambda : file_and_param[3] if len(file_and_param)>3 else True)()
+    runtime = (lambda: file_and_param[4] if len(file_and_param) > 4 else 1)()
+    file = file_and_param[0]
+    file_dir_name=os.path.dirname(file)
+    unzip_file_list=[]
+    for f in glob.glob(file+"*"):
+        print(f)
+        unzip_file(f)
+        unzip_file_list.append(f)
+        #os.remove(f)
+    eldarica = "../eldarica-graph-generation/eld "
+    file_name = file[file.rfind("/") + 1:]
+    measurement_params_fold=["true", "full", "empty", "predicted", "random","term", "oct", "relEqs", "relIneqs"]
+    measurement_str={}
+    for fold in measurement_params_fold:
+        if fold in ["empty","term","oct","relEqs","relIneqs"]:
+            parameter_list=" -abstract:"+fold + " -moveFile"
+        elif fold in ["full"]:
+            parameter_list = " -abstract:empty -generateTemplates "
+        elif fold in ["random"]:
+            parameter_list = " -abstract:empty -generateTemplates -rdm "
+        elif fold in ["predicted"]:
+            parameter_list = " -abstract:empty -generateTemplates -readTemplates"
+        elif fold in ["true"]:
+            parameter_list = " -abstract:empty -generateTemplates -readTrueLabel"
+
+        timeout=file_and_param[2]
+        shell_file_name = "run-ulimit" + "-" + file_name + ".sh"
+        timeout_command = "timeout "+str(timeout)
+        f = open(shell_file_name, "w")
+        f.write("#!/bin/sh\n")
+        f.write(timeout_command + " " + eldarica + " " + file + " " + parameter_list + "\n")
+        f.close()
+        supplementary_command = ["sh", shell_file_name]
+        used_time=0
+        for i in range(runtime):
+            if os.path.exists(file):
+                used_time=used_time+call_Eldarica_one_time(file_name,parameter_list,supplementary_command,str(i+1)+"/"+str(runtime))
+
+        used_time=used_time/runtime
+        # subprocess.call(supplementary_command)
+        os.remove(shell_file_name)
+        #read measurement
+        json_file=file+".measure.JSON"
+        if os.path.exists(json_file):
+            with open(json_file) as f:
+                loaded_measurement = json.load(f)
+            measurement_str["measurementWith"+fold+"Label"]=loaded_measurement
+            os.remove(json_file)
+        else:
+            relative_files = glob.glob(file + "*")
+            for file in relative_files:
+                if os.path.exists(file):
+                    os.rename(file,"../benchmarks/exceptions/shell-timeout/"+os.path.basename(file))
+
+    if os.path.exists(file):
+        with open(file_dir_name+'/'+ file_name + '.measurement.JSON', 'w') as f:
+            json.dump(measurement_str, f, indent=4)
+
+        # compress files
+        for f in unzip_file_list:
+            os.remove(f)
         file_list = glob.glob(file + "*")
         for f in file_list:
             file_compress([f], f + ".zip")

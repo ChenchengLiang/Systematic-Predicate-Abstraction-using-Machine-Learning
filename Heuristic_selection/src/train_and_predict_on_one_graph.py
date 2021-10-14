@@ -9,7 +9,7 @@ def main():
     # benchmark_list=["temp-multiclass-anu","temp-multiclass-344","temp-multiclass-06",
     #                 "temp-multiclass-08","temp-multiclass-10","temp-multiclass-13",
     #                 "temp-multiclass-14","temp-multiclass-15","temp-multiclass-178"]
-    benchmark_list=["temp-multiclass-anu"]
+    benchmark_list=["temp-multiclass-debug-1"]
     for b in benchmark_list:
         for num_layers in num_layers_list:
             wrapped_train_and_predict_on_one_graph(b,num_layers)

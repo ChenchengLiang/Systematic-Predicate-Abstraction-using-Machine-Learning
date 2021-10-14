@@ -75,7 +75,6 @@ def get_analysis_for_predicted_labels(json_obj_list,out_of_test_set=False,time_u
 
         for field_name in measurement_name_list:
             get_best_measurement(int_field_map, measurement_list_map[field_name], measurement_best_count_map[field_name],field_name=field_name,file_name=file_name)
-
     print("------------")
     scatter_plot_range = [0,max(list(map(np.float,flattenList(measurement_list_all_files_map["timeConsumptionForCEGAR"]))))/1000]#scatter_plot_range
     print("scatter_plot_range (seconds)",scatter_plot_range)
