@@ -7,6 +7,57 @@ import os
 import time
 
 
+def measurement_control_by_python(benchmark_fold):
+    thread_number = 4
+    continuous_extracting = True
+    move_file = False
+    max_nodes_per_batch = 100000
+    generateTemplates=""
+    separateByPredicates=""#-separateByPredicates
+    abstract=""
+    generateSimplePredicates=""
+    noIntervals=""
+    out_of_test_set = True
+    timeout= 900
+    wrapped_generate_horn_graph_params = {"benchmark_fold": benchmark_fold, "max_nodes_per_batch": max_nodes_per_batch,
+                                          "separateByPredicates": separateByPredicates,
+                                          "abstract": abstract, "move_file": move_file, "thread_number": thread_number,
+                                          "generateSimplePredicates": generateSimplePredicates,
+                                          "generateTemplates": generateTemplates, "data_fold": ["test_data"],
+                                          "horn_graph_folder": "", "noIntervals": noIntervals}
+    filtered_file_list, file_list_with_horn_graph, file_list = \
+        wrapped_generate_horn_graph(wrapped_generate_horn_graph_params)#"train_data","valid_data",
+    # description: get solvability and measurement info with different predicate setting for unseen data
+    params = {"filtered_file_list": filtered_file_list,
+                                                            "thread_number": thread_number,
+                                                            "continuous_extracting": continuous_extracting,
+                                                            "move_file": move_file,
+                                                            "checkSolvability": "",
+                                                            "generateTemplates": generateTemplates,
+                                                            "measurePredictedPredicates": "",
+                                                            "onlyInitialPredicates": "", "abstract": abstract,
+                                                            "noIntervals": noIntervals,
+                                                            "separateByPredicates": separateByPredicates,
+                                                            "solvabilityTimeout": str(timeout), "timeout": timeout}
+
+    check_solvability_parameter_list = params["checkSolvability"] + " " + params["separateByPredicates"] + " " + params[
+        "measurePredictedPredicates"] \
+                                       + " " + params["onlyInitialPredicates"] + " " + params[
+                                           "generateTemplates"] + " " + params["abstract"] + " " + \
+                                       params["noIntervals"] + " -solvabilityTimeout:" + params["solvabilityTimeout"]
+    file_list_with_parameters = (lambda: [
+        [file, check_solvability_parameter_list, params["timeout"], params["move_file"]] if not os.path.exists(
+            file + ".measurement.JSON.zip") else [] for
+        file in params["filtered_file_list"]] if params["continuous_extracting"] == True
+    else [[file, check_solvability_parameter_list, params["timeout"], params["move_file"]] for
+          file in params["filtered_file_list"]])()
+
+    file_list_for_solvability_check = list(filter(lambda x: len(x) != 0, file_list_with_parameters))
+    print("file_list_for_measurement", len(file_list_for_solvability_check))
+    run_eldarica_with_shell_pool_with_file_list(params["thread_number"], run_eldarica_with_shell_get_measurement,
+                                                file_list_for_solvability_check)
+
+
 def get_solvability_log(data_fold, command_input):
     solvability_dict = {}
     benchmark_name = os.path.join("../benchmarks/", command_input)
@@ -217,10 +268,9 @@ def run_eldarica_with_shell_get_measurement(file_and_param):
     file = file_and_param[0]
     file_dir_name=os.path.dirname(file)
     unzip_file_list=[]
-    for f in glob.glob(file+"*"):
-        print(f)
-        unzip_file(f)
-        unzip_file_list.append(f)
+    for one_file in glob.glob(file+"*"):
+        unzip_file(one_file)
+        unzip_file_list.append(one_file)
         #os.remove(f)
     eldarica = "../eldarica-graph-generation/eld "
     file_name = file[file.rfind("/") + 1:]
@@ -228,23 +278,23 @@ def run_eldarica_with_shell_get_measurement(file_and_param):
     measurement_str={}
     for fold in measurement_params_fold:
         if fold in ["empty","term","oct","relEqs","relIneqs"]:
-            parameter_list=" -abstract:"+fold + " -moveFile"
+            parameter_list=" -abstract:"+fold + " -singleMeasurement"
         elif fold in ["full"]:
-            parameter_list = " -abstract:empty -generateTemplates "
+            parameter_list = " -abstract:empty -generateTemplates -singleMeasurement"
         elif fold in ["random"]:
-            parameter_list = " -abstract:empty -generateTemplates -rdm "
+            parameter_list = " -abstract:empty -generateTemplates -rdm -singleMeasurement"
         elif fold in ["predicted"]:
-            parameter_list = " -abstract:empty -generateTemplates -readTemplates"
+            parameter_list = " -abstract:empty -generateTemplates -readTemplates -singleMeasurement"
         elif fold in ["true"]:
-            parameter_list = " -abstract:empty -generateTemplates -readTrueLabel"
+            parameter_list = " -abstract:empty -generateTemplates -readTrueLabel -singleMeasurement"
 
         timeout=file_and_param[2]
         shell_file_name = "run-ulimit" + "-" + file_name + ".sh"
         timeout_command = "timeout "+str(timeout)
-        f = open(shell_file_name, "w")
-        f.write("#!/bin/sh\n")
-        f.write(timeout_command + " " + eldarica + " " + file + " " + parameter_list + "\n")
-        f.close()
+        f_shell = open(shell_file_name, "w")
+        f_shell.write("#!/bin/sh\n")
+        f_shell.write(timeout_command + " " + eldarica + " " + file + " " + parameter_list + "\n")
+        f_shell.close()
         supplementary_command = ["sh", shell_file_name]
         used_time=0
         for i in range(runtime):

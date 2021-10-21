@@ -9,7 +9,7 @@ def main():
     # benchmark_list=["temp-multiclass-anu","temp-multiclass-344","temp-multiclass-06",
     #                 "temp-multiclass-08","temp-multiclass-10","temp-multiclass-13",
     #                 "temp-multiclass-14","temp-multiclass-15","temp-multiclass-178"]
-    benchmark_list=["temp-multiclass-debug-1"]
+    benchmark_list=["temp_debug"]
     for b in benchmark_list:
         for num_layers in num_layers_list:
             wrapped_train_and_predict_on_one_graph(b,num_layers)
@@ -17,7 +17,8 @@ def main():
 
 def wrapped_train_and_predict_on_one_graph(benchmark,num_layers):
     parameter_list = []
-    label = "node_multiclass"
+    label = "node_multiclass"#node_multiclass
+    label_field="templateRelevanceLabel"# templateRelevanceLabel,templateCostLabel
     force_read = True
     form_label = True
     file_type = ".smt2"
@@ -30,13 +31,13 @@ def wrapped_train_and_predict_on_one_graph(benchmark,num_layers):
     hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers,
                         "regression_hidden_layer_size": regression_layers, "threshold": 0.5,
                         "max_nodes_per_batch": 10000,
-                        "max_epochs": 500, "patience": 500, "num_node_target_labels": num_node_target_labels}
+                        "max_epochs": 2, "patience": 2, "num_node_target_labels": num_node_target_labels}
 
     parameter_list.append(
         parameters(relative_path="../benchmarks/" + benchmark_name,
                    absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
                    json_type=".hyperEdgeHornGraph.JSON", label=label,
-                   label_field="templateRelevanceLabel"))  # templateRelevanceLabel,templateCostLabel
+                   label_field=label_field))
 
     GPU_switch(GPU)
 

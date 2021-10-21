@@ -43,8 +43,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
 
     parameters["use_inter_layer_layernorm"]=True
     parameters["dense_every_num_layers"] = 32
-    # parameters["residual_every_num_layers"] = 32
-    # parameters["global_exchange_every_num_layers"] = 32
+    parameters["residual_every_num_layers"] = 32
+    parameters["global_exchange_every_num_layers"] = 32
 
     parameters['num_layers'] = hyper_parameters["num_layers"]
     parameters['node_label_embedding_size'] = nodeFeatureDim
@@ -178,11 +178,11 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         _, _, test_results = loaded_model.run_one_epoch(test_data, training=False, quiet=quiet)
         test_metric, test_metric_string = loaded_model.compute_epoch_metrics(test_results)
 
-        predicted_Y_loaded_model = loaded_model.predict(test_data)
-        sigmoid_predicted_Y_loaded_model=tf.math.sigmoid(predicted_Y_loaded_model)
-        rounded_predicted_Y_loaded_model=my_round_fun(sigmoid_predicted_Y_loaded_model,threshold=hyper_parameters["threshold"],label=label)
+        raw_predicted_Y_loaded_model = loaded_model.predict(test_data)
+        predicted_Y_loaded_model=raw_predicted_Y_loaded_model if label in ["predicate_occurrence_in_clauses"] else tf.math.sigmoid(raw_predicted_Y_loaded_model)
+        rounded_predicted_Y_loaded_model=my_round_fun(predicted_Y_loaded_model,threshold=hyper_parameters["threshold"],label=label)
 
-        #print("predicted_Y_loaded_model",sigmoid_predicted_Y_loaded_model)
+        print("predicted_Y_loaded_model",predicted_Y_loaded_model)
         if verbose==True:
             print("rounded_predicted_Y_loaded_model",len(rounded_predicted_Y_loaded_model),rounded_predicted_Y_loaded_model)
 
@@ -235,9 +235,9 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     # visualize results
     draw_training_results(train_loss_list_average, valid_loss_list_average,
                           mean_loss_list_average,
-                          error_loaded_model_average, true_Y, sigmoid_predicted_Y_loaded_model, label,
+                          error_loaded_model_average, true_Y, predicted_Y_loaded_model, label,
                           benchmark_name, graph_type,gathered_nodes_binary_classification_task,hyper_parameters)
-    write_train_results_to_log(dataset, sigmoid_predicted_Y_loaded_model, train_loss_average,
+    write_train_results_to_log(dataset, predicted_Y_loaded_model, train_loss_average,
                                valid_loss_average, error_memory_model, mean_loss_list, accuracy_average,
                                best_valid_epoch_average,hyper_parameters,
                                benchmark=benchmark_name, label=label, graph_type=graph_type)
@@ -270,12 +270,12 @@ def write_accuracy_to_log(label, benchmark, accuracy_list, best_valid_epoch_list
 def draw_training_results(train_loss_list_average, valid_loss_list_average,
                           mean_loss_list_average,
                           mse_loaded_model_average, true_Y, predicted_Y_loaded_model, label,
-                          benchmark_name, graph_type,gathered_nodes_binary_classification_task,hyper_parameters):
+                          benchmark_name, graph_type,gathered_nodes_binary_classification_task,hyper_parameters,mean_loss_line="False"):
     # mse on train, validation,test,mean
-    plt.plot(train_loss_list_average, color="blue")
+    plt.plot(train_loss_list_average,color="blue")
     plt.plot(valid_loss_list_average, color="green")
-    plt.plot([mean_loss_list_average] * len(train_loss_list_average), color="red")
     plt.plot([mse_loaded_model_average] * len(train_loss_list_average), color="black")
+    #plt.plot([mse_loaded_model_average] * len(train_loss_list_average), "o",color="black")
     y_range=[0,max(max(train_loss_list_average),max(valid_loss_list_average))]
     upper_bound=2#max(y_range)#1
     grid=upper_bound/10
@@ -287,16 +287,20 @@ def draw_training_results(train_loss_list_average, valid_loss_list_average,
     plt.xlabel('epochs')
     train_loss_legend = mpatches.Patch(color='blue', label='train_loss')
     valid_loss_legend = mpatches.Patch(color='green', label='valid_loss')
-    mean_loss_legend = mpatches.Patch(color='red', label='mean_loss')
     test_loss_legend = mpatches.Patch(color='black', label='test_loss')
-    plt.legend(handles=[train_loss_legend, valid_loss_legend, mean_loss_legend, test_loss_legend])
+    if mean_loss_line==True:
+        plt.plot([mean_loss_list_average] * len(train_loss_list_average), color="red")
+        mean_loss_legend = mpatches.Patch(color='red', label='mean_loss')
+        plt.legend(handles=[train_loss_legend, valid_loss_legend, mean_loss_legend, test_loss_legend])
+
+    plt.legend(handles=[train_loss_legend, valid_loss_legend, test_loss_legend])
     regression_hidden_layer_size_name=str(len(hyper_parameters["regression_hidden_layer_size"]))+"x" +str(hyper_parameters["regression_hidden_layer_size"][0])
     plot_name=assemble_name(label,graph_type,benchmark_name,"nodeFeatureDim",str(hyper_parameters["nodeFeatureDim"]),"num_layers",str(hyper_parameters["num_layers"]),"regression_hidden_layer_size",regression_hidden_layer_size_name,"threshold",str(hyper_parameters["threshold"]))
     plt.savefig("trained_model/" + plot_name + ".png")
     plt.clf()
     # plt.show()
 
-    if label in gathered_nodes_binary_classification_task: # confusion matrix on true y and predicted y
+    if label in gathered_nodes_binary_classification_task+["argument_identify"]: # confusion matrix on true y and predicted y
         saving_path_confusion_matrix="trained_model/" + plot_name+ "-confusion_matrix.png"
         saving_path_roc = "trained_model/" + plot_name + "-ROC.png"
         recall,precision,f1_score,false_positive_rate=get_recall_and_precision(true_Y,my_round_fun(predicted_Y_loaded_model,threshold=hyper_parameters["threshold"],label=label),verbose=True)
@@ -354,7 +358,9 @@ def write_train_results_to_log(dataset, predicted_Y_loaded_model, train_loss, va
         out_file.write("accuracy list:" + str(accuracy_list) + "\n")
         out_file.write("mean accuracy:" + str(mean_accuracy) + "\n")
 
-        predicted_label_lists = get_predicted_label_list_divided_by_file(dataset, predicted_Y_loaded_model[0])
+        if label=="node_multiclass":
+            predicted_Y_loaded_model=predicted_Y_loaded_model[0]
+        predicted_label_lists = get_predicted_label_list_divided_by_file(dataset, predicted_Y_loaded_model)
         true_label_list= dataset._label_list["test"]
 
         mse_list = []
@@ -531,6 +537,9 @@ def write_graph_to_pickle(params):
                     elif params["label"]=="clause_occurrence_in_counter_examples_binary":
                         graphs_label_indices.append(loaded_graph["clauseIndices"])
                         graphs_learning_labels.append(loaded_graph["clauseBinaryOccurrenceInCounterExampleList"])
+                    elif params["label"]=="argument_identify":
+                        graphs_label_indices.append(loaded_graph["argumentIndices"])
+                        graphs_learning_labels.append(loaded_graph["nodeIds"])
 
                     else:
                         graphs_argument_indices.append(loaded_graph["argumentIndices"])
@@ -544,24 +553,36 @@ def write_graph_to_pickle(params):
                     if json_type==".hyperEdgeHornGraph.JSON" or json_type==".equivalent-hyperedgeGraph.JSON" \
                             or json_type==".concretized-hyperedgeGraph.JSON": #read adjacency_lists
                         #for hyperedge horn graph
-                        graphs_adjacency_lists.append([
-                            np.array(loaded_graph["argumentEdges"]),
-                            np.array(loaded_graph["guardASTEdges"]),
-                            #np.array(loaded_graph["dataFlowASTEdges"]),
-                            #np.array(loaded_graph["ASTEdges"]),
-                            np.array(loaded_graph["AST_1Edges"]),
-                            np.array(loaded_graph["AST_2Edges"]),
-                            #np.array(loaded_graph["verifHintTplPredEdges"]),
-                            # np.array(loaded_graph["verifHintTplPredPosNegEdges"]),
-                            # np.array(loaded_graph["verifHintTplEqTermEdges"]),
-                            # np.array(loaded_graph["verifHintTplInEqTermEdges"]),
-                            #np.array(loaded_graph["verifHintTplInEqTermPosNegEdges"]),
-                            np.array(loaded_graph["templateEdges"]),
-                            np.array(loaded_graph["binaryAdjacentList"]),
-                            np.array(loaded_graph["controlFlowHyperEdges"]),
-                            np.array(loaded_graph["dataFlowHyperEdges"]),
-                            np.array(loaded_graph["ternaryAdjacencyList"])
-                        ])
+                        if params["label"] in ["node_multiclass","node_multiclass"]:
+                            graphs_adjacency_lists.append([
+                                np.array(loaded_graph["argumentEdges"]),
+                                np.array(loaded_graph["guardASTEdges"]),
+                                #np.array(loaded_graph["dataFlowASTEdges"]),
+                                #np.array(loaded_graph["ASTEdges"]),
+                                np.array(loaded_graph["AST_1Edges"]),
+                                np.array(loaded_graph["AST_2Edges"]),
+                                #np.array(loaded_graph["verifHintTplPredEdges"]),
+                                # np.array(loaded_graph["verifHintTplPredPosNegEdges"]),
+                                # np.array(loaded_graph["verifHintTplEqTermEdges"]),
+                                # np.array(loaded_graph["verifHintTplInEqTermEdges"]),
+                                #np.array(loaded_graph["verifHintTplInEqTermPosNegEdges"]),
+                                np.array(loaded_graph["templateEdges"]),
+                                np.array(loaded_graph["binaryAdjacentList"]),
+                                np.array(loaded_graph["controlFlowHyperEdges"]),
+                                np.array(loaded_graph["dataFlowHyperEdges"]),
+                                np.array(loaded_graph["ternaryAdjacencyList"])
+                            ])
+                        else:
+                            graphs_adjacency_lists.append([
+                                np.array(loaded_graph["argumentEdges"]),
+                                np.array(loaded_graph["guardASTEdges"]),
+                                np.array(loaded_graph["AST_1Edges"]),
+                                np.array(loaded_graph["AST_2Edges"]),
+                                np.array(loaded_graph["binaryAdjacentList"]),
+                                np.array(loaded_graph["controlFlowHyperEdges"]),
+                                np.array(loaded_graph["dataFlowHyperEdges"]),
+                                np.array(loaded_graph["ternaryAdjacencyList"])
+                            ])
                     else:
                         #for layer horn graph
                         graphs_adjacency_lists.append([
@@ -616,7 +637,7 @@ def form_GNN_inputs_and_labels(params):
     for df in params["datafold"]:
         parsed_dot_file = pickleRead(
             "train-" + params["label"] + "-" + params["graph_type"] + "-" + benchmark_name + "-gnnInput_" + df + "_data")
-        if params["label"] in params["gathered_nodes_binary_classification_task"] or params["label"] in ["predicate_occurrence_in_clauses","argument_lower_bound","argument_upper_bound","node_multiclass"]:
+        if params["label"] in params["gathered_nodes_binary_classification_task"] + ["predicate_occurrence_in_clauses","argument_lower_bound","argument_upper_bound","node_multiclass","argument_identify"]:
             params_form_predicate_occurrence_related_label_graph_sample = {
                 "graphs_node_label_ids": parsed_dot_file.graphs_node_label_ids,
                 "graphs_node_symbols": parsed_dot_file.graphs_node_symbols,
@@ -716,6 +737,19 @@ def form_predicate_occurrence_related_label_graph_sample(params):
             graphs_learning_labels_temp.append(tf.one_hot(indices, depth))
         params["graphs_learning_labels"]=graphs_learning_labels_temp
 
+    elif params["label"]=="argument_identify":
+        graphs_learning_labels_temp = []
+        for one_graph_learning_labels,indices in zip(params["graphs_learning_labels"],params["graphs_label_indices"]):
+            temp_graph_label = []
+            for learning_labels in one_graph_learning_labels:
+                if learning_labels in indices:
+                    temp_graph_label.append(1)
+                else:
+                    temp_graph_label.append(0)
+            graphs_learning_labels_temp.append(temp_graph_label)
+        params["graphs_learning_labels"] = graphs_learning_labels_temp
+
+    #todo:argument occurence
     elif params["label"]=="argument_bound":
         for one_graph_learning_labels in params["graphs_learning_labels"]: #transform "None" to infinity
             for learning_labels in one_graph_learning_labels:

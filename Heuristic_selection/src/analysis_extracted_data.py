@@ -294,10 +294,10 @@ def main():
 
     # extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
-    # shuffle_data("../benchmarks/Linear-dataset/Linear-dataset-train",
-    #              "../benchmarks/Linear-dataset/Linear-dataset-train-shuffled")
-    divide_data_to_threads("Linear-dataset/separated_benchmark-abstract-empty/unsolvable",
-                           "Linear-dataset/separated_benchmark-abstract-empty/unsolvable-dividied",three_fold=True,datafold_list=["test_data"],chunk_number=5)#datafold_list=["test_data"]
+    # shuffle_data("../benchmarks/Linear-dataset/separated_benchmark-abstract-empty/sat",
+    #              "../benchmarks/Linear-dataset/separated_benchmark-abstract-empty/sat-shuffled")
+    # divide_data_to_threads("Linear-dataset/extractable",
+    #                        "Linear-dataset/extractable-dividied",three_fold=True,datafold_list=["train_data","valid_data","test_data"],chunk_number=17)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -311,11 +311,15 @@ def main():
     #                                             ,["empty","term","oct","relEqs","relIneqs","off","comb"])
     #collect_unsolvable_cases(["all-LIA-lin-abstract-empty-solvability"], ["empty"], filed="solvable-file")
 
+    # collect_one_field("linear-extracted-empty/exceptions",field_list=["time-out-exception","shell-timeout","no-predicates-selected",
+    #                                                                   "solvable-file","empty-mined-label"],
+    #                   target_folder="linear-extracted-empty/collected",source_folder="Linear-dataset/raw/train_data")
+
     #rebuild_exception_file("exception-LIA-Lin+sv-comp-predicted",["solvable-file"])
     # get_generated_horn_graph()
     # for fold in ["train_data","valid_data","test_data"]:
     #     clean_extracted_data("thread_1/"+fold)
-    #clean_extracted_data("LIA-Lin+sv-comp-template-unsolvable-horn-graph/test_data")
+    clean_extracted_data("linear-horn-graph-100000/test_data",total_file=5)
 
     #align_extracted_data(benchmark="LIA-Lin+sv-comp",folder_name="sv-comp+LIA-Lin-train-with-CEGAR")
     # get_k_fold_train_data(benchmark="Linear-dataset",folder_name="Linear-dataset-extracted")
@@ -351,7 +355,7 @@ def main():
 
     # for i in range(0,17):
     #     rename_files_in_benchmarks("LIA-Lin+sv-comp/LIA-Lin+sv-comp-divided/thread_"+str(i))
-    #compress_exception("LIA-Lin+sv-comp-train-templates/exceptions")
+    #compress_exception("Linear-dataset/separated_benchmark-abstract-empty/Linear-dataset-horn-graph-10000/exceptions")
 
 
 
@@ -753,7 +757,7 @@ def rebuild_exception_file(benchmark="",field_list=["solvability-timeout", "shel
             shutil.copyfile(file_name, new_folder + "/" + f)
 
 
-def clean_extracted_data(benchmark,separated_predicates=False):
+def clean_extracted_data(benchmark,separated_predicates=False,total_file=5):
     if(separated_predicates):
         file_list = glob.glob("../benchmarks/" + benchmark + "/*.smt2.zip")
         file_list = [f[:-len(".zip")] for f in file_list]
@@ -775,31 +779,32 @@ def clean_extracted_data(benchmark,separated_predicates=False):
                     if os.path.exists(file):
                         os.remove(file)
 
-    file_list = glob.glob("../benchmarks/" + benchmark + "/*.smt2.zip")
-    file_list = [f[:-len(".zip")] for f in file_list]
-    for f in file_list:
-        if not os.path.exists(f + ".circles.gv.zip") :
-            relative_files = glob.glob(f + "*")
-            for file in relative_files:
-                if os.path.exists(file):
-                    os.remove(file)
 
-    circle_file_list = glob.glob("../benchmarks/" + benchmark + "/*.circles.gv.zip")
-    file_list = [f[:-len(".circles.gv.zip")] for f in circle_file_list]
+    file_list = glob.glob("../benchmarks/" + benchmark + "/*")
+    file_list = [f[:f.rfind(".smt2")] for f in file_list]
     for f in file_list:
-        if not os.path.exists(f+".zip"):
-            for file in glob.glob(f+"*"):
-                if os.path.exists(file):
-                    os.remove(file)
-    circle_file_list = glob.glob("../benchmarks/" + benchmark + "/*.circles.gv")
-    file_list = [f[:-len(".circles.gv")] for f in circle_file_list]
-    for f in file_list:
-        if not os.path.exists(f):
-            for file in glob.glob(f + "*"):
-                if os.path.exists(file):
-                    os.remove(file)
+        relative_f = glob.glob(f + "*")
+        if (len(relative_f) != total_file):
+            for ff in relative_f:
+                os.remove(ff)
+    for unzipped_fold in [".gv",".JSON",".smt2",".tpl"]:
+        file_list = glob.glob("../benchmarks/" + benchmark + "/*"+unzipped_fold)
+        for f in file_list:
+            os.remove(f)
 
 
+def collect_one_field(benchmarks="",field_list=[],target_folder="",source_folder=""):
+    loaded_jsons=read_benchmark_exception_json(benchmarks)
+    try:
+        os.mkdir("../benchmarks/" + target_folder)
+    except:
+        print("folder existed")
+    for field in field_list:
+        file_list=loaded_jsons[field]
+        file_list = [f + ".zip" if f.find(".zip") < 0 else f for f in file_list]
+        print(field,len(file_list),file_list)
+        for f in file_list:
+            copy("../benchmarks/"+source_folder+"/" + f, "../benchmarks/"+target_folder)
 def collect_unsolvable_cases(benchmarks=[],abstract_list=[],filed = "shell-timeout"):
     loaded_jsons=[read_benchmark_exception_json(b) for b in benchmarks]
     common_files = set(loaded_jsons[0][filed])

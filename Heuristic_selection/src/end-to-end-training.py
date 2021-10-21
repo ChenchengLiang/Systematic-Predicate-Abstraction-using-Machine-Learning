@@ -16,13 +16,14 @@ from utils import get_statistic_data,get_recall_scatter,wrapped_generate_horn_gr
 from horn_dataset import draw_training_results,write_train_results_to_log,get_test_loss_with_class_weight,logit,compute_loss
 import numpy as np
 import tensorflow as tf
+from utils_1 import measurement_control_by_python
 from tensorflow.keras import mixed_precision
 import gc
 def main():
-    fold=[0,1,2,3,4]#[0,1,2,3,4]
+    fold=[0]
     #different_num_layers_training()
     #clean_k_fold_test_data(benchmark="chc-comp-LIA-Lin-2021-extract")
-    #k_fold_training(benchmark="Linear-dataset-extracted",fold=fold)
+    k_fold_training(benchmark="temp-debug",fold=fold)
     k_fold_data_collection(benchmark="temp-debug",separateByPredicates="",fold=len(fold))#-separateByPredicates
 
 
@@ -30,7 +31,7 @@ def k_fold_training(benchmark="chc-comp21-benchmarks-main-all-extract",fold=[0])
     # description: train in 5 fold
     #end_to_end_training(benchmark=benchmark + "-" + str(4) + "-fold")
     for i in fold:
-        end_to_end_training(benchmark=benchmark + "-" + str(i) + "-fold",num_layers=2)
+        end_to_end_training(benchmark=benchmark + "-" + str(i) + "-fold",num_layers=8)
         gc.collect()
         tf.keras.backend.clear_session()
 
@@ -120,8 +121,8 @@ def end_to_end_training(num_layers=8,benchmark=""):
               "GPU": False,
               "train_quiet": False,
               "test_quiet": False,
-              "max_epochs": 500,
-              "patience": 500,
+              "max_epochs": 1000,
+              "patience": 200,
               "max_nodes_per_batch": 10000,
               "separateByPredicates":"",#-separateByPredicates
               "generateTemplates":"-generateTemplates",
@@ -136,7 +137,7 @@ def end_to_end_training(num_layers=8,benchmark=""):
                                                             "argument_occurrence_binary",
                                                             "template_relevance",
                                                             "clause_occurrence_in_counter_examples_binary"]}
-    hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers, "regression_hidden_layer_size": [64,64,64,64,64,64,64,64,64],"threshold": params["threshold"]}
+    hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers, "regression_hidden_layer_size": [64,64],"threshold": params["threshold"]}
 
     #description: generate horn graph if there is no horn graph file in test set
     wrapped_generate_horn_graph_params = {"benchmark_fold": params["benchmark"],
@@ -167,18 +168,19 @@ def end_to_end_training(num_layers=8,benchmark=""):
     # description: get final measurement from Eldarica, if predicated predicate cannot solve the problem there is no measurement file
     tf.keras.backend.clear_session()
     gc.collect()
-    get_solvability_and_measurement_from_eldarica_params = {"filtered_file_list": filtered_file_list,
-                                                            "thread_number": 4,
-                                                                "continuous_extracting": True,
-                                                            "move_file": False,
-                                                            "checkSolvability": "",
-                                                            "generateTemplates": params["generateTemplates"],
-                                                            "measurePredictedPredicates": "-measurePredictedPredicates",
-                                                            "onlyInitialPredicates": "", "abstract": params["abstract"],
-                                                            "noIntervals": "",
-                                                            "separateByPredicates": params["separateByPredicates"],
-                                                            "solvabilityTimeout": "3600","timeout":4000}
-    get_solvability_and_measurement_from_eldarica(get_solvability_and_measurement_from_eldarica_params)#3600
+    measurement_control_by_python(benchmark)
+    # get_solvability_and_measurement_from_eldarica_params = {"filtered_file_list": filtered_file_list,
+    #                                                         "thread_number": 4,
+    #                                                             "continuous_extracting": True,
+    #                                                         "move_file": False,
+    #                                                         "checkSolvability": "",
+    #                                                         "generateTemplates": params["generateTemplates"],
+    #                                                         "measurePredictedPredicates": "-measurePredictedPredicates",
+    #                                                         "onlyInitialPredicates": "", "abstract": params["abstract"],
+    #                                                         "noIntervals": "",
+    #                                                         "separateByPredicates": params["separateByPredicates"],
+    #                                                         "solvabilityTimeout": "3600","timeout":4000}
+    # get_solvability_and_measurement_from_eldarica(get_solvability_and_measurement_from_eldarica_params)#3600
 
     # description: In solvable set, draw time consumption
 
@@ -290,6 +292,19 @@ def read_data_and_train(params, hyper_parameters):
     print("graph_type", params["graph_type"])
     parameters['graph_type'] = params["graph_type"]  # hyperEdgeHornGraph or layerHornGraph
     parameters['hidden_dim'] = nodeFeatureDim  # 64
+
+    parameters["global_exchange_dropout_rate"]=0
+    parameters["layer_input_dropout_rate"]=0
+    parameters["gnn_layer_input_dropout_rate"]=0
+    parameters["graph_aggregation_dropout_rate"]=0
+    parameters["regression_mlp_dropout"]=0
+    parameters["scoring_mlp_dropout_rate"]=0
+
+    parameters["use_inter_layer_layernorm"]=True
+    parameters["dense_every_num_layers"] = 32
+    parameters["residual_every_num_layers"] = 32
+    parameters["global_exchange_every_num_layers"] = 32
+
     parameters['num_layers'] = hyper_parameters["num_layers"]
     #parameters["residual_every_num_layers"] = 10000000
     parameters['node_label_embedding_size'] = nodeFeatureDim
@@ -309,13 +324,7 @@ def read_data_and_train(params, hyper_parameters):
         "learning_rate_decay": 0.98,#0.98
         "momentum": 0.85,
         "gradient_clip_value": 1,  # 1
-        "use_intermediate_gnn_results": True,
-        # "global_exchange_dropout_rate":0,
-        # "layer_input_dropout_rate": 0,
-        # "gnn_layer_input_dropout_rate": 0,
-        # "graph_aggregation_dropout_rate": 0,
-        # "regression_mlp_dropout": 0,
-        # "scoring_mlp_dropout_rate": 0,
+        "use_intermediate_gnn_results": False,
     }
     parameters.update(these_hypers)
 

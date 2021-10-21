@@ -180,13 +180,13 @@ def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",labe
     parameters = pickleRead(benchmark + "-" + label + "-parameters", "../src/trained_model/")
     parameters["benchmark"] = benchmark_name
     print("vocabulary size:", parameters["node_vocab_size"])
+
     if set_max_nodes_per_batch==True:
         parameters['max_nodes_per_batch']=hyper_parameter["max_nodes_per_batch"]
 
-
     if force_read == True:
         params_write_graph_to_pickle={"benchmark":benchmark_name,"data_fold":["test"],"label":label,"path":path,"graph_type":graph_type,
-                                      "max_nodes_per_batch":parameters['max_nodes_per_batch'],"vocabulary_name":benchmark,
+                                      "max_nodes_per_batch":hyper_parameter["max_nodes_per_batch"],"vocabulary_name":benchmark,
                                       "file_list":file_list,"file_type":".smt2","label_field":hyper_parameter["label_field"]}
         write_graph_to_pickle(params_write_graph_to_pickle)
     else:
@@ -197,6 +197,8 @@ def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",labe
                                            "gathered_nodes_binary_classification_task":gathered_nodes_binary_classification_task,
                                            "use_class_weight":False,"num_node_target_labels":num_node_target_labels}
         form_GNN_inputs_and_labels(params_form_GNN_inputs_and_labels)
+
+
 
     quiet = False
     dataset = HornGraphDataset(parameters)

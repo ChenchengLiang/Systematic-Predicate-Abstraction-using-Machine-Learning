@@ -389,6 +389,8 @@ def my_round_fun(num_list,threshold=0.5,label="template_relevance"):
     if label=="node_multiclass":
         num_list=np.array(num_list[0])
         return [np.where(r==max(r),1,0)for r in num_list]
+    elif label=="predicate_occurrence_in_clauses":
+        return num_list
     else:
         return list(np.where(num_list > threshold, 1, 0))
 

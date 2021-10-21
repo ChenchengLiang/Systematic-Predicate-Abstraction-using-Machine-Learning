@@ -430,11 +430,11 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
 
   val simplifiedClausesForGraph = HintsSelection.simplifyClausesForGraphs(simplifiedClauses, simpHints)// remove from benchmark if there are multiple atom in body
   val sp = new Simplifier
-
+  val fileName=GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"), GlobalParameters.get.fileName.length)
 
   if (GlobalParameters.get.getHornGraph == true) {
     if (simplifiedClausesForGraph.isEmpty) {
-      HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/exceptions/no-simplified-clauses/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"), GlobalParameters.get.fileName.length), message = "no simplified clauses")
+      HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/exceptions/no-simplified-clauses/" + fileName, message = "no simplified clauses")
       sys.exit()
     }
     val initialPredicates =
@@ -453,14 +453,13 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
       }else if(GlobalParameters.get.generateTemplates){
         if (GlobalParameters.get.withoutGraphJSON)
          HintsSelection.wrappedReadHints(simplifiedClausesForGraph, "unlabeledPredicates")//todo:boolean template predicate-2 will be treated as Eq term
-        else
-          generateCombinationTemplates(simplifiedClauses)
+        else {generateCombinationTemplates(simplifiedClauses)}
       } else{
         VerificationHints(Map()) ++ simpHints
       }
 
 
-    if (initialPredicates.totalPredicateNumber == 0 && GlobalParameters.get.generateSimplePredicates == true) {
+    if (initialPredicates.totalPredicateNumber == 0 && (GlobalParameters.get.generateSimplePredicates == true||GlobalParameters.get.generateTemplates==true)) {
       HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/exceptions/no-initial-predicates/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"), GlobalParameters.get.fileName.length), message = "no initial predicates")
       sys.exit()
     }
@@ -653,12 +652,15 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
           initialPredicatesForCEGAR.toInitialPredicates, predGenerator,
           counterexampleMethod)
 
-      //todo: write results to JSON file
-      val measurementList:Seq[Tuple2[String,Double]]=Seq(Tuple2("timeConsumptionForCEGAR",predAbs.cegar.cegarEndTime-predAbs.cegar.cegarStartTime)
-        ,Tuple2("itearationNumber",predAbs.cegar.iterationNum),
-        Tuple2("generatedPredicateNumber",predAbs.cegar.generatedPredicateNumber),Tuple2("averagePredicateSize",predAbs.cegar.averagePredicateSize),
-        Tuple2("predicateGeneratorTime",predAbs.cegar.predicateGeneratorTime))
-      HintsSelection.writeInfoToJSON(measurementList,suffix = "measure")
+      if (GlobalParameters.get.singleMeasurement){
+        //write measurement to JSON file
+        val measurementList:Seq[Tuple2[String,Double]]=Seq(Tuple2("timeConsumptionForCEGAR",predAbs.cegar.cegarEndTime-predAbs.cegar.cegarStartTime)
+          ,Tuple2("itearationNumber",predAbs.cegar.iterationNum),
+          Tuple2("generatedPredicateNumber",predAbs.cegar.generatedPredicateNumber),Tuple2("averagePredicateSize",predAbs.cegar.averagePredicateSize),
+          Tuple2("predicateGeneratorTime",predAbs.cegar.predicateGeneratorTime))
+        HintsSelection.writeInfoToJSON(measurementList,suffix = "measure")
+      }
+
 
       if (GlobalParameters.get.log){
         val predMiner=Console.withOut(outStream){new PredicateMiner(predAbs)}

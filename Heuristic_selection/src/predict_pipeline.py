@@ -1,13 +1,12 @@
 from utils import flattenList,plot_scatter,generate_horn_graph,wrapped_generate_horn_graph,get_solvability_and_measurement_from_eldarica,get_recall_scatter,mutual_differences
-import os
-import sys
-from measurement_functions import read_measurement_from_JSON,get_analysis_for_predicted_labels
+import tensorflow as tf
+import gc
 from predict_functions import predict_label
 def main():
-    fold_number_list=["solvability"]
+    fold_number_list=["test"]
     for fold in fold_number_list:
         predict_pipeline(fold)
-#todo: get measurement for solvable set
+
 def predict_pipeline(fold_number=0):
     # description: parameter settings
     benchmark = "Linear-dataset-train"#sys.argv[1]
@@ -42,9 +41,17 @@ def predict_pipeline(fold_number=0):
         wrapped_generate_horn_graph(wrapped_generate_horn_graph_params)
 
 
-    # description: predict label
-    predict_label(benchmark, max_nodes_per_batch, benchmark_fold, filtered_file_list,trained_model_path,use_test_threshold,
-                  separateByPredicates=separateByPredicates,label=label,verbose=verbose,num_node_target_labels=num_node_target_labels)#file_list
+    # description: predict label one by one
+    for f in filtered_file_list:
+        print("file_name:",f)
+        predict_label(benchmark, max_nodes_per_batch, benchmark_fold, [f],trained_model_path,use_test_threshold,
+                      separateByPredicates=separateByPredicates,label=label,verbose=verbose,num_node_target_labels=num_node_target_labels)#file_list
+        gc.collect()
+        tf.keras.backend.clear_session()
+    # description: predict label together
+    # predict_label(benchmark, max_nodes_per_batch, benchmark_fold, filtered_file_list, trained_model_path, use_test_threshold,
+    #               separateByPredicates=separateByPredicates, label=label, verbose=verbose,
+    #               num_node_target_labels=num_node_target_labels)  # file_list
 
     # # description: get solvability and measurement info with different predicate setting for unseen data
     # get_solvability_and_measurement_from_eldarica_params={"filtered_file_list":filtered_file_list,"thread_number":thread_number,"continuous_extracting":continuous_extracting,
