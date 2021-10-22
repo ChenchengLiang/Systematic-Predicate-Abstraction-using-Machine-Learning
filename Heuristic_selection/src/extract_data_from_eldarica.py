@@ -107,13 +107,14 @@ def main():
 
     # extract data by shell
     data_fold=["train_data","test_data","valid_data"]
-    command_input=sys.argv[1]
+    command_input="temp-debug"#sys.argv[1]
     benchmark_name = os.path.join("../benchmarks/",command_input)#sys.argv[1]
     thread_number=4 #16
     timeout=3000
     #not use -abstract:all but try them separately
-    #separateMultiplePredicatesInBody
-    eldarica_parameters="-moveFile -noIntervals -extractTemplates -abstract:empty -getHornGraph:hyperEdgeGraph -solvabilityTimeout:3000 -mainTimeout:3000 -t:3000"#-abstract:all
+    #separateMultiplePredicatesInBody,-getLabelFromCounterExample,-argumentOccurenceLabel,-argumentBoundLabel,extractTemplates
+    #monoDirectionLayerGraph,hyperEdgeGraph
+    eldarica_parameters="-moveFile -getLabelFromCounterExample -argumentOccurenceLabel -argumentBoundLabel -abstract:empty -getHornGraph:monoDirectionLayerGraph -solvabilityTimeout:3000 -mainTimeout:3000 -t:3000"#-abstract:all
     #-onlyInitialPredicates -noIntervals -separateByPredicates  -generateTemplates
     #eldarica_parameters = "-moveFile -generateSimplePredicates -separateByPredicates -extractPredicates -noIntervals -labelSimpleGeneratedPredicates -getHornGraph:hyperEdgeGraph  -abstract:off -solvabilityTimeout:3600 -mainTimeout:3600 -t:4000"
     for df in data_fold:

@@ -10,27 +10,29 @@ def main():
                  "node_multiclass":"templateRelevanceLabel",
                  "predicate_occurrence_in_SCG":"predicateStrongConnectedComponent",
                  "argument_lower_bound_existence":"argumentBoundList",
-                 "argument_upper_bound_existence":"argumentBoundList"}
+                 "argument_upper_bound_existence":"argumentBoundList",
+                 "clause_occurrence_in_counter_examples_binary":"clauseBinaryOccurrenceInCounterExampleList"}
 
     parameter_list = []
     label_list=[]
     #label = "occurrence"
     #label = "rank"
     #label = "argument_identify"
-    #label_list.append("argument_identify")
+    label_list.append("argument_identify")
     #label = "argument_identify_no_batchs"
     #label = "control_location_identify"
-    #label_list.append("predicate_occurrence_in_clauses")
-    #label_list.append("predicate_occurrence_in_SCG")
+    label_list.append("predicate_occurrence_in_clauses")
+    label_list.append("predicate_occurrence_in_SCG")
     # label="argument_bound"
-    #label_list.append("argument_lower_bound_existence")
+    label_list.append("argument_lower_bound_existence")
     label_list.append("argument_upper_bound_existence")
     # label_list.append("argument_lower_bound")
     # label_list.append("argument_upper_bound")
     #label_list.append("argument_occurrence_binary")
     #label_list.append("template_relevance")
     #label_list.append("node_multiclass")
-    #label = "clause_occurrence_in_counter_examples_binary"
+    label_list.append("clause_occurrence_in_counter_examples_binary")
+
     # json_type = ".hyperEdgeHornGraph.JSON"
     # json_type = ".layerHornGraph.JSON"
     force_read = True

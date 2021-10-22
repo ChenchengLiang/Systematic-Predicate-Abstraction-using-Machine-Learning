@@ -160,11 +160,10 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         print("test_metric_string model from memory", test_metric_string)
         print("test_metric model from memory", test_metric)
 
-        predicted_Y_loaded_model_from_memory = model.predict(test_data)
-        sigmoid_predicted_Y_loaded_model_from_memory=tf.math.sigmoid(predicted_Y_loaded_model_from_memory)
-        rounded_predicted_Y_loaded_model_from_memory=my_round_fun(sigmoid_predicted_Y_loaded_model_from_memory,threshold=hyper_parameters["threshold"],label=label)
-        # print("predicted_Y_loaded_model_from_memory",sigmoid_predicted_Y_loaded_model_from_memory)
-        # print("rounded_predicted_Y_loaded_model_from_memory head",rounded_predicted_Y_loaded_model_from_memory[:10])
+        raw_predicted_Y_loaded_model_from_memory = model.predict(test_data)
+        predicted_Y_loaded_model_from_memory = raw_predicted_Y_loaded_model_from_memory if label in [
+            "predicate_occurrence_in_clauses"] else tf.math.sigmoid(raw_predicted_Y_loaded_model_from_memory)
+        rounded_predicted_Y_loaded_model_from_memory=my_round_fun(predicted_Y_loaded_model_from_memory,threshold=hyper_parameters["threshold"],label=label)
 
         #load model from files
         loaded_model = tf2_gnn.cli_utils.model_utils.load_model_for_prediction(trained_model_path, dataset)
@@ -190,9 +189,9 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         class_weight={"weight_for_1":parameters["class_weight_fold"]["weight_for_1"]/parameters["class_weight_fold"]["weight_for_0"],"weight_for_0":1}
         from_logits=True
 
-        error_loaded_model = compute_loss(label, true_Y, predicted_Y_loaded_model, class_weight, from_logits,gathered_nodes_binary_classification_task)
+        error_loaded_model = compute_loss(label, true_Y, raw_predicted_Y_loaded_model, class_weight, from_logits,gathered_nodes_binary_classification_task)
         print("\n error of loaded_model", error_loaded_model)
-        error_memory_model = compute_loss(label, true_Y, predicted_Y_loaded_model_from_memory, class_weight, from_logits,gathered_nodes_binary_classification_task)
+        error_memory_model = compute_loss(label, true_Y, raw_predicted_Y_loaded_model_from_memory, class_weight, from_logits,gathered_nodes_binary_classification_task)
         print("\n error of error_memory_model", error_memory_model)
         mean_label=np.full(np.array(predicted_Y_loaded_model_from_memory).shape,np.mean(true_Y))
         mean_loss = compute_loss(label, true_Y, mean_label, class_weight, from_logits,gathered_nodes_binary_classification_task)
@@ -801,7 +800,6 @@ def form_predicate_occurrence_related_label_graph_sample(params):
                                                                                                          params["file_name_list"],
                                                                                                          graphs_node_indices,
                                                                                                          params["graphs_learning_labels"]):
-        print("debug---")
         raw_data_graph.file_names.append(file_name)
         # node tokenization
         tokenized_node_label_ids=tokenize_symbols(params["token_map"],node_symbols)
