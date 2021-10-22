@@ -296,8 +296,8 @@ def main():
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
     # shuffle_data("../benchmarks/Linear-dataset/separated_benchmark-abstract-empty/sat",
     #              "../benchmarks/Linear-dataset/separated_benchmark-abstract-empty/sat-shuffled")
-    # divide_data_to_threads("Linear-dataset/extractable",
-    #                        "Linear-dataset/extractable-dividied",three_fold=True,datafold_list=["train_data","valid_data","test_data"],chunk_number=17)#datafold_list=["test_data"]
+    divide_data_to_threads("Linear-dataset/extractable",
+                           "Linear-dataset/extractable-dividied",three_fold=True,datafold_list=["train_data","valid_data","test_data"],chunk_number=4)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -319,7 +319,7 @@ def main():
     # get_generated_horn_graph()
     # for fold in ["train_data","valid_data","test_data"]:
     #     clean_extracted_data("thread_1/"+fold)
-    clean_extracted_data("linear-horn-graph-100000/test_data",total_file=5)
+    #clean_extracted_data("linear-empty-extracted/train_data",total_file=6)
 
     #align_extracted_data(benchmark="LIA-Lin+sv-comp",folder_name="sv-comp+LIA-Lin-train-with-CEGAR")
     # get_k_fold_train_data(benchmark="Linear-dataset",folder_name="Linear-dataset-extracted")

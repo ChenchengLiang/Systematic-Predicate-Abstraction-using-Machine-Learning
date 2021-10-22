@@ -7,7 +7,7 @@ def main():
     thread_number=4
     generateSimplePredicates=""
     separateByPredicates=""
-    generateTemplates="-generateTemplates"
+    generateTemplates=" " #"-generateTemplates"
     noIntervals=""
     abstract="-abstract:empty"
     benchmark=os.path.join("../benchmarks/",sys.argv[1])#sys.argv[1]
@@ -16,7 +16,7 @@ def main():
                                           "separateByPredicates": separateByPredicates,
                                           "abstract": abstract, "move_file": move_file, "thread_number": thread_number,
                                           "generateSimplePredicates": generateSimplePredicates,
-                                          "generateTemplates": generateTemplates, "data_fold": ["test_data"],
+                                          "generateTemplates": generateTemplates, "data_fold": ["valid_data","train_data","test_data"],
                                           "horn_graph_folder": "", "noIntervals": noIntervals}
     filtered_file_list, file_list_with_horn_graph, file_list = wrapped_generate_horn_graph(wrapped_generate_horn_graph_params)
 main()

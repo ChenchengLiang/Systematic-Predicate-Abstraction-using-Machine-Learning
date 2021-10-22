@@ -5,7 +5,12 @@ from horn_dataset import train_on_graphs
 
 
 def main():
-    label_pairs={"argument_identify":"argumentIndices","predicate_occurrence_in_clauses":"predicateOccurrenceInClause","node_multiclass":"templateRelevanceLabel"}
+    label_pairs={"argument_identify":"argumentIndices",
+                 "predicate_occurrence_in_clauses":"predicateOccurrenceInClause",
+                 "node_multiclass":"templateRelevanceLabel",
+                 "predicate_occurrence_in_SCG":"predicateStrongConnectedComponent",
+                 "argument_lower_bound_existence":"argumentBoundList",
+                 "argument_upper_bound_existence":"argumentBoundList"}
 
     parameter_list = []
     label_list=[]
@@ -15,11 +20,11 @@ def main():
     #label_list.append("argument_identify")
     #label = "argument_identify_no_batchs"
     #label = "control_location_identify"
-    label_list.append("predicate_occurrence_in_clauses")
+    #label_list.append("predicate_occurrence_in_clauses")
     #label_list.append("predicate_occurrence_in_SCG")
     # label="argument_bound"
     #label_list.append("argument_lower_bound_existence")
-    # label_list.append("argument_upper_bound_existence")
+    label_list.append("argument_upper_bound_existence")
     # label_list.append("argument_lower_bound")
     # label_list.append("argument_upper_bound")
     #label_list.append("argument_occurrence_binary")
@@ -42,7 +47,7 @@ def main():
     # tf.random.set_seed(0)
 
     hyper_parameters={"nodeFeatureDim":64,"num_layers":8,"regression_hidden_layer_size":[64,64],"threshold":0.5,"max_nodes_per_batch":10000,
-                      "max_epochs":500,"patience":500,"num_node_target_labels":num_node_target_labels}
+                      "max_epochs":50,"patience":50,"num_node_target_labels":num_node_target_labels}
 
     for label in label_list:
         parameter_list.append(parameters(relative_path="../benchmarks/"+benchmark_name,
@@ -56,10 +61,9 @@ def main():
         #     parameters(relative_path="../benchmarks/" + benchmark_name,
         #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
         #                json_type=".concretized-hyperedgeGraph.JSON", label=label))
-        # parameter_list.append(
-        #     parameters(relative_path="../benchmarks/" + benchmark_name,
-        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
-        #                json_type=".mono-layerHornGraph.JSON", label=label,label_field=label_pairs[label]))
+        parameter_list.append(parameters(relative_path="../benchmarks/" + benchmark_name,
+                       absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+                       json_type=".mono-layerHornGraph.JSON", label=label,label_field=label_pairs[label]))
         # parameter_list.append(
         #     parameters(relative_path="../benchmarks/"+benchmark_name,
         #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,

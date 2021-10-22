@@ -113,7 +113,7 @@ def main():
     timeout=3000
     #not use -abstract:all but try them separately
     #separateMultiplePredicatesInBody
-    eldarica_parameters="-moveFile -extractTemplates -abstract:empty -getHornGraph:hyperEdgeGraph -solvabilityTimeout:3000 -mainTimeout:3000 -t:3000"#-abstract:all
+    eldarica_parameters="-moveFile -noIntervals -extractTemplates -abstract:empty -getHornGraph:hyperEdgeGraph -solvabilityTimeout:3000 -mainTimeout:3000 -t:3000"#-abstract:all
     #-onlyInitialPredicates -noIntervals -separateByPredicates  -generateTemplates
     #eldarica_parameters = "-moveFile -generateSimplePredicates -separateByPredicates -extractPredicates -noIntervals -labelSimpleGeneratedPredicates -getHornGraph:hyperEdgeGraph  -abstract:off -solvabilityTimeout:3600 -mainTimeout:3600 -t:4000"
     for df in data_fold:

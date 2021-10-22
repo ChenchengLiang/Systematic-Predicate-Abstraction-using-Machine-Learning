@@ -117,18 +117,11 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
 
     for n in range(train_n_times): # train n time to get average performance, default is one
         # initial different models by different training task
-        if label == "argument_identify" or label == "control_location_identify" or label == "argument_identify_no_batchs": #all nodes binary classification task
+        if label in gathered_nodes_binary_classification_task+["argument_identify","control_location_identify","argument_identify_no_batchs"]:
             model = InvariantNodeIdentifyTask(parameters, dataset)
         elif label=="node_multiclass":
             model = InvariantNodeMultiClassTask(parameters, dataset)
-        elif label=="predicate_occurrence_in_clauses" or label=="argument_lower_bound" or label=="argument_upper_bound":#gathered nodes single output regression task
-            model = InvariantArgumentSelectionTask(parameters, dataset)
-        elif label in gathered_nodes_binary_classification_task: #gathered nodes binary classification task
-            model = InvariantNodeIdentifyTask(parameters, dataset)
-        elif label=="argument_bound": #gathered nodes two outputs regression task
-            patience=max_epochs
-            model = InvariantArgumentSelectionTask(parameters, dataset)
-        else:
+        elif label in ["predicate_occurrence_in_clauses","argument_lower_bound","argument_upper_bound","argument_bound"]:
             model = InvariantArgumentSelectionTask(parameters, dataset)
 
         #train
@@ -519,8 +512,8 @@ def write_graph_to_pickle(params):
                     elif params["label"]=="predicate_occurrence_in_SCG":
                         graphs_label_indices.append(loaded_graph["predicateIndices"])
                         graphs_learning_labels.append(loaded_graph["predicateStrongConnectedComponent"])
-                    elif params["label"]=="argument_bound" or params["label"]=="argument_lower_bound_existence" or\
-                            params["label"]=="argument_upper_bound_existence" or params["label"]=="argument_lower_bound" or params["label"]=="argument_upper_bound":
+                    elif params["label"] in ["argument_bound","argument_lower_bound_existence","argument_upper_bound_existence","argument_lower_bound","argument_upper_bound"]:
+                        graphs_label_indices.append(loaded_graph["argumentIndices"])
                         graphs_argument_indices.append(loaded_graph["argumentIndices"])
                         graphs_learning_labels.append(loaded_graph["argumentBoundList"])
                     elif params["label"]=="control_location_identify":
@@ -540,7 +533,6 @@ def write_graph_to_pickle(params):
                     elif params["label"]=="argument_identify":
                         graphs_label_indices.append(loaded_graph["argumentIndices"])
                         graphs_learning_labels.append(loaded_graph["nodeIds"])
-
                     else:
                         graphs_argument_indices.append(loaded_graph["argumentIndices"])
                         # read argument from JSON file
@@ -716,11 +708,6 @@ def form_predicate_occurrence_related_label_graph_sample(params):
     raw_data_graph=get_batch_graph_sample_info(params["graphs_adjacency_lists"],params["total_number_of_node"],
                                                params["vocabulary_set"],params["token_map"])
 
-    if params["label"] in params["gathered_nodes_binary_classification_task"]:
-        drawLabelPieChart(params["graphs_learning_labels"], params["label"], params["graph_type"], params["benchmark"],params["df"])
-    if params["label"] == "node_multiclass":
-        drawLabelPieChart(params["graphs_learning_labels"], params["label"], params["graph_type"], params["benchmark"],
-                          params["df"],multi_label=params["num_node_target_labels"],)
 
     if params["label"]=="node_multiclass":
         graphs_learning_labels_temp = []
@@ -749,7 +736,6 @@ def form_predicate_occurrence_related_label_graph_sample(params):
             graphs_learning_labels_temp.append(temp_graph_label)
         params["graphs_learning_labels"] = graphs_learning_labels_temp
 
-    #todo:argument occurence
     elif params["label"]=="argument_bound":
         for one_graph_learning_labels in params["graphs_learning_labels"]: #transform "None" to infinity
             for learning_labels in one_graph_learning_labels:
@@ -798,6 +784,13 @@ def form_predicate_occurrence_related_label_graph_sample(params):
                                                                                                 params["graphs_adjacency_lists"],
                                                                                                 params["file_name_list"], params["label"])
 
+
+
+    if params["label"] in params["gathered_nodes_binary_classification_task"]:
+        drawLabelPieChart(params["graphs_learning_labels"], params["label"], params["graph_type"], params["benchmark"],params["df"])
+    if params["label"] == "node_multiclass":
+        drawLabelPieChart(params["graphs_learning_labels"], params["label"], params["graph_type"], params["benchmark"],
+                          params["df"],multi_label=params["num_node_target_labels"],)
     all_one_label=0
     one_one_label=0
     other_distribution=0
@@ -808,6 +801,7 @@ def form_predicate_occurrence_related_label_graph_sample(params):
                                                                                                          params["file_name_list"],
                                                                                                          graphs_node_indices,
                                                                                                          params["graphs_learning_labels"]):
+        print("debug---")
         raw_data_graph.file_names.append(file_name)
         # node tokenization
         tokenized_node_label_ids=tokenize_symbols(params["token_map"],node_symbols)
@@ -823,8 +817,8 @@ def form_predicate_occurrence_related_label_graph_sample(params):
         # graphs_learning_labels=[learning_labels]
         # print("node_label_ids",len(node_label_ids),node_label_ids)
         # print("tokenized_node_label_ids",len(tokenized_node_label_ids),tokenized_node_label_ids)
-        # print("node_indices",node_indices)
-        # print("learning_labels",learning_labels)
+        # print("node_indices",len(node_indices),node_indices)
+        # print("learning_labels",len(learning_labels),learning_labels)
 
 
 
