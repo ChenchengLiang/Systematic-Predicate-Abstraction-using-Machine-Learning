@@ -31,20 +31,20 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters['graph_type'] = graph_type  # hyperEdgeHornGraph or layerHornGraph
     #parameters["message_calculation_class"]="rgcn"#rgcn,ggnn,rgat
     #parameters['num_heads'] = 2
-    parameters["global_exchange_dropout_rate"]=0
-    parameters["layer_input_dropout_rate"]=0
-    parameters["gnn_layer_input_dropout_rate"]=0
-    parameters["graph_aggregation_dropout_rate"]=0
-    parameters["regression_mlp_dropout"]=0
-    parameters["scoring_mlp_dropout_rate"]=0
+    # parameters["global_exchange_dropout_rate"]=0
+    # parameters["layer_input_dropout_rate"]=0
+    # parameters["gnn_layer_input_dropout_rate"]=0
+    # parameters["graph_aggregation_dropout_rate"]=0
+    # parameters["regression_mlp_dropout"]=0
+    # parameters["scoring_mlp_dropout_rate"]=0
     #parameters["residual_every_num_layers"]=10000000
     parameters['hidden_dim'] = nodeFeatureDim #64
     #parameters["num_edge_MLP_hidden_layers"]
 
     parameters["use_inter_layer_layernorm"]=True
-    parameters["dense_every_num_layers"] = 32
-    parameters["residual_every_num_layers"] = 32
-    parameters["global_exchange_every_num_layers"] = 32
+    # parameters["dense_every_num_layers"] = 32
+    # parameters["residual_every_num_layers"] = 32
+    # parameters["global_exchange_every_num_layers"] = 32
 
     parameters['num_layers'] = hyper_parameters["num_layers"]
     parameters['node_label_embedding_size'] = nodeFeatureDim
@@ -268,8 +268,11 @@ def draw_training_results(train_loss_list_average, valid_loss_list_average,
     plt.plot(valid_loss_list_average, color="green")
     plt.plot([mse_loaded_model_average] * len(train_loss_list_average), color="black")
     #plt.plot([mse_loaded_model_average] * len(train_loss_list_average), "o",color="black")
-    y_range=[0,max(max(train_loss_list_average),max(valid_loss_list_average))]
-    upper_bound=2#max(y_range)#1
+    y_range=[0,max(max(max(train_loss_list_average),max(valid_loss_list_average)),mse_loaded_model_average)]
+    if hyper_parameters["fix_y_axis"]==True:
+        upper_bound=2
+    else:
+        upper_bound=max(y_range)
     grid=upper_bound/10
     plt.ylim([min(y_range), upper_bound])
     plt.yticks(np.arange(min(y_range), upper_bound, grid))
@@ -707,7 +710,9 @@ def form_predicate_occurrence_related_label_graph_sample(params):
     raw_data_graph=get_batch_graph_sample_info(params["graphs_adjacency_lists"],params["total_number_of_node"],
                                                params["vocabulary_set"],params["token_map"])
 
-
+    if params["label"] == "node_multiclass":
+        drawLabelPieChart(params["graphs_learning_labels"], params["label"], params["graph_type"], params["benchmark"],
+                          params["df"],multi_label=params["num_node_target_labels"])
     if params["label"]=="node_multiclass":
         graphs_learning_labels_temp = []
         for one_graph_learning_labels in params["graphs_learning_labels"]:
@@ -784,12 +789,9 @@ def form_predicate_occurrence_related_label_graph_sample(params):
                                                                                                 params["file_name_list"], params["label"])
 
 
-
-    if params["label"] in params["gathered_nodes_binary_classification_task"]:
+    if params["label"] in params["gathered_nodes_binary_classification_task"] + ["argument_identify"]:
         drawLabelPieChart(params["graphs_learning_labels"], params["label"], params["graph_type"], params["benchmark"],params["df"])
-    if params["label"] == "node_multiclass":
-        drawLabelPieChart(params["graphs_learning_labels"], params["label"], params["graph_type"], params["benchmark"],
-                          params["df"],multi_label=params["num_node_target_labels"],)
+
     all_one_label=0
     one_one_label=0
     other_distribution=0
@@ -1074,8 +1076,8 @@ def get_predicted_label_list_divided_by_file(dataset,predicted_Y_loaded_model):
     return predicted_label_lists
 
 def build_vocabulary(datafold=["train", "valid", "test"], path="",json_type=".layerHornGraph.JSON",max_nodes_per_batch=10000):
-    vocabulary_set=set(["unknown_node","unknown_predicate","unkown_symblic_constant","unkown_predicate_argument",
-                        "unknown_operator","unknown_constant","unknown_predicate_label"])
+    vocabulary_set=set(["unknown_node","unknown_predicate","unknown_symbolic_constant","unknown_predicate_argument",
+                        "unknown_operator","unknown_constant","unknown_guard","unknown_template","unknown_predicateName","unknown_clause","unknown_clauseHead","unknown_clauseBody","unknown_clauseArgument"])
     for fold in datafold:
         for json_file in glob.glob(path+fold+"_data/*"+json_type+".zip"):
             if os.path.exists(json_file):
@@ -1100,6 +1102,12 @@ def build_vocabulary(datafold=["train", "valid", "test"], path="",json_type=".la
     return vocabulary_set,token_map
 
 def tokenize_symbols(token_map,node_symbols):
+    unknown_node_map = {"CONTROL": "unknown_predicate", "guard": "unknown_guard",
+                        "predicateArgument": "unknown_predicate_argument", "template": "unknown_template",
+                        "symbolicConstant": "unknown_symbolic_constant", "predicateName": "unknown_predicateName",
+                        "clause": "unknown_clause",
+                        "clauseHead": "unknown_clauseHead", "clauseBody": "unknown_clauseBody",
+                        "clauseArgument": "unknown_clauseArgument"}
     converted_node_symbols=[ convert_constant_to_category(word) for word in node_symbols]
     # node tokenization
     full_operator_list = ["+", "-", "*", "/", ">", ">=", "=", "<", "<=", "==", "===", "!", "+++", "++", "**", "***",
@@ -1109,25 +1117,16 @@ def tokenize_symbols(token_map,node_symbols):
     for symbol in converted_node_symbols:
         if symbol in token_map:
             tokenized_node_label_ids.append(token_map[symbol])
-        elif "CONTROL" in symbol:
-            #print("unknown_predicate_CONTROL", symbol)
-            tokenized_node_label_ids.append(token_map["unknown_predicate"])
-        elif "predicateArgument" in symbol:
-            #print("unkown_predicateArgument", symbol)
-            tokenized_node_label_ids.append(token_map["unkown_predicate_argument"])
-        elif "template" in symbol:
-            #print("unknown_predicate_label", symbol)
-            tokenized_node_label_ids.append(token_map["unknown_predicate_label"])
-        elif "SYMBOLIC_CONSTANT" in symbol:
-            #print("unkown_symblic_constant", symbol)
-            tokenized_node_label_ids.append(token_map["unkown_symblic_constant"])
+        # elif "CONTROL" in symbol:
+        #     tokenized_node_label_ids.append(token_map["unknown_predicate"])
         elif symbol.isnumeric() or symbol[1:].isnumeric():
-            #print("unknown_constant", symbol)
             tokenized_node_label_ids.append(token_map["unknown_constant"])
         elif symbol in full_operator_list:
-            #print("unknown_operator",symbol)
             tokenized_node_label_ids.append(token_map["unknown_operator"])
         else:
+            for k in unknown_node_map:
+                if k in symbol:
+                    tokenized_node_label_ids.append(token_map[unknown_node_map[k]])
             tokenized_node_label_ids.append(token_map["unknown_node"])
     return tokenized_node_label_ids
 

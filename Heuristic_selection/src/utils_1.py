@@ -332,15 +332,21 @@ def run_eldarica_with_shell_get_measurement(file_and_param):
 
 
 def run_eldarica_with_shell_get_solvability(file_and_param):
+    #todo:debug for ""File is not a zip file""
     move_file= (lambda : file_and_param[3] if len(file_and_param)>3 else True)()
     runtime = (lambda: file_and_param[4] if len(file_and_param) > 4 else 1)()
     file = file_and_param[0]
     file_dir_name=os.path.dirname(file)
     unzip_file_list=[]
+    # todo: rename these file to not be deleted by Eldarica
+    # zipped_file_list=glob.glob(file+"*")
+    # for f in zipped_file_list:
+
     for f in glob.glob(file+"*"):
         unzip_file(f)
-        unzip_file_list.append(f)
+        unzip_file_list.append(f[:-len(".zip")])
         #os.remove(f)
+    print("unzip_file_list",unzip_file_list)
     eldarica = "../eldarica-graph-generation/eld "
     # file = "../benchmarks/ulimit-test/Problem19_label06_true-unreach-call.c.flat_000.smt2"
     file_name = file[file.rfind("/") + 1:]
@@ -367,10 +373,11 @@ def run_eldarica_with_shell_get_solvability(file_and_param):
         f.close()
         supplementary_command = ["sh", shell_file_name]
         used_time=0
+
         for i in range(runtime):
-            used_time=used_time+call_Eldarica_one_time(file_name,parameter_list,supplementary_command,str(i+1)+"/"+str(runtime))
-            if not os.path.exists(file): #if moved by Eldarica zip it back
-                unzip_file(file + ".zip")
+            if os.path.exists(file): #if moved by Eldarica zip it back
+                used_time=used_time+call_Eldarica_one_time(file_name,parameter_list,supplementary_command,str(i+1)+"/"+str(runtime))
+
         used_time=used_time/runtime
         # subprocess.call(supplementary_command)
         os.remove(shell_file_name)
@@ -381,18 +388,19 @@ def run_eldarica_with_shell_get_solvability(file_and_param):
         else:
             solvability_str["solvability"+fold+"InitialPredicates"] = "false"
 
-
-    with open(file_dir_name+'/'+ file_name + '.solvability.JSON', 'w') as f:
-        json.dump(solvability_str, f, indent=4)
-
-    # compress files
-    for f in unzip_file_list:
-        os.remove(f)
+    solvability_file=file_dir_name+'/'+ file_name + '.solvability.JSON'
     if os.path.exists(file):
-        file_list = glob.glob(file + "*")
-        for f in file_list:
-            file_compress([f], f + ".zip")
+        with open(solvability_file, 'w') as f:
+            json.dump(solvability_str, f, indent=4)
+
+    for f in unzip_file_list:
+        if os.path.exists(f):
             os.remove(f)
+    # compress solvability_file
+    if os.path.exists(solvability_file):
+        file_compress([solvability_file], solvability_file + ".zip")
+        os.remove(solvability_file)
+
 
 def call_Eldarica_one_time(file_name,parameter_list,supplementary_command,runtime_progress):
     print("extracting " + file_name, parameter_list,runtime_progress)

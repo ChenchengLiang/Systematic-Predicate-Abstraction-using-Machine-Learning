@@ -152,12 +152,14 @@ def shuffle_data(rootdir, target_folder):
     if len(file_list)==0:
         file_list = glob.glob(rootdir + "/*.smt2.zip")
     print("total file ", len(file_list))
-    random.shuffle(file_list)
-    random.shuffle(file_list)
+    for i in range(5):
+        random.shuffle(file_list)
     # print(file_list)
-    train_files = file_list[0:int(len(file_list) * 0.6)]
-    valid_files = file_list[int(len(file_list) * 0.6):int(len(file_list) * 0.8)]
-    test_files = file_list[int(len(file_list) * 0.8):len(file_list)]
+    train_fold,valid_fold,test_fold=0.6,0.2,0.2
+    #train_fold, valid_fold, test_fold = 0.8, 0.1, 0.1
+    train_files = file_list[0:int(len(file_list) * train_fold)]
+    valid_files = file_list[int(len(file_list) * train_fold):int(len(file_list) * (1-valid_fold))]
+    test_files = file_list[int(len(file_list) * (1-test_fold)):len(file_list)]
     try:
         os.mkdir("../benchmarks/" + target_folder)
     except:
@@ -292,12 +294,15 @@ def main():
     # generate_JSON_field(parameter_for_JSON.root_dir, json_file_type=parameter_for_JSON.json_file_type,
     #                          eldarica_parameters=parameter_for_JSON.eldarica_parameters)
 
+    # for fold in ["train_data","valid_data","test_data"]:
+    #     clean_extracted_data("thread_1/"+fold)
+    #clean_extracted_data("linear-abstract-empty-unsolvable-horn-graphs-maxNode-10000/test_data",total_file=5)
     # extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
-    # shuffle_data("../benchmarks/Linear-dataset/separated_benchmark-abstract-empty/sat",
-    #              "../benchmarks/Linear-dataset/separated_benchmark-abstract-empty/sat-shuffled")
-    divide_data_to_threads("Linear-dataset/extractable",
-                           "Linear-dataset/extractable-dividied",three_fold=True,datafold_list=["train_data","valid_data","test_data"],chunk_number=4)#datafold_list=["test_data"]
+    # shuffle_data("../benchmarks/Linear-dataset/linear-abstract-empty-sat-extracted/sat-extracted/extracted-train-data",
+    #              "../benchmarks/Linear-dataset/linear-abstract-empty-sat-extracted/sat-extracted/extracted-train-data-shuffled-1")
+    divide_data_to_threads("Linear-dataset-train-unsolvable-predicted-test",
+                           "Linear-dataset-train-unsolvable-predicted-test-dividied",three_fold=True,datafold_list=["train_data","valid_data","test_data"],chunk_number=17)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -317,9 +322,7 @@ def main():
 
     #rebuild_exception_file("exception-LIA-Lin+sv-comp-predicted",["solvable-file"])
     # get_generated_horn_graph()
-    # for fold in ["train_data","valid_data","test_data"]:
-    #     clean_extracted_data("thread_1/"+fold)
-    #clean_extracted_data("linear-empty-extracted/train_data",total_file=6)
+
 
     #align_extracted_data(benchmark="LIA-Lin+sv-comp",folder_name="sv-comp+LIA-Lin-train-with-CEGAR")
     # get_k_fold_train_data(benchmark="Linear-dataset",folder_name="Linear-dataset-extracted")

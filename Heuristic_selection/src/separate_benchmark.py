@@ -55,7 +55,7 @@ def compress_files_in_exceptions():
     folder = ["exceed-max-node", "lia-lin-multiple-predicates-in-body", "no-initial-predicates",
               "no-predicates-selected", "no-simplified-clauses", "other-error", "out-of-memory",
               "shell-timeout", "solvability-timeout", "stack-overflow", "test-timeout", "time-out-exception",
-              "unsat","loop-head-empty"]
+              "unsat","loop-head-empty","empty-mined-label"]
     benckmarks = ["../benchmarks/exceptions/" + f for f in folder]
     for benchmark in benckmarks:
         from utils import file_compress

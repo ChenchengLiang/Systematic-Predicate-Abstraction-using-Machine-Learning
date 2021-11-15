@@ -37,7 +37,7 @@ def solvability_control_by_eldarica():
     get_solvability_and_measurement_from_eldarica(get_solvability_and_measurement_from_eldarica_params)
 
 def solvability_control_by_python():
-    benchmark_fold = sys.argv[1]
+    benchmark_fold = sys.argv[1] #"Linear-dataset-train-unsolvable-predicted-solvability"
     thread_number = 4
     continuous_extracting = True
     move_file = True
