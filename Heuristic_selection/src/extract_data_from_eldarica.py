@@ -81,30 +81,6 @@ def main():
     "-getHornGraph:hyperEdgeGraph","-getHornGraph:monoDirectionLayerGraph","-getHornGraph:hybridDirectionLayerGraph",
     "fineGrainedEdgeTypeLayerGraph"
     '''
-    #parameterList = ["-getLabelFromCE", "-abstract:manual"]
-    #parameterList = ["-getHornGraph","-abstract:manual"]
-    #parameterList = ["-extractPredicates","-solvabilityTimeout:180","-absTimeout:180", "-noIntervals"]
-    #parameterList = ["-extractPredicates","-onlySimplePredicates","-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120"] #extract test data, predicates generated from only simple generator
-    #parameterList = ["-extractPredicates","-generateSimplePredicates","-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120"] #extract train and valid data, predicates generated from both cegar and simple generator
-    #parameterList = ["-extractPredicates","-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120"] #extract predicate label only from cegar process
-
-    #extract data
-    # benchmark_name=os.path.join("../benchmarks/",sys.argv[1])#"../benchmarks/LIA-lin-datafold/"
-    # parameterList = ["-extractPredicates","-labelSimpleGeneratedPredicates","-varyGeneratedPredicates","-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120","-getHornGraph:hyperEdgeGraph","-mainTimeout:1200","-t:1800"] #extract train and valid data, predicates generated from both cegar and simple generator
-    # extract_train_data_pool(os.path.join(benchmark_name,"train_data"),extract_graph_from_eldarica,countinous_extract=True,parameterList=parameterList)
-    # extract_train_data_pool(os.path.join(benchmark_name,"valid_data"),extract_graph_from_eldarica, countinous_extract=True, parameterList=parameterList)
-    # extract_train_data_pool(os.path.join(benchmark_name, "test_data"), extract_graph_from_eldarica,countinous_extract=True, parameterList=parameterList)
-    # parameterList = ["-extractPredicates", "-labelSimpleGeneratedPredicates","-varyGeneratedPredicates", "-noIntervals", "-abstract","-solvabilityTimeout:120","-absTimeout:120","-getHornGraph:hyperEdgeGraph","-mainTimeout:1200","-t:1800"]  # extract test data, predicates generated from only simple generator
-    # extract_train_data_pool(os.path.join(benchmark_name,"test_data_simple_generator"),extract_graph_from_eldarica, countinous_extract=True, parameterList=parameterList)
-
-    #extract data by reading .tpl and json file
-    # benchmark_name = os.path.join("../benchmarks/", sys.argv[1])  # "../benchmarks/LIA-lin-datafold/"
-    # parameterList = ["-extractPredicates","-getHornGraph:hyperEdgeGraph", "-readHints"]
-    # for fold in ["train_data","valid_data","test_data"]:
-    #     extract_train_data_pool(os.path.join(benchmark_name, fold), extract_graph_from_eldarica,
-    #                             countinous_extract=True, parameterList=parameterList)
-
-
     # extract data by shell
     data_fold=["train_data","test_data","valid_data"]
     command_input=sys.argv[1]#"temp-debug"
@@ -112,11 +88,15 @@ def main():
     thread_number=2 #16
     timeout=2000
     #not use -abstract:all but try them separately
-    #separateMultiplePredicatesInBody,-getLabelFromCounterExample,-argumentOccurenceLabel,-argumentBoundLabel,extractTemplates
+    #separateMultiplePredicatesInBody,-getLabelFromCounterExample,-argumentOccurenceLabel,-argumentBoundLabel,extractTemplates,-onlyInitialPredicates -noIntervals -separateByPredicates  -generateTemplates
     #monoDirectionLayerGraph,hyperEdgeGraph
     #-maxNode:
+    parameters_extract_train_data_for_template_selection="-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -extractTemplates -t:1800"
+    parameters_generate_horn_graph_for_unsolvable_data_template_selection = "-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -generateTemplates -t:1800"
+    parameters_extract_train_data_for_first_three_graph_hyperedge="-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -t:1800"
+    parameters_extract_train_data_for_first_three_graph_mono_layer = "-moveFile -abstract:empty -getHornGraph:monoDirectionLayerGraph -t:1800"
+    parameters_extract_train_data_for_first_three_graph_bi_layer = "-moveFile -abstract:empty -getHornGraph:biDirectionLayerGraph -t:1800"
     eldarica_parameters="-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -t:1800" #-abstract:all -solvabilityTimeout:3600 -mainTimeout:3600
-    #-onlyInitialPredicates -noIntervals -separateByPredicates  -generateTemplates
     #eldarica_parameters = "-moveFile -generateSimplePredicates -separateByPredicates -extractPredicates -noIntervals -labelSimpleGeneratedPredicates -getHornGraph:hyperEdgeGraph  -abstract:off -solvabilityTimeout:3600 -mainTimeout:3600 -t:4000"
     for df in data_fold:
         run_eldarica_with_shell_pool(os.path.join(benchmark_name,df), run_eldarica_with_shell, eldarica_parameters,timeout=timeout,thread=thread_number)

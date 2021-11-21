@@ -189,9 +189,9 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         class_weight={"weight_for_1":parameters["class_weight_fold"]["weight_for_1"]/parameters["class_weight_fold"]["weight_for_0"],"weight_for_0":1}
         from_logits=True
 
-        error_loaded_model = compute_loss(label, true_Y, raw_predicted_Y_loaded_model, class_weight, from_logits,gathered_nodes_binary_classification_task)
+        error_loaded_model = compute_loss(label, true_Y, predicted_Y_loaded_model, class_weight, from_logits,gathered_nodes_binary_classification_task)
         print("\n error of loaded_model", error_loaded_model)
-        error_memory_model = compute_loss(label, true_Y, raw_predicted_Y_loaded_model_from_memory, class_weight, from_logits,gathered_nodes_binary_classification_task)
+        error_memory_model = compute_loss(label, true_Y, predicted_Y_loaded_model, class_weight, from_logits,gathered_nodes_binary_classification_task)
         print("\n error of error_memory_model", error_memory_model)
         mean_label=np.full(np.array(predicted_Y_loaded_model_from_memory).shape,np.mean(true_Y))
         mean_loss = compute_loss(label, true_Y, mean_label, class_weight, from_logits,gathered_nodes_binary_classification_task)
@@ -242,8 +242,12 @@ def get_classification_accuracy(true_Y,rounded_predicted_Y_loaded_model,label):
     if label=="node_multiclass":
         true_Y=np.argmax(true_Y, axis=1)
         rounded_predicted_Y_loaded_model = np.argmax(rounded_predicted_Y_loaded_model, axis=1)
-    print("true_Y",true_Y)
-    print("rounded_predicted_Y_loaded_model",rounded_predicted_Y_loaded_model)
+    if len(true_Y)<100:
+        print("true_Y", true_Y)
+        print("rounded_predicted_Y_loaded_model", rounded_predicted_Y_loaded_model)
+    else:
+        print("true_Y[100]", true_Y[100])
+        print("rounded_predicted_Y_loaded_model[100]", rounded_predicted_Y_loaded_model[100])
     num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, rounded_predicted_Y_loaded_model), tf.int32))
     accuracy = num_correct / len(rounded_predicted_Y_loaded_model)
     print("accuracy", accuracy)
@@ -580,16 +584,16 @@ def write_graph_to_pickle(params):
                     else:
                         #for layer horn graph
                         graphs_adjacency_lists.append([
-                            # np.array(loaded_graph["predicateArgumentEdges"]),
-                            # np.array(loaded_graph["predicateInstanceEdges"]),
-                            # np.array(loaded_graph["argumentInstanceEdges"]),
-                            # np.array(loaded_graph["controlHeadEdges"]),
-                            # np.array(loaded_graph["controlBodyEdges"]),
+                            np.array(loaded_graph["predicateArgumentEdges"]),
+                            np.array(loaded_graph["predicateInstanceEdges"]),
+                            np.array(loaded_graph["argumentInstanceEdges"]),
+                            np.array(loaded_graph["controlHeadEdges"]),
+                            np.array(loaded_graph["controlBodyEdges"]),
                             # np.array(loaded_graph["controlEdges"]),
-                            # np.array(loaded_graph["controlArgumentEdges"]),
-                            # np.array(loaded_graph["subTermEdges"]),
-                            # np.array(loaded_graph["guardEdges"]),
-                            # np.array(loaded_graph["dataEdges"]),
+                            np.array(loaded_graph["controlArgumentEdges"]),
+                            np.array(loaded_graph["subTermEdges"]),
+                            np.array(loaded_graph["guardEdges"]),
+                            np.array(loaded_graph["dataEdges"]),
                             # np.array(loaded_graph["predicateInstanceHeadEdges"]),
                             # np.array(loaded_graph["predicateInstanceBodyEdges"]),
                             # np.array(loaded_graph["controlArgumentHeadEdges"]),

@@ -3,7 +3,7 @@ import sys
 def main():
     from utils_1 import wrapped_generate_horn_graph
     move_file = True
-    max_nodes_per_batch=100000
+    max_nodes_per_batch=10000
     thread_number=4
     generateSimplePredicates=""
     separateByPredicates=""
