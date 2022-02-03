@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2020 Philipp Ruemmer. All rights reserved.
+ * Copyright (c) 2011-2021 Philipp Ruemmer. All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -52,6 +52,11 @@ object HornClauses {
     (for (clause <- clauses.iterator;
           p <- clause.predicates.iterator) yield p).toSet - HornClauses.FALSE
 
+  def allPredicatesCC[CC <% HornClauses.ConstraintClause]
+                     (clauses : Iterable[CC]) : Set[Predicate] =
+    (for (clause <- clauses.iterator;
+          p <- clause.predicates.iterator) yield p).toSet - HornClauses.FALSE
+
   def allTermsSimple(terms : Iterable[ITerm]) : Boolean =
     terms forall {
       case SimpleTerm(_) => true
@@ -61,6 +66,8 @@ object HornClauses {
   case class Clause(head : IAtom, body : List[IAtom], constraint : IFormula) {
     lazy val constants =
       SymbolCollector constants (and(body) & constraint & head)
+    lazy val constantsSorted =
+      SymbolCollector constantsSorted (and(body) & constraint & head)
     
     private lazy val headCanDirectlyBeInlined =
       (head.args forall (_.isInstanceOf[IConstant])) &&
@@ -244,7 +251,7 @@ object HornClauses {
       }
 
       val matrix = (and(body) &&& constraint) ===> headFor
-      quanConsts(Quantifier.ALL, constants.toSeq, matrix)
+      quanConsts(Quantifier.ALL, constantsSorted, matrix)
     }
 
     def toSMTString : String = SMTLineariser asString this.toFormula
@@ -319,6 +326,9 @@ object HornClauses {
                             Signature(Set(), Set(), order.orderedConstants, order))
     def collectTheories(coll : TheoryCollector) : Unit = {}
     override def toString = head.toString + " :- " + body.mkString(", ")
+
+    def predicates : Set[Predicate] =
+      (for (l <- Iterator(head) ++ body.iterator) yield l.predicate).toSet
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -410,7 +420,7 @@ object HornClauses {
       // TODO: check whether any quantifiers are left in the contraint, which could
       // be eliminated right away
 
-      HornPredAbs.toInternal(quanConsts(Quantifier.EX, c.constants,
+      HornPredAbs.toInternal(quanConsts(Quantifier.EX, c.constantsSorted,
                                         c.constraint & headEqs & bodyEqs),
                              sig)
     }

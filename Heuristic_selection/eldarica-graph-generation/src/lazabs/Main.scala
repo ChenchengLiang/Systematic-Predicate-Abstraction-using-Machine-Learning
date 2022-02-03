@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2021 Hossein Hojjat, Filip Konecny, Philipp Ruemmer,
+ * Copyright (c) 2011-2022 Hossein Hojjat, Filip Konecny, Philipp Ruemmer,
  * Pavle Subotic. All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -52,6 +52,9 @@ object GlobalParameters {
     new scala.util.DynamicVariable[GlobalParameters] (new GlobalParameters)
 
   def get : GlobalParameters = parameters.value
+
+  def withValue[A](p : GlobalParameters)(comp : => A) : A =
+    parameters.withValue(p)(comp)
 }
 
 class GlobalParameters extends Cloneable {
@@ -59,6 +62,7 @@ class GlobalParameters extends Cloneable {
   var argumentOccurenceLabel=false
   var argumentBoundLabel=false
   var getLabelFromCounterExample=false
+  var unionOption=false
   var readTrueLabel=false
   var separateMultiplePredicatesInBody=false
   var withoutGraphJSON=false
@@ -102,6 +106,7 @@ class GlobalParameters extends Cloneable {
   var intervals = true
   var prettyPrint = false
   var smtPrettyPrint = false
+  var graphPrettyPrint = false
 //  var interpolation = false
   var ntsPrint = false
   var printIntermediateClauseSets = false
@@ -148,9 +153,13 @@ class GlobalParameters extends Cloneable {
   var eogCEX = false;
   var plainCEX = false;
   var simplifiedCEX = false;
+  var cexInSMT = false;
   var assertions = false
   var verifyInterpolants = false
   var minePredicates = false
+  var mineCounterexamples = false
+  var boundsAnalysis = false
+  var boundsAnalysisTO = 5000
   var timeoutChecker : () => Unit = () => ()
 
   def needFullSolution = assertions || displaySolutionProlog || displaySolutionSMT
@@ -194,6 +203,7 @@ class GlobalParameters extends Cloneable {
     that.intervals = this.intervals
     that.prettyPrint = this.prettyPrint
     that.smtPrettyPrint = this.smtPrettyPrint
+    that. graphPrettyPrint = this.graphPrettyPrint
     that.ntsPrint = this.ntsPrint
     that.printIntermediateClauseSets = this.printIntermediateClauseSets
     that.horn = this.horn
@@ -235,6 +245,7 @@ class GlobalParameters extends Cloneable {
     that.pngNo = this.pngNo
     that.eogCEX = this.eogCEX
     that.plainCEX = this.plainCEX
+    that.cexInSMT = this.cexInSMT
     that.simplifiedCEX = this.simplifiedCEX
     that.assertions = this.assertions
     that.verifyInterpolants = this.verifyInterpolants
@@ -258,6 +269,7 @@ class GlobalParameters extends Cloneable {
     that.getHornGraph=this.getHornGraph
     that.getAllHornGraph=this.getAllHornGraph
     that.getLabelFromCounterExample=this.getLabelFromCounterExample
+    that.unionOption=this.unionOption
     that.argumentOccurenceLabel=this.argumentOccurenceLabel
     that.argumentBoundLabel=this.argumentBoundLabel
     that.generateSimplePredicates=this.generateSimplePredicates
@@ -270,6 +282,10 @@ class GlobalParameters extends Cloneable {
     that.readCost=this.readCost
     that.rdm=this.rdm
     that.moveFile = this.moveFile
+    that.minePredicates = this.minePredicates
+    that.mineCounterexamples = this.mineCounterexamples
+    that.boundsAnalysis = this.boundsAnalysis
+    that.boundsAnalysisTO = this.boundsAnalysisTO
   }
 
   override def clone : GlobalParameters = {
@@ -342,7 +358,7 @@ object Main {
 
 
   val greeting =
-    "Eldarica v2.0.7.\n(C) Copyright 2012-2021 Hossein Hojjat and Philipp Ruemmer"
+    "Eldarica v2.0.7.\n(C) Copyright 2012-2022 Hossein Hojjat and Philipp Ruemmer"
 
   def doMain(args: Array[String],
              stoppingCond : => Boolean) : Unit = try {
@@ -383,6 +399,7 @@ object Main {
       case "-getSMT2" :: rest => getSMT2 = true; arguments(rest)
       case "-debugLog" :: rest => debugLog = true; arguments(rest)
       case "-getLabelFromCounterExample":: rest =>getLabelFromCounterExample = true; arguments(rest)
+      case "-getLabelFromCounterExample:union":: rest =>{getLabelFromCounterExample = true; unionOption = true; arguments(rest)}
       case "-argumentOccurenceLabel":: rest =>argumentOccurenceLabel = true; arguments(rest)
       case "-argumentBoundLabel":: rest =>argumentBoundLabel = true; arguments(rest)
       case "-getHornGraph" :: rest => {
@@ -432,6 +449,7 @@ object Main {
       }
       case "-pIntermediate" :: rest => printIntermediateClauseSets = true; arguments(rest)
       case "-sp" :: rest => smtPrettyPrint = true; arguments(rest)
+      case "-gp" :: rest => graphPrettyPrint = true; arguments(rest)
 //      case "-pnts" :: rest => ntsPrint = true; arguments(rest)
       case "-horn" :: rest => horn = true; arguments(rest)
       case "-glb" :: rest => global = true; arguments(rest)
@@ -536,6 +554,15 @@ object Main {
 
       case "-minePredicates" :: rest => minePredicates = true; arguments(rest)
 
+      case "-mineCounterexamples" :: rest => mineCounterexamples = true; arguments(rest)
+
+      case "-boundsAnalysis" :: rest => boundsAnalysis = true; arguments(rest)
+
+      case tTimeout :: rest if (tTimeout.startsWith("-boundsAnalysisTO:")) =>
+        boundsAnalysisTO =
+          (java.lang.Float.parseFloat(tTimeout.drop(18)) * 1000).toInt;
+        arguments(rest)
+
       case "-splitClauses" :: rest => splitClauses = true; arguments(rest)
 
       case arithMode :: rest if (arithMode startsWith "-arithMode:") => {
@@ -591,6 +618,7 @@ object Main {
       case "-dotCEX" :: rest => pngNo = false; arguments(rest)
       case "-eogCEX" :: rest => pngNo = false; eogCEX = true; arguments(rest)
       case "-cex" :: rest => plainCEX = true; arguments(rest)
+      case "-scex" :: rest => plainCEX = true; cexInSMT = true; arguments(rest)
       case "-cexSimplified" :: rest => simplifiedCEX = true; arguments(rest)
       case "-assert" :: rest => GlobalParameters.get.assertions = true; arguments(rest)
       case "-verifyInterpolants" :: rest => verifyInterpolants = true; arguments(rest)
@@ -603,9 +631,10 @@ object Main {
           " -log:n\t\tDisplay progress with verbosity n (currently 0 <= n <= 3)\n" +
           " -statistics\tDisplay statistics (implied by -log)\n" +
           " -t:time\tSet timeout (in seconds)\n" +
-          " -cex\t\tShow textual counterexamples\n" +
-          " -dotCEX\tOutput counterexample in dot format\n" +
-          " -eogCEX\tDisplay counterexample using eog\n" +
+          " -cex\t\tShow textual counterexamples\n" + 
+          " -scex\t\tShow textual counterexamples in SMT-LIB format\n" + 
+          " -dotCEX\tOutput counterexample in dot format\n" + 
+          " -eogCEX\tDisplay counterexample using eog\n" + 
           " -m:func\tUse function func as entry point (default: main)\n" +
           "\n" +
           "Horn engine:\n" +
@@ -668,7 +697,7 @@ object Main {
           " -rank:n\t use top n or score above n ranked hints read from file\n"+
           " -maxNode:n\t if the node number exceeded this number, stop drawing\n"+
           " -getSMT2\t get SMT2 file\n"+
-          " -getLabelFromCounterExample\t  predicate occurrence in counter example\n"+
+          " -getLabelFromCounterExample:option\t  Interp. union. predicate occurrence in counter example\n"+
           " -argumentOccurenceLabel\t  argument occurrence in hints\n"+
           " -argumentBoundLabel\t  get argument lower and upper bound\n"+
           " -getHornGraph\t get all types of horn graph file and GNN input\n"+
@@ -964,6 +993,6 @@ object Main {
     if (message == null)
       println("error")
     else
-      println("(error \"" + message.replace("\"", "\"\"\"") + "\")")
+      println("(error \"" + ap.parser.SMTLineariser.escapeString(message) + "\")")
   
 }

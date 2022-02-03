@@ -85,18 +85,22 @@ def main():
     data_fold=["train_data","test_data","valid_data"]
     command_input=sys.argv[1]#"temp-debug"
     benchmark_name = os.path.join("../benchmarks/",command_input)#sys.argv[1]
-    thread_number=2 #16
-    timeout=2000
+    thread_number=16 #16
+    timeout=1800
     #not use -abstract:all but try them separately
     #separateMultiplePredicatesInBody,-getLabelFromCounterExample,-argumentOccurenceLabel,-argumentBoundLabel,extractTemplates,-onlyInitialPredicates -noIntervals -separateByPredicates  -generateTemplates
     #monoDirectionLayerGraph,hyperEdgeGraph
     #-maxNode:
-    parameters_extract_train_data_for_template_selection="-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -extractTemplates -t:1800"
-    parameters_generate_horn_graph_for_unsolvable_data_template_selection = "-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -generateTemplates -t:1800"
-    parameters_extract_train_data_for_first_three_graph_hyperedge="-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -t:1800"
-    parameters_extract_train_data_for_first_three_graph_mono_layer = "-moveFile -abstract:empty -getHornGraph:monoDirectionLayerGraph -t:1800"
-    parameters_extract_train_data_for_first_three_graph_bi_layer = "-moveFile -abstract:empty -getHornGraph:biDirectionLayerGraph -t:1800"
-    eldarica_parameters="-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -t:1800" #-abstract:all -solvabilityTimeout:3600 -mainTimeout:3600
+    parameters_extract_train_data_for_template_selection="-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -extractTemplates -t:1800 -maxNode:10000"
+    parameters_generate_horn_graph_for_unsolvable_data_template_selection = "-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -generateTemplates -t:1800 -maxNode:10000"
+    parameters_extract_train_data_for_first_three_graph_hyperedge="-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -t:1800 -maxNode:1000"
+    parameters_extract_train_data_for_counter_example_graph_hyperedge="-moveFile -abstract:empty -getLabelFromCounterExample -t:1800 -maxNode:10000"
+    parameters_extract_train_data_for_counter_example_graph_hyperedge_union = "-moveFile -abstract:empty -getLabelFromCounterExample:union -t:1800 -maxNode:10000"
+    parameters_extract_train_data_for_counter_example_graph_layer = "-moveFile -abstract:empty -getLabelFromCounterExample -getHornGraph:monoDirectionLayerGraph -t:1800 -maxNode:10000"
+    parameters_extract_train_data_for_counter_example_graph_layer_union = "-moveFile -abstract:empty -getLabelFromCounterExample:union -getHornGraph:monoDirectionLayerGraph -t:1800 -maxNode:10000"
+    parameters_extract_train_data_for_first_three_graph_mono_layer = "-moveFile -abstract:empty -getHornGraph:monoDirectionLayerGraph -t:1800 -maxNode:10000"
+    parameters_extract_train_data_for_first_three_graph_bi_layer = "-moveFile -abstract:empty -getHornGraph:biDirectionLayerGraph -t:1800 -maxNode:10000"
+    eldarica_parameters=parameters_extract_train_data_for_first_three_graph_hyperedge#"-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -t:1800" #-abstract:all -solvabilityTimeout:3600 -mainTimeout:3600
     #eldarica_parameters = "-moveFile -generateSimplePredicates -separateByPredicates -extractPredicates -noIntervals -labelSimpleGeneratedPredicates -getHornGraph:hyperEdgeGraph  -abstract:off -solvabilityTimeout:3600 -mainTimeout:3600 -t:4000"
     for df in data_fold:
         run_eldarica_with_shell_pool(os.path.join(benchmark_name,df), run_eldarica_with_shell, eldarica_parameters,timeout=timeout,thread=thread_number)

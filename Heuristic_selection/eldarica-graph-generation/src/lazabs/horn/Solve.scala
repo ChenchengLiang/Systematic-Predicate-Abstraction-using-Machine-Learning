@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2021 Hossein Hojjat and Philipp Ruemmer.
+ * Copyright (c) 2011-2022 Hossein Hojjat and Philipp Ruemmer.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,10 @@ import global._
 import bottomup._
 
 import bottomup.RelationSymbol
-import abstractions.{AbsLattice}
+import abstractions.AbsLattice
+import lazabs.horn.bottomup.Util.Dag
+
+import ap.parser._
 
 
 object Solve {
@@ -95,7 +98,7 @@ object Solve {
 
         result match {
 
-          case Right(cex) => {
+          case Right(_cex) => {
             if (lazabs.GlobalParameters.get.didIncompleteTransformation)
               println("unknown")
             else
@@ -106,21 +109,35 @@ object Solve {
                   println("NOT SOLVABLE")
               }
 
-            if (lazabs.GlobalParameters.get.plainCEX) {
-              println
-              cex.prettyPrint
+            lazy val cex = _cex()
+
+            if (lazabs.GlobalParameters.get.assertions) {
+              // make sure that the full counterexample is computed
+              cex
             }
 
-            Util.show(cex, "horn-cex")
-//            println(printTree(cex,""))
+            if (lazabs.GlobalParameters.get.plainCEX) {
+              println
+              dagPrettyPrint(cex)
+            }
+
+            if (!lazabs.GlobalParameters.get.pngNo)
+              Util.show(cex, "horn-cex")
           }
 
-          case Left(solution) => {
+          case Left(_solution) => {
             lazabs.GlobalParameters.get.format match {
               case lazabs.GlobalParameters.InputFormat.SMTHorn =>
                 println("sat")
               case _ =>
                 println("SOLVABLE")
+            }
+
+            lazy val solution = _solution()
+
+            if (lazabs.GlobalParameters.get.assertions) {
+              // make sure that the full solution is computed
+              solution
             }
 
             if (lazabs.GlobalParameters.get.displaySolutionProlog) {
@@ -154,4 +171,17 @@ object Solve {
         }
       }    
   }
+
+  def dagPrettyPrint(cex : Dag[IFormula]) =
+    if (lazabs.GlobalParameters.get.cexInSMT) {
+      val smtCEX = cex map {
+        f => f match {
+          case IAtom(HornClauses.FALSE, _) => "false"
+          case f => SMTLineariser asString f
+        }
+      }
+      smtCEX.prettyPrint
+    } else {
+      cex.prettyPrint
+    }
 }

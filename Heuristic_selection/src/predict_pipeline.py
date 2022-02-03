@@ -43,12 +43,12 @@ def predict_pipeline(fold_number=0):
 
 
     # description: predict label one by one
-    # for f in filtered_file_list:
-    #     print("file_name:",f)
-    #     predict_label(benchmark, max_nodes_per_batch, benchmark_fold, [f],trained_model_path,use_test_threshold,
-    #                   separateByPredicates=separateByPredicates,label=label,verbose=verbose,num_node_target_labels=num_node_target_labels)#file_list
-    #     gc.collect()
-    #     tf.keras.backend.clear_session()
+    for f in filtered_file_list:
+        print("file_name:",f)
+        predict_label(benchmark, max_nodes_per_batch, benchmark_fold, [f],trained_model_path,use_test_threshold,
+                      separateByPredicates=separateByPredicates,label=label,verbose=verbose,num_node_target_labels=num_node_target_labels)#file_list
+        gc.collect()
+        tf.keras.backend.clear_session()
     # description: predict label together
     # predict_label(benchmark, max_nodes_per_batch, benchmark_fold, filtered_file_list, trained_model_path, use_test_threshold,
     #               separateByPredicates=separateByPredicates, label=label, verbose=verbose,
@@ -62,74 +62,74 @@ def predict_pipeline(fold_number=0):
     # get_solvability_and_measurement_from_eldarica(get_solvability_and_measurement_from_eldarica_params)
     #
     # description: read solvability results
-    json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
-    #,"term","oct","relEqs","relIneqs"
-    fold_name= ["empty","predicted","full","random","term","oct","relEqs","relIneqs"] if generateTemplates=="-generateTemplates" else ["empty","predicted","full","true","random"]
-    solvability_name_fold= (lambda : fold_name if out_of_test_set==True else fold_name + ["true"])()
-    solvability_json_name_fold=[ "solvability"+x+"InitialPredicates" for x in solvability_name_fold]
-    solvable_file_list={name_fold:[] for name_fold in solvability_json_name_fold}
-    for name_fold in solvability_json_name_fold:
-        solvability = [1 if s[name_fold] == "true" else 0 for s in json_solvability_obj_list]
-        print("solved cases when use "+name_fold[len("solvability"):], str(sum(solvability)) + "/" + str(len(json_solvability_obj_list)))
-        for i, (s, f) in enumerate(zip(solvability, json_solvability_obj_list)):
-            if s == 1:
-                #print(json_solvability_obj_list[i]["file_name"])
-                solvable_file_list[name_fold].append(json_solvability_obj_list[i]["file_name"])
-    difference_betw_predicted_full=mutual_differences(solvable_file_list["solvabilitypredictedInitialPredicates"],solvable_file_list["solvabilityfullInitialPredicates"])
-    difference_betw_predicted_empty = mutual_differences(solvable_file_list["solvabilitypredictedInitialPredicates"],solvable_file_list["solvabilityemptyInitialPredicates"])
-    #difference_betw_predicted_true = mutual_differences(solvable_file_list["solvabilitypredictedInitialPredicates"],solvable_file_list["solvabilitytrueInitialPredicates"])
-    difference_betw_full_empty = mutual_differences(solvable_file_list["solvabilityfullInitialPredicates"],solvable_file_list["solvabilityemptyInitialPredicates"])
-    common_betw_predicted_full=set(solvable_file_list["solvabilitypredictedInitialPredicates"]).intersection(set(solvable_file_list["solvabilityfullInitialPredicates"]))
-    common_betw_predicted_empty = set(solvable_file_list["solvabilitypredictedInitialPredicates"]).intersection(set(solvable_file_list["solvabilityemptyInitialPredicates"]))
-    #common_betw_predicted_true = set(solvable_file_list["solvabilitypredictedInitialPredicates"]).intersection(set(solvable_file_list["solvabilitytrueInitialPredicates"]))
-    common_betw_full_empty = set(solvable_file_list["solvabilityfullInitialPredicates"]).intersection(set(solvable_file_list["solvabilityemptyInitialPredicates"]))
-
-    #unique solved
-    for u_fold in fold_name:
-        unique_solved_by_u_fold=[]
-        fold_name_except_u_fold = fold_name.copy()
-        fold_name_except_u_fold.remove(u_fold)
-        solvable_file_list_except_predicted = set(flattenList(
-            [solvable_file_list["solvability" + fn + "InitialPredicates"] for fn in fold_name_except_u_fold]))
-        for f in solvable_file_list["solvabilitypredictedInitialPredicates"]:
-            if not f in solvable_file_list_except_predicted:
-                unique_solved_by_u_fold.append(f[f.rfind("/") + 1:])
-        #print("solvable_file_list_except_predicted",len(solvable_file_list_except_predicted),solvable_file_list_except_predicted)
-        print("unique_solved_by " +u_fold, len(unique_solved_by_u_fold), unique_solved_by_u_fold)
-
-
-    print("difference_betw_predicted_full", len(difference_betw_predicted_full),difference_betw_predicted_full)
-    print("difference_betw_predicted_empty", len(difference_betw_predicted_empty),difference_betw_predicted_empty)
-    # print("difference_betw_full_empty", len(difference_betw_full_empty))
-    #print("difference_betw_predicted_true", len(difference_betw_predicted_true))
-    print("common_betw_predicted_empty", len(common_betw_predicted_empty))
-    print("common_betw_predicted_full", len(common_betw_predicted_full))
-    #print("common_betw_predicted_true", len(common_betw_predicted_true))
-    print("common_betw_full_empty", len(common_betw_full_empty))
-
-    unique_solved_by_predicted = []
-    unique_solved_by_random = []
-    # unique_solved_by_true = []
-    fold_name_except_predicted = fold_name
-    fold_name_except_predicted.remove("predicted")
-    fold_name_except_random = fold_name
-    fold_name_except_random.remove("random")
-    solvable_file_list_except_predicted = set(flattenList(
-        [solvable_file_list["solvability" + fn + "InitialPredicates"] for fn in fold_name_except_predicted]))
-    solvable_file_list_except_random = set(
-        flattenList([solvable_file_list["solvability" + fn + "InitialPredicates"] for fn in fold_name_except_random]))
-    for f in solvable_file_list["solvabilitypredictedInitialPredicates"]:
-        if not f in solvable_file_list_except_predicted:
-            unique_solved_by_predicted.append(f[f.rfind("/") + 1:])
-    for f in solvable_file_list["solvabilityrandomInitialPredicates"]:
-        if not f in solvable_file_list_except_random:
-            unique_solved_by_random.append(f[f.rfind("/") + 1:])
-    # for f in solvable_file_list["solvabilitytrueInitialPredicates"]:
-    #     if not f in set(solvable_file_list["solvabilityfullInitialPredicates"]+ solvable_file_list["solvabilityemptyInitialPredicates"]):
-    #         unique_solved_by_true.append(f)
-
-    print("unique_solved_by_predicted", len(unique_solved_by_predicted),unique_solved_by_predicted)
-    print("unique_solved_by_random", len(unique_solved_by_random),unique_solved_by_random)
+    # json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
+    # #,"term","oct","relEqs","relIneqs"
+    # fold_name= ["empty","predicted","full","random","term","oct","relEqs","relIneqs"] if generateTemplates=="-generateTemplates" else ["empty","predicted","full","true","random"]
+    # solvability_name_fold= (lambda : fold_name if out_of_test_set==True else fold_name + ["true"])()
+    # solvability_json_name_fold=[ "solvability"+x+"InitialPredicates" for x in solvability_name_fold]
+    # solvable_file_list={name_fold:[] for name_fold in solvability_json_name_fold}
+    # for name_fold in solvability_json_name_fold:
+    #     solvability = [1 if s[name_fold] == "true" else 0 for s in json_solvability_obj_list]
+    #     print("solved cases when use "+name_fold[len("solvability"):], str(sum(solvability)) + "/" + str(len(json_solvability_obj_list)))
+    #     for i, (s, f) in enumerate(zip(solvability, json_solvability_obj_list)):
+    #         if s == 1:
+    #             #print(json_solvability_obj_list[i]["file_name"])
+    #             solvable_file_list[name_fold].append(json_solvability_obj_list[i]["file_name"])
+    # difference_betw_predicted_full=mutual_differences(solvable_file_list["solvabilitypredictedInitialPredicates"],solvable_file_list["solvabilityfullInitialPredicates"])
+    # difference_betw_predicted_empty = mutual_differences(solvable_file_list["solvabilitypredictedInitialPredicates"],solvable_file_list["solvabilityemptyInitialPredicates"])
+    # #difference_betw_predicted_true = mutual_differences(solvable_file_list["solvabilitypredictedInitialPredicates"],solvable_file_list["solvabilitytrueInitialPredicates"])
+    # difference_betw_full_empty = mutual_differences(solvable_file_list["solvabilityfullInitialPredicates"],solvable_file_list["solvabilityemptyInitialPredicates"])
+    # common_betw_predicted_full=set(solvable_file_list["solvabilitypredictedInitialPredicates"]).intersection(set(solvable_file_list["solvabilityfullInitialPredicates"]))
+    # common_betw_predicted_empty = set(solvable_file_list["solvabilitypredictedInitialPredicates"]).intersection(set(solvable_file_list["solvabilityemptyInitialPredicates"]))
+    # #common_betw_predicted_true = set(solvable_file_list["solvabilitypredictedInitialPredicates"]).intersection(set(solvable_file_list["solvabilitytrueInitialPredicates"]))
+    # common_betw_full_empty = set(solvable_file_list["solvabilityfullInitialPredicates"]).intersection(set(solvable_file_list["solvabilityemptyInitialPredicates"]))
+    #
+    # #unique solved
+    # for u_fold in fold_name:
+    #     unique_solved_by_u_fold=[]
+    #     fold_name_except_u_fold = fold_name.copy()
+    #     fold_name_except_u_fold.remove(u_fold)
+    #     solvable_file_list_except_predicted = set(flattenList(
+    #         [solvable_file_list["solvability" + fn + "InitialPredicates"] for fn in fold_name_except_u_fold]))
+    #     for f in solvable_file_list["solvabilitypredictedInitialPredicates"]:
+    #         if not f in solvable_file_list_except_predicted:
+    #             unique_solved_by_u_fold.append(f[f.rfind("/") + 1:])
+    #     #print("solvable_file_list_except_predicted",len(solvable_file_list_except_predicted),solvable_file_list_except_predicted)
+    #     print("unique_solved_by " +u_fold, len(unique_solved_by_u_fold), unique_solved_by_u_fold)
+    #
+    #
+    # print("difference_betw_predicted_full", len(difference_betw_predicted_full),difference_betw_predicted_full)
+    # print("difference_betw_predicted_empty", len(difference_betw_predicted_empty),difference_betw_predicted_empty)
+    # # print("difference_betw_full_empty", len(difference_betw_full_empty))
+    # #print("difference_betw_predicted_true", len(difference_betw_predicted_true))
+    # print("common_betw_predicted_empty", len(common_betw_predicted_empty))
+    # print("common_betw_predicted_full", len(common_betw_predicted_full))
+    # #print("common_betw_predicted_true", len(common_betw_predicted_true))
+    # print("common_betw_full_empty", len(common_betw_full_empty))
+    #
+    # unique_solved_by_predicted = []
+    # unique_solved_by_random = []
+    # # unique_solved_by_true = []
+    # fold_name_except_predicted = fold_name
+    # fold_name_except_predicted.remove("predicted")
+    # fold_name_except_random = fold_name
+    # fold_name_except_random.remove("random")
+    # solvable_file_list_except_predicted = set(flattenList(
+    #     [solvable_file_list["solvability" + fn + "InitialPredicates"] for fn in fold_name_except_predicted]))
+    # solvable_file_list_except_random = set(
+    #     flattenList([solvable_file_list["solvability" + fn + "InitialPredicates"] for fn in fold_name_except_random]))
+    # for f in solvable_file_list["solvabilitypredictedInitialPredicates"]:
+    #     if not f in solvable_file_list_except_predicted:
+    #         unique_solved_by_predicted.append(f[f.rfind("/") + 1:])
+    # for f in solvable_file_list["solvabilityrandomInitialPredicates"]:
+    #     if not f in solvable_file_list_except_random:
+    #         unique_solved_by_random.append(f[f.rfind("/") + 1:])
+    # # for f in solvable_file_list["solvabilitytrueInitialPredicates"]:
+    # #     if not f in set(solvable_file_list["solvabilityfullInitialPredicates"]+ solvable_file_list["solvabilityemptyInitialPredicates"]):
+    # #         unique_solved_by_true.append(f)
+    #
+    # print("unique_solved_by_predicted", len(unique_solved_by_predicted),unique_solved_by_predicted)
+    # print("unique_solved_by_random", len(unique_solved_by_random),unique_solved_by_random)
 
 
 

@@ -8,6 +8,7 @@ def main():
     label_pairs={"argument_identify":"argumentIndices",
                  "predicate_occurrence_in_clauses":"predicateOccurrenceInClause",
                  "predicate_occurrence_in_SCG":"predicateStrongConnectedComponent",
+                 "scc_test": "predicateStrongConnectedComponent",
                  "argument_lower_bound_existence":"argumentBoundList",
                  "argument_upper_bound_existence":"argumentBoundList",
                  "clause_occurrence_in_counter_examples_binary":"clauseBinaryOccurrenceInCounterExampleList",
@@ -19,12 +20,13 @@ def main():
     #label = "rank"
     #label = "argument_identify_no_batchs"
     #label = "control_location_identify"
-    label_list.append("argument_identify")
+    #label_list.append("argument_identify")
     #label_list.append("predicate_occurrence_in_clauses")
-    #label_list.append("predicate_occurrence_in_SCG")
+    label_list.append("predicate_occurrence_in_SCG")
+    #label_list.append("scc_test")
     # label_list.append("argument_lower_bound_existence")
     # label_list.append("argument_upper_bound_existence")
-    # label_list.append("clause_occurrence_in_counter_examples_binary")
+    #label_list.append("clause_occurrence_in_counter_examples_binary")
     # label="argument_bound"
     # label_list.append("argument_lower_bound")
     # label_list.append("argument_upper_bound")
@@ -40,21 +42,21 @@ def main():
     GPU=False
     use_class_weight=False
     pickle = True
-    benchmark_name = "lienar-10-percent-first-three-tasks-bi-direction-layer-graph/"
-    num_node_target_labels=5
+    benchmark_name = "Linear-dataset-pure-scc-self-edge/"#"Linear-dataset-counter-example-train-full-common/"#"Linear-dataset-counter-example-task-hyper-edge-graph/"
+    num_node_target_labels=2
 
     # random.seed(0)
     # np.random.seed(0)
     # tf.random.set_seed(0)
 
 
-    hyper_parameters={"nodeFeatureDim":64,"num_layers":2,"regression_hidden_layer_size":[64,64],"threshold":0.5,"max_nodes_per_batch":10000,
-                      "max_epochs":500,"patience":50,"num_node_target_labels":num_node_target_labels,"fix_y_axis":False}
+    hyper_parameters={"nodeFeatureDim":64,"num_layers":32,"regression_hidden_layer_size":[64,64],"threshold":0.5,"max_nodes_per_batch":10000,
+                      "max_epochs":500,"patience":100,"num_node_target_labels":num_node_target_labels,"fix_y_axis":False}
 
     for label in label_list:
-        # parameter_list.append(parameters(relative_path="../benchmarks/"+benchmark_name,
-        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
-        #                json_type=".hyperEdgeHornGraph.JSON", label=label,label_field=label_pairs[label]))#templateRelevanceLabel,templateCostLabel,argumentIndices
+        parameter_list.append(parameters(relative_path="../benchmarks/"+benchmark_name,
+                      absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
+                      json_type=".hyperEdgeHornGraph.JSON", label=label,label_field=label_pairs[label]))#templateRelevanceLabel,templateCostLabel,argumentIndices
         # parameter_list.append(
         #     parameters(relative_path="../benchmarks/" + benchmark_name,
         #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
@@ -70,10 +72,10 @@ def main():
         #     parameters(relative_path="../benchmarks/"+benchmark_name,
         #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
         #                json_type=".hybrid-layerHornGraph.JSON", label=label))
-        parameter_list.append(
-            parameters(relative_path="../benchmarks/"+benchmark_name,
-                       absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
-                       json_type=".bi-layerHornGraph.JSON", label=label,label_field=label_pairs[label]))
+        # parameter_list.append(
+        #     parameters(relative_path="../benchmarks/"+benchmark_name,
+        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
+        #                json_type=".bi-layerHornGraph.JSON", label=label,label_field=label_pairs[label]))
         # parameter_list.append(
         #     parameters(relative_path="../benchmarks/" + benchmark_name,
         #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,

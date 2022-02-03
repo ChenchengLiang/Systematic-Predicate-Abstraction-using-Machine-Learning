@@ -30,7 +30,7 @@ trauncating and rounding after unsorted_segment_sum can be found in tf2_gnn/laye
 
 
 def main():
-    GPU = True
+    GPU = False
     pickle = False
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
                                                  "argument_upper_bound_existence", "argument_occurrence_binary",

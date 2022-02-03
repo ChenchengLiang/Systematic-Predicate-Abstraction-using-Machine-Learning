@@ -13,12 +13,12 @@ from utils import file_compress,unzip_file
 
 def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score_list,graph_type=".layerHornGraph.JSON"):
     # write predicted_argument_score to JSON file
-    old_field = ["nodeIds", "nodeSymbolList","falseIndices", "argumentIndices", "controlLocationIndices",
+    old_field = ["nodeIds", "nodeSymbolList","falseIndices", "argumentIndices", "controlLocationIndices","guardIndices",
                      "binaryAdjacentList", "ternaryAdjacencyList","unknownEdges","argumentIDList", "argumentNameList",
                      "argumentEdges","guardASTEdges","dataFlowASTEdges","controlFlowHyperEdges","dataFlowHyperEdges",
                      "argumentOccurrence","predicateIndices","predicateOccurrenceInClause","predicateStrongConnectedComponent",
                  "argumentBoundList","argumentBinaryOccurrenceList","templateIndices","templateRelevanceLabel","clauseIndices", #"templateCostLabel",
-                 "clauseBinaryOccurrenceInCounterExampleList","templateASTEdges","templateEdges","dummyFiled"]
+                 "clauseBinaryOccurrenceInCounterExampleList","templateASTEdges","templateEdges","controlLocationEdgeForSCC","dummyFiled"]
     new_field = ["predictedLabel"]
     for file, predicted_argument_score in zip(dataset._file_list["test"], predicted_argument_score_list):
         # # read argument id and name from .argument file
@@ -86,19 +86,33 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
             print("predicted_label", transfored_predicted_Y_loaded_model)
             print("threshold", threshold)
             print("corrected label:" + str(corrected_label) + "/" + str(len(g._node_label)))
+            if corrected_label<len(g._node_label):
+                from analysis_extracted_data import copy_relative_files
+                benchmark_folder=os.path.dirname(os.path.dirname(file_name))
+                final_target_folder=os.path.join(benchmark_folder,"wrong_predicted")
+                try:
+                    os.mkdir(final_target_folder)
+                except:
+                    pass
+                print("not 100% accuracy:",corrected_label/len(g._node_label))
+                copy_relative_files(file_name, final_target_folder)
 
-        old_field = ["nodeIds", "nodeSymbolList", "falseIndices", "argumentIndices", "controlLocationIndices",
+        old_field = ["nodeIds", "nodeSymbolList", "falseIndices", "argumentIndices", "controlLocationIndices","guardIndices",
                      "unknownEdges", "argumentIDList", "argumentNameList",
                      "argumentOccurrence", "predicateIndices", "predicateOccurrenceInClause",
                      "predicateStrongConnectedComponent",
                      "argumentBoundList", "argumentBinaryOccurrenceList", "templateIndices", "templateRelevanceLabel", #"templateCostLabel",
                      "clauseIndices","clauseBinaryOccurrenceInCounterExampleList",
-                     "argumentEdges", "guardASTEdges", "dataFlowASTEdges",
-                     "templateASTEdges","ASTEdges","AST_1Edges","AST_2Edges", "templateEdges","verifHintTplEqTermEdges","verifHintTplInEqTermEdges","verifHintTplPredPosNegEdges",
                      "binaryAdjacentList",
-                     "controlFlowHyperEdges","dataFlowHyperEdges",
                      "ternaryAdjacencyList",
                      "dummyFiled"]
+
+        if graph_type[1:-5]=="hyperEdgeHornGraph":
+            old_field=old_field+["argumentEdges","guardASTEdges","dataFlowASTEdges","templateASTEdges","controlFlowHyperEdges","dataFlowHyperEdges",
+                                 "ASTEdges","AST_1Edges","AST_2Edges", "templateEdges","verifHintTplEqTermEdges","verifHintTplInEqTermEdges","verifHintTplPredPosNegEdges",
+                                 "controlLocationEdgeForSCC"]
+        else:
+            old_field=old_field+["predicateArgumentEdges","predicateInstanceEdges"]
         json_file_name=file_name+graph_type
         if os.path.exists(json_file_name + ".zip"):
             unzip_file(json_file_name + ".zip")
@@ -270,7 +284,7 @@ def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",labe
 
 
 def predict_label(benchmark,max_nodes_per_batch,benchmark_fold,file_list,trained_model_path,use_test_threshold,label = "template_relevance",
-                  separateByPredicates="",verbose=True,num_node_target_labels=2):
+                  separateByPredicates="",verbose=True,num_node_target_labels=2,GPU=False,graph_type="hyperEdgeHornGraph"):
     if separateByPredicates:
         file_list=[]
     # read best threshold from pickle
@@ -279,14 +293,14 @@ def predict_label(benchmark,max_nodes_per_batch,benchmark_fold,file_list,trained
     hyper_parameter = {"max_nodes_per_batch": max_nodes_per_batch,
                        "best_threshold_set": (lambda : parameters["best_threshold_set"] if use_test_threshold== True else {"threshold":0.5,"accuracy":0})(),
                        "read_best_threshold": True,"label_field":parameters["label_field"]}
-    json_type = ".hyperEdgeHornGraph.JSON"
-    graph_type = json_type[1:json_type.find(".JSON")]
+    json_type = "."+graph_type+".JSON"
+    #graph_type = json_type[1:json_type.find(".JSON")]
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
                                                  "argument_upper_bound_existence", "argument_occurrence_binary",
                                                  "template_relevance", "clause_occurrence_in_counter_examples_binary"]
     force_read = True
     form_label = True
-    GPU_switch(False)
+    GPU_switch(GPU)
     result_dir = wrapped_prediction(trained_model_path=trained_model_path, benchmark=benchmark, benchmark_fold=benchmark_fold, force_read=force_read, form_label=form_label,
                                     json_type=json_type, graph_type=graph_type, gathered_nodes_binary_classification_task=gathered_nodes_binary_classification_task, hyper_parameter=hyper_parameter,label=label,
                                     set_max_nodes_per_batch=True,file_list=file_list,num_node_target_labels=num_node_target_labels)

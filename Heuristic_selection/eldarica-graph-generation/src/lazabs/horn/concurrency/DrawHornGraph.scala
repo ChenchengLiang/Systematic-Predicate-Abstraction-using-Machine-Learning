@@ -36,7 +36,7 @@ import lazabs.horn.abstractions.{TemplateType, TemplateTypeUsefulNess}
 import lazabs.horn.bottomup.HornClauses.Clause
 import lazabs.horn.preprocessor.HornPreprocessor.{Clauses, VerificationHints}
 import lazabs.horn.concurrency.DrawHornGraph.{HornGraphType, addQuotes, isNumeric}
-import lazabs.horn.concurrency.HintsSelection.{detectIfAJSONFieldExists, getParametersFromVerifHintElement, spAPI}
+import lazabs.horn.concurrency.HintsSelection.{detectIfAJSONFieldExists, getParametersFromVerifHintElement, replaceMultiSamePredicateInBody, spAPI}
 import play.api.libs.json.{JsSuccess, Json}
 
 import scala.collection.mutable.{ArrayBuffer, HashMap => MHashMap, Map => MuMap}
@@ -93,9 +93,7 @@ case class NodeInfo(canonicalName:String,labelName:String,className:String,shape
   var fillColor="white"
 }
 
-class GNNInput(clauseCollection:ClauseInfo) {
-  val simpClauses=clauseCollection.simplifiedClause
-  val clausesInCE = clauseCollection.clausesInCounterExample
+class GNNInput(simpClauses:Clauses,clausesInCE:Clauses) {
   var GNNNodeID = 0
   var hyperEdgeNodeID = 0
   var TotalNodeID = 0
@@ -135,6 +133,7 @@ class GNNInput(clauseCollection:ClauseInfo) {
   val controlFlowHyperEdges = new Adjacency("controlFlowHyperEdge", 3)
   val dataFlowHyperEdges = new Adjacency("dataFlowHyperEdge", 3)
   val clauseEdges = new Adjacency("clauseEdge", 2)
+  val controlLocationEdgeForSCC = new Adjacency("controlLocationEdgeForSCC", 2)
 
   //edge category for layer version horn graph
   val predicateArgumentEdges = new Adjacency("predicateArgument", 2)
@@ -162,9 +161,11 @@ class GNNInput(clauseCollection:ClauseInfo) {
   val subTermConstantOperatorEdges = new Adjacency("subTermConstantOperator", 2)
   val subTermOperatorOperatorEdges = new Adjacency("subTermOperatorOperator", 2)
   val subTermScOperatorEdges = new Adjacency("subTermScOperator", 2)
+  val predicateTransitiveEdges = new Adjacency("transitive", 2)
 
   var controlLocationIndices = Array[Int]()
   var falseIndices = Array[Int]()
+  var initialIndices = Array[Int]()
   var argumentIndices = Array[Int]()
   var guardIndices = Array[Int]()
   var templateIndices = Array[Int]()
@@ -178,10 +179,9 @@ class GNNInput(clauseCollection:ClauseInfo) {
   var argumentInfoHornGraphList = new ArrayBuffer[argumentInfoHronGraph]
   var nodeNameToIDMap = MuMap[String, Int]()
 
-  val learningLabel= new FormLearningLabels(clauseCollection)
+  val learningLabel= new FormLearningLabels(simpClauses,clausesInCE)
   val predicateOccurrenceInClauseLabel=learningLabel.getPredicateOccurenceInClauses()
-  val predicateStrongConnectedComponentLabel=learningLabel.getStrongConnectedComponentPredicateList()
-
+  val (predicateStrongConnectedComponentLabel,transitiveEdgeList)=learningLabel.getStrongConnectedComponentPredicateList()
   def incrementTemplates(element:String,fromID:Int,toID:Int): Unit ={
     element match {
       case "verifHintTplPred"=>verifHintTplPredEdges.incrementBinaryEdge(fromID, toID)
@@ -216,6 +216,8 @@ class GNNInput(clauseCollection:ClauseInfo) {
           case "clause" => clauseEdges.incrementBinaryEdge(fromID,toID)
           case "controlFlowHyperEdge"=> controlFlowHyperEdges.incrementBinaryEdge(fromID,toID)
           case "dataFlowHyperEdge" => dataFlowHyperEdges.incrementBinaryEdge(fromID,toID)
+          case "controlLocationEdgeForSCC" => controlLocationEdgeForSCC.incrementBinaryEdge(fromID,toID)
+          case "transitive" => predicateTransitiveEdges.incrementBinaryEdge(fromID,toID)
           case _ => unknownEdges.incrementBinaryEdge(fromID, toID)
         }
       }
@@ -271,6 +273,10 @@ class GNNInput(clauseCollection:ClauseInfo) {
     falseIndices :+= GNNNodeID
     incrementNodeIds(nodeUniqueName, nodeClass, nodeName)
   }
+  def incrementInitialIndicesAndNodeIds(nodeUniqueName: String, nodeClass: String, nodeName: String): Unit = {
+    initialIndices :+= GNNNodeID
+    incrementNodeIds(nodeUniqueName, nodeClass, nodeName)
+  }
 
   def incrementArgumentIndicesAndNodeIds(nodeUniqueName: String, nodeClass: String, nodeName: String): Unit = {
     argumentIndices :+= GNNNodeID
@@ -301,7 +307,10 @@ class GNNInput(clauseCollection:ClauseInfo) {
   }
   def incrementGuardIndicesAndNodeIds(nodeUniqueName: String, nodeClass: String, nodeName: String,clauseInfo:Clauses): Unit ={
     guardIndices :+=GNNNodeID
-    //todo: collect some learning labels
+    if (!clauseInfo.isEmpty && clausesInCE.map(_.toString).contains(clauseInfo.head.toString)) {
+      clausesOccurrenceInCounterExample :+=1
+    } else
+      clausesOccurrenceInCounterExample :+=0
     incrementNodeIds(nodeUniqueName, nodeClass, nodeName)
   }
   def incrementClauseIndicesAndNodeIds(nodeUniqueName: String, nodeClass: String, nodeName: String,clauseInfo:Clauses): Unit ={
@@ -315,7 +324,8 @@ class GNNInput(clauseCollection:ClauseInfo) {
 
   def incrementControlLocationIndicesAndNodeIds(nodeUniqueName: String, nodeClass: String, nodeName: String): Unit = {
     controlLocationIndices :+= GNNNodeID
-    for (l<-predicateOccurrenceInClauseLabel) if (l._1.name==nodeName) {
+    //println("predicateOccurrenceInClauseLabel",predicateOccurrenceInClauseLabel)
+    for (l<-predicateOccurrenceInClauseLabel) if (l._1==nodeName) {
       predicateIndices :+= GNNNodeID
       predicateOccurrenceInClause :+= l._2
       predicateStrongConnectedComponent:+=predicateStrongConnectedComponentLabel(nodeName)
@@ -325,7 +335,7 @@ class GNNInput(clauseCollection:ClauseInfo) {
   }
 
   def incrementPredicateIndicesAndNodeIds(nodeUniqueName: String, nodeClass: String, nodeName: String): Unit = {
-    for (l<-predicateOccurrenceInClauseLabel) if (l._1.name==nodeName) {
+    for (l<-predicateOccurrenceInClauseLabel) if (l._1==nodeName) {
       predicateIndices :+= GNNNodeID
       predicateOccurrenceInClause :+= l._2
       predicateStrongConnectedComponent:+=predicateStrongConnectedComponentLabel(nodeName)
@@ -424,6 +434,7 @@ class GNNInput(clauseCollection:ClauseInfo) {
         nodeSymbols :+= nodeClass + "_" + controlFlowHyperEdgeCanonicalID.toString
       case "dataFlowHyperEdge"=>
         nodeSymbols :+= nodeClass + "_" + dataFlowHyperEdgeCanonicalID.toString
+      case "Initial" => nodeSymbols :+= nodeName
       case "FALSE" => nodeSymbols :+= nodeName
       case "operator" => nodeSymbols :+= nodeName
       case "constant" => nodeSymbols :+= nodeName
@@ -435,7 +446,7 @@ class GNNInput(clauseCollection:ClauseInfo) {
 class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: VerificationHintsInfo, argumentInfoList: ArrayBuffer[argumentInfo]) {
   val sp = new Simplifier()
   val spAPI = ap.SimpleAPI.spawn
-  val simpClauses = clausesCollection.simplifiedClause
+  val simpClauses= clausesCollection.simplifiedClause
   val clausesInCE = clausesCollection.clausesInCounterExample
   val graphType = GlobalParameters.get.hornGraphType match {
     case DrawHornGraph.HornGraphType.hyperEdgeGraph => "hyperEdgeHornGraph"
@@ -460,7 +471,7 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
   val constantNodeSetCrossGraph = scala.collection.mutable.Map[String, String]()
   var astEdgeType = ""
   var astEndNodeType=""
-  val gnn_input = new GNNInput(clausesCollection)
+  val gnn_input = new GNNInput(simpClauses,clausesInCE)
   val writerGraph = new PrintWriter(new File(file + "." + graphType + ".gv"))
 
   edgeNameMap += ("templateAST"->"tplAST")
@@ -689,7 +700,7 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
   }
 
   def createNode(canonicalName: String, labelName: String, className: String, shape: String, clauseLabelInfo:Clauses=Seq(),hintLabel:Int=0): Unit = {
-    gnn_input.nodeInfoList+=(canonicalName->new NodeInfo(canonicalName,labelName,className,shape))
+    gnn_input.nodeInfoList+=(canonicalName->new NodeInfo(canonicalName,labelName+":"+gnn_input.GNNNodeID.toString,className,shape))
 //    writerGraph.write(addQuotes(canonicalName) +
 //      " [label=" + addQuotes(labelName) + " nodeName=" + addQuotes(canonicalName) + " class=" + className + " shape=" + addQuotes(shape) + "];" + "\n")
     className match {
@@ -697,6 +708,7 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
       case "CONTROL" => gnn_input.incrementControlLocationIndicesAndNodeIds(canonicalName, className, labelName)
       case "predicateName" => gnn_input.incrementPredicateIndicesAndNodeIds(canonicalName, className, labelName)
       case "FALSE" => gnn_input.incrementFalseIndicesAndNodeIds(canonicalName, className, labelName)
+      case "Initial" => gnn_input.incrementInitialIndicesAndNodeIds(canonicalName, className, labelName)
       case "template"=>gnn_input.incrementTemplateIndicesAndNodeIds(canonicalName, className, labelName,hintLabel)
       case "clause"=> gnn_input.incrementClauseIndicesAndNodeIds(canonicalName, className, labelName,clauseLabelInfo)
       case "guard"=> gnn_input.incrementGuardIndicesAndNodeIds(canonicalName, className, labelName,clauseLabelInfo)
@@ -800,6 +812,7 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
     writeGNNInputFieldToJSONFile("nodeIds", IntArray(gnn_input.nodeIds), writer, lastFiledFlag)
     writeGNNInputFieldToJSONFile("nodeSymbolList", StringArray(gnn_input.nodeSymbols), writer, lastFiledFlag)
     writeGNNInputFieldToJSONFile("falseIndices", IntArray(gnn_input.falseIndices), writer, lastFiledFlag)
+    writeGNNInputFieldToJSONFile("initialIndices", IntArray(gnn_input.initialIndices), writer, lastFiledFlag)
     writeGNNInputFieldToJSONFile("argumentIndices", IntArray(argumentIndicesList.toArray), writer, lastFiledFlag)
     writeGNNInputFieldToJSONFile("argumentBoundList", PairStringArray(argumentBoundList.toArray), writer, lastFiledFlag)
     writeGNNInputFieldToJSONFile("argumentBinaryOccurrenceList", IntArray(argumentBinaryOccurrenceList.toArray), writer, lastFiledFlag)
@@ -821,6 +834,9 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
     writeGNNInputFieldToJSONFile("predicateStrongConnectedComponent", IntArray(gnn_input.predicateStrongConnectedComponent), writer, lastFiledFlag)
     GlobalParameters.get.hornGraphType match {
       case DrawHornGraph.HornGraphType.hyperEdgeGraph=> {
+//        if (gnn_input.AST_1Edges.binaryEdge.length==0 || gnn_input.AST_2Edges.binaryEdge.length==0){
+//          println("gnn_input.AST_1Edges.binaryEdge",gnn_input.AST_1Edges.binaryEdge.length)
+//        }
         writeGNNInputFieldToJSONFile("argumentEdges", PairArray(gnn_input.argumentEdges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("guardASTEdges", PairArray(gnn_input.guardASTEdges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("ASTEdges", PairArray(gnn_input.ASTEdges.binaryEdge), writer, lastFiledFlag)
@@ -836,6 +852,8 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
         writeGNNInputFieldToJSONFile("dataFlowASTEdges", PairArray(gnn_input.dataFlowASTEdges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("controlFlowHyperEdges", TripleArray(gnn_input.controlFlowHyperEdges.ternaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("dataFlowHyperEdges", TripleArray(gnn_input.dataFlowHyperEdges.ternaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("controlLocationEdgeForSCC", PairArray(gnn_input.controlLocationEdgeForSCC.binaryEdge.distinct), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("predicateTransitiveEdges", PairArray(gnn_input.predicateTransitiveEdges.binaryEdge.distinct), writer, lastFiledFlag)
       }
       case DrawHornGraph.HornGraphType.equivalentHyperedgeGraph| DrawHornGraph.HornGraphType.concretizedHyperedgeGraph=>{
         writeGNNInputFieldToJSONFile("argumentEdges", PairArray(gnn_input.argumentEdges.binaryEdge), writer, lastFiledFlag)
@@ -848,6 +866,7 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
         writeGNNInputFieldToJSONFile("dataFlowASTEdges", PairArray(gnn_input.dataFlowASTEdges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("controlFlowHyperEdges", PairArray(gnn_input.controlFlowHyperEdges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("dataFlowHyperEdges", PairArray(gnn_input.dataFlowHyperEdges.binaryEdge), writer, lastFiledFlag)
+        writeGNNInputFieldToJSONFile("controlLocationEdgeForSCC", PairArray(gnn_input.controlLocationEdgeForSCC.binaryEdge.distinct), writer, lastFiledFlag)
       }
       case _ => {
         writeGNNInputFieldToJSONFile("predicateArgumentEdges", PairArray(gnn_input.predicateArgumentEdges.binaryEdge), writer, lastFiledFlag)

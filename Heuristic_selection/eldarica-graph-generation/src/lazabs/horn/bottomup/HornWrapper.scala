@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2021 Hossein Hojjat and Philipp Ruemmer.
+ * Copyright (c) 2011-2022 Hossein Hojjat and Philipp Ruemmer.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -279,7 +279,7 @@ class HornWrapper(constraints: Seq[HornClause],
     else
       List()
 
-  val result: Either[Map[Predicate, IFormula], Dag[IAtom]] =
+  val result : Either[() => Map[Predicate, IFormula], () => Dag[IAtom]] =
     ParallelComputation(params) {
       new InnerHornWrapper(unsimplifiedClauses, simplifiedClauses,
         allHints, preprocBackTranslator,
@@ -406,10 +406,22 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
   //    }
   //  }
 
-  val simplifiedClausesForGraph = HintsSelection.simplifyClausesForGraphs(simplifiedClauses, simpHints)// remove from benchmark if there are multiple atom in body
+
+  val simplifiedClausesForGraph = HintsSelection.normalizedClausesForGraphs(simplifiedClauses, simpHints)
+  if (GlobalParameters.get.graphPrettyPrint==true){
+    println("--------simplified clauses--------")
+    simplifiedClauses.map(_.toPrologString).foreach(println(_))
+    println("--------normalized clauses--------")
+    simplifiedClausesForGraph.map(_.toPrologString).foreach(println(_))
+  }
+  HintsSelection.filterInvalidInputs(simplifiedClausesForGraph)
   HintsSelection.checkMaxNode(simplifiedClausesForGraph)
+
   val sp = new Simplifier
   val fileName=GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"), GlobalParameters.get.fileName.length)
+
+
+
 
   if (simplifiedClausesForGraph.isEmpty) {
     HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/exceptions/no-simplified-clauses/" + fileName, message = "no simplified clauses")
@@ -612,12 +624,18 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
 
   //////////////////////////////////////////////////////////////////////////////
 
-  val result: Either[Map[Predicate, IFormula], Dag[IAtom]] = {
+  val result : Either[() => Map[Predicate, IFormula], () => Dag[IAtom]] = {
     val counterexampleMethod =
       if (disjunctive)
         CEGAR.CounterexampleMethod.AllShortest
       else
         CEGAR.CounterexampleMethod.FirstBestShortest
+
+    if (lazabs.GlobalParameters.get.boundsAnalysis) {
+      new BoundAnalyzer(simplifiedClauses, predGenerator)
+      sys.exit()
+      //throw PrintingFinishedException
+    }
 
     val predAbs = Console.withOut(outStream) {
       println
@@ -646,7 +664,18 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
       }
 
       if (GlobalParameters.get.getLabelFromCounterExample == true) {
-        val clausesInCE = getClausesInCounterExamples(predAbs.result, simplifiedClausesForGraph)
+        //val clausesInCE = getClausesInCounterExamples(predAbs.result, simplifiedClausesForGraph)
+        println("Mining counter example labels ...")
+        val CEMiner = new CounterexampleMiner(simplifiedClausesForGraph, predGenerator)
+        val clausesInCE =
+          if (GlobalParameters.get.unionOption == true)
+            for ((c, i) <- simplifiedClausesForGraph.zipWithIndex;
+                 if CEMiner.unionMinimalCounterexampleIndexs.contains(i)) yield {c}
+          else
+            for ((c, i) <- simplifiedClausesForGraph.zipWithIndex;
+                 if CEMiner.commonCounterexampleIndexs.contains(i)) yield {c}
+        println("Mining counter example labels finished ")
+
         val argumentInfo = HintsSelection.getArgumentLabel(simplifiedClausesForGraph,simpHints,predGenerator,disjunctive,
           argumentOccurrence = GlobalParameters.get.argumentOccurenceLabel,argumentBound =GlobalParameters.get.argumentBoundLabel)
         val hintsCollection = new VerificationHintsInfo(VerificationHints(Map()), VerificationHints(Map()), VerificationHints(Map()))
@@ -680,17 +709,26 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
       predAbs
     }
 
+    // save the current configuration, to make sure that the lazily
+    // computed solutions or counterexamples are computed with the
+    // same settings
+    val currentParams = GlobalParameters.get.clone
+
     predAbs.result match {
       case Left(res) => {
-        val r =
-          if (lazabs.GlobalParameters.get.needFullSolution) {
-            val fullSol = preprocBackTranslator translate res
-            HornWrapper.verifySolution(fullSol, unsimplifiedClauses)
-            Left(fullSol)
-          } else {
-            // only keep relation symbols that were also part of the orginal problem
-            Left(res filterKeys allPredicates(unsimplifiedClauses))
+        def solFun() =
+          lazabs.GlobalParameters.withValue(currentParams) {
+            if (lazabs.GlobalParameters.get.needFullSolution) {
+              val fullSol = preprocBackTranslator translate res
+              HornWrapper.verifySolution(fullSol, unsimplifiedClauses)
+              fullSol
+            } else {
+              // only keep relation symbols that were also part of the orginal problem
+              res filterKeys allPredicates(unsimplifiedClauses)
+            }
           }
+
+        val r = Left(solFun _)
 
         if (lazabs.GlobalParameters.get.minePredicates)
           new PredicateMiner(predAbs)
@@ -707,13 +745,22 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
           println
           cex.map(_._1).prettyPrint
         }
-        if (lazabs.GlobalParameters.get.needFullCEX) {
-          val fullCEX = preprocBackTranslator translate cex
-          HornWrapper.verifyCEX(fullCEX, unsimplifiedClauses)
-          Right(for (p <- fullCEX) yield p._1)
-        } else {
-          Right(for (p <- cex) yield p._1)
-        }
+        def cexFun() =
+          lazabs.GlobalParameters.withValue(currentParams) {
+            if (lazabs.GlobalParameters.get.needFullCEX) {
+              val fullCEX = preprocBackTranslator translate cex
+              HornWrapper.verifyCEX(fullCEX, unsimplifiedClauses)
+              for (p <- fullCEX) yield p._1
+            } else {
+              for (p <- cex) yield p._1
+            }
+          }
+
+        if (lazabs.GlobalParameters.get.mineCounterexamples)
+          new CounterexampleMiner(simplifiedClauses, predGenerator)
+
+        Right(cexFun _)
+
       }
     }
   }

@@ -299,10 +299,10 @@ def main():
     #clean_extracted_data("linear-abstract-empty-unsolvable-horn-graphs-maxNode-10000/test_data",total_file=5)
     # extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
-    # shuffle_data("../benchmarks/Linear-dataset/linear-abstract-empty-sat-extracted/sat-extracted/extracted-train-data",
-    #              "../benchmarks/Linear-dataset/linear-abstract-empty-sat-extracted/sat-extracted/extracted-train-data-shuffled-1")
-    divide_data_to_threads("Linear-dataset-train-unsolvable-predicted-test",
-                           "Linear-dataset-train-unsolvable-predicted-test-dividied",three_fold=True,datafold_list=["train_data","valid_data","test_data"],chunk_number=17)#datafold_list=["test_data"]
+    shuffle_data("../benchmarks/Linear-dataset-pure-scc/raw",
+                 "../benchmarks/Linear-dataset-pure-scc/raw-shuffle")
+    # divide_data_to_threads("Linear-dataset/counter-example-task-extractable/raw-shuffle",
+    #                        "Linear-dataset/counter-example-task-extractable/raw-shuffle-dividied",three_fold=True,datafold_list=["train_data","valid_data","test_data"],chunk_number=17)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -360,7 +360,29 @@ def main():
     #     rename_files_in_benchmarks("LIA-Lin+sv-comp/LIA-Lin+sv-comp-divided/thread_"+str(i))
     #compress_exception("Linear-dataset/separated_benchmark-abstract-empty/Linear-dataset-horn-graph-10000/exceptions")
 
+    # for data_fold in ["train_data","valid_data","test_data"]:
+    #     collect_common_files("Linear-dataset/first-three-task-extractable/extractable-raw/"+data_fold,"Linear-dataset/separated_benchmark-abstract-empty/exceptions/unsat","Linear-dataset/counter-example-task-extractable")
 
+
+def collect_common_files(folder1,folder2,out_put_folder):
+    files_in_folder_1=glob.glob("../benchmarks/" + folder1 + "/*.smt2.zip")
+    files_in_folder_2 = glob.glob("../benchmarks/" + folder2 + "/*.smt2.zip")
+
+    files_in_folder_1= [f[f.rfind("/")+1:] for f in files_in_folder_1]
+    files_in_folder_2 = [f[f.rfind("/") + 1:] for f in files_in_folder_2]
+    print("files_in_folder_1",len(files_in_folder_1))
+    print(files_in_folder_1)
+    print("files_in_folder_2", len(files_in_folder_2))
+    print(files_in_folder_2)
+    common_files=set(files_in_folder_1).intersection(set(files_in_folder_2))
+    print("common_files",len(common_files))
+    print(common_files)
+    try:
+        os.mkdir("../benchmarks/"+out_put_folder)
+    except:
+        print("folder existed")
+    for f in common_files:
+        copy_relative_files("../benchmarks/" + folder1 +"/"+f[:-len(".zip")],"../benchmarks/"+out_put_folder)
 
 def compress_exception(benchmark=""):
     folder = ["exceed-max-node", "lia-lin-multiple-predicates-in-body", "no-initial-predicates",

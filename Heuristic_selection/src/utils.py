@@ -48,31 +48,32 @@ def wrapped_generate_horn_graph(params):
     generate_horn_graph_params={"file_list":file_list,"max_nodes_per_batch":params["max_nodes_per_batch"],"move_file":params["move_file"],
                                 "thread_number":params["thread_number"],"generateSimplePredicates":params["generateSimplePredicates"],
                                 "generateTemplates":params["generateTemplates"],"separateByPredicates":params["separateByPredicates"],
-                                "abstract":params["abstract"],"noIntervals":params["noIntervals"]}
+                                "abstract":params["abstract"],"noIntervals":params["noIntervals"],"graph_type":params["graph_type"]}
     generate_horn_graph(generate_horn_graph_params)
     suffix = (lambda: "-0" if params["separateByPredicates"] else "")()
-    file_list = [file if os.path.exists(file +suffix + ".hyperEdgeHornGraph.JSON.zip") else None for file in file_list]
+    file_list = [file if os.path.exists(file +suffix + "."+params["graph_type"]+".JSON.zip") else None for file in file_list]
     file_list = list(filter(None, file_list))
     file_list_with_horn_graph = "file with horn graph " + str(len(file_list)) + "/" + str(initial_file_number)
     print("file_list_with_horn_graph", file_list_with_horn_graph)
     # description: filter files by max_nodes_per_batch
     filtered_file_list = filter_file_list_by_max_node(file_list, params["max_nodes_per_batch"],separateByPredicates=params["separateByPredicates"],
-                                                      benchmark_fold=params["benchmark_fold"],data_fold=params["data_fold"])
+                                                      benchmark_fold=params["benchmark_fold"],data_fold=params["data_fold"],graph_type=params["graph_type"])
     print("filtered_file_list",len(filtered_file_list))
     return filtered_file_list,file_list_with_horn_graph,file_list
 
 def generate_horn_graph(params):
     # description: generate horn graph
+    graph_type_eldarica_dirct={"mono-layerHornGraph":"monoDirectionLayerGraph","hyperEdgeHornGraph":"hyperEdgeGraph"}
     timeout = 60*60  # second
     move_file_parameter_eldarica = (lambda: " -moveFile " if params["move_file"] == True else " ")()
     # todo: use intervals and abstract:off -varyGeneratedPredicates
-    eldarica_parameters = "-getHornGraph:hyperEdgeGraph "+params["separateByPredicates"]+" "+\
+    eldarica_parameters = "-getHornGraph:"+graph_type_eldarica_dirct[params["graph_type"]]+" "+params["separateByPredicates"]+" "+\
                           params["generateSimplePredicates"] +" "+params["generateTemplates"]+" " + move_file_parameter_eldarica + " -maxNode:" + str(
         params["max_nodes_per_batch"]) + " "+params["abstract"] +" "+params["noIntervals"]+" -mainTimeout:3600"
     suffix = (lambda: "-0" if params["separateByPredicates"] else "")()
 
     file_list_with_parameters = [
-        [file, eldarica_parameters, timeout, params["move_file"]] if not os.path.exists(file+suffix + ".hyperEdgeHornGraph.JSON.zip") else []
+        [file, eldarica_parameters, timeout, params["move_file"]] if not os.path.exists(file+suffix + "."+params["graph_type"]+".JSON.zip") else []
         for file in params["file_list"]]
 
     file_list_for_horn_graph_generation = list(filter(lambda x: len(x) != 0, file_list_with_parameters))
@@ -90,15 +91,15 @@ def call_eldarica_in_batch(file_list,parameter_list=["-abstract", "-noIntervals"
     for file in file_list:
         call_eldarica(file, parameter_list)
 
-def filter_file_list_by_max_node(file_list,max_nodes_per_batch,separateByPredicates="",benchmark_fold="",data_fold=["test_data"]):
+def filter_file_list_by_max_node(file_list,max_nodes_per_batch,separateByPredicates="",benchmark_fold="",data_fold=["test_data"],graph_type="hyperEdgeHornGraph"):
     suffix=""
     if separateByPredicates:
         file_list = []
         for df in data_fold:
-            file_list=file_list+glob.glob("../benchmarks/"+benchmark_fold+"/"+df+"/*.hyperEdgeHornGraph.JSON.zip")
+            file_list=file_list+glob.glob("../benchmarks/"+benchmark_fold+"/"+df+"/*."+graph_type+".JSON.zip")
         file_list = [file[:-len(".zip")] for file in file_list]
     else:
-        suffix=".hyperEdgeHornGraph.JSON"
+        suffix="."+graph_type+".JSON"
     filtered_file_list=[]
     for file in file_list:
         file_name=file + suffix
@@ -246,11 +247,11 @@ def file_compress(inp_file_names, out_zip_file):
         print("*** Exception occurred during zip process -" ,str(e))
     finally:
         zf.close()
-def get_statistic_data(file_list,benchmark_fold="",separateByPredicates="",max_nodes_per_batch=10000):
+def get_statistic_data(file_list,benchmark_fold="",separateByPredicates="",max_nodes_per_batch=10000,graph_type="hyperEdgeHornGraph"):
     true_label = []
     predicted_label = []
     predicted_label_logit=[]
-    file_list=glob.glob("../benchmarks/"+benchmark_fold+"/test_data/*.hyperEdgeHornGraph.JSON")
+    file_list=glob.glob("../benchmarks/"+benchmark_fold+"/test_data/*."+graph_type+".JSON")
     for file in file_list:
         with open(file) as f:
             loaded_graph = json.load(f)
