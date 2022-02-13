@@ -251,8 +251,12 @@ def run_eldarica_with_shell(file_and_param):
 
     if move_file==True:
         if used_time>timeout and os.path.exists(file) and (not os.path.exists(file+"circles.gv")):
-            os.rename(file,"../benchmarks/exceptions/shell-timeout/"+file_name)
+            new_file="../benchmarks/exceptions/shell-timeout/"+file_name
+            os.rename(file,new_file)
             print("extracting " + file_name + " failed due to time out, move file to shell-timeout")
+            #compress
+            file_compress([new_file], new_file + ".zip")
+            os.remove(new_file)
 
     # compress files
     if os.path.exists(file):

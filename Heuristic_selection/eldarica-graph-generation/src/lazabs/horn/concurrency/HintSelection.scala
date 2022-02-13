@@ -596,7 +596,7 @@ object HintsSelection {
     val (csSimplifiedClauses,_,_)=cs.process(uniqueClauses.distinct,hints)
     GlobalParameters.get.hornGraphType match {
       case HornGraphType.hyperEdgeGraph | HornGraphType.equivalentHyperedgeGraph | HornGraphType.concretizedHyperedgeGraph=>{
-        val replacedClause=(for (c<-csSimplifiedClauses) yield replaceMultiSamePredicateInBody(c)).flatten// replace multiple same predicate in body
+        val replacedClause=(for ((c,i)<-csSimplifiedClauses.zipWithIndex) yield replaceMultiSamePredicateInBody(c,i)).flatten// replace multiple same predicate in body
         for (c<-replacedClause) yield HintsSelection.getSimplifiedClauses(DrawHyperEdgeHornGraph.replaceIntersectArgumentInBody(c.normalize()))
       }
       case _=>csSimplifiedClauses
@@ -1180,7 +1180,7 @@ object HintsSelection {
     //println(Console.BLUE + "clauseConstraintQuantify finished")
     Clause(clause.head, clause.body, simplifyedConstraints)
   }
-  def replaceMultiSamePredicateInBody(clause: Clause): Clauses ={
+  def replaceMultiSamePredicateInBody(clause: Clause,clauseIndex:Int): Clauses ={
     //if head == body: p(x)<-p(a) => p(x)<-p'(a), p'(a)<-p(a)
     //if multiple same relation symbos in the body: p(x)<-p'(a),p'(b)=> p(x)<-p'(a),p''(b), p''(b)<-p'(b)
     val originalBodyPredicatesList=clause.body
@@ -1190,7 +1190,7 @@ object HintsSelection {
     var count=1
     val renamedClauseBody=for(pbody<-clause.body)yield{
       if (!pbodyStrings.add(pbody.pred.name)){
-        val renamedBodyPredicate=IAtom(new Predicate(pbody.pred.name+"_"+count.toString,pbody.pred.arity),pbody.args)
+        val renamedBodyPredicate=IAtom(new Predicate(pbody.pred.name+"_"+clauseIndex.toString+"_"+count.toString,pbody.pred.arity),pbody.args)
         //println("replace",pbody,"by",renamedBodyPredicate)
         renamedBodyPredicatesList=renamedBodyPredicatesList:+renamedBodyPredicate
         count=count+1
@@ -1849,6 +1849,25 @@ object HintsSelection {
     arguments
   }
 
+  def argumentBoundAnalysis(argumentList: Array[(IExpression.Predicate, Int)],simplifiedClausesForGraph:Clauses,
+                            predGenerator:  Dag[DisjInterpolator.AndOrNode[NormClause, Unit]] => Either[Seq[(Predicate, Seq[Conjunction])], Dag[(IAtom, NormClause)]]): ArrayBuffer[argumentInfo] ={
+    val arguments = getArgumentInfo(argumentList)
+    val b=new BoundAnalyzer(simplifiedClausesForGraph, predGenerator)
+    for (arg<-arguments){
+      val lowerB=matchArgumentBound(b.lowerBounds.get(arg.location,arg.index))
+      val upperB=matchArgumentBound(b.upperBounds.get(arg.location,arg.index))
+      if (GlobalParameters.get.graphPrettyPrint==true)
+        println(arg.headName+":"+"argument"+arg.index+":["+lowerB+","+upperB+"]")
+      arg.bound=(lowerB,upperB)
+    }
+    arguments
+  }
+  def matchArgumentBound[A](bound:Option[A]): String ={
+    bound match {
+      case Some(x) => "1"
+      case None => "0"
+    }
+  }
   def getArgumentOccurrenceInHints(file: String,
                                    argumentList: Array[(IExpression.Predicate, Int)],
                                    positiveHints: VerificationHints,
@@ -1917,17 +1936,23 @@ object HintsSelection {
                        , predGenerator:  Dag[DisjInterpolator.AndOrNode[NormClause, Unit]] => Either[Seq[(Predicate, Seq[Conjunction])], Dag[(IAtom, NormClause)]],
                        disjunctive: Boolean,argumentOccurrence:Boolean,argumentBound:Boolean):  ArrayBuffer[argumentInfo] ={
     val argumentList = (for (p <- HornClauses.allPredicates(simplifiedClausesForGraph)) yield (p, p.arity)).toArray.sortBy(_._1.name)
-
+    //for (a<-argumentList) println(a)
     val argumentInfo = if (argumentOccurrence==true && argumentBound==true){
       val argumentOccurrenceInfo = HintsSelection.writeArgumentOccurrenceInHintsToFile(GlobalParameters.get.fileName, argumentList, simpHints, countOccurrence = false)
-      val argumentBoundInfo = HintsSelection.getArgumentBoundForSmt(argumentList,disjunctive,simplifiedClausesForGraph,simpHints,predGenerator)
+      val argumentBoundInfo = GlobalParameters.get.boundsAnalysis match {
+        case true=>argumentBoundAnalysis(argumentList,simplifiedClausesForGraph,predGenerator)
+        case false=>getArgumentBoundForSmt(argumentList,disjunctive,simplifiedClausesForGraph,simpHints,predGenerator)
+      }
       for (a<-(argumentOccurrenceInfo zip argumentBoundInfo)) yield {
         a._1.bound=a._2.bound
         a._1}
     }else if (argumentOccurrence==true){
       HintsSelection.writeArgumentOccurrenceInHintsToFile(GlobalParameters.get.fileName, argumentList, simpHints, countOccurrence = false)
     }else if (argumentBound==true){
-      HintsSelection.getArgumentBoundForSmt(argumentList,disjunctive,simplifiedClausesForGraph,simpHints,predGenerator)
+      GlobalParameters.get.boundsAnalysis match {
+        case true=>argumentBoundAnalysis(argumentList,simplifiedClausesForGraph,predGenerator)
+        case false=>getArgumentBoundForSmt(argumentList,disjunctive,simplifiedClausesForGraph,simpHints,predGenerator)
+      }
     } else{
       getArgumentInfo(argumentList)
     }

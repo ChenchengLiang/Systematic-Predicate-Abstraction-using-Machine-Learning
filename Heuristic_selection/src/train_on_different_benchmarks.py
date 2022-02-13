@@ -22,10 +22,10 @@ def main():
     #label = "control_location_identify"
     #label_list.append("argument_identify")
     #label_list.append("predicate_occurrence_in_clauses")
-    label_list.append("predicate_occurrence_in_SCG")
+    #label_list.append("predicate_occurrence_in_SCG")
     #label_list.append("scc_test")
-    # label_list.append("argument_lower_bound_existence")
-    # label_list.append("argument_upper_bound_existence")
+    label_list.append("argument_lower_bound_existence")
+    label_list.append("argument_upper_bound_existence")
     #label_list.append("clause_occurrence_in_counter_examples_binary")
     # label="argument_bound"
     # label_list.append("argument_lower_bound")
@@ -42,64 +42,70 @@ def main():
     GPU=False
     use_class_weight=False
     pickle = True
-    benchmark_name = "Linear-dataset-pure-scc-self-edge/"#"Linear-dataset-counter-example-train-full-common/"#"Linear-dataset-counter-example-task-hyper-edge-graph/"
+    benchmark_name = "Linear-dataset-argument-bound-10-percent/"#"Linear-dataset-counter-example-train-full-common/"#"Linear-dataset-counter-example-task-hyper-edge-graph/"
     num_node_target_labels=2
 
     # random.seed(0)
     # np.random.seed(0)
     # tf.random.set_seed(0)
 
+    num_layers_list=[8]
 
-    hyper_parameters={"nodeFeatureDim":64,"num_layers":32,"regression_hidden_layer_size":[64,64],"threshold":0.5,"max_nodes_per_batch":10000,
-                      "max_epochs":500,"patience":100,"num_node_target_labels":num_node_target_labels,"fix_y_axis":False}
+    for num_layers in num_layers_list:
+        hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers, "regression_hidden_layer_size": [64, 64],
+                            "threshold": 0.5, "max_nodes_per_batch": 10000,
+                            "max_epochs": 500, "patience": 100, "num_node_target_labels": num_node_target_labels,
+                            "fix_y_axis": False}
 
-    for label in label_list:
-        parameter_list.append(parameters(relative_path="../benchmarks/"+benchmark_name,
-                      absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
-                      json_type=".hyperEdgeHornGraph.JSON", label=label,label_field=label_pairs[label]))#templateRelevanceLabel,templateCostLabel,argumentIndices
-        # parameter_list.append(
-        #     parameters(relative_path="../benchmarks/" + benchmark_name,
-        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
-        #                json_type=".equivalent-hyperedgeGraph.JSON", label=label))
-        # parameter_list.append(
-        #     parameters(relative_path="../benchmarks/" + benchmark_name,
-        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
-        #                json_type=".concretized-hyperedgeGraph.JSON", label=label))
-        # parameter_list.append(parameters(relative_path="../benchmarks/" + benchmark_name,
-        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
-        #                json_type=".mono-layerHornGraph.JSON", label=label,label_field=label_pairs[label]))
-        # parameter_list.append(
-        #     parameters(relative_path="../benchmarks/"+benchmark_name,
-        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
-        #                json_type=".hybrid-layerHornGraph.JSON", label=label))
-        # parameter_list.append(
-        #     parameters(relative_path="../benchmarks/"+benchmark_name,
-        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
-        #                json_type=".bi-layerHornGraph.JSON", label=label,label_field=label_pairs[label]))
-        # parameter_list.append(
-        #     parameters(relative_path="../benchmarks/" + benchmark_name,
-        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
-        #                json_type=".clause-related-task-layerHornGraph.JSON", label=label))
-        # parameter_list.append(
-        #     parameters(relative_path="../benchmarks/" + benchmark_name,
-        #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
-        #                json_type=".fine-grained-edge-type-layerHornGraph.JSON", label=label))
+        for label in label_list:
+            parameter_list.append(parameters(relative_path="../benchmarks/"+benchmark_name,
+                          absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
+                          json_type=".hyperEdgeHornGraph.JSON", label=label,label_field=label_pairs[label]))#templateRelevanceLabel,templateCostLabel,argumentIndices
+            # parameter_list.append(
+            #     parameters(relative_path="../benchmarks/" + benchmark_name,
+            #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+            #                json_type=".equivalent-hyperedgeGraph.JSON", label=label))
+            # parameter_list.append(
+            #     parameters(relative_path="../benchmarks/" + benchmark_name,
+            #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+            #                json_type=".concretized-hyperedgeGraph.JSON", label=label))
+            # parameter_list.append(parameters(relative_path="../benchmarks/" + benchmark_name,
+            #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+            #                json_type=".mono-layerHornGraph.JSON", label=label,label_field=label_pairs[label]))
+            # parameter_list.append(
+            #     parameters(relative_path="../benchmarks/"+benchmark_name,
+            #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
+            #                json_type=".hybrid-layerHornGraph.JSON", label=label))
+            # parameter_list.append(
+            #     parameters(relative_path="../benchmarks/"+benchmark_name,
+            #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
+            #                json_type=".bi-layerHornGraph.JSON", label=label,label_field=label_pairs[label]))
+            # parameter_list.append(
+            #     parameters(relative_path="../benchmarks/" + benchmark_name,
+            #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+            #                json_type=".clause-related-task-layerHornGraph.JSON", label=label))
+            # parameter_list.append(
+            #     parameters(relative_path="../benchmarks/" + benchmark_name,
+            #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+            #                json_type=".fine-grained-edge-type-layerHornGraph.JSON", label=label))
 
-    GPU_switch(GPU)
+        GPU_switch(GPU)
 
 
-    for param in parameter_list:
-        if pickle==False:
-            train_on_graphs(benchmark_name=param.absolute_path[param.absolute_path.find("/benchmarks/")+len("/benchmarks/"):-1], label=param.label, force_read=force_read,
-                            train_n_times=1,path=param.absolute_path, file_type=file_type, form_label=form_label,
-                            json_type=param.json_type,GPU=GPU,pickle=pickle,use_class_weight=use_class_weight,label_field=param.label_field,
-                            hyper_parameters=hyper_parameters)
-        else:
-            train_on_graphs(benchmark_name=param.benchmark_name(),
-                            label=param.label, force_read=force_read,
-                            train_n_times=1, path=param.relative_path, file_type=file_type, form_label=form_label,
-                            json_type=param.json_type, GPU=GPU, pickle=pickle,use_class_weight=use_class_weight,label_field=param.label_field,
-                            hyper_parameters=hyper_parameters)
-        tf.keras.backend.clear_session()
+        for param in parameter_list:
+            if pickle==False:
+                train_on_graphs(benchmark_name=param.absolute_path[param.absolute_path.find("/benchmarks/")+len("/benchmarks/"):-1], label=param.label, force_read=force_read,
+                                train_n_times=1,path=param.absolute_path, file_type=file_type, form_label=form_label,
+                                json_type=param.json_type,GPU=GPU,pickle=pickle,use_class_weight=use_class_weight,label_field=param.label_field,
+                                hyper_parameters=hyper_parameters)
+            else:
+                train_on_graphs(benchmark_name=param.benchmark_name(),
+                                label=param.label, force_read=force_read,
+                                train_n_times=1, path=param.relative_path, file_type=file_type, form_label=form_label,
+                                json_type=param.json_type, GPU=GPU, pickle=pickle,use_class_weight=use_class_weight,label_field=param.label_field,
+                                hyper_parameters=hyper_parameters)
+            tf.keras.backend.clear_session()
+
+        parameter_list=[]
 
 main()

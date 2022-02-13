@@ -77,14 +77,14 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
             if y == predicted_Y:
                 corrected_label = corrected_label + 1
 
-        print("true_Y_list", true_Y_list)
-        print("transfored_predicted_Y_loaded_model", transfored_predicted_Y_loaded_model)
         if verbose==True:
             print("file_name", file_name)
             # print("g.node_indices", len(g._node_indices),g._node_indices)
-            print("g.node_label", len(true_Y_list), true_Y_list)
-            print("predicted_label", transfored_predicted_Y_loaded_model)
+            # print("g.node_label", len(true_Y_list), true_Y_list)
+            # print("predicted_label", np.array(transfored_predicted_Y_loaded_model))
             print("threshold", threshold)
+            print("true_Y_list", true_Y_list)
+            print("transfored_predicted_Y_loaded_model", np.array(transfored_predicted_Y_loaded_model))
             print("corrected label:" + str(corrected_label) + "/" + str(len(g._node_label)))
             if corrected_label<len(g._node_label):
                 from analysis_extracted_data import copy_relative_files
@@ -110,7 +110,7 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
         if graph_type[1:-5]=="hyperEdgeHornGraph":
             old_field=old_field+["argumentEdges","guardASTEdges","dataFlowASTEdges","templateASTEdges","controlFlowHyperEdges","dataFlowHyperEdges",
                                  "ASTEdges","AST_1Edges","AST_2Edges", "templateEdges","verifHintTplEqTermEdges","verifHintTplInEqTermEdges","verifHintTplPredPosNegEdges",
-                                 "controlLocationEdgeForSCC"]
+                                 "controlLocationEdgeForSCC","predicateTransitiveEdges"]
         else:
             old_field=old_field+["predicateArgumentEdges","predicateInstanceEdges"]
         json_file_name=file_name+graph_type

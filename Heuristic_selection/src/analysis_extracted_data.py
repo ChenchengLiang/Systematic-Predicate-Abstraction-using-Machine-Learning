@@ -299,8 +299,8 @@ def main():
     #clean_extracted_data("linear-abstract-empty-unsolvable-horn-graphs-maxNode-10000/test_data",total_file=5)
     # extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
-    shuffle_data("../benchmarks/Linear-dataset-pure-scc/raw",
-                 "../benchmarks/Linear-dataset-pure-scc/raw-shuffle")
+    shuffle_data("../benchmarks/Linear-dataset-argument-bound-10-percent/raw",
+                 "../benchmarks/Linear-dataset-argument-bound-10-percent/raw-shuffle")
     # divide_data_to_threads("Linear-dataset/counter-example-task-extractable/raw-shuffle",
     #                        "Linear-dataset/counter-example-task-extractable/raw-shuffle-dividied",three_fold=True,datafold_list=["train_data","valid_data","test_data"],chunk_number=17)#datafold_list=["test_data"]
 
@@ -358,10 +358,47 @@ def main():
 
     # for i in range(0,17):
     #     rename_files_in_benchmarks("LIA-Lin+sv-comp/LIA-Lin+sv-comp-divided/thread_"+str(i))
-    #compress_exception("Linear-dataset/separated_benchmark-abstract-empty/Linear-dataset-horn-graph-10000/exceptions")
+
+    #compress_exception("exceptions")
 
     # for data_fold in ["train_data","valid_data","test_data"]:
     #     collect_common_files("Linear-dataset/first-three-task-extractable/extractable-raw/"+data_fold,"Linear-dataset/separated_benchmark-abstract-empty/exceptions/unsat","Linear-dataset/counter-example-task-extractable")
+
+    # source_folder="Linear-dataset-pure-argument-identification-task"
+    # select_files_with_condition(source_folder, source_folder+"-separate-by-node-number")
+
+
+def make_dirct(d):
+    try:
+        os.mkdir(d)
+    except:
+        print("folder existed")
+
+def select_files_with_condition(source_folder_name,target_folder_name):
+    target_folder_1="../benchmarks/" + target_folder_name + "_1"
+    make_dirct(target_folder_1)
+    target_folder_2="../benchmarks/" + target_folder_name + "_2"
+    make_dirct(target_folder_2)
+    for fold in ["train_data","valid_data","test_data"]:
+        source_folder="../benchmarks/" + source_folder_name+"/"+fold
+        target_folder_1_fold = target_folder_1 + "/" + fold
+        target_folder_2_fold = target_folder_2+ "/" + fold
+        make_dirct(target_folder_1_fold)
+        make_dirct(target_folder_2_fold)
+        unzip_all_file_folder(source_folder)
+        file_list=glob.glob("../benchmarks/" + source_folder_name+"/"+fold + "/*.smt2")
+        for file in file_list:
+            with open(file+".hyperEdgeHornGraph.JSON") as f:
+                loaded_graph = json.load(f)
+            if len(loaded_graph["nodeIds"])>500:
+                #print(file, "nodeIDs > 100, move to " + target_folder_1_fold)
+                copy_relative_files(file, target_folder_1_fold)
+            else:
+                #print(file,"nodeIDs < 100, move to "+target_folder_2_fold)
+                copy_relative_files(file,target_folder_2_fold)
+        compress_all_file_folder(source_folder)
+        compress_all_file_folder(target_folder_1_fold)
+        compress_all_file_folder(target_folder_2_fold)
 
 
 def collect_common_files(folder1,folder2,out_put_folder):

@@ -501,14 +501,23 @@ def write_graph_to_pickle(params):
                 elif len(loaded_graph["nodeIds"]) >= params["max_nodes_per_batch"]: #
                     print("more than " + str(params["max_nodes_per_batch"]) + " nodes","skip",fileName)
                     skipped_file_list.append(fileName)
-                # elif json_type == (".hyperEdgeHornGraph.JSON" or json_type == ".equivalent-hyperedgeGraph.JSON" \
-                #                    or json_type == ".concretized-hyperedgeGraph.JSON") and (len(loaded_graph["AST_1Edges"]) == 0 or len(loaded_graph["AST_2Edges"]) == 0 ):
-                #     print("no AST edge", "skip", fileName)
-                #     skipped_file_list.append(fileName)
-                # elif json_type == (".hyperEdgeHornGraph.JSON" or json_type == ".equivalent-hyperedgeGraph.JSON" \
-                #                    or json_type == ".concretized-hyperedgeGraph.JSON") and len(loaded_graph["dataFlowHyperEdges"]) == 0:
-                #     print("no dataflow edge", "skip", fileName)
-                #     skipped_file_list.append(fileName)
+                elif (json_type == (".hyperEdgeHornGraph.JSON" or json_type == ".equivalent-hyperedgeGraph.JSON" \
+                                   or json_type == ".concretized-hyperedgeGraph.JSON") and
+                      (params["label"]=="argument_lower_bound_existence" or params["label"]=="argument_upper_bound_existence" or
+                       params["label"]=="argument_identify")
+                      and len(loaded_graph["argumentIndices"]) == 0):
+                    print("no argumentIndices", "skip", fileName)
+                    skipped_file_list.append(fileName)
+                elif (json_type == (".hyperEdgeHornGraph.JSON" or json_type == ".equivalent-hyperedgeGraph.JSON" \
+                                   or json_type == ".concretized-hyperedgeGraph.JSON") and
+                      (params["label"]=="predicate_occurrence_in_SCG" or params["label"]=="predicate_occurrence_in_clauses") and len(loaded_graph["predicateIndices"]) == 0):
+                    print("no predicateIndices", "skip", fileName)
+                    skipped_file_list.append(fileName)
+                elif (json_type == (".hyperEdgeHornGraph.JSON" or json_type == ".equivalent-hyperedgeGraph.JSON" \
+                                   or json_type == ".concretized-hyperedgeGraph.JSON") and
+                      (params["label"]=="clause_occurrence_in_counter_examples_binary") and len(loaded_graph["guardIndices"]) == 0):
+                    print("no guardIndices", "skip", fileName)
+                    skipped_file_list.append(fileName)
 
                     # file_name_list.append(fileGraph[:fileGraph.find(json_type)])
                     # graphs_node_label_ids.append(loaded_graph["nodeIds"])
@@ -600,16 +609,16 @@ def write_graph_to_pickle(params):
                         else:
                             #try only multiple binary and ternary edges
                             graphs_adjacency_lists.append([
-                                # np.array(loaded_graph["argumentEdges"]),
-                                # np.array(loaded_graph["guardASTEdges"]),
-                                # np.array(loaded_graph["AST_1Edges"]),
-                                # np.array(loaded_graph["AST_2Edges"]),
-                                np.array(loaded_graph["controlLocationEdgeForSCC"]),
+                                np.array(loaded_graph["argumentEdges"]),
+                                np.array(loaded_graph["guardASTEdges"]),
+                                np.array(loaded_graph["AST_1Edges"]),
+                                np.array(loaded_graph["AST_2Edges"]),
+                                np.array(loaded_graph["binaryAdjacentList"]),
+                                np.array(loaded_graph["controlFlowHyperEdges"]),
+                                np.array(loaded_graph["dataFlowHyperEdges"]),
+                                np.array(loaded_graph["ternaryAdjacencyList"]),
+                                #np.array(loaded_graph["controlLocationEdgeForSCC"]),
                                 #np.array(loaded_graph["predicateTransitiveEdges"]),
-                                # np.array(loaded_graph["binaryAdjacentList"]),
-                                # np.array(loaded_graph["controlFlowHyperEdges"]),
-                                # np.array(loaded_graph["dataFlowHyperEdges"]),
-                                # np.array(loaded_graph["ternaryAdjacencyList"]),
                             ])
                     else:
                         #for layer horn graph
@@ -772,6 +781,7 @@ def form_predicate_occurrence_related_label_graph_sample(params):
                 else:
                     temp_graph_label.append(0)
             graphs_learning_labels_temp.append(temp_graph_label)
+        graphs_node_indices = params["graphs_node_label_ids"]
         params["graphs_learning_labels"] = graphs_learning_labels_temp
 
     elif params["label"]=="argument_bound":
@@ -786,10 +796,10 @@ def form_predicate_occurrence_related_label_graph_sample(params):
         for one_graph_learning_labels in params["graphs_learning_labels"]:
             temp_graph_label=[]
             for learning_labels in one_graph_learning_labels:
-                if isinstance(learning_labels[0],str):
-                    learning_labels[0]=0
-                else:
-                    learning_labels[0] = 1
+                # if isinstance(learning_labels[0],str):
+                #     learning_labels[0]=0
+                # else:
+                #     learning_labels[0] = 1
                 temp_graph_label.append(learning_labels[0])
             graphs_learning_labels_temp.append(temp_graph_label)
         params["graphs_learning_labels"]=graphs_learning_labels_temp
@@ -798,10 +808,10 @@ def form_predicate_occurrence_related_label_graph_sample(params):
         for one_graph_learning_labels in params["graphs_learning_labels"]:
             temp_graph_label=[]
             for learning_labels in one_graph_learning_labels:
-                if isinstance(learning_labels[1],str):
-                    learning_labels[1]=0
-                else:
-                    learning_labels[1] = 1
+                # if isinstance(learning_labels[1],str):
+                #     learning_labels[1]=0
+                # else:
+                #     learning_labels[1] = 1
                 temp_graph_label.append(learning_labels[1])
             graphs_learning_labels_temp.append(temp_graph_label)
         params["graphs_learning_labels"] = graphs_learning_labels_temp
@@ -896,6 +906,9 @@ def form_predicate_occurrence_related_label_graph_sample(params):
         #     print("\n node_indices ", len(node_indices))
         #     print("learning_labels", len(learning_labels))
 
+
+        # print("node_indices ", len(node_indices),node_indices)
+        # print("learning_labels", len(learning_labels),learning_labels)
 
         #print("token_map",params["token_map"])
         final_graphs.append(
