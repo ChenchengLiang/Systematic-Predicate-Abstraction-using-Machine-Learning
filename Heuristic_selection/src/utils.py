@@ -127,7 +127,7 @@ def plot_scatter(true_Y,predicted_Y,name="",range=[0,0],x_label="True Values",y_
     plt.savefig("trained_model/" + name+ "-scatter.png")
     plt.clf()
 
-def plot_confusion_matrix(predicted_Y_loaded_model,true_Y,saving_path,recall=0,precision=0,f1_score=0,threshold=0.5,label="template_relevance"):
+def plot_confusion_matrix(predicted_Y_loaded_model,true_Y,saving_path,recall=0,precision=0,f1_score=0,threshold=0.5,label="template_relevance",accuracy=0):
     predicted_Y_loaded_model = my_round_fun(np.array(predicted_Y_loaded_model),label=label)
     #predicted_Y_loaded_model =  list(map(my_round_fun,np.array(predicted_Y_loaded_model)))#tf.math.round(predicted_Y_loaded_model)
     if label=="node_multiclass":
@@ -140,7 +140,7 @@ def plot_confusion_matrix(predicted_Y_loaded_model,true_Y,saving_path,recall=0,p
     seaborn.heatmap(cm, annot=True, fmt="d")
     plt.title("recall:"+str(recall)+", precision:"+str(precision)+",f1_score:"+str(f1_score))
     plt.ylabel('Actual label')
-    plt.xlabel('Predicted label')
+    plt.xlabel('Predicted label' + ",acc:"+str(accuracy))
     plt.savefig(saving_path)
     plt.clf()
     seaborn.reset_defaults()

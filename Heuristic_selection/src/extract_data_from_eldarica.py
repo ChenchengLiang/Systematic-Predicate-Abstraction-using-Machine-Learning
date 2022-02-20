@@ -86,7 +86,7 @@ def main():
     command_input=sys.argv[1]#"temp-debug"
     benchmark_name = os.path.join("../benchmarks/",command_input)#sys.argv[1]
     thread_number=16
-    timeout=360#3600*3
+    timeout=3600#3600*3
     #not use -abstract:all but try them separately
     #separateMultiplePredicatesInBody,-getLabelFromCounterExample,-argumentOccurenceLabel,-argumentBoundLabel,extractTemplates,-onlyInitialPredicates -noIntervals -separateByPredicates  -generateTemplates
     #monoDirectionLayerGraph,hyperEdgeGraph
@@ -101,7 +101,8 @@ def main():
     parameters_extract_train_data_for_first_three_graph_mono_layer = "-moveFile -abstract:empty -getHornGraph:monoDirectionLayerGraph -t:1800 -maxNode:10000"
     parameters_extract_train_data_for_first_three_graph_bi_layer = "-moveFile -abstract:empty -getHornGraph:biDirectionLayerGraph -t:1800 -maxNode:10000"
     parameters_extract_train_data_for_argument_bound_graph_hyperedge = "-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -argumentBoundLabel -boundsAnalysis -t:"+str(timeout)+" -boundsAnalysisTO:3 -maxNode:10000"
-    eldarica_parameters=parameters_extract_train_data_for_first_three_graph_hyperedge#"-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -t:1800" #-abstract:all -solvabilityTimeout:3600 -mainTimeout:3600
+    parameters_extract_train_data_get_normalized_benchmark = "-getSMT2"
+    eldarica_parameters=parameters_extract_train_data_for_counter_example_graph_hyperedge#"-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -t:1800" #-abstract:all -solvabilityTimeout:3600 -mainTimeout:3600
     #eldarica_parameters = "-moveFile -generateSimplePredicates -separateByPredicates -extractPredicates -noIntervals -labelSimpleGeneratedPredicates -getHornGraph:hyperEdgeGraph  -abstract:off -solvabilityTimeout:3600 -mainTimeout:3600 -t:4000"
     for df in data_fold:
         run_eldarica_with_shell_pool(os.path.join(benchmark_name,df), run_eldarica_with_shell, eldarica_parameters,timeout=timeout,thread=thread_number)

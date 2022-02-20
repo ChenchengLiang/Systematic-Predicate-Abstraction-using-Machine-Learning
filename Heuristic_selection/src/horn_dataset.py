@@ -232,7 +232,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     draw_training_results(train_loss_list_average, valid_loss_list_average,
                           mean_loss_list_average,
                           error_loaded_model_average, true_Y, predicted_Y_loaded_model, label,
-                          benchmark_name, graph_type,gathered_nodes_binary_classification_task,hyper_parameters)
+                          benchmark_name, graph_type,gathered_nodes_binary_classification_task,hyper_parameters,accuracy=mean_accuracy)
     write_train_results_to_log(dataset, predicted_Y_loaded_model, train_loss_average,
                                valid_loss_average, error_memory_model, mean_loss_list, accuracy_average,
                                best_valid_epoch_average,hyper_parameters,
@@ -272,7 +272,7 @@ def write_accuracy_to_log(label, benchmark, accuracy_list, best_valid_epoch_list
 def draw_training_results(train_loss_list_average, valid_loss_list_average,
                           mean_loss_list_average,
                           mse_loaded_model_average, true_Y, predicted_Y_loaded_model, label,
-                          benchmark_name, graph_type,gathered_nodes_binary_classification_task,hyper_parameters,mean_loss_line="False"):
+                          benchmark_name, graph_type,gathered_nodes_binary_classification_task,hyper_parameters,mean_loss_line="False",accuracy=0):
     # mse on train, validation,test,mean
     plt.plot(train_loss_list_average,color="blue")
     plt.plot(valid_loss_list_average, color="green")
@@ -309,7 +309,7 @@ def draw_training_results(train_loss_list_average, valid_loss_list_average,
         saving_path_confusion_matrix="trained_model/" + plot_name+ "-confusion_matrix.png"
         saving_path_roc = "trained_model/" + plot_name + "-ROC.png"
         recall,precision,f1_score,false_positive_rate=get_recall_and_precision(true_Y,my_round_fun(predicted_Y_loaded_model,threshold=hyper_parameters["threshold"],label=label),verbose=True)
-        plot_confusion_matrix(predicted_Y_loaded_model,true_Y,saving_path_confusion_matrix,recall=recall,precision=precision,f1_score=f1_score)
+        plot_confusion_matrix(predicted_Y_loaded_model,true_Y,saving_path_confusion_matrix,recall=recall,precision=precision,f1_score=f1_score,accuracy=accuracy)
         plot_ROC(false_positive_rate,recall,saving_path_roc)
     elif label=="node_multiclass":
         saving_path_confusion_matrix = "trained_model/" + plot_name + "-confusion_matrix.png"
@@ -518,6 +518,11 @@ def write_graph_to_pickle(params):
                       (params["label"]=="clause_occurrence_in_counter_examples_binary") and len(loaded_graph["guardIndices"]) == 0):
                     print("no guardIndices", "skip", fileName)
                     skipped_file_list.append(fileName)
+                elif (json_type == (".hyperEdgeHornGraph.JSON" or json_type == ".equivalent-hyperedgeGraph.JSON" \
+                                    or json_type == ".concretized-hyperedgeGraph.JSON") and (params["label"] == "template_relevance") and len(
+                            loaded_graph["templateIndices"]) == 0):
+                    print("no templateIndices", "skip", fileName)
+                    skipped_file_list.append(fileName)
 
                     # file_name_list.append(fileGraph[:fileGraph.find(json_type)])
                     # graphs_node_label_ids.append(loaded_graph["nodeIds"])
@@ -586,38 +591,70 @@ def write_graph_to_pickle(params):
                     if json_type==".hyperEdgeHornGraph.JSON" or json_type==".equivalent-hyperedgeGraph.JSON" \
                             or json_type==".concretized-hyperedgeGraph.JSON": #read adjacency_lists
                         #for hyperedge horn graph
+                        #add dummy edge if that edge is empty
+                        total_node_number=len(loaded_graph["nodeIds"])
+                        dummy_biary_edge=[0,0]
+                        dummy_ternary_edge=[0,0,0]
+                        argumentEdges=np.array([dummy_biary_edge]) if len(loaded_graph["argumentEdges"])==0 else np.array(loaded_graph["argumentEdges"])
+                        guardASTEdges = np.array([dummy_biary_edge]) if len(
+                            loaded_graph["guardASTEdges"]) == 0 else np.array(loaded_graph["guardASTEdges"])
+                        dataFlowASTEdges = np.array([dummy_biary_edge]) if len(
+                            loaded_graph["dataFlowASTEdges"]) == 0 else np.array(loaded_graph["dataFlowASTEdges"])
+                        ASTEdges = np.array([dummy_biary_edge]) if len(
+                            loaded_graph["ASTEdges"]) == 0 else np.array(loaded_graph["ASTEdges"])
+                        AST_1Edges = np.array([dummy_biary_edge]) if len(
+                            loaded_graph["AST_1Edges"]) == 0 else np.array(loaded_graph["AST_1Edges"])
+                        AST_2Edges = np.array([dummy_biary_edge]) if len(
+                            loaded_graph["AST_2Edges"]) == 0 else np.array(loaded_graph["AST_2Edges"])
+                        controlLocationEdgeForSCC = np.array([dummy_biary_edge]) if len(
+                            loaded_graph["controlLocationEdgeForSCC"]) == 0 else np.array(loaded_graph["controlLocationEdgeForSCC"])
+                        templateEdges = np.array([dummy_biary_edge]) if len(
+                            loaded_graph["templateEdges"]) == 0 else np.array(
+                            loaded_graph["templateEdges"])
+                        binaryAdjacentList = np.array([dummy_biary_edge]) if len(
+                            loaded_graph["binaryAdjacentList"]) == 0 else np.array(
+                            loaded_graph["binaryAdjacentList"])
+                        controlFlowHyperEdges = np.array([dummy_ternary_edge]) if len(
+                            loaded_graph["controlFlowHyperEdges"]) == 0 else np.array(
+                            loaded_graph["controlFlowHyperEdges"])
+                        dataFlowHyperEdges = np.array([dummy_ternary_edge]) if len(
+                            loaded_graph["dataFlowHyperEdges"]) == 0 else np.array(
+                            loaded_graph["dataFlowHyperEdges"])
+                        ternaryAdjacencyList = np.array([dummy_ternary_edge]) if len(
+                            loaded_graph["ternaryAdjacencyList"]) == 0 else np.array(
+                            loaded_graph["ternaryAdjacencyList"])
                         if params["label"] in ["node_multiclass"]:
                             graphs_adjacency_lists.append([
-                                np.array(loaded_graph["argumentEdges"]),
-                                np.array(loaded_graph["guardASTEdges"]),
-                                #np.array(loaded_graph["dataFlowASTEdges"]),
-                                #np.array(loaded_graph["ASTEdges"]),
-                                np.array(loaded_graph["AST_1Edges"]),
-                                np.array(loaded_graph["AST_2Edges"]),
-                                #np.array(loaded_graph["controlLocationEdgeForSCC"]),
+                                argumentEdges,
+                                guardASTEdges,
+                                #dataFlowASTEdges,
+                                #ASTEdges,
+                                AST_1Edges,
+                                AST_2Edges,
+                                #controlLocationEdgeForSCC,
                                 #np.array(loaded_graph["verifHintTplPredEdges"]),
                                 # np.array(loaded_graph["verifHintTplPredPosNegEdges"]),
                                 # np.array(loaded_graph["verifHintTplEqTermEdges"]),
                                 # np.array(loaded_graph["verifHintTplInEqTermEdges"]),
                                 #np.array(loaded_graph["verifHintTplInEqTermPosNegEdges"]),
-                                np.array(loaded_graph["templateEdges"]),
-                                np.array(loaded_graph["binaryAdjacentList"]),
-                                np.array(loaded_graph["controlFlowHyperEdges"]),
-                                np.array(loaded_graph["dataFlowHyperEdges"]),
-                                np.array(loaded_graph["ternaryAdjacencyList"])
+                                templateEdges,
+                                binaryAdjacentList,
+                                controlFlowHyperEdges,
+                                dataFlowHyperEdges,
+                                ternaryAdjacencyList
                             ])
                         else:
                             #try only multiple binary and ternary edges
                             graphs_adjacency_lists.append([
-                                np.array(loaded_graph["argumentEdges"]),
-                                np.array(loaded_graph["guardASTEdges"]),
-                                np.array(loaded_graph["AST_1Edges"]),
-                                np.array(loaded_graph["AST_2Edges"]),
-                                np.array(loaded_graph["binaryAdjacentList"]),
-                                np.array(loaded_graph["controlFlowHyperEdges"]),
-                                np.array(loaded_graph["dataFlowHyperEdges"]),
-                                np.array(loaded_graph["ternaryAdjacencyList"]),
-                                #np.array(loaded_graph["controlLocationEdgeForSCC"]),
+                                argumentEdges,
+                                guardASTEdges,
+                                AST_1Edges,
+                                AST_2Edges,
+                                binaryAdjacentList,
+                                controlFlowHyperEdges,
+                                dataFlowHyperEdges,
+                                ternaryAdjacencyList,
+                                #controlLocationEdgeForSCC,
                                 #np.array(loaded_graph["predicateTransitiveEdges"]),
                             ])
                     else:
@@ -906,7 +943,8 @@ def form_predicate_occurrence_related_label_graph_sample(params):
         #     print("\n node_indices ", len(node_indices))
         #     print("learning_labels", len(learning_labels))
 
-
+        #tokenized_node_label_ids=tokenized_node_label_ids.append(-1)
+        # print("tokenized_node_label_ids",tokenized_node_label_ids)
         # print("node_indices ", len(node_indices),node_indices)
         # print("learning_labels", len(learning_labels),learning_labels)
 

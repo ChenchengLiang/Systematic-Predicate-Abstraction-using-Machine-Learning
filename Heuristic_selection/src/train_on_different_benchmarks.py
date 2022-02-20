@@ -24,9 +24,9 @@ def main():
     #label_list.append("predicate_occurrence_in_clauses")
     #label_list.append("predicate_occurrence_in_SCG")
     #label_list.append("scc_test")
-    label_list.append("argument_lower_bound_existence")
-    label_list.append("argument_upper_bound_existence")
-    #label_list.append("clause_occurrence_in_counter_examples_binary")
+    #label_list.append("argument_lower_bound_existence")
+    #label_list.append("argument_upper_bound_existence")
+    label_list.append("clause_occurrence_in_counter_examples_binary")
     # label="argument_bound"
     # label_list.append("argument_lower_bound")
     # label_list.append("argument_upper_bound")
@@ -42,14 +42,14 @@ def main():
     GPU=False
     use_class_weight=False
     pickle = True
-    benchmark_name = "Linear-dataset-argument-bound-10-percent/"#"Linear-dataset-counter-example-train-full-common/"#"Linear-dataset-counter-example-task-hyper-edge-graph/"
+    benchmark_name = "Linear-dataset-counter-example-train-full-common-1/"#"Linear-dataset-counter-example-train-full-common/"#"Linear-dataset-counter-example-task-hyper-edge-graph/"
     num_node_target_labels=2
 
     # random.seed(0)
     # np.random.seed(0)
     # tf.random.set_seed(0)
 
-    num_layers_list=[8]
+    num_layers_list=[8,16]
 
     for num_layers in num_layers_list:
         hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers, "regression_hidden_layer_size": [64, 64],

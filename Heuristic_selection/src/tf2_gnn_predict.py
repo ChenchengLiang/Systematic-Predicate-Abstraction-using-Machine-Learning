@@ -5,14 +5,14 @@ from utils import flattenList,plot_scatter,generate_horn_graph,wrapped_generate_
 import tensorflow as tf
 import gc
 def main():
-    benchmark="Linear-dataset-first-three-task-hyper-edge-graph"
+    benchmark="Linear-dataset-counter-example-train-full-common-1"
     #benchmark="Linear-dataset-first-three-task-hyper-edge-graph"
     benchmark_fold = benchmark+"-"+"predict" # sys.argv[2]
 
     max_nodes_per_batch = 10000
 
     # /home/cheli243/PycharmProjects/HintsLearning/src/
-    trained_model_path = "trained_model/GNN_Argument_selection__2022-02-13_09-52-32_best.pkl"
+    trained_model_path = "trained_model/GNN_Argument_selection__2022-02-19_16-39-54_best.pkl"
     thread_number = 4
     continuous_extracting = True
     move_file = False
@@ -23,9 +23,9 @@ def main():
     generateTemplates = ""  # -generateTemplates
     abstract = "-abstract:empty"  # empty
     noIntervals = ""
-    #label = "clause_occurrence_in_counter_examples_binary"
+    label = "clause_occurrence_in_counter_examples_binary"
     #label = "predicate_occurrence_in_SCG"
-    label = "argument_identify"
+    #label = "argument_identify"
     #label = "argument_lower_bound_existence"
     #label = "scc_test"
     num_node_target_labels = 2
