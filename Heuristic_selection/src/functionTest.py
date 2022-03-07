@@ -227,6 +227,24 @@ def decode_one_hot(predicted_Y_loaded_model):
     return [np.argmax(y)  for y in predicted_Y_loaded_model]
 def main():
     print((None,)+(1,))
+    true_Y=[1,2,10,88,100]
+    predicted_Y=[1,11,10,88,100]
+    a = plt.axes(aspect='equal')
+    plt.scatter(true_Y, predicted_Y)
+    plt.xlabel("x_label")
+    plt.ylabel("y_label")
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.plot([0,100], [0,100])
+    # small_lims = range
+    # lims = np.logspace(0, np.max([np.max(true_Y), np.max(predicted_Y)]), num=10)
+    # #lims = [0, np.max([np.max(true_Y), np.max(predicted_Y)])]
+    # lims = (lambda : small_lims if range!=[0,0] else lims)()
+    # plt.xlim((0,100))
+    # plt.ylim((0,100))
+    # _ = plt.plot(lims, lims)
+    plt.savefig("trained_model/" + "test" + "-scatter.png")
+    plt.clf()
 
 
 

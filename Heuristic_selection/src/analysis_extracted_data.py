@@ -160,22 +160,17 @@ def shuffle_data(rootdir, target_folder):
     train_files = file_list[0:int(len(file_list) * train_fold)]
     valid_files = file_list[int(len(file_list) * train_fold):int(len(file_list) * (1-valid_fold))]
     test_files = file_list[int(len(file_list) * (1-test_fold)):len(file_list)]
-    try:
-        os.mkdir("../benchmarks/" + target_folder)
-    except:
-        print("../benchmarks/" + target_folder + " existed")
+    make_dirct("../benchmarks/" + target_folder)
     for file, fold_name in zip([train_files, valid_files, test_files], ["train_data", "valid_data", "test_data"]):
-        try:
-            os.mkdir("../benchmarks/" + target_folder + "/" + fold_name)
-        except:
-            print("../benchmarks/" + target_folder + "/" + fold_name,"existed")
+        make_dirct("../benchmarks/" + target_folder + "/" + fold_name)
         print(fold_name + "_files", len(file))
         final_target_folder = os.path.join("../benchmarks/" + target_folder + "/", fold_name)
         for f in file:
             #copy(f, final_target_folder)
             print(f[:-len(".zip")])
             copy_relative_files(f[:-len(".zip")], final_target_folder)
-    # os.mkdir(os.path.join("../benchmarks/"+target_folder+"/", "test_data_simple_generator"))
+
+    #make_dirct(os.path.join("../benchmarks/"+target_folder+"/", "test_data_simple_generator"))
     # for file in test_files:
     #     copy(file, os.path.join("../benchmarks/"+target_folder+"/", "test_data_simple_generator"))
 
@@ -187,10 +182,7 @@ def divide_data_to_threads(benchmark="", target_folder="", three_fold=True, chun
                            datafold_list=["train_data", "valid_data", "test_data"]):
     target_folder=target_folder+"-"+str(chunk_number)
     root = "../benchmarks/" + benchmark
-    try:
-        os.mkdir(os.path.join("../benchmarks", target_folder))
-    except:
-        print("path existed")
+    make_dirct(os.path.join("../benchmarks", target_folder))
     datafold_files_list = [os.path.join(root, d) for d in datafold_list]
     if three_fold == False:
         datafold_list = datafold_list + ["test_data_simple_generator"]
@@ -202,14 +194,8 @@ def divide_data_to_threads(benchmark="", target_folder="", three_fold=True, chun
         chunk_size = int(len(datafold_file_list) / chunk_number)
         for i in range(0, chunk_number):
             thread_dir = os.path.join("../benchmarks", target_folder, "thread_" + str(i))
-            try:
-                os.mkdir(thread_dir)
-            except:
-                pass
-            try:
-                os.mkdir(os.path.join(thread_dir, datafold))
-            except:
-                pass
+            make_dirct(thread_dir)
+            make_dirct(os.path.join(thread_dir, datafold))
             for file in datafold_file_list[i * chunk_size:(i + 1) * chunk_size]:
                 file=file[:-len(".zip")]
                 copy_relative_files(file, os.path.join(thread_dir, datafold))
@@ -299,10 +285,10 @@ def main():
     #clean_extracted_data("linear-abstract-empty-unsolvable-horn-graphs-maxNode-10000/test_data",total_file=5)
     # extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
-    shuffle_data("../benchmarks/Linear-dataset-argument-bound-10-percent/raw",
-                 "../benchmarks/Linear-dataset-argument-bound-10-percent/raw-shuffle")
-    # divide_data_to_threads("Linear-dataset/counter-example-task-extractable/raw-shuffle",
-    #                        "Linear-dataset/counter-example-task-extractable/raw-shuffle-dividied",three_fold=True,datafold_list=["train_data","valid_data","test_data"],chunk_number=17)#datafold_list=["test_data"]
+    # shuffle_data("../benchmarks/Linear-dataset/CE-common-files/extracted",
+    #              "../benchmarks/Linear-dataset/CE-common-files/extracted-shuffle")
+    # divide_data_to_threads("non-linear-dataset/separated_benchmark-abstract-empty/exceptions/unsat-raw",
+    #                        "non-linear-dataset/separated_benchmark-abstract-empty/exceptions/unsat-raw-dividied",three_fold=True,datafold_list=["train_data","valid_data","test_data"],chunk_number=2)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -353,7 +339,7 @@ def main():
     #         unzip_all_file_folder("all-LIA-Lin-train-unsolvable-predicted-measurement-2/temp-1-divided/thread_"+str(i)+"/"+fold)
 
     # for fold in ["train_data"]:
-    #     compress_all_file_folder("all-LIA-Lin-train-unsolvable-predicted-measurement-2/temp-1"+"/"+fold)
+    #     compress_all_file_folder("Linear-dataset-counter-example-layer-graph-train-full-union-1/temp"+"/"+fold)
 
 
     # for i in range(0,17):
@@ -363,16 +349,15 @@ def main():
 
     # for data_fold in ["train_data","valid_data","test_data"]:
     #     collect_common_files("Linear-dataset/first-three-task-extractable/extractable-raw/"+data_fold,"Linear-dataset/separated_benchmark-abstract-empty/exceptions/unsat","Linear-dataset/counter-example-task-extractable")
-
+    collect_common_files(folder1="Linear-dataset-counter-example-hyperedge-common/extracted",
+                         folder2="Linear-dataset-counter-example-layer-graph-train-full-common-1/extracted",
+                         out_put_folder="Linear-dataset/CE-common-aligned")
+    collect_common_files(folder1="Linear-dataset-counter-example-hyperedge-union/extracted",
+                         folder2="Linear-dataset-counter-example-layer-graph-train-full-union-1/extracted",
+                         out_put_folder="Linear-dataset/CE-union-aligned")
     # source_folder="Linear-dataset-pure-argument-identification-task"
     # select_files_with_condition(source_folder, source_folder+"-separate-by-node-number")
 
-
-def make_dirct(d):
-    try:
-        os.mkdir(d)
-    except:
-        print("folder existed")
 
 def select_files_with_condition(source_folder_name,target_folder_name):
     target_folder_1="../benchmarks/" + target_folder_name + "_1"
@@ -414,12 +399,10 @@ def collect_common_files(folder1,folder2,out_put_folder):
     common_files=set(files_in_folder_1).intersection(set(files_in_folder_2))
     print("common_files",len(common_files))
     print(common_files)
-    try:
-        os.mkdir("../benchmarks/"+out_put_folder)
-    except:
-        print("folder existed")
+    make_dirct("../benchmarks/"+out_put_folder)
     for f in common_files:
         copy_relative_files("../benchmarks/" + folder1 +"/"+f[:-len(".zip")],"../benchmarks/"+out_put_folder)
+        copy_relative_files("../benchmarks/" + folder2 + "/" + f[:-len(".zip")], "../benchmarks/" + out_put_folder)
 
 def compress_exception(benchmark=""):
     folder = ["exceed-max-node", "lia-lin-multiple-predicates-in-body", "no-initial-predicates",
@@ -472,12 +455,11 @@ def separate_unsolvable_horn_graphs(benchmarks="",folder="",trunck_number=5,trai
     trunck_number=trunck_number
     batch_size=int(len(file_list)/trunck_number)
     folder_name=train_folder+"-unsolvable-predicted-"
-    try:
-        for t in range(trunck_number):
-            os.mkdir("../benchmarks/"+folder_name+str(t))
-            os.mkdir("../benchmarks/"+folder_name+str(t)+"/test_data")
-    except:
-        print("folder existed")
+
+    for t in range(trunck_number):
+        make_dirct("../benchmarks/"+folder_name+str(t))
+        make_dirct("../benchmarks/"+folder_name+str(t)+"/test_data")
+
     trunck=-1
     print("file_list",len(file_list))
     print("batch_size",batch_size)
@@ -497,11 +479,8 @@ def separate_extracted_and_left_data(benchmark="",folder=""):
     file_list= glob.glob("../benchmarks/"+benchmark+"/"+folder+"/*.smt2")
     extracted_folder_name="../benchmarks/"+benchmark+"/extracted"
     not_extracted_folder_name="../benchmarks/" + benchmark + "/not-extracted"
-    try:
-        os.mkdir(extracted_folder_name)
-        os.mkdir(not_extracted_folder_name)
-    except:
-        print("folder existed")
+    make_dirct(extracted_folder_name)
+    make_dirct(not_extracted_folder_name)
     for file in file_list:
         if os.path.exists(file+"-0.hyperEdgeHornGraph.JSON"):
             #copy_relative_files(file,extracted_folder_name)
@@ -577,10 +556,7 @@ def collect_unsolvable_data(horn_graph_folder="", unsolvable_folder="", target_f
     horn_graph_file_name_list = [f[f.rfind("/") + 1:] for f in horn_graph_file_list]
     print(unsolvable_file_name_list)
     print(horn_graph_file_name_list)
-    try:
-        os.mkdir(intersect_file_folder)
-    except:
-        print("folder existed")
+    make_dirct(intersect_file_folder)
     for f in unsolvable_file_name_list:
         if f in horn_graph_file_name_list and os.path.exists(
                 "../benchmarks/" + horn_graph_folder + "/" + f + ".circles.gv"):
@@ -750,12 +726,10 @@ def get_k_fold_train_data(fold=5, benchmark="chc-comp21-benchmarks-main-all",
     for f in range(fold):
         fold_folder = os.path.join(path, folder_name + "-" + str(f) + "-fold")
         print("fold_folder", fold_folder)
-        try:
-            os.mkdir(fold_folder)
-            for df in ["train_data", "valid_data", "test_data"]:
-                os.mkdir(os.path.join(fold_folder, df))
-        except:
-            pass
+        make_dirct(fold_folder)
+        for df in ["train_data", "valid_data", "test_data"]:
+            make_dirct(os.path.join(fold_folder, df))
+
         for file in separated_file_list[f]:  # test
             copy_relative_files(file, os.path.join(fold_folder, "test_data"))
         for file in separated_file_list[(f + 1) % (fold - 1)]:  # valid
@@ -813,7 +787,7 @@ def rebuild_exception_file(benchmark="",field_list=["solvability-timeout", "shel
     loaded_fields = read_benchmark_exception_json(benchmark)
     for filed in field_list:
         new_folder = "../benchmarks/" + benchmark + "/" + filed
-        os.mkdir(new_folder)
+        make_dirct(new_folder)
         for f in loaded_fields[filed]:
             file_name = "../benchmarks/LIA-Lin+sv-comp/LIA-Lin+sv-comp-templates-unsolvables/test_data/" + f
             shutil.copyfile(file_name, new_folder + "/" + f)
@@ -857,10 +831,7 @@ def clean_extracted_data(benchmark,separated_predicates=False,total_file=5):
 
 def collect_one_field(benchmarks="",field_list=[],target_folder="",source_folder=""):
     loaded_jsons=read_benchmark_exception_json(benchmarks)
-    try:
-        os.mkdir("../benchmarks/" + target_folder)
-    except:
-        print("folder existed")
+    make_dirct("../benchmarks/" + target_folder)
     for field in field_list:
         file_list=loaded_jsons[field]
         file_list = [f + ".zip" if f.find(".zip") < 0 else f for f in file_list]
@@ -877,11 +848,8 @@ def collect_unsolvable_cases(benchmarks=[],abstract_list=[],filed = "shell-timeo
 
     print("common_files",len(common_files))
     print(common_files)
-    try:
-        os.mkdir("../benchmarks/all-LIA-Lin/common-set")
-        os.mkdir("../benchmarks/all-LIA-Lin/common-set/train_data")
-    except:
-        print("folder existed")
+    make_dirct("../benchmarks/all-LIA-Lin/common-set")
+    make_dirct("../benchmarks/all-LIA-Lin/common-set/train_data")
     for f in common_files:
         copy("../benchmarks/all-LIA-Lin/raw/train_data/"+f,"../benchmarks/all-LIA-Lin/common-set/train_data")
 
@@ -899,10 +867,7 @@ def benchmark_exceptions_analysis(benchmark1="",benchmark2=""):
     print(common_files)
     #collect common files
     common_timeout_folder="../benchmarks/"+benchmark1+"/common_timeout"
-    try:
-        os.mkdir(common_timeout_folder)
-    except:
-        print("folder existed")
+    make_dirct(common_timeout_folder)
     for f in glob.glob("../benchmarks/"+benchmark1+"/shell-timeout/*"):
         file_name=f[f.rfind("/")+1:][:-len(".zip")]
         if file_name in common_files:
@@ -922,6 +887,10 @@ def read_benchmark_exception_json(folder_name):
         loaded_graph = json.load(f)
     return loaded_graph
 
-
+def make_dirct(d):
+    try:
+        os.mkdir(d)
+    except:
+        print(str(d),"folder existed")
 if __name__ == '__main__':
     main()

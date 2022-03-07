@@ -1,15 +1,13 @@
 import os
-
 import numpy as np
 import tensorflow as tf
 import tf2_gnn
 from tf2_gnn.data import DataFold
 from utils import call_eldarica
-from Miscellaneous import add_JSON_field,pickleRead,pickleWrite
-from horn_dataset import write_graph_to_pickle, form_GNN_inputs_and_labels,get_test_loss_with_class_weight,compute_loss,HornGraphDataset
-from utils import my_round_fun
-from Miscellaneous import GPU_switch, pickleRead
-from utils import file_compress,unzip_file
+from Miscellaneous import add_JSON_field, GPU_switch, pickleRead, pickleWrite
+from horn_dataset import write_graph_to_pickle, form_GNN_inputs_and_labels, get_test_loss_with_class_weight, \
+    compute_loss, HornGraphDataset
+from utils import my_round_fun, plot_scatter, file_compress, unzip_file
 
 def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score_list,graph_type=".layerHornGraph.JSON"):
     # write predicted_argument_score to JSON file
@@ -275,10 +273,10 @@ def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",labe
 
         return {"trained_model_path":trained_model_path,"best_set_threshold":best_set_threshold["accuracy"],"best_set_ranks":best_set_ranks["accuracy"],
                 "benchmark_fold":benchmark_fold,"label":label,"hyper_parameter":hyper_parameter,"positive_label_percentage":positive_label_number / len(true_Y),
-                "negative_label_number":negative_label_number / len(true_Y),"dataset":dataset,"predicted_Y_loaded_model":predicted_Y_loaded_model,
+                "true_Y":true_Y,"negative_label_number":negative_label_number / len(true_Y),"dataset":dataset,"predicted_Y_loaded_model":predicted_Y_loaded_model,
                 "best_threshold":best_set_threshold["threshold"],"rounded_predicted_Y_loaded_model":rounded_predicted_Y_loaded_model}
     else:
-        return {"trained_model_path": trained_model_path,"dataset":dataset,
+        return {"trained_model_path": trained_model_path,"dataset":dataset,"true_Y":true_Y,
                 "benchmark_fold": benchmark_fold, "label": label, "hyper_parameter": hyper_parameter,
                 "rounded_predicted_Y_loaded_model":rounded_predicted_Y_loaded_model,"predicted_Y_loaded_model": predicted_Y_loaded_model,"best_threshold":0.5}
 
@@ -306,6 +304,10 @@ def predict_label(benchmark,max_nodes_per_batch,benchmark_fold,file_list,trained
                                     set_max_nodes_per_batch=True,file_list=file_list,num_node_target_labels=num_node_target_labels)
     write_predicted_label_to_JSON_file(result_dir["dataset"], result_dir["rounded_predicted_Y_loaded_model"], json_type,
                                        result_dir["best_threshold"],verbose=verbose,label=label)
+
+    if label=="predicate_occurrence_in_clauses":
+        plot_scatter(result_dir["true_Y"], result_dir["predicted_Y_loaded_model"], name=label+"-"+graph_type, range=[0, 0], x_label="True Values", y_label="Predictions")
+
     return result_dir["predicted_Y_loaded_model"]
 
 

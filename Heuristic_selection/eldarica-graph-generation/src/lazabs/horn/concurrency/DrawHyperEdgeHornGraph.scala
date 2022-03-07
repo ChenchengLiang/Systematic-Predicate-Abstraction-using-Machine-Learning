@@ -408,8 +408,10 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
     //vasualize argument bound labels
     if(GlobalParameters.get.argumentBoundLabel){
       for (arg<-gnn_input.argumentInfoHornGraphList){
-        gnn_input.nodeInfoList(arg.canonicalName).labelList:+=arg.bound._1.toInt //lower bound
-        //gnn_input.nodeInfoList(arg.canonicalName).labelList:+=arg.bound._2.toInt //upper bound
+        if (GlobalParameters.get.visualizeLowerBound)
+          gnn_input.nodeInfoList(arg.canonicalName).labelList:+=arg.bound._1.toInt //lower bound
+        else
+          gnn_input.nodeInfoList(arg.canonicalName).labelList:+=arg.bound._2.toInt //upper bound
       }
     }
     //visualize counter-example labels
@@ -427,7 +429,7 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
     val predictedLabel = readPredictedLabelFromJson()
     if (!predictedLabel.isEmpty) {
       var counter = 0
-      for (n <- gnn_input.nodeInfoList) {
+      for (n <- gnn_input.nodeInfoList.toSeq.sortBy(_._2.globalIndex)) {
         if (!n._2.labelList.isEmpty) {
           n._2.predictedLabelList :+= predictedLabel(counter)
           if (predictedLabel(counter)==n._2.labelList(0))

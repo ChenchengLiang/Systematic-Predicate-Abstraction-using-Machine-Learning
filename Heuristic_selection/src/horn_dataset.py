@@ -14,7 +14,7 @@ from tf2_gnn.data import DataFold, HornGraphSample, HornGraphDataset
 from tf2_gnn.models import InvariantArgumentSelectionTask, InvariantNodeIdentifyTask,InvariantNodeMultiClassTask
 from Miscellaneous import pickleWrite, pickleRead, drawLabelPieChart
 from archived.dotToGraphInfo import parseArgumentsFromJson
-from utils import plot_confusion_matrix,get_recall_and_precision,plot_ROC,assemble_name,my_round_fun,unzip_file
+from utils import plot_confusion_matrix,get_recall_and_precision,plot_ROC,assemble_name,my_round_fun,unzip_file,plot_scatter
 
 
 def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",
@@ -317,16 +317,7 @@ def draw_training_results(train_loss_list_average, valid_loss_list_average,
                               precision="-", f1_score="-",label="node_multiclass")
     else:
         # scatter on true y and predicted y
-        a = plt.axes(aspect='equal')
-        plt.scatter(true_Y, predicted_Y_loaded_model)
-        plt.xlabel('True Values')
-        plt.ylabel('Predictions')
-        lims = [0, np.max([np.max(true_Y), np.max(predicted_Y_loaded_model)])]
-        plt.xlim(lims)
-        plt.ylim(lims)
-        _ = plt.plot(lims, lims)
-        plt.savefig("trained_model/" + plot_name + "-scatter.png")
-        plt.clf()
+        plot_scatter(true_Y, predicted_Y_loaded_model, name="", range=[0, 0], x_label="True Values", y_label="Predictions")
 
     # # error distribution on true y and predicted y
     # if np.min(predicted_Y_loaded_model) == float("-inf") or np.max(predicted_Y_loaded_model) == float("inf") or np.min(
@@ -592,7 +583,6 @@ def write_graph_to_pickle(params):
                             or json_type==".concretized-hyperedgeGraph.JSON": #read adjacency_lists
                         #for hyperedge horn graph
                         #add dummy edge if that edge is empty
-                        total_node_number=len(loaded_graph["nodeIds"])
                         dummy_biary_edge=[0,0]
                         dummy_ternary_edge=[0,0,0]
                         argumentEdges=np.array([dummy_biary_edge]) if len(loaded_graph["argumentEdges"])==0 else np.array(loaded_graph["argumentEdges"])
@@ -1282,7 +1272,7 @@ def logit(p):
 
 
 def compute_loss(label, true_Y, predicted_Y_loaded_model, class_weight, from_logits,gathered_nodes_binary_classification_task):
-    if label in gathered_nodes_binary_classification_task+["argument_identify,scc_test"]:
+    if label in gathered_nodes_binary_classification_task+["argument_identify","scc_test"]:
         return get_test_loss_with_class_weight(class_weight,predicted_Y_loaded_model,labels=true_Y,from_logits=from_logits)
     elif label == "node_multiclass":
         predicted_Y_loaded_model=np.array(predicted_Y_loaded_model[0])

@@ -114,16 +114,23 @@ def filter_file_list_by_max_node(file_list,max_nodes_per_batch,separateByPredica
     return list(set(filtered_file_list))
 
 def plot_scatter(true_Y,predicted_Y,name="",range=[0,0],x_label="True Values",y_label="Predictions"):
-    a = plt.axes(aspect='equal')
+    #a = plt.axes(aspect='equal')
+    upperBound=np.max([np.max(true_Y), np.max(predicted_Y)])
     plt.scatter(true_Y, predicted_Y)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-    small_lims = range
-    lims = [0, np.max([np.max(true_Y), np.max(predicted_Y)])]
-    lims = (lambda : small_lims if range!=[0,0] else lims)()
-    plt.xlim(lims)
-    plt.ylim(lims)
-    _ = plt.plot(lims, lims)
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.plot([0, upperBound], [0, upperBound])
+    plt.xlim([0,upperBound])
+    plt.ylim([0,upperBound])
+    # small_lims = range
+    # lims = np.logspace(0, np.max([np.max(true_Y), np.max(predicted_Y)]), num=10)
+    # #lims = [0, np.max([np.max(true_Y), np.max(predicted_Y)])]
+    # lims = (lambda : small_lims if range!=[0,0] else lims)()
+    # plt.xlim(lims)
+    # plt.ylim(lims)
+    # _ = plt.plot(lims, lims)
     plt.savefig("trained_model/" + name+ "-scatter.png")
     plt.clf()
 
