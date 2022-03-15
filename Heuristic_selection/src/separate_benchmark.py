@@ -30,7 +30,7 @@ def main():
             json_file='../benchmarks/exceptions/benchmark_info_' + "thread_"+str(t) + '.JSON'
             os.remove(json_file)
         #compress files in exceptions
-        #compress_files_in_exceptions()
+        compress_files_in_exceptions()
     elif command_input=="compress":
         compress_files_in_exceptions()
     else:

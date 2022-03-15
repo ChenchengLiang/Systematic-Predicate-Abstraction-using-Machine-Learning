@@ -2,11 +2,10 @@ import random
 import os
 from shutil import copy, rmtree, copytree
 import glob
-from archived.dotToGraphInfo import DotToGraphInfo
 import numpy as np
 import matplotlib.pyplot as plt
 from distutils.dir_util import copy_tree
-from Miscellaneous import pickleRead, clear_directory, clear_file
+#from Miscellaneous import pickleRead, clear_directory, clear_file
 import subprocess
 import json
 from multiprocessing import Pool
@@ -14,114 +13,114 @@ import shutil
 from utils import unzip_file
 import zipfile
 
-def generate_JSON_field(rootdir, json_file_type=".layerHornGraph.JSON", eldarica_parameters="-getHornGraph"):
-    for root, subdirs, files in os.walk(rootdir):
-        if len(subdirs) == 1 and subdirs[0] == "wrong_extracted_cases":
-            os.rmdir(root + "/wrong_extracted_cases")
-    old_field = []
-    new_field = []
-    if json_file_type == ".layerHornGraph.JSON" or json_file_type == ".bi-layerHornGraph.JSON":
-        new_field = ["nodeIds", "nodeSymbolList", "falseIndices", "argumentIndices", "controlLocationIndices",
-                     "binaryAdjacentList", "ternaryAdjacencyList", "unknownEdges", "argumentIDList", "argumentNameList",
-                     "predicateArgumentEdges", "predicateInstanceEdges", "argumentInstanceEdges", "controlHeadEdges",
-                     "controlBodyEdges",
-                     "argumentOccurrence", "controlArgumentEdges", "guardEdges", "dataEdges", "predicateIndices",
-                     "predicateOccurrenceInClause", "predicateStrongConnectedComponent", "argumentBoundList",
-                     "argumentBinaryOccurrenceList", "templateIndices", "templateRelevanceLabel"]
-    else:
-        new_field = ["nodeIds", "nodeSymbolList", "falseIndices", "argumentIndices", "controlLocationIndices",
-                     "binaryAdjacentList", "ternaryAdjacencyList", "unknownEdges", "argumentIDList", "argumentNameList",
-                     "argumentEdges", "guardASTEdges", "dataFlowASTEdges", "controlFlowHyperEdges",
-                     "dataFlowHyperEdges",
-                     "argumentOccurrence", "predicateIndices", "predicateOccurrenceInClause",
-                     "predicateStrongConnectedComponent", "argumentBoundList", "argumentBinaryOccurrenceList",
-                     "templateIndices", "templateRelevanceLabel"]
-
-    for root, subdirs, files in os.walk(rootdir):
-        if len(subdirs) == 0:
-            for file in glob.glob(root + "/*.smt2"):
-                print(file)
-                # read JSON' label
-                json_file = file + ".JSON"
-                graph_json_file = file + json_file_type
-                json_obj = {}
-                with open(json_file) as f:
-                    loaded_graph = json.load(f)
-                    for field in old_field:
-                        json_obj[field] = loaded_graph[field]
-                eld = subprocess.Popen(["../eldarica-graph-generation/eld", file, eldarica_parameters],
-                                       stdout=subprocess.DEVNULL,
-                                       shell=False)
-                eld.wait()
-                # add more field
-                with open(graph_json_file) as f:
-                    loaded_graph = json.load(f)
-                    for field in new_field:
-                        json_obj[field] = loaded_graph[field]
-                # write json object to JSON file
-                clear_file(graph_json_file)
-                with open(graph_json_file, 'w') as f:
-                    json.dump(json_obj, f, indent=4)
-
-
-def add_horn_graph_json_file(rootdir, graph_type="-getHornGraph", json_file_type=".layerHornGraph.JSON"):
-    old_field = []
-    new_field = []
-    if json_file_type == ".layerHornGraph.JSON" or json_file_type == ".bi-layerHornGraph.JSON":
-        new_field = ["nodeIds", "nodeSymbolList", "falseIndices", "argumentIndices", "controlLocationIndices",
-                     "binaryAdjacentList", "ternaryAdjacencyList", "unknownEdges", "argumentIDList", "argumentNameList",
-                     "predicateArgumentEdges", "predicateInstanceEdges", "argumentInstanceEdges", "controlHeadEdges",
-                     "controlBodyEdges",
-                     "controlArgumentEdges", "guardEdges", "dataEdges",
-                     "argumentOccurrence", "predicateIndices", "predicateOccurrenceInClause",
-                     "predicateStrongConnectedComponent", "argumentBoundList", "argumentBinaryOccurrenceList",
-                     "templateIndices", "templateRelevanceLabel"]
-
-    else:
-        new_field = ["nodeIds", "nodeSymbolList", "falseIndices", "argumentIndices", "controlLocationIndices",
-                     "binaryAdjacentList", "ternaryAdjacencyList", "unknownEdges", "argumentIDList", "argumentNameList",
-                     "argumentEdges", "guardASTEdges", "dataFlowASTEdges", "controlFlowHyperEdges",
-                     "dataFlowHyperEdges",
-                     "argumentOccurrence", "predicateIndices", "predicateOccurrenceInClause",
-                     "predicateStrongConnectedComponent", "argumentBoundList", "argumentBinaryOccurrenceList",
-                     "templateIndices", "templateRelevanceLabel"]
-
-    for root, subdirs, files in os.walk(rootdir):
-        if len(subdirs) == 1 and subdirs[0] == "wrong_extracted_cases":
-            os.rmdir(root + "/wrong_extracted_cases")
-    for root, subdirs, files in os.walk(rootdir):
-        if len(subdirs) == 0:
-            for file in glob.glob(root + "/*.smt2"):
-                json_file = file + ".JSON"
-                graph_json_file = file + json_file_type
-                # if not os.path.isfile(graph_json_file):
-                # read JSON' label
-                json_obj = {}
-                with open(json_file) as f:
-                    loaded_graph = json.load(f)
-                    for field in old_field:
-                        json_obj[field] = loaded_graph[field]
-                print("../eldarica-graph-generation/eld", file, graph_type)
-                eld = subprocess.Popen(["../eldarica-graph-generation/eld", file, graph_type],
-                                       stdout=subprocess.DEVNULL,
-                                       shell=False)
-                eld.wait()
-                # add more field
-                with open(graph_json_file) as layer_f:
-                    loaded_graph = json.load(layer_f)
-                    for field in new_field:
-                        json_obj[field] = loaded_graph[field]
-                if os.path.isfile(graph_json_file):
-                    # write json object to JSON file
-                    clear_file(graph_json_file)
-                    with open(graph_json_file, 'w') as f:
-                        json.dump(json_obj, f, indent=4)
-                else:
-                    with open(graph_json_file, 'w') as f:
-                        json.dump(json_obj, f, indent=4)
-                    # for f in glob.glob(file+"*"):
-                    #     copy(f,"../benchmarks/memory_problem_cases/")
-                    #     os.remove(f)
+# def generate_JSON_field(rootdir, json_file_type=".layerHornGraph.JSON", eldarica_parameters="-getHornGraph"):
+#     for root, subdirs, files in os.walk(rootdir):
+#         if len(subdirs) == 1 and subdirs[0] == "wrong_extracted_cases":
+#             os.rmdir(root + "/wrong_extracted_cases")
+#     old_field = []
+#     new_field = []
+#     if json_file_type == ".layerHornGraph.JSON" or json_file_type == ".bi-layerHornGraph.JSON":
+#         new_field = ["nodeIds", "nodeSymbolList", "falseIndices", "argumentIndices", "controlLocationIndices",
+#                      "binaryAdjacentList", "ternaryAdjacencyList", "unknownEdges", "argumentIDList", "argumentNameList",
+#                      "predicateArgumentEdges", "predicateInstanceEdges", "argumentInstanceEdges", "controlHeadEdges",
+#                      "controlBodyEdges",
+#                      "argumentOccurrence", "controlArgumentEdges", "guardEdges", "dataEdges", "predicateIndices",
+#                      "predicateOccurrenceInClause", "predicateStrongConnectedComponent", "argumentBoundList",
+#                      "argumentBinaryOccurrenceList", "templateIndices", "templateRelevanceLabel"]
+#     else:
+#         new_field = ["nodeIds", "nodeSymbolList", "falseIndices", "argumentIndices", "controlLocationIndices",
+#                      "binaryAdjacentList", "ternaryAdjacencyList", "unknownEdges", "argumentIDList", "argumentNameList",
+#                      "argumentEdges", "guardASTEdges", "dataFlowASTEdges", "controlFlowHyperEdges",
+#                      "dataFlowHyperEdges",
+#                      "argumentOccurrence", "predicateIndices", "predicateOccurrenceInClause",
+#                      "predicateStrongConnectedComponent", "argumentBoundList", "argumentBinaryOccurrenceList",
+#                      "templateIndices", "templateRelevanceLabel"]
+#
+#     for root, subdirs, files in os.walk(rootdir):
+#         if len(subdirs) == 0:
+#             for file in glob.glob(root + "/*.smt2"):
+#                 print(file)
+#                 # read JSON' label
+#                 json_file = file + ".JSON"
+#                 graph_json_file = file + json_file_type
+#                 json_obj = {}
+#                 with open(json_file) as f:
+#                     loaded_graph = json.load(f)
+#                     for field in old_field:
+#                         json_obj[field] = loaded_graph[field]
+#                 eld = subprocess.Popen(["../eldarica-graph-generation/eld", file, eldarica_parameters],
+#                                        stdout=subprocess.DEVNULL,
+#                                        shell=False)
+#                 eld.wait()
+#                 # add more field
+#                 with open(graph_json_file) as f:
+#                     loaded_graph = json.load(f)
+#                     for field in new_field:
+#                         json_obj[field] = loaded_graph[field]
+#                 # write json object to JSON file
+#                 clear_file(graph_json_file)
+#                 with open(graph_json_file, 'w') as f:
+#                     json.dump(json_obj, f, indent=4)
+#
+#
+# def add_horn_graph_json_file(rootdir, graph_type="-getHornGraph", json_file_type=".layerHornGraph.JSON"):
+#     old_field = []
+#     new_field = []
+#     if json_file_type == ".layerHornGraph.JSON" or json_file_type == ".bi-layerHornGraph.JSON":
+#         new_field = ["nodeIds", "nodeSymbolList", "falseIndices", "argumentIndices", "controlLocationIndices",
+#                      "binaryAdjacentList", "ternaryAdjacencyList", "unknownEdges", "argumentIDList", "argumentNameList",
+#                      "predicateArgumentEdges", "predicateInstanceEdges", "argumentInstanceEdges", "controlHeadEdges",
+#                      "controlBodyEdges",
+#                      "controlArgumentEdges", "guardEdges", "dataEdges",
+#                      "argumentOccurrence", "predicateIndices", "predicateOccurrenceInClause",
+#                      "predicateStrongConnectedComponent", "argumentBoundList", "argumentBinaryOccurrenceList",
+#                      "templateIndices", "templateRelevanceLabel"]
+#
+#     else:
+#         new_field = ["nodeIds", "nodeSymbolList", "falseIndices", "argumentIndices", "controlLocationIndices",
+#                      "binaryAdjacentList", "ternaryAdjacencyList", "unknownEdges", "argumentIDList", "argumentNameList",
+#                      "argumentEdges", "guardASTEdges", "dataFlowASTEdges", "controlFlowHyperEdges",
+#                      "dataFlowHyperEdges",
+#                      "argumentOccurrence", "predicateIndices", "predicateOccurrenceInClause",
+#                      "predicateStrongConnectedComponent", "argumentBoundList", "argumentBinaryOccurrenceList",
+#                      "templateIndices", "templateRelevanceLabel"]
+#
+#     for root, subdirs, files in os.walk(rootdir):
+#         if len(subdirs) == 1 and subdirs[0] == "wrong_extracted_cases":
+#             os.rmdir(root + "/wrong_extracted_cases")
+#     for root, subdirs, files in os.walk(rootdir):
+#         if len(subdirs) == 0:
+#             for file in glob.glob(root + "/*.smt2"):
+#                 json_file = file + ".JSON"
+#                 graph_json_file = file + json_file_type
+#                 # if not os.path.isfile(graph_json_file):
+#                 # read JSON' label
+#                 json_obj = {}
+#                 with open(json_file) as f:
+#                     loaded_graph = json.load(f)
+#                     for field in old_field:
+#                         json_obj[field] = loaded_graph[field]
+#                 print("../eldarica-graph-generation/eld", file, graph_type)
+#                 eld = subprocess.Popen(["../eldarica-graph-generation/eld", file, graph_type],
+#                                        stdout=subprocess.DEVNULL,
+#                                        shell=False)
+#                 eld.wait()
+#                 # add more field
+#                 with open(graph_json_file) as layer_f:
+#                     loaded_graph = json.load(layer_f)
+#                     for field in new_field:
+#                         json_obj[field] = loaded_graph[field]
+#                 if os.path.isfile(graph_json_file):
+#                     # write json object to JSON file
+#                     clear_file(graph_json_file)
+#                     with open(graph_json_file, 'w') as f:
+#                         json.dump(json_obj, f, indent=4)
+#                 else:
+#                     with open(graph_json_file, 'w') as f:
+#                         json.dump(json_obj, f, indent=4)
+#                     # for f in glob.glob(file+"*"):
+#                     #     copy(f,"../benchmarks/memory_problem_cases/")
+#                     #     os.remove(f)
 
 
 def shuffle_data_train_valid(rootdir):
@@ -191,7 +190,7 @@ def divide_data_to_threads(benchmark="", target_folder="", three_fold=True, chun
     for datafold, datafold_files in zip(datafold_list, datafold_files_list):
         datafold_file_list = glob.glob(datafold_files + "/*.smt2.zip")
         print(datafold_files, len(datafold_file_list))
-        chunk_size = int(len(datafold_file_list) / chunk_number)
+        chunk_size = round(len(datafold_file_list) / chunk_number)
         for i in range(0, chunk_number):
             thread_dir = os.path.join("../benchmarks", target_folder, "thread_" + str(i))
             make_dirct(thread_dir)
@@ -282,13 +281,13 @@ def main():
 
     # for fold in ["train_data","valid_data","test_data"]:
     #     clean_extracted_data("thread_1/"+fold)
-    #clean_extracted_data("linear-abstract-empty-unsolvable-horn-graphs-maxNode-10000/test_data",total_file=5)
+    # clean_extracted_data("non-linear-hyperedge-4-task/extracted",total_file=3)
     # extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
-    # shuffle_data("../benchmarks/Linear-dataset/CE-common-files/extracted",
-    #              "../benchmarks/Linear-dataset/CE-common-files/extracted-shuffle")
-    # divide_data_to_threads("non-linear-dataset/separated_benchmark-abstract-empty/exceptions/unsat-raw",
-    #                        "non-linear-dataset/separated_benchmark-abstract-empty/exceptions/unsat-raw-dividied",three_fold=True,datafold_list=["train_data","valid_data","test_data"],chunk_number=2)#datafold_list=["test_data"]
+    # shuffle_data("../benchmarks/Non-linear-CE-union-hyperedge/extracted",
+    #              "../benchmarks/Non-linear-CE-union-hyperedge/extracted-shuffle")
+    divide_data_to_threads("non-linear-dataset/raw",
+                           "non-linear-dataset/raw-dividied",three_fold=True,datafold_list=["train_data","valid_data","test_data"],chunk_number=133)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -344,17 +343,17 @@ def main():
 
     # for i in range(0,17):
     #     rename_files_in_benchmarks("LIA-Lin+sv-comp/LIA-Lin+sv-comp-divided/thread_"+str(i))
-
-    #compress_exception("exceptions")
+    #
+    # compress_exception("exceptions")
 
     # for data_fold in ["train_data","valid_data","test_data"]:
     #     collect_common_files("Linear-dataset/first-three-task-extractable/extractable-raw/"+data_fold,"Linear-dataset/separated_benchmark-abstract-empty/exceptions/unsat","Linear-dataset/counter-example-task-extractable")
-    collect_common_files(folder1="Linear-dataset-counter-example-hyperedge-common/extracted",
-                         folder2="Linear-dataset-counter-example-layer-graph-train-full-common-1/extracted",
-                         out_put_folder="Linear-dataset/CE-common-aligned")
-    collect_common_files(folder1="Linear-dataset-counter-example-hyperedge-union/extracted",
-                         folder2="Linear-dataset-counter-example-layer-graph-train-full-union-1/extracted",
-                         out_put_folder="Linear-dataset/CE-union-aligned")
+    # collect_common_files(folder1="Linear-dataset-counter-example-hyperedge-common/extracted",
+    #                      folder2="Linear-dataset-counter-example-layer-graph-train-full-common-1/extracted",
+    #                      out_put_folder="Linear-dataset/CE-common-aligned")
+    # collect_common_files(folder1="Linear-dataset-counter-example-hyperedge-union/extracted",
+    #                      folder2="Linear-dataset-counter-example-layer-graph-train-full-union-1/extracted",
+    #                      out_put_folder="Linear-dataset/CE-union-aligned")
     # source_folder="Linear-dataset-pure-argument-identification-task"
     # select_files_with_condition(source_folder, source_folder+"-separate-by-node-number")
 
@@ -816,17 +815,21 @@ def clean_extracted_data(benchmark,separated_predicates=False,total_file=5):
                         os.remove(file)
 
 
-    file_list = glob.glob("../benchmarks/" + benchmark + "/*")
-    file_list = [f[:f.rfind(".smt2")] for f in file_list]
-    for f in file_list:
-        relative_f = glob.glob(f + "*")
-        if (len(relative_f) != total_file):
-            for ff in relative_f:
-                os.remove(ff)
-    for unzipped_fold in [".gv",".JSON",".smt2",".tpl"]:
+
+    for unzipped_fold in [".gv",".JSON",".smt2"]:#".tpl"
         file_list = glob.glob("../benchmarks/" + benchmark + "/*"+unzipped_fold)
         for f in file_list:
             os.remove(f)
+
+    file_list = glob.glob("../benchmarks/" + benchmark + "/*.smt2.zip")
+    file_list = [f[:f.rfind("smt2.zip")] for f in file_list]
+    for f in file_list:
+        relative_f = glob.glob(f + "*")
+        if (len(relative_f) != total_file):
+            print(len(relative_f), total_file, relative_f)
+            for ff in relative_f:
+                os.remove(ff)
+
 
 
 def collect_one_field(benchmarks="",field_list=[],target_folder="",source_folder=""):

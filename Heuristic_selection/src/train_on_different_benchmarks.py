@@ -42,7 +42,7 @@ def main():
     GPU=False
     use_class_weight=False
     pickle = True
-    benchmark_name = "Liner-dataset-CE-common-files/"#"Linear-dataset-counter-example-task-hyper-edge-graph/"
+    benchmark_name = "Non-linear-CE-union-hyperedge/"#"Linear-dataset-counter-example-task-hyper-edge-graph/"
     num_node_target_labels=2
 
     # random.seed(0)
