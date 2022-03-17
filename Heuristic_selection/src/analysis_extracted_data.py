@@ -281,13 +281,13 @@ def main():
 
     # for fold in ["train_data","valid_data","test_data"]:
     #     clean_extracted_data("thread_1/"+fold)
-    # clean_extracted_data("non-linear-hyperedge-4-task/extracted",total_file=3)
+    # clean_extracted_data("non-linear-hyperedge-CE-common/train_data",total_file=3)
     # extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
-    # shuffle_data("../benchmarks/Non-linear-CE-union-hyperedge/extracted",
-    #              "../benchmarks/Non-linear-CE-union-hyperedge/extracted-shuffle")
-    divide_data_to_threads("non-linear-dataset/raw",
-                           "non-linear-dataset/raw-dividied",three_fold=True,datafold_list=["train_data","valid_data","test_data"],chunk_number=133)#datafold_list=["test_data"]
+    shuffle_data("../benchmarks/align-lin+non-lin/merged-4-task-lin+non-lin-hyperedge+layer",
+                 "../benchmarks/align-lin+non-lin/shuffle")
+    # divide_data_to_threads("Linear-dataset/raw",
+    #                        "Linear-dataset/raw-dividied",three_fold=True,datafold_list=["train_data","valid_data","test_data"],chunk_number=4)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -351,9 +351,9 @@ def main():
     # collect_common_files(folder1="Linear-dataset-counter-example-hyperedge-common/extracted",
     #                      folder2="Linear-dataset-counter-example-layer-graph-train-full-common-1/extracted",
     #                      out_put_folder="Linear-dataset/CE-common-aligned")
-    # collect_common_files(folder1="Linear-dataset-counter-example-hyperedge-union/extracted",
-    #                      folder2="Linear-dataset-counter-example-layer-graph-train-full-union-1/extracted",
-    #                      out_put_folder="Linear-dataset/CE-union-aligned")
+    # collect_common_files(folder1="align-lin+non-lin/merged-lin+non-lin-4-task-hyperedge",
+    #                      folder2="align-lin+non-lin/merged-lin+non-lin-4-task-layer",
+    #                      out_put_folder="align-lin+non-lin/merged")
     # source_folder="Linear-dataset-pure-argument-identification-task"
     # select_files_with_condition(source_folder, source_folder+"-separate-by-node-number")
 

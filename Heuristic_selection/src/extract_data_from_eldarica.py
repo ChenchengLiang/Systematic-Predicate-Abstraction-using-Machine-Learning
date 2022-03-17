@@ -106,7 +106,7 @@ def extract_data_by_shell():
     parameters_extract_train_data_for_argument_bound_graph_layer = "-moveFile -abstract:empty -getHornGraph:monoDirectionLayerGraph -argumentBoundLabel -boundsAnalysis -t:" + str(
         60*60*3) + " -boundsAnalysisTO:3 -maxNode:10000"
     parameters_extract_train_data_get_normalized_benchmark = "-getSMT2"
-    eldarica_parameters = parameters_extract_train_data_for_argument_bound_graph_layer  # "-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -t:1800" #-abstract:all -solvabilityTimeout:3600 -mainTimeout:3600
+    eldarica_parameters = parameters_extract_train_data_for_counter_example_graph_layer_union  # "-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -t:1800" #-abstract:all -solvabilityTimeout:3600 -mainTimeout:3600
     # eldarica_parameters = "-moveFile -generateSimplePredicates -separateByPredicates -extractPredicates -noIntervals -labelSimpleGeneratedPredicates -getHornGraph:hyperEdgeGraph  -abstract:off -solvabilityTimeout:3600 -mainTimeout:3600 -t:4000"
     for df in data_fold:
         run_eldarica_with_shell_pool(os.path.join(benchmark_name, df), run_eldarica_with_shell, eldarica_parameters,

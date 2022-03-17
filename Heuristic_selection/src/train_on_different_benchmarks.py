@@ -20,13 +20,13 @@ def main():
     #label = "rank"
     #label = "argument_identify_no_batchs"
     #label = "control_location_identify"
-    #label_list.append("argument_identify")
+    label_list.append("argument_identify")
     #label_list.append("predicate_occurrence_in_clauses")
     #label_list.append("predicate_occurrence_in_SCG")
     #label_list.append("scc_test")
     #label_list.append("argument_lower_bound_existence")
     #label_list.append("argument_upper_bound_existence")
-    label_list.append("clause_occurrence_in_counter_examples_binary")
+    #label_list.append("clause_occurrence_in_counter_examples_binary")
     # label="argument_bound"
     #label_list.append("argument_lower_bound")
     # label_list.append("argument_upper_bound")
@@ -42,7 +42,7 @@ def main():
     GPU=False
     use_class_weight=False
     pickle = True
-    benchmark_name = "Non-linear-CE-union-hyperedge/"#"Linear-dataset-counter-example-task-hyper-edge-graph/"
+    benchmark_name = "align-lin+non-lin/"#"Linear-dataset-counter-example-task-hyper-edge-graph/"
     num_node_target_labels=2
 
     # random.seed(0)
