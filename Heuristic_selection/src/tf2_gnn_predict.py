@@ -5,14 +5,14 @@ from utils import flattenList,plot_scatter,generate_horn_graph,wrapped_generate_
 import tensorflow as tf
 import gc
 def main():
-    benchmark="Linear-dataset-counter-example-layer-graph-train-full-common-1"
+    benchmark="align-lin+non-lin"
     #benchmark="Linear-dataset-first-three-task-hyper-edge-graph"
     benchmark_fold = benchmark+"-"+"predict" # sys.argv[2]
 
     max_nodes_per_batch = 10000
 
     # /home/cheli243/PycharmProjects/HintsLearning/src/
-    trained_model_path = "trained_model/GNN_Argument_selection__2022-03-02_16-43-47_best.pkl"
+    trained_model_path = "trained_model/GNN_Argument_selection__2022-04-30_09-11-46_best.pkl"
     thread_number = 4
     continuous_extracting = True
     move_file = False
@@ -23,9 +23,9 @@ def main():
     generateTemplates = ""  # -generateTemplates
     abstract = "-abstract:empty"  # empty
     noIntervals = ""
-    label = "clause_occurrence_in_counter_examples_binary"
+    #label = "clause_occurrence_in_counter_examples_binary"
     #label = "predicate_occurrence_in_SCG"
-    #label = "argument_identify"
+    label = "argument_identify"
     #label = "argument_lower_bound_existence"
     #label = "argument_upper_bound_existence"
     #label = "scc_test"
@@ -33,8 +33,8 @@ def main():
     num_node_target_labels = 2
     verbose = True
     timeout = 300 * 10 if generateTemplates == "-generateTemplates" else 300 * 6
-    #graph_type="hyperEdgeHornGraph"
-    graph_type = "mono-layerHornGraph"
+    graph_type="hyperEdgeHornGraph"
+    #graph_type = "mono-layerHornGraph"
 
     wrapped_generate_horn_graph_params = {"benchmark_fold": benchmark_fold, "max_nodes_per_batch": max_nodes_per_batch,
                                           "separateByPredicates": separateByPredicates,

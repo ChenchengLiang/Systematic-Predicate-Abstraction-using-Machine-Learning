@@ -91,6 +91,7 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
   edgeNameMap += ("dataFlowAST" -> "data")
   edgeNameMap += ("guardAST" -> "guard")
   edgeNameMap += ("AST" -> "AST")
+  edgeNameMap += ("AST_0" -> "AST_0")//unary AST
   edgeNameMap += ("AST_1" -> "AST_1")
   edgeNameMap += ("AST_2" -> "AST_2")
   edgeNameMap += ("argument" -> "arg")
@@ -114,6 +115,7 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
   edgeDirectionMap += ("dataFlowAST" -> false)
   edgeDirectionMap += ("guardAST" -> false)
   edgeDirectionMap += ("AST" -> false)
+  edgeDirectionMap += ("AST_0" -> false)
   edgeDirectionMap += ("AST_1" -> false)
   edgeDirectionMap += ("AST_2" -> false)
   edgeDirectionMap += ("argument" -> false)
@@ -612,14 +614,14 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
    */
 
 
-    val normalizedClause=clause.normalize()
+    //val normalizedClause=clause.normalize()
     //replace intersect arguments in body and add arg=arg' to constrains
-    val replacedClause = DrawHyperEdgeHornGraph.replaceIntersectArgumentInBody(normalizedClause)
+    //val replacedClause = DrawHyperEdgeHornGraph.replaceIntersectArgumentInBody(normalizedClause)
     //val argumentCanonilizedClauses=getArgumentReplacedClause(replacedClause)
     //val simplifiedArgumentCanonilizedClauses=getSimplifiedClauses(argumentCanonilizedClauses)
-    val simplifyedClauses=HintsSelection.getSimplifiedClauses(replacedClause) //quantify constraintand
+    //val simplifyedClauses=HintsSelection.getSimplifiedClauses(clause) //quantify constraintand
 
-    val finalSimplifiedClauses=simplifyedClauses //change to replacedClause see not simplified constraints
+    val finalSimplifiedClauses=clause //change to replacedClause see not simplified constraints
 
     //var guardList = Set[IFormula]()
     var dataflowList = Set[IFormula]()
@@ -663,12 +665,12 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
       dataFlowInfoWriter.write("--------------------\n")
       dataFlowInfoWriter.write("original clause:\n")
       dataFlowInfoWriter.write(clause.toPrologString + "\n")
-      dataFlowInfoWriter.write("normalized clause:\n")
-      dataFlowInfoWriter.write(normalizedClause.toPrologString + "\n")
-      dataFlowInfoWriter.write("replaceIntersectArgumentInBody clause:\n")
-      dataFlowInfoWriter.write(replacedClause.toPrologString + "\n")
-      dataFlowInfoWriter.write("simplified clause:\n")
-      dataFlowInfoWriter.write(simplifyedClauses.toPrologString + "\n")
+//      dataFlowInfoWriter.write("normalized clause:\n")
+//      dataFlowInfoWriter.write(normalizedClause.toPrologString + "\n")
+//      dataFlowInfoWriter.write("replaceIntersectArgumentInBody clause:\n")
+//      dataFlowInfoWriter.write(replacedClause.toPrologString + "\n")
+//      dataFlowInfoWriter.write("simplified clause:\n")
+//      dataFlowInfoWriter.write(simplifyedClauses.toPrologString + "\n")
       //    dataFlowInfoWriter.write("argument canonicalized  clauses:\n")
       //    dataFlowInfoWriter.write(argumentCanonilizedClauses.toPrologString + "\n")
       //    dataFlowInfoWriter.write("simplified argument canonilized clauses:\n")
@@ -684,7 +686,7 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
       //      dataFlowInfoWriter.write(r.toString + "\n")
       dataFlowInfoWriter.close()
     }
-    (dataFlowSeq, guardSeq, simplifyedClauses)
+    (dataFlowSeq, guardSeq, finalSimplifiedClauses)
   }
 
   def getArgumentReplacedClause(clause:Clause): Clause ={

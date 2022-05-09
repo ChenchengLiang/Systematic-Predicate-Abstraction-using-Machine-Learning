@@ -7,7 +7,8 @@ from utils import call_eldarica
 from Miscellaneous import add_JSON_field, GPU_switch, pickleRead, pickleWrite
 from horn_dataset import write_graph_to_pickle, form_GNN_inputs_and_labels, get_test_loss_with_class_weight, \
     compute_loss, HornGraphDataset
-from utils import my_round_fun, plot_scatter, file_compress, unzip_file
+from utils import my_round_fun, plot_scatter, file_compress, unzip_file,plot_confusion_matrix,get_recall_and_precision,plot_ROC
+from utils_tf import get_classification_accuracy
 
 def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score_list,graph_type=".layerHornGraph.JSON"):
     # write predicted_argument_score to JSON file
@@ -305,8 +306,24 @@ def predict_label(benchmark,max_nodes_per_batch,benchmark_fold,file_list,trained
     write_predicted_label_to_JSON_file(result_dir["dataset"], result_dir["rounded_predicted_Y_loaded_model"], json_type,
                                        result_dir["best_threshold"],verbose=verbose,label=label)
 
-    if label=="predicate_occurrence_in_clauses":
-        plot_scatter(result_dir["true_Y"], result_dir["predicted_Y_loaded_model"], name=label+"-"+graph_type, range=[0, 0], x_label="True Values", y_label="Predictions")
+    plot_name="predicted"
+    if label in gathered_nodes_binary_classification_task+["argument_identify","scc_test"]: # confusion matrix on true y and predicted y
+        accuracy = get_classification_accuracy(result_dir["true_Y"], my_round_fun(result_dir["predicted_Y_loaded_model"],threshold=0.5,label=label), label,
+                                               result_dir["predicted_Y_loaded_model"], result_dir["predicted_Y_loaded_model"])
+        saving_path_confusion_matrix="trained_model/" + plot_name+ "-confusion_matrix.png"
+        saving_path_roc = "trained_model/" + plot_name + "-ROC.png"
+        recall,precision,f1_score,false_positive_rate=get_recall_and_precision(result_dir["true_Y"],my_round_fun(result_dir["predicted_Y_loaded_model"],threshold=0.5,label=label),verbose=True)
+        plot_confusion_matrix(result_dir["predicted_Y_loaded_model"],result_dir["true_Y"],saving_path_confusion_matrix,recall=recall,precision=precision,f1_score=f1_score,accuracy=accuracy)
+        plot_ROC(false_positive_rate,recall,saving_path_roc)
+    elif label=="node_multiclass":
+        saving_path_confusion_matrix = "trained_model/" + plot_name + "-confusion_matrix.png"
+        plot_confusion_matrix(result_dir["predicted_Y_loaded_model"], result_dir["true_Y"], saving_path_confusion_matrix, recall="-",
+                              precision="-", f1_score="-",label="node_multiclass")
+    else:
+        plot_scatter(result_dir["true_Y"], result_dir["predicted_Y_loaded_model"], name="", range=[0, 0], x_label="True Values", y_label="Predictions")
+
+    # if label=="predicate_occurrence_in_clauses":
+    #     plot_scatter(result_dir["true_Y"], result_dir["predicted_Y_loaded_model"], name=label+"-"+graph_type, range=[0, 0], x_label="True Values", y_label="Predictions")
 
     return result_dir["predicted_Y_loaded_model"]
 

@@ -1,3 +1,5 @@
+import os.path
+
 import tensorflow as tf
 from horn_dataset import parameters
 from Miscellaneous import GPU_switch
@@ -42,7 +44,7 @@ def main():
     GPU=False
     use_class_weight=False
     pickle = True
-    benchmark_name = "align-lin+non-lin/"#"Linear-dataset-counter-example-task-hyper-edge-graph/"
+    benchmark_name = "align-lin+non-lin-first-task-debug/"#"align-lin+non-lin/"#"Linear-dataset-counter-example-task-hyper-edge-graph/"
     num_node_target_labels=2
 
     # random.seed(0)
@@ -54,39 +56,41 @@ def main():
     for num_layers in num_layers_list:
         hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers, "regression_hidden_layer_size": [64, 64],
                             "threshold": 0.5, "max_nodes_per_batch": 10000,
-                            "max_epochs": 500, "patience": 100, "num_node_target_labels": num_node_target_labels,
+                            "max_epochs": 500, "patience": 20, "num_node_target_labels": num_node_target_labels,
                             "fix_y_axis": False}
 
+        relative_path = os.path.join("../benchmarks/", benchmark_name)
+        absolute_path = os.path.join("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/", benchmark_name)
         for label in label_list:
-            parameter_list.append(parameters(relative_path="../benchmarks/"+benchmark_name,
-                          absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
+            parameter_list.append(parameters(relative_path=relative_path,
+                          absolute_path=absolute_path,
                           json_type=".hyperEdgeHornGraph.JSON", label=label,label_field=label_pairs[label]))#templateRelevanceLabel,templateCostLabel,argumentIndices
             # parameter_list.append(
-            #     parameters(relative_path="../benchmarks/" + benchmark_name,
-            #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+            #     parameters(relative_path=relative_path,
+            #                absolute_path=absolute_path,
             #                json_type=".equivalent-hyperedgeGraph.JSON", label=label))
             # parameter_list.append(
-            #     parameters(relative_path="../benchmarks/" + benchmark_name,
-            #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+            #     parameters(relative_path=relative_path,
+            #                absolute_path=absolute_path,
             #                json_type=".concretized-hyperedgeGraph.JSON", label=label))
-            # parameter_list.append(parameters(relative_path="../benchmarks/" + benchmark_name,
-            #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+            # parameter_list.append(parameters(relative_path=relative_path,
+            #                absolute_path=absolute_path,
             #                json_type=".mono-layerHornGraph.JSON", label=label,label_field=label_pairs[label]))
             # parameter_list.append(
-            #     parameters(relative_path="../benchmarks/"+benchmark_name,
-            #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
+            #     parameters(relative_path=relative_path,
+            #                absolute_path=absolute_path,
             #                json_type=".hybrid-layerHornGraph.JSON", label=label))
             # parameter_list.append(
-            #     parameters(relative_path="../benchmarks/"+benchmark_name,
-            #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/"+benchmark_name,
+            #     parameters(relative_path=relative_path,
+            #                absolute_path=absolute_path,
             #                json_type=".bi-layerHornGraph.JSON", label=label,label_field=label_pairs[label]))
             # parameter_list.append(
-            #     parameters(relative_path="../benchmarks/" + benchmark_name,
-            #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+            #     parameters(relative_path=relative_path,
+            #                absolute_path=absolute_path,
             #                json_type=".clause-related-task-layerHornGraph.JSON", label=label))
             # parameter_list.append(
-            #     parameters(relative_path="../benchmarks/" + benchmark_name,
-            #                absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
+            #     parameters(relative_path=relative_path,
+            #                absolute_path=absolute_path,
             #                json_type=".fine-grained-edge-type-layerHornGraph.JSON", label=label))
 
         GPU_switch(GPU)

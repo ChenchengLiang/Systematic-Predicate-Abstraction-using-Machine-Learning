@@ -226,16 +226,10 @@ def _traucate(x, decimals=0): #trauncate
 def decode_one_hot(predicted_Y_loaded_model):
     return [np.argmax(y)  for y in predicted_Y_loaded_model]
 def main():
-    print((None,)+(1,))
-    true_Y=[1,2,10,88,100]
-    predicted_Y=[1,11,10,88,100]
-    a = plt.axes(aspect='equal')
-    plt.scatter(true_Y, predicted_Y)
-    plt.xlabel("x_label")
-    plt.ylabel("y_label")
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.plot([0,100], [0,100])
+    # a=np.array([[1,1]])
+    # b=np.array([[2,2]])
+    # print(np.concatenate((a,b),axis=0))
+
     # small_lims = range
     # lims = np.logspace(0, np.max([np.max(true_Y), np.max(predicted_Y)]), num=10)
     # #lims = [0, np.max([np.max(true_Y), np.max(predicted_Y)])]
@@ -243,8 +237,28 @@ def main():
     # plt.xlim((0,100))
     # plt.ylim((0,100))
     # _ = plt.plot(lims, lims)
-    plt.savefig("trained_model/" + "test" + "-scatter.png")
-    plt.clf()
+    # plt.savefig("trained_model/" + "test" + "-scatter.png")
+    # plt.clf()
+
+
+    print(np.unique(np.array([[0,0],[0,0],[0,1]]), axis=0))
+
+    with open("../benchmarks/align-lin+non-lin-predict/wrong_predicted/chc-LIA-lin_495.smt2.hyperEdgeHornGraph.JSON") as f:
+        loaded_graph = json.load(f)
+        nodeIds=loaded_graph["nodeIds"]
+        AST_1Edges = loaded_graph["AST_1Edges"]
+        AST_2Edges=loaded_graph["AST_2Edges"]
+        nodeSymbolList = loaded_graph["nodeSymbolList"]
+        print("AST_1Edges",len(AST_1Edges),len(np.unique(AST_1Edges, axis=0)))
+        print("AST_2Edges",len(AST_2Edges),len(np.unique(AST_2Edges, axis=0)))
+        print(nodeSymbolList[AST_1Edges[0][0]],nodeSymbolList[AST_1Edges[0][1]])
+        print(nodeSymbolList[AST_2Edges[0][0]], nodeSymbolList[AST_2Edges[0][1]])
+
+        argument_identify_labels=[1 if x in loaded_graph["argumentIndices"]  else 0 for x in nodeIds]
+        print("nodeIds",len(loaded_graph["argumentIndices"] ),nodeIds)
+        print("nodeIds",sum(argument_identify_labels),argument_identify_labels)
+
+
 
 
 

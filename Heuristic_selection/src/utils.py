@@ -116,12 +116,13 @@ def filter_file_list_by_max_node(file_list,max_nodes_per_batch,separateByPredica
 def plot_scatter(true_Y,predicted_Y,name="",range=[0,0],x_label="True Values",y_label="Predictions"):
     #a = plt.axes(aspect='equal')
     upperBound=np.max([np.max(true_Y), np.max(predicted_Y)])
-    plt.scatter(true_Y, predicted_Y)
+    plt.scatter(true_Y, predicted_Y,marker="x",s=10)#s=10,marker="x"
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.xscale('log')
     plt.yscale('log')
-    plt.plot([0, upperBound], [0, upperBound])
+    plt.grid(linewidth = 0.5)
+    plt.plot([0, upperBound], [0, upperBound],color="black", linewidth=0.5)
     plt.xlim([0,upperBound])
     plt.ylim([0,upperBound])
     # small_lims = range
@@ -162,6 +163,8 @@ def plot_ROC(FP_rate,TP_rate,saving_path):
     plt.legend()
     plt.savefig(saving_path)
     plt.clf()
+
+
 
 def run_eldarica_with_shell_pool(filePath, fun, eldarica_parameters,timeout=60,thread=4,countinous_extract=True,
                                  graphtype="hyperEdgeHornGraph",runtime=1):

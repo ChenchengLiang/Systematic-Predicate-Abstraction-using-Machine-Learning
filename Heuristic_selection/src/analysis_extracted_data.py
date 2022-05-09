@@ -281,13 +281,13 @@ def main():
 
     # for fold in ["train_data","valid_data","test_data"]:
     #     clean_extracted_data("thread_1/"+fold)
-    # clean_extracted_data("non-linear-hyperedge-CE-common/train_data",total_file=3)
+    #clean_extracted_data("linear-layer-CE-union-uppmax/extracted",total_file=3,edge_type="mono-layerHornGraph")
     # extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
-    shuffle_data("../benchmarks/align-lin+non-lin/merged-4-task-lin+non-lin-hyperedge+layer",
-                 "../benchmarks/align-lin+non-lin/shuffle")
-    # divide_data_to_threads("Linear-dataset/raw",
-    #                        "Linear-dataset/raw-dividied",three_fold=True,datafold_list=["train_data","valid_data","test_data"],chunk_number=4)#datafold_list=["test_data"]
+    shuffle_data("../benchmarks/align-lin+non-lin/fifth-task-union-hyperedge+layer-linear+nonlinear",
+                 "../benchmarks/align-lin+non-lin/fifth-task-union-hyperedge+layer-linear+nonlinear-shuffle")
+    # divide_data_to_threads("non-linear-dataset/separated_benchmark-abstract-empty/exceptions/unsat-raw",
+    #                        "non-linear-dataset/separated_benchmark-abstract-empty/exceptions/unsat-raw-divided",three_fold=True,datafold_list=["train_data","valid_data","test_data"],chunk_number=60)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -351,9 +351,9 @@ def main():
     # collect_common_files(folder1="Linear-dataset-counter-example-hyperedge-common/extracted",
     #                      folder2="Linear-dataset-counter-example-layer-graph-train-full-common-1/extracted",
     #                      out_put_folder="Linear-dataset/CE-common-aligned")
-    # collect_common_files(folder1="align-lin+non-lin/merged-lin+non-lin-4-task-hyperedge",
-    #                      folder2="align-lin+non-lin/merged-lin+non-lin-4-task-layer",
-    #                      out_put_folder="align-lin+non-lin/merged")
+    # collect_common_files(folder1="align-lin+non-lin/fifth-task-union-hyperedge-linear+nonlinear",
+    #                      folder2="align-lin+non-lin/fifth-task-union-layer-linear+nonlinear",
+    #                      out_put_folder="align-lin+non-lin/fifth-task-union-hyperedge+layer-linear+nonlinear")
     # source_folder="Linear-dataset-pure-argument-identification-task"
     # select_files_with_condition(source_folder, source_folder+"-separate-by-node-number")
 
@@ -792,20 +792,20 @@ def rebuild_exception_file(benchmark="",field_list=["solvability-timeout", "shel
             shutil.copyfile(file_name, new_folder + "/" + f)
 
 
-def clean_extracted_data(benchmark,separated_predicates=False,total_file=5):
+def clean_extracted_data(benchmark,separated_predicates=False,total_file=5,edge_type="hyperEdgeHornGraph"):
     if(separated_predicates):
         file_list = glob.glob("../benchmarks/" + benchmark + "/*.smt2.zip")
         file_list = [f[:-len(".zip")] for f in file_list]
         for f in file_list:
-            if not (os.path.exists(f + "-0.hyperEdgeHornGraph.JSON.zip") ):#and os.path.exists(f + ".unlabeledPredicates.tpl.zip")
+            if not (os.path.exists(f + "-0."+edge_type+".JSON.zip") ):#and os.path.exists(f + ".unlabeledPredicates.tpl.zip")
                 print(f)
                 relative_files=glob.glob(f+"*")
                 for file in relative_files:
                     if os.path.exists(file):
                         os.remove(file)
 
-        file_list = glob.glob("../benchmarks/" + benchmark + "/*-0.hyperEdgeHornGraph.JSON.zip")
-        file_list = [f[:-len("-0.hyperEdgeHornGraph.JSON.zip")] for f in file_list]
+        file_list = glob.glob("../benchmarks/" + benchmark + "/*-0."+edge_type+".JSON.zip")
+        file_list = [f[:-len("-0."+edge_type+".JSON.zip")] for f in file_list]
         for f in file_list:
             if not (os.path.exists(f+".zip")):  # and os.path.exists(f + ".unlabeledPredicates.tpl.zip")
                 print(f)

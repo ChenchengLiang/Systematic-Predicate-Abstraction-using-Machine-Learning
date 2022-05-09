@@ -15,6 +15,7 @@ from tf2_gnn.models import InvariantArgumentSelectionTask, InvariantNodeIdentify
 from Miscellaneous import pickleWrite, pickleRead, drawLabelPieChart
 from archived.dotToGraphInfo import parseArgumentsFromJson
 from utils import plot_confusion_matrix,get_recall_and_precision,plot_ROC,assemble_name,my_round_fun,unzip_file,plot_scatter
+from utils_tf import get_classification_accuracy
 
 
 def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",
@@ -40,13 +41,14 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
     parameters['hidden_dim'] = nodeFeatureDim #64
 
     parameters["use_inter_layer_layernorm"]=True
+    parameters["use_intermediate_gnn_results"]= True
     # parameters["dense_every_num_layers"] = 32
     # parameters["residual_every_num_layers"] = 32
     # parameters["global_exchange_every_num_layers"] = 32
     #parameters["num_edge_MLP_hidden_layers"] = 2
     parameters["add_self_loop_edges"]=False
 
-    # parameters["use_intermediate_gnn_results"]=False
+
 
 
     parameters['num_layers'] = hyper_parameters["num_layers"]
@@ -86,7 +88,8 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         else:
             print("Use pickle data for training")
         #if form_label == True and not os.path.isfile("../pickleData/" + label + "-" + benchmark_name + "-gnnInput_train_data.txt"):
-        if form_label == True:
+        if \
+                form_label == True:
             params_form_GNN_inputs_and_labels={"label":label,"datafold":["train", "valid", "test"],"benchmark":benchmark_name,"graph_type":graph_type,
                                                "gathered_nodes_binary_classification_task":gathered_nodes_binary_classification_task,"use_class_weight":use_class_weight,
                                                "num_node_target_labels":hyper_parameters["num_node_target_labels"]}
@@ -158,40 +161,37 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
 
         # use model in memory
         _, _, test_results = model.run_one_epoch(test_data, training=False, quiet=quiet)
-        test_metric, test_metric_string = model.compute_epoch_metrics(test_results)
-        print("test_metric_string model from memory", test_metric_string)
-        print("test_metric model from memory", test_metric)
+        test_metric_from_memory, test_metric_string_from_memory = model.compute_epoch_metrics(test_results)
+        print("test_metric_string model from memory", test_metric_string_from_memory)
+        print("test_metric model from memory", test_metric_from_memory)
 
+        from_logits = True
         raw_predicted_Y_loaded_model_from_memory = model.predict(test_data)
         #predicted_Y_loaded_model_from_memory = raw_predicted_Y_loaded_model_from_memory if label in ["predicate_occurrence_in_clauses"] else tf.math.sigmoid(raw_predicted_Y_loaded_model_from_memory)
         predicted_Y_loaded_model_from_memory= raw_predicted_Y_loaded_model_from_memory
-        rounded_predicted_Y_loaded_model_from_memory=my_round_fun(predicted_Y_loaded_model_from_memory,threshold=hyper_parameters["threshold"],label=label)
 
         #load model from files
         loaded_model = tf2_gnn.cli_utils.model_utils.load_model_for_prediction(trained_model_path, dataset)
         _, _, test_results = loaded_model.run_one_epoch(test_data, training=False, quiet=quiet)
         test_metric, test_metric_string = loaded_model.compute_epoch_metrics(test_results)
+        print("test_metric_string", test_metric_string)
+        print("test_metric", test_metric)
 
-        raw_predicted_Y_loaded_model = loaded_model.predict(test_data)
+        raw_predicted_Y_loaded_model = loaded_model.predict(test_data) # test_results test_data
         #predicted_Y_loaded_model=raw_predicted_Y_loaded_model if label in ["predicate_occurrence_in_clauses"] else tf.math.sigmoid(raw_predicted_Y_loaded_model)
         predicted_Y_loaded_model=raw_predicted_Y_loaded_model
-        rounded_predicted_Y_loaded_model=my_round_fun(predicted_Y_loaded_model,threshold=hyper_parameters["threshold"],label=label)
 
 
-        print("predicted_Y_loaded_model",predicted_Y_loaded_model)
-        if verbose==True:
-            print("rounded_predicted_Y_loaded_model",len(rounded_predicted_Y_loaded_model),rounded_predicted_Y_loaded_model)
 
-        print("test_metric_string",test_metric_string)
-        print("test_metric",test_metric)
 
         true_Y=[]
         for data in iter(test_data):
             #print(data[0]) #input
             true_Y.extend(np.array(data[1]["node_labels"]))
+        true_Y=tf.cast(true_Y,tf.float32)
 
         class_weight={"weight_for_1":parameters["class_weight_fold"]["weight_for_1"]/parameters["class_weight_fold"]["weight_for_0"],"weight_for_0":1}
-        from_logits=True
+
 
         error_loaded_model = compute_loss(label, true_Y, predicted_Y_loaded_model, class_weight, from_logits,gathered_nodes_binary_classification_task)
         print("\n error of loaded_model", error_loaded_model)
@@ -201,6 +201,22 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         mean_loss = compute_loss(label, true_Y, mean_label, class_weight, from_logits,gathered_nodes_binary_classification_task)
         print("\n mean_loss_Y_and_True_Y", mean_loss)
         mean_loss_list=mean_loss
+
+
+        predicted_Y_loaded_model_from_memory = tf.nn.sigmoid(predicted_Y_loaded_model_from_memory) if from_logits==True else predicted_Y_loaded_model_from_memory
+        # rounded_predicted_Y_loaded_model_from_memory = my_round_fun(predicted_Y_loaded_model_from_memory,
+        #                                                             threshold=hyper_parameters["threshold"],
+        #                                                             label=label)
+        rounded_predicted_Y_loaded_model_from_memory = tf.math.round(predicted_Y_loaded_model_from_memory)
+        predicted_Y_loaded_model = tf.nn.sigmoid(predicted_Y_loaded_model) if from_logits==True else predicted_Y_loaded_model
+        # rounded_predicted_Y_loaded_model = my_round_fun(predicted_Y_loaded_model,
+        #                                                 threshold=hyper_parameters["threshold"], label=label)
+        rounded_predicted_Y_loaded_model = tf.math.round(predicted_Y_loaded_model)
+
+        print("predicted_Y_loaded_model",predicted_Y_loaded_model)
+        if verbose==True:
+            print("rounded_predicted_Y_loaded_model",len(rounded_predicted_Y_loaded_model),rounded_predicted_Y_loaded_model)
+
         accuracy=get_classification_accuracy(true_Y,rounded_predicted_Y_loaded_model,label,predicted_Y_loaded_model_from_memory,predicted_Y_loaded_model)
         accuracy_average.append(accuracy)
 
@@ -242,22 +258,6 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
 
     return trained_model_path
 
-def get_classification_accuracy(true_Y,rounded_predicted_Y_loaded_model,label,predicted_Y_loaded_model_from_memory,predicted_Y_loaded_model):
-    if label=="node_multiclass":
-        true_Y=np.argmax(true_Y, axis=1)
-        rounded_predicted_Y_loaded_model = np.argmax(rounded_predicted_Y_loaded_model, axis=1)
-    if len(true_Y)<100:
-        print("true_Y", true_Y)
-        print("rounded_predicted_Y_loaded_model", rounded_predicted_Y_loaded_model)
-        # print("predicted_Y_loaded_model_from_memory",predicted_Y_loaded_model_from_memory)
-        # print("predicted_Y_loaded_model",predicted_Y_loaded_model)
-    else:
-        print("true_Y[100]", true_Y[100])
-        print("rounded_predicted_Y_loaded_model[100]", rounded_predicted_Y_loaded_model[100])
-    num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, rounded_predicted_Y_loaded_model), tf.int32))
-    accuracy = num_correct / len(rounded_predicted_Y_loaded_model)
-    print("accuracy", accuracy)
-    return accuracy
 
 def write_accuracy_to_log(label, benchmark, accuracy_list, best_valid_epoch_list, graph_type):
     mean_accuracy = np.mean(accuracy_list)
@@ -448,7 +448,7 @@ def write_graph_to_pickle(params):
     else:
         vocabulary_set, token_map = build_vocabulary(datafold=["train", "valid", "test"], path=params["path"],json_type=json_type,
                                                      max_nodes_per_batch=params["max_nodes_per_batch"])
-        pickleWrite([vocabulary_set, token_map], params["benchmark"] + "-" + params["label"] + "-vocabulary", "../src/trained_model/")
+        pickleWrite([list(vocabulary_set), token_map], params["benchmark"] + "-" + params["label"] + "-vocabulary", "../src/trained_model/")
     benchmark_name = params["benchmark"].replace("/", "-")
     for df in params["data_fold"]:
         print("write data_fold to pickle data:", df)
@@ -470,9 +470,11 @@ def write_graph_to_pickle(params):
             for zf in zipped_files:
                 unzip_file(zf)
             files_from_benchmark = glob.glob(params["path"] + df + "_data/" + '*' + json_type)
-        file_set=(lambda : [f+json_type for f in params["file_list"]] if len(params["file_list"])>0 else files_from_benchmark)()
+        file_set=[f+json_type for f in params["file_list"]] if len(params["file_list"])>0 else files_from_benchmark
         # print("files_from_benchmark",files_from_benchmark)
         # print("file_set",file_set)
+        # sample_dict={"train":100,"valid":20,"test":20}
+        # for fileGraph in file_set[:sample_dict[df]]:
         for fileGraph in file_set:
             fileName = fileGraph[:fileGraph.find( json_type)]
             fileName = fileName[fileName.rindex("/") + 1:]
@@ -492,10 +494,8 @@ def write_graph_to_pickle(params):
                 elif len(loaded_graph["nodeIds"]) >= params["max_nodes_per_batch"]: #
                     print("more than " + str(params["max_nodes_per_batch"]) + " nodes","skip",fileName)
                     skipped_file_list.append(fileName)
-                elif (json_type == (".hyperEdgeHornGraph.JSON" or json_type == ".equivalent-hyperedgeGraph.JSON" \
-                                   or json_type == ".concretized-hyperedgeGraph.JSON") and
-                      (params["label"]=="argument_lower_bound_existence" or params["label"]=="argument_upper_bound_existence" or
-                       params["label"]=="argument_identify")
+                #skip for both Horn graphs
+                elif ((params["label"]=="argument_lower_bound_existence" or params["label"]=="argument_upper_bound_existence")#or params["label"]=="argument_identify"
                       and len(loaded_graph["argumentIndices"]) == 0):
                     print("no argumentIndices", "skip", fileName)
                     skipped_file_list.append(fileName)
@@ -582,37 +582,58 @@ def write_graph_to_pickle(params):
                     if json_type==".hyperEdgeHornGraph.JSON" or json_type==".equivalent-hyperedgeGraph.JSON" \
                             or json_type==".concretized-hyperedgeGraph.JSON": #read adjacency_lists
                         #for hyperedge horn graph
-                        #add dummy edge if that edge is empty
-                        dummy_biary_edge=[0,0]
-                        dummy_ternary_edge=[0,0,0]
-                        argumentEdges=np.array([dummy_biary_edge]) if len(loaded_graph["argumentEdges"])==0 else np.array(loaded_graph["argumentEdges"])
-                        guardASTEdges = np.array([dummy_biary_edge]) if len(
-                            loaded_graph["guardASTEdges"]) == 0 else np.array(loaded_graph["guardASTEdges"])
-                        dataFlowASTEdges = np.array([dummy_biary_edge]) if len(
-                            loaded_graph["dataFlowASTEdges"]) == 0 else np.array(loaded_graph["dataFlowASTEdges"])
-                        ASTEdges = np.array([dummy_biary_edge]) if len(
-                            loaded_graph["ASTEdges"]) == 0 else np.array(loaded_graph["ASTEdges"])
-                        AST_1Edges = np.array([dummy_biary_edge]) if len(
-                            loaded_graph["AST_1Edges"]) == 0 else np.array(loaded_graph["AST_1Edges"])
-                        AST_2Edges = np.array([dummy_biary_edge]) if len(
-                            loaded_graph["AST_2Edges"]) == 0 else np.array(loaded_graph["AST_2Edges"])
-                        controlLocationEdgeForSCC = np.array([dummy_biary_edge]) if len(
-                            loaded_graph["controlLocationEdgeForSCC"]) == 0 else np.array(loaded_graph["controlLocationEdgeForSCC"])
-                        templateEdges = np.array([dummy_biary_edge]) if len(
-                            loaded_graph["templateEdges"]) == 0 else np.array(
-                            loaded_graph["templateEdges"])
-                        binaryAdjacentList = np.array([dummy_biary_edge]) if len(
-                            loaded_graph["binaryAdjacentList"]) == 0 else np.array(
-                            loaded_graph["binaryAdjacentList"])
-                        controlFlowHyperEdges = np.array([dummy_ternary_edge]) if len(
-                            loaded_graph["controlFlowHyperEdges"]) == 0 else np.array(
-                            loaded_graph["controlFlowHyperEdges"])
-                        dataFlowHyperEdges = np.array([dummy_ternary_edge]) if len(
-                            loaded_graph["dataFlowHyperEdges"]) == 0 else np.array(
-                            loaded_graph["dataFlowHyperEdges"])
-                        ternaryAdjacencyList = np.array([dummy_ternary_edge]) if len(
-                            loaded_graph["ternaryAdjacencyList"]) == 0 else np.array(
-                            loaded_graph["ternaryAdjacencyList"])
+                        #todo:don't add dummy edge, skip them
+                        argumentEdges =  np.array(loaded_graph["argumentEdges"])
+                        guardASTEdges = np.array(loaded_graph["guardASTEdges"])
+                        dataFlowASTEdges = np.array(loaded_graph["dataFlowASTEdges"])
+                        ASTEdges = np.array(loaded_graph["ASTEdges"])
+                        AST_1Edges = np.array(loaded_graph["AST_1Edges"])
+                        AST_2Edges = np.array(loaded_graph["AST_2Edges"])
+                        #merged_AST_1_and_2= np.concatenate((AST_1Edges,AST_1Edges),axis=0)
+                        controlLocationEdgeForSCC = np.array(loaded_graph["controlLocationEdgeForSCC"])
+                        templateEdges = np.array(loaded_graph["templateEdges"])
+                        binaryAdjacentList = np.array(loaded_graph["binaryAdjacentList"])
+                        controlFlowHyperEdges =  np.array(loaded_graph["controlFlowHyperEdges"])
+                        dataFlowHyperEdges = np.array(loaded_graph["dataFlowHyperEdges"])
+                        ternaryAdjacencyList = np.array(loaded_graph["ternaryAdjacencyList"])
+
+                        #
+                        # #add dummy edge if that edge is empty
+                        # dummy_biary_edge=[0,0]
+                        # dummy_ternary_edge=[0,0,0]
+                        # argumentEdges=np.array([dummy_biary_edge]) if len(loaded_graph["argumentEdges"])==0 else np.array(loaded_graph["argumentEdges"])
+                        # #inverse argument edge
+                        # #argumentEdges=np.array([[a[1],a[0]] for a in argumentEdges])
+                        # guardASTEdges = np.array([dummy_biary_edge]) if len(
+                        #     loaded_graph["guardASTEdges"]) == 0 else np.array(loaded_graph["guardASTEdges"])
+                        # dataFlowASTEdges = np.array([dummy_biary_edge]) if len(
+                        #     loaded_graph["dataFlowASTEdges"]) == 0 else np.array(loaded_graph["dataFlowASTEdges"])
+                        # ASTEdges = np.array([dummy_biary_edge]) if len(
+                        #     loaded_graph["ASTEdges"]) == 0 else np.array(loaded_graph["ASTEdges"])
+                        # AST_1Edges = np.array([dummy_biary_edge]) if len(
+                        #     loaded_graph["AST_1Edges"]) == 0 else np.array(loaded_graph["AST_1Edges"])
+                        # AST_2Edges = np.array([dummy_biary_edge]) if len(
+                        #     loaded_graph["AST_2Edges"]) == 0 else np.array(loaded_graph["AST_2Edges"])
+                        # controlLocationEdgeForSCC = np.array([dummy_biary_edge]) if len(
+                        #     loaded_graph["controlLocationEdgeForSCC"]) == 0 else np.array(loaded_graph["controlLocationEdgeForSCC"])
+                        # templateEdges = np.array([dummy_biary_edge]) if len(
+                        #     loaded_graph["templateEdges"]) == 0 else np.array(
+                        #     loaded_graph["templateEdges"])
+                        # binaryAdjacentList = np.array([dummy_biary_edge]) if len(
+                        #     loaded_graph["binaryAdjacentList"]) == 0 else np.array(
+                        #     loaded_graph["binaryAdjacentList"])
+                        # controlFlowHyperEdges = np.array([dummy_ternary_edge]) if len(
+                        #     loaded_graph["controlFlowHyperEdges"]) == 0 else np.array(
+                        #     loaded_graph["controlFlowHyperEdges"])
+                        # dataFlowHyperEdges = np.array([dummy_ternary_edge]) if len(
+                        #     loaded_graph["dataFlowHyperEdges"]) == 0 else np.array(
+                        #     loaded_graph["dataFlowHyperEdges"])
+                        # #binary the DFHE
+                        # #dataFlowHyperEdges_0 = np.array([[a[0], a[2]] for a in dataFlowHyperEdges])
+                        # #dataFlowHyperEdges_1 = np.array([[a[1], a[2]] for a in dataFlowHyperEdges])
+                        # ternaryAdjacencyList = np.array([dummy_ternary_edge]) if len(
+                        #     loaded_graph["ternaryAdjacencyList"]) == 0 else np.array(
+                        #     loaded_graph["ternaryAdjacencyList"])
                         if params["label"] in ["node_multiclass"]:
                             graphs_adjacency_lists.append([
                                 argumentEdges,
@@ -634,12 +655,14 @@ def write_graph_to_pickle(params):
                                 ternaryAdjacencyList
                             ])
                         else:
-                            #try only multiple binary and ternary edges
                             graphs_adjacency_lists.append([
                                 argumentEdges,
                                 guardASTEdges,
                                 AST_1Edges,
                                 AST_2Edges,
+                                #merged_AST_1_and_2,
+                                #dataFlowHyperEdges_0,
+                                #dataFlowHyperEdges_1,
                                 binaryAdjacentList,
                                 controlFlowHyperEdges,
                                 dataFlowHyperEdges,
@@ -800,7 +823,7 @@ def form_predicate_occurrence_related_label_graph_sample(params):
 
     elif params["label"]=="argument_identify":
         graphs_learning_labels_temp = []
-        for one_graph_learning_labels,indices in zip(params["graphs_learning_labels"],params["graphs_label_indices"]):
+        for one_graph_learning_labels,indices,file_name in zip(params["graphs_learning_labels"],params["graphs_label_indices"],params["file_name_list"]):
             temp_graph_label = []
             for learning_labels in one_graph_learning_labels:
                 if learning_labels in indices:
@@ -808,7 +831,11 @@ def form_predicate_occurrence_related_label_graph_sample(params):
                 else:
                     temp_graph_label.append(0)
             graphs_learning_labels_temp.append(temp_graph_label)
-        graphs_node_indices = params["graphs_node_label_ids"]
+            # print("file_name",file_name)
+            # print("indices",len(indices),indices)
+            # print("temp_graph_label",sum(temp_graph_label),temp_graph_label)
+        #graphs_node_indices = params["graphs_node_label_ids"]
+        graphs_node_indices = params["graphs_learning_labels"]
         params["graphs_learning_labels"] = graphs_learning_labels_temp
 
     elif params["label"]=="argument_bound":
@@ -1156,7 +1183,7 @@ def get_predicted_label_list_divided_by_file(dataset,predicted_Y_loaded_model):
     return predicted_label_lists
 
 def build_vocabulary(datafold=["train", "valid", "test"], path="",json_type=".layerHornGraph.JSON",max_nodes_per_batch=10000):
-    vocabulary_set=set(["unknown_node","unknown_predicate","unknown_symbolic_constant","unknown_predicate_argument",
+    vocabulary_set=set(["dummy,unknown_node","unknown_predicate","unknown_symbolic_constant","unknown_predicate_argument",
                         "unknown_operator","unknown_constant","unknown_guard","unknown_template","unknown_predicateName",
                         "unknown_clause","unknown_clauseHead","unknown_clauseBody","unknown_clauseArgument"])
     for fold in datafold:
@@ -1174,6 +1201,8 @@ def build_vocabulary(datafold=["train", "valid", "test"], path="",json_type=".la
                 os.remove(json_file[:-len(".zip")])
     token_map={}
     token_id=0
+    #todo: pad vocabulary_set
+
     vocabulary_set=set([convert_constant_to_category(w) for w in vocabulary_set])
     for word in sorted(vocabulary_set):
         token_map[word]=token_id
@@ -1196,8 +1225,8 @@ def tokenize_symbols(token_map,node_symbols,graph_type):
 
     converted_node_symbols=[ convert_constant_to_category(word) for word in node_symbols]
     # node tokenization
-    full_operator_list = ["+", "-", "*", "/", ">", ">=", "=", "<", "<=", "==", "===", "!", "+++", "++", "**", "***",
-                          "--", "---", "=/=","&","|","EX","and","or"]
+    full_operator_list = ["+", "-", "*", "/", ">",">0", ">=",">=0", "=","=0", "<","<0", "<=","<=0", "==","==0", "===", "!", "+++", "++", "**", "***",
+                          "--", "---", "=/=","&","|","EX","and","or","eps"]
     tokenized_node_label_ids = []
     # print("node_symbols",node_symbols)
     # print("converted_node_symbols", converted_node_symbols)
