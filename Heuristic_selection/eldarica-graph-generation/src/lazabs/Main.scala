@@ -33,6 +33,7 @@ import ap.util.{Debug, Timeout}
 import lazabs.art.SearchMethod._
 import lazabs.horn.abstractions.StaticAbstractionBuilder.AbstractionType
 import lazabs.horn.concurrency.DrawHornGraph.HornGraphType
+import lazabs.horn.concurrency.HintsSelection.getFileName
 import lazabs.horn.concurrency.{CCReader, HintsSelection}
 import lazabs.nts._
 import lazabs.prover._
@@ -84,6 +85,7 @@ class GlobalParameters extends Cloneable {
   var extractTemplates=false
   var extractPredicates=false
   var separateByPredicates=false
+  var separateByPredicatesBatchSize=200
   var measurePredictedPredicates=false
   var singleMeasurement=false
   var labelSimpleGeneratedPredicates=false
@@ -92,6 +94,8 @@ class GlobalParameters extends Cloneable {
   var readTemplates=false
   var rank=0.0
   var getSMT2=false
+  var readSMT2=false
+  var getSolvingTime=false
   var getHornGraph=false
   var getAllHornGraph=false
   var hornGraphType:HornGraphType.Value=HornGraphType.hyperEdgeGraph
@@ -264,6 +268,7 @@ class GlobalParameters extends Cloneable {
     that.extractTemplates=this.extractTemplates
     that.extractPredicates=this.extractPredicates
     that.separateByPredicates=this.separateByPredicates
+    that.separateByPredicatesBatchSize=this.separateByPredicatesBatchSize
     that.measurePredictedPredicates=this.measurePredictedPredicates
     that.singleMeasurement=this.singleMeasurement
     that.labelSimpleGeneratedPredicates=this.labelSimpleGeneratedPredicates
@@ -271,6 +276,8 @@ class GlobalParameters extends Cloneable {
     that.readHints=this.readHints
     that.readTemplates=this.readTemplates
     that.getSMT2=this.getSMT2
+    that.readSMT2=this.readSMT2
+    that.getSolvingTime=this.getSolvingTime
     that.getHornGraph=this.getHornGraph
     that.getAllHornGraph=this.getAllHornGraph
     that.getLabelFromCounterExample=this.getLabelFromCounterExample
@@ -395,7 +402,6 @@ object Main {
       case "-p" :: rest => prettyPrint = true; arguments(rest)
       case "-extractTemplates" :: rest => extractTemplates = true; arguments(rest)
       case "-extractPredicates" :: rest => extractPredicates = true; arguments(rest)
-      case "-separateByPredicates" :: rest => separateByPredicates = true; arguments(rest)
       case "-measurePredictedPredicates" :: rest=> measurePredictedPredicates=true; arguments(rest)
       case "-singleMeasurement" :: rest=> singleMeasurement=true; arguments(rest)
       case "-labelSimpleGeneratedPredicates"::rest => labelSimpleGeneratedPredicates = true; arguments(rest)
@@ -413,6 +419,8 @@ object Main {
       case "-readHints" :: rest => readHints = true; arguments(rest)
       case "-readTemplates" :: rest => readTemplates = true; arguments(rest)
       case "-getSMT2" :: rest => getSMT2 = true; arguments(rest)
+      case "-readSMT2" :: rest => readSMT2 = true; arguments(rest)
+      case "-getSolvingTime" :: rest => getSolvingTime = true; arguments(rest)
       case "-debugLog" :: rest => debugLog = true; arguments(rest)
       case "-getLabelFromCounterExample":: rest =>getLabelFromCounterExample = true; arguments(rest)
       case "-getLabelFromCounterExample:union":: rest =>{getLabelFromCounterExample = true; unionOption = true; arguments(rest)}
@@ -496,6 +504,30 @@ object Main {
         templateBasedInterpolation = true
         templateBasedInterpolationType = AbstractionType.All
         arguments(rest)}
+      case "-abstract:unlabeled" :: rest => {
+        templateBasedInterpolation = true
+        templateBasedInterpolationType = AbstractionType.Unlabeled
+        arguments(rest)}
+      case "-abstract:labeled" :: rest => {
+        templateBasedInterpolation = true
+        templateBasedInterpolationType = AbstractionType.Labeled
+        arguments(rest)}
+      case "-abstract:predictedCG" :: rest => {
+        templateBasedInterpolation = true
+        templateBasedInterpolationType = AbstractionType.PredictedCG
+        arguments(rest)}
+      case "-abstract:predictedCDHG" :: rest => {
+        templateBasedInterpolation = true
+        templateBasedInterpolationType = AbstractionType.PredictedCDHG
+        arguments(rest)}
+      case "-abstract:mined" :: rest => {
+        templateBasedInterpolation = true
+        templateBasedInterpolationType = AbstractionType.Mined
+        arguments(rest)}
+      case "-abstract:random" :: rest => {
+        templateBasedInterpolation = true
+        templateBasedInterpolationType = AbstractionType.Random
+        arguments(rest)}
       case "-portfolio" :: rest => {
         portfolio = GlobalParameters.Portfolio.General
         arguments(rest)
@@ -545,6 +577,10 @@ object Main {
       case _maxNode :: rest if (_maxNode.startsWith("-maxNode:")) =>
         maxNode = java.lang.Integer.parseInt(_maxNode.drop("-maxNode:".length));
         arguments(rest)
+      case _separateByPredicates :: rest if (_separateByPredicates.startsWith("-separateByPredicates:")) => {
+        separateByPredicates = true;
+        separateByPredicatesBatchSize = java.lang.Integer.parseInt(_separateByPredicates.drop("-separateByPredicates:".length))
+        arguments(rest)}
       case _solvabilityTimeout :: rest if (_solvabilityTimeout.startsWith("-solvabilityTimeout:")) =>
         solvabilityTimeout =
           (java.lang.Float.parseFloat(_solvabilityTimeout.drop("-solvabilityTimeout:".length))*1000 ).toInt;
@@ -727,6 +763,8 @@ object Main {
           " -rank:n\t use top n or score above n ranked hints read from file\n"+
           " -maxNode:n\t if the node number exceeded this number, stop drawing\n"+
           " -getSMT2\t get SMT2 file\n"+
+          " -readSMT2\t read SMT2 file without preprocessing\n"+
+          " -getSolvingTime\t get Solving time in JSON file\n"+
           " -getLabelFromCounterExample:option\t  Interp. union. predicate occurrence in counter example\n"+
           " -argumentOccurenceLabel\t  argument occurrence in hints\n"+
           " -argumentBoundLabel\t  get argument lower and upper bound\n"+
@@ -988,31 +1026,31 @@ object Main {
 
   } catch {
     case TimeoutException | StoppedException =>{
-      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/time-out-exception/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length))
+      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/time-out-exception/" + getFileName)
       printError(" timeout", GlobalParameters.get.format)
     }
     case  MainTimeoutException =>{
-      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/time-out-exception/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length))
+      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/time-out-exception/" + getFileName())
       printError("main timeout", GlobalParameters.get.format)
     }
       // nothing
     case _ : java.lang.OutOfMemoryError =>{
-      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/out-of-memory/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length))
+      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/out-of-memory/" + getFileName())
       printError("out of memory", GlobalParameters.get.format)
     }
     case _ : java.lang.StackOverflowError =>{
-      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/stack-overflow/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length))
+      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/stack-overflow/" + getFileName())
       printError("stack overflow", GlobalParameters.get.format)
     }
     case t : Exception =>{
       printError(t.getMessage, GlobalParameters.get.format)
       t.printStackTrace()
-      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/other-error/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length))
+      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/other-error/" + getFileName())
     }
     case x:Any=>{
       printError("other-error", GlobalParameters.get.format)
       println(Console.RED + x.toString)
-      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/other-error/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length))
+      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/other-error/" + getFileName())
     }
 
 

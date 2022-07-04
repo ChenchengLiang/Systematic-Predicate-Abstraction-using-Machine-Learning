@@ -34,10 +34,12 @@ import ap.basetypes.IdealInt
 import ap.parser._
 import ap.parser.smtlib.Absyn.ConstantTerm
 import ap.terfor.preds.Predicate
+import ap.types.{MonoSortedPredicate, SortedConstantTerm}
 import ap.types.Sort.Integer.newConstant
 import lazabs.GlobalParameters
 import lazabs.horn.bottomup.HornClauses.Clause
 import lazabs.horn.bottomup.HornPredAbs
+import lazabs.horn.bottomup.HornPredAbs.predArgumentSorts
 import lazabs.horn.concurrency.DrawHornGraph.{HornGraphType, addQuotes}
 import lazabs.horn.concurrency.DrawHyperEdgeHornGraph.HyperEdgeType
 import lazabs.horn.concurrency.HintsSelection.{predicateQuantify, replaceMultiSamePredicateInBody, timeoutForPredicateDistinct}
@@ -55,9 +57,10 @@ object DrawHyperEdgeHornGraph {
     var f: IFormula = clause.constraint
     def replaceArgumentInBody(body: IAtom): IAtom = {
       var argList: Seq[ITerm] = Seq()
-      for (arg <- body.args) {
+      for ((arg,s)<- body.args zip predArgumentSorts(body.pred)) {
         if ((for (a<-clause.head.args) yield a.toString).contains(arg.toString)) {
-          val ic = IConstant(newConstant(arg.toString + "__"))
+          //val ic = IConstant(newConstant(arg.toString + "__"))
+          val ic = IConstant(new SortedConstantTerm((arg.toString + "__"),s))
           //replace argument
           argList :+= ic
           //add equation in constrains
@@ -65,6 +68,7 @@ object DrawHyperEdgeHornGraph {
         } else
           argList :+= arg
       }
+      //val monosortedPredicate = MonoSortedPredicate(body.pred.name, predArgumentSorts(body.pred))
       IAtom(body.pred, argList)
     }
 
@@ -96,12 +100,6 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
   edgeNameMap += ("AST_2" -> "AST_2")
   edgeNameMap += ("argument" -> "arg")
   edgeNameMap += ("clause" -> "clause")
-  edgeNameMap += ("template" -> "template")
-  edgeNameMap += ("verifHintTplPred" -> "Pred")
-  edgeNameMap += ("verifHintTplPredPosNeg" -> "PredPosNeg")
-  edgeNameMap += ("verifHintTplEqTerm" -> "EqTerm (tpl)")
-  edgeNameMap += ("verifHintTplInEqTerm" -> "InEqTerm (tpl)")
-  edgeNameMap += ("verifHintTplInEqTermPosNeg" -> "InEqTermPosNeg")
   edgeNameMap += ("controlLocationEdgeForSCC" -> "p")
   edgeNameMap += ("transitive" -> "t")
   //turn on/off edge's label
@@ -400,8 +398,9 @@ class DrawHyperEdgeHornGraph(file: String, clausesCollection: ClauseInfo, hints:
   //draw templates
   astEdgeType = "AST" //"templateAST"
   val templateNameList = if (GlobalParameters.get.extractPredicates) drawPredicate() else drawTemplates() //drawTemplatesWithNode()
-  for ((head, templateNodeNameList) <- templateNameList; templateNodeName <- templateNodeNameList)
+  for ((head, templateNodeNameList) <- templateNameList; templateNodeName <- templateNodeNameList) {
     addBinaryEdge(controlFlowNodeSetCrossGraph(head), templateNodeName._1, templateNodeName._2)
+  }
 
 
   val (argumentIDList, argumentNameList, argumentOccurrenceList, argumentBoundList, argumentIndicesList, argumentBinaryOccurrenceList) = matchArguments()

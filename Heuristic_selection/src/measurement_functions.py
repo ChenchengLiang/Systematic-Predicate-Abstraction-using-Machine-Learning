@@ -1,6 +1,7 @@
 import os
 from multiprocessing import Pool
-from utils import call_eldarica,plot_scatter
+from utils import call_eldarica
+from plot import plot_scatter
 import json
 import numpy as np
 from utils import flattenList,unzip_file
@@ -36,7 +37,7 @@ def read_measurement_from_JSON(file_list,measurement=".measurement.JSON"):
                 loaded_graph = json.load(f)
                 for field in loaded_graph:
                     # print(bcolors.GRENN + str(field) + str(loaded_graph[field]) + bcolors.RESET)
-                    json_obj[str(field)] = str(loaded_graph[field])
+                    json_obj[str(field)] = loaded_graph[field]
             json_obj_list.append(json_obj)
 
         #delete unziped file

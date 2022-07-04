@@ -20,26 +20,6 @@ def GPU_switch(GPU):
         for gpu in gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
 
-def drawLabelPieChart(learning_label,label,graph_type,benchmark_name,df,multi_label=2):
-    label_list=[x for x in range(multi_label)]
-    flat_list = [item for sublist in learning_label for item in sublist]
-    if multi_label==2:
-        positive_label_number =flat_list.count(1)
-        negative_label_number=flat_list.count(0)
-        sizes = [positive_label_number, negative_label_number]
-        labels = '1', "0"
-        explode = (0, 0)  # only "explode" the 2nd slice (i.e. 'Hogs')
-    else:
-        labels = [str(i) for i in range(0,multi_label)]
-        sizes = [flat_list.count(i) for i in label_list]
-        explode = [0 for i in range(0,multi_label)]
-    fig1, ax1 = plt.subplots()
-    ax1.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%',
-            shadow=True, startangle=90)
-    ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-    plt.title("Label distribution")
-    plt.savefig("trained_model/" + label + "-" + graph_type +"-" + df + "-" + benchmark_name + "pie_chart.png")
-    plt.clf()
 
 def add_JSON_field(fileName="",file_type=".layerHornGraph.JSON",old_field=[],new_field=[],new_field_content=[]):
     json_file = fileName + file_type
@@ -56,7 +36,7 @@ def add_JSON_field(fileName="",file_type=".layerHornGraph.JSON",old_field=[],new
     # write json object to JSON file
     clear_file(json_file)
     with open(json_file, 'w') as f:
-        json.dump(json_obj, f)
+        json.dump(json_obj, f,indent=4, sort_keys=True)
 
 def copy_and_remove(src,dst):
     if os.path.isdir(src):

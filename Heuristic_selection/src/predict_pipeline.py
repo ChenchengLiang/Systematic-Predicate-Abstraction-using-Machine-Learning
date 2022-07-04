@@ -1,4 +1,6 @@
-from utils import flattenList,plot_scatter,generate_horn_graph,wrapped_generate_horn_graph,get_solvability_and_measurement_from_eldarica,get_recall_scatter,mutual_differences
+from utils_1 import generate_horn_graph,wrapped_generate_horn_graph,get_solvability_and_measurement_from_eldarica
+from utils import mutual_differences,flattenList
+from plot import get_recall_scatter,plot_scatter
 import tensorflow as tf
 import gc
 from predict_functions import predict_label
@@ -10,7 +12,7 @@ def main():
 
 def predict_pipeline(fold_number=0):
     # description: parameter settings
-    benchmark = "Linear-dataset-train"#sys.argv[1]
+    benchmark = "template_selection_train_non_linear"#sys.argv[1]
 
     #benchmark_fold = benchmark + "-" + "unsolvable"#sys.argv[2]
 
@@ -19,7 +21,9 @@ def predict_pipeline(fold_number=0):
     max_nodes_per_batch = 10000
 
     #/home/cheli243/PycharmProjects/HintsLearning/src/
-    trained_model_path="trained_model/GNN_Argument_selection__2021-11-08_01-35-17_best.pkl"
+    graph_type = "monoDirectionLayerGraph"  # "hyperEdgeGraph"
+    graph_type_model_pairs={"hyperEdgeGraph":"trained_model/GNN_Argument_selection__2022-06-29_16-31-21_best.pkl",
+                            "monoDirectionLayerGraph":"trained_model/GNN_Argument_selection__2022-06-29_16-40-58_best.pkl"}
     thread_number = 4
     continuous_extracting=True
     move_file = False
@@ -30,106 +34,76 @@ def predict_pipeline(fold_number=0):
     generateTemplates="-generateTemplates"#-generateTemplates
     abstract = "-abstract:empty"#empty
     noIntervals=""
+    splitClauses="-splitClauses:1"
     label="node_multiclass"
     num_node_target_labels=5
     verbose=True
-    timeout = 300 * 10 if generateTemplates == "-generateTemplates" else 300 * 6
+    timeout = 60
 
+    # description: generate both graphs
     wrapped_generate_horn_graph_params={"benchmark_fold":benchmark_fold,"max_nodes_per_batch":max_nodes_per_batch,"separateByPredicates":separateByPredicates,
                                         "abstract":abstract,"move_file":move_file,"thread_number":thread_number,"generateSimplePredicates":generateSimplePredicates,
-                                        "generateTemplates":generateTemplates,"data_fold":["test_data"],"horn_graph_folder":"","noIntervals":noIntervals}
+                                        "generateTemplates":generateTemplates,"data_fold":["test_data"],"horn_graph_folder":"","noIntervals":noIntervals,
+                                        "graph_type":graph_type,"splitClauses":splitClauses,"timeout":60*60}
     filtered_file_list, file_list_with_horn_graph, file_list = \
         wrapped_generate_horn_graph(wrapped_generate_horn_graph_params)
 
 
-    # description: predict label one by one
-    for f in filtered_file_list:
-        print("file_name:",f)
-        predict_label(benchmark, max_nodes_per_batch, benchmark_fold, [f],trained_model_path,use_test_threshold,
-                      separateByPredicates=separateByPredicates,label=label,verbose=verbose,num_node_target_labels=num_node_target_labels)#file_list
-        gc.collect()
-        tf.keras.backend.clear_session()
-    # description: predict label together
-    # predict_label(benchmark, max_nodes_per_batch, benchmark_fold, filtered_file_list, trained_model_path, use_test_threshold,
-    #               separateByPredicates=separateByPredicates, label=label, verbose=verbose,
-    #               num_node_target_labels=num_node_target_labels)  # file_list
+    for gt in graph_type_model_pairs:
+        # description: predict label one by one
+        # for f in filtered_file_list:
+        #     print("file_name:",f)
+        #     predict_label(benchmark, max_nodes_per_batch, benchmark_fold, [f],graph_type_model_pairs[gt],use_test_threshold,
+        #                   separateByPredicates=separateByPredicates,label=label,verbose=verbose,num_node_target_labels=num_node_target_labels,
+        #                   graph_type=gt)#file_list
+        #     gc.collect()
+        #     tf.keras.backend.clear_session()
 
-    # # description: get solvability and measurement info with different predicate setting for unseen data
-    # get_solvability_and_measurement_from_eldarica_params={"filtered_file_list":filtered_file_list,"thread_number":thread_number,"continuous_extracting":continuous_extracting,
-    #                                                       "move_file":move_file,"checkSolvability":"-checkSolvability","generateTemplates":generateTemplates,
-    #                                                       "measurePredictedPredicates":"","onlyInitialPredicates":"","abstract":abstract,"noIntervals":noIntervals,
-    #                                                       "separateByPredicates":separateByPredicates,"solvabilityTimeout":"300","timeout":timeout}#"solvabilityTimeout":"3600","timeout":60*60*4
-    # get_solvability_and_measurement_from_eldarica(get_solvability_and_measurement_from_eldarica_params)
-    #
+        # description: predict label together
+        predict_label(benchmark, max_nodes_per_batch, benchmark_fold, filtered_file_list, graph_type_model_pairs[gt], use_test_threshold,
+                      separateByPredicates=separateByPredicates, label=label, verbose=verbose,
+                      num_node_target_labels=num_node_target_labels,graph_type=gt)  # file_list
+
+    # description: get solvability and measurement info with different predicate setting for unseen data
+    get_solvability_and_measurement_from_eldarica_params={"filtered_file_list":filtered_file_list,"thread_number":thread_number,"continuous_extracting":continuous_extracting,
+                                                          "move_file":move_file,"checkSolvability":"-checkSolvability","generateTemplates":generateTemplates,
+                                                          "measurePredictedPredicates":"","onlyInitialPredicates":"","abstract":abstract,"noIntervals":noIntervals,
+                                                          "separateByPredicates":separateByPredicates,"solvabilityTimeout":"300",
+                                                          "timeout":timeout,"splitClauses":splitClauses,"getHornGraph":"-getHornGraph:"+graph_type}#"solvabilityTimeout":"3600","timeout":60*60*4
+    get_solvability_and_measurement_from_eldarica(get_solvability_and_measurement_from_eldarica_params)
+
     # description: read solvability results
-    # json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
-    # #,"term","oct","relEqs","relIneqs"
-    # fold_name= ["empty","predicted","full","random","term","oct","relEqs","relIneqs"] if generateTemplates=="-generateTemplates" else ["empty","predicted","full","true","random"]
-    # solvability_name_fold= (lambda : fold_name if out_of_test_set==True else fold_name + ["true"])()
-    # solvability_json_name_fold=[ "solvability"+x+"InitialPredicates" for x in solvability_name_fold]
-    # solvable_file_list={name_fold:[] for name_fold in solvability_json_name_fold}
-    # for name_fold in solvability_json_name_fold:
-    #     solvability = [1 if s[name_fold] == "true" else 0 for s in json_solvability_obj_list]
-    #     print("solved cases when use "+name_fold[len("solvability"):], str(sum(solvability)) + "/" + str(len(json_solvability_obj_list)))
-    #     for i, (s, f) in enumerate(zip(solvability, json_solvability_obj_list)):
-    #         if s == 1:
-    #             #print(json_solvability_obj_list[i]["file_name"])
-    #             solvable_file_list[name_fold].append(json_solvability_obj_list[i]["file_name"])
-    # difference_betw_predicted_full=mutual_differences(solvable_file_list["solvabilitypredictedInitialPredicates"],solvable_file_list["solvabilityfullInitialPredicates"])
-    # difference_betw_predicted_empty = mutual_differences(solvable_file_list["solvabilitypredictedInitialPredicates"],solvable_file_list["solvabilityemptyInitialPredicates"])
-    # #difference_betw_predicted_true = mutual_differences(solvable_file_list["solvabilitypredictedInitialPredicates"],solvable_file_list["solvabilitytrueInitialPredicates"])
-    # difference_betw_full_empty = mutual_differences(solvable_file_list["solvabilityfullInitialPredicates"],solvable_file_list["solvabilityemptyInitialPredicates"])
-    # common_betw_predicted_full=set(solvable_file_list["solvabilitypredictedInitialPredicates"]).intersection(set(solvable_file_list["solvabilityfullInitialPredicates"]))
-    # common_betw_predicted_empty = set(solvable_file_list["solvabilitypredictedInitialPredicates"]).intersection(set(solvable_file_list["solvabilityemptyInitialPredicates"]))
-    # #common_betw_predicted_true = set(solvable_file_list["solvabilitypredictedInitialPredicates"]).intersection(set(solvable_file_list["solvabilitytrueInitialPredicates"]))
-    # common_betw_full_empty = set(solvable_file_list["solvabilityfullInitialPredicates"]).intersection(set(solvable_file_list["solvabilityemptyInitialPredicates"]))
-    #
-    # #unique solved
-    # for u_fold in fold_name:
-    #     unique_solved_by_u_fold=[]
-    #     fold_name_except_u_fold = fold_name.copy()
-    #     fold_name_except_u_fold.remove(u_fold)
-    #     solvable_file_list_except_predicted = set(flattenList(
-    #         [solvable_file_list["solvability" + fn + "InitialPredicates"] for fn in fold_name_except_u_fold]))
-    #     for f in solvable_file_list["solvabilitypredictedInitialPredicates"]:
-    #         if not f in solvable_file_list_except_predicted:
-    #             unique_solved_by_u_fold.append(f[f.rfind("/") + 1:])
-    #     #print("solvable_file_list_except_predicted",len(solvable_file_list_except_predicted),solvable_file_list_except_predicted)
-    #     print("unique_solved_by " +u_fold, len(unique_solved_by_u_fold), unique_solved_by_u_fold)
-    #
-    #
-    # print("difference_betw_predicted_full", len(difference_betw_predicted_full),difference_betw_predicted_full)
-    # print("difference_betw_predicted_empty", len(difference_betw_predicted_empty),difference_betw_predicted_empty)
-    # # print("difference_betw_full_empty", len(difference_betw_full_empty))
-    # #print("difference_betw_predicted_true", len(difference_betw_predicted_true))
-    # print("common_betw_predicted_empty", len(common_betw_predicted_empty))
-    # print("common_betw_predicted_full", len(common_betw_predicted_full))
-    # #print("common_betw_predicted_true", len(common_betw_predicted_true))
-    # print("common_betw_full_empty", len(common_betw_full_empty))
-    #
-    # unique_solved_by_predicted = []
-    # unique_solved_by_random = []
-    # # unique_solved_by_true = []
-    # fold_name_except_predicted = fold_name
-    # fold_name_except_predicted.remove("predicted")
-    # fold_name_except_random = fold_name
-    # fold_name_except_random.remove("random")
-    # solvable_file_list_except_predicted = set(flattenList(
-    #     [solvable_file_list["solvability" + fn + "InitialPredicates"] for fn in fold_name_except_predicted]))
-    # solvable_file_list_except_random = set(
-    #     flattenList([solvable_file_list["solvability" + fn + "InitialPredicates"] for fn in fold_name_except_random]))
-    # for f in solvable_file_list["solvabilitypredictedInitialPredicates"]:
-    #     if not f in solvable_file_list_except_predicted:
-    #         unique_solved_by_predicted.append(f[f.rfind("/") + 1:])
-    # for f in solvable_file_list["solvabilityrandomInitialPredicates"]:
-    #     if not f in solvable_file_list_except_random:
-    #         unique_solved_by_random.append(f[f.rfind("/") + 1:])
-    # # for f in solvable_file_list["solvabilitytrueInitialPredicates"]:
-    # #     if not f in set(solvable_file_list["solvabilityfullInitialPredicates"]+ solvable_file_list["solvabilityemptyInitialPredicates"]):
-    # #         unique_solved_by_true.append(f)
-    #
-    # print("unique_solved_by_predicted", len(unique_solved_by_predicted),unique_solved_by_predicted)
-    # print("unique_solved_by_random", len(unique_solved_by_random),unique_solved_by_random)
+    json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
+    abstract_option=["Empty", "Term", "Octagon", "RelationalEqs", "RelationalIneqs","Random","Unlabeled","Labeled","PredictedCG","PredictedCDHG","Mined","Off"]
+    solvability_summary={op:{"solvable_number":0,"solvable_list":[],"unique_solvable_number":0,"unique_solvable_list":[]} for op in abstract_option}
+    print("json_solvability_obj_list",json_solvability_obj_list)
+    splitClauses_name="_splitClauses_1" if splitClauses=="-splitClauses:1" else "_splitClauses_0"
+    for f in json_solvability_obj_list:
+        for op in abstract_option:
+            if list(f["solvability_"+op+splitClauses_name])[0]==1:
+                solvability_summary[op]["solvable_number"]=solvability_summary[op]["solvable_number"]+1
+                solvability_summary[op]["solvable_list"].append(f["file_name"][f["file_name"].rfind("/")+1:-len(".solvability.JSON")])
+
+
+    # get unique solved list by differernt abstract option
+    for i in solvability_summary:
+        solvable_set_from_other_option=[]
+        for j in solvability_summary:
+            if j!=i:
+                solvable_set_from_other_option=solvable_set_from_other_option+solvability_summary[j]["solvable_list"]
+        solvable_set_from_other_option=list(set(solvable_set_from_other_option))
+        unique_solved_list= set(solvability_summary[i]["solvable_list"]).difference(set(solvable_set_from_other_option))
+        if len(unique_solved_list)!=0:
+            solvability_summary[i]["unique_solvable_number"]=len(unique_solved_list)
+            solvability_summary[i]["unique_solvable_list"]=unique_solved_list
+
+
+    #write solvalbility summary to json file
+    summary_json_file_name="../benchmarks/"+benchmark_fold+"/solvability_summary.JSON"
+    import json
+    with open(summary_json_file_name, 'w') as f:
+        json.dump(solvability_summary, f,indent=4, sort_keys=True)
+
 
 
 

@@ -12,7 +12,7 @@ def read_graph(graph_file_name):
 
 
 def main():
-    read_graph("../benchmarks/temp-multiclass-11-analysis/11.c_000.smt2.hyperEdgeHornGraph.gv")
+    read_graph("../benchmarks/temp-multiclass-11-analysis/11.c_000.smt2.hyperEdgeGraph.gv")
 
 
 main()

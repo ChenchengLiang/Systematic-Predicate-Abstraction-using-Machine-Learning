@@ -31,13 +31,14 @@ import ap.parser.ConstantSubstVisitor
 import ap.SimpleAPI.ProverStatus
 import ap.{PresburgerTools, Prover, SimpleAPI}
 import ap.basetypes.IdealInt
-import ap.parser.IExpression._
+import ap.parser.IExpression.{Predicate, _}
 import ap.parser.{IExpression, IFormula, _}
 import ap.proof.certificates.ReduceInference
 import ap.terfor.conjunctions.Conjunction
 import ap.terfor.preds.Predicate
 import ap.theories.TheoryCollector
-import ap.types.{SortedPredicate, TypeTheory}
+import ap.types.Sort.MultipleValueBool.{False, True}
+import ap.types.{MonoSortedPredicate, Sort, SortedPredicate, TypeTheory}
 import ap.util.{Seqs, Timeout}
 import lazabs.GlobalParameters
 import lazabs.horn.abstractions.AbstractionRecord.AbstractionMap
@@ -48,12 +49,16 @@ import lazabs.horn.bottomup
 import lazabs.horn.bottomup.DisjInterpolator.AndOrNode
 import lazabs.horn.bottomup.HornClauses.Clause
 import lazabs.horn.bottomup.CEGAR
+import lazabs.horn.bottomup.HornPredAbs.predArgumentSorts
+import lazabs.horn.bottomup.PrincessFlataWrappers.MHashMap
 import lazabs.horn.bottomup.Util.Dag
 import lazabs.horn.bottomup.{HornClauses, _}
 import lazabs.horn.concurrency.DrawHornGraph.HornGraphType
 import lazabs.horn.concurrency.GraphTranslator.getBatchSize
-import lazabs.horn.preprocessor.{ConstraintSimplifier, HornPreprocessor}
-import lazabs.horn.preprocessor.HornPreprocessor.{Clauses, VerificationHints, simplify}
+import lazabs.horn.concurrency.TemplateSelectionUtils.outputPrologFile
+import lazabs.horn.preprocessor.{ConstraintSimplifier, HornPreprocessor, SymbolSplitter}
+import lazabs.horn.preprocessor.HornPreprocessor.{Clauses, NameFactory, VerificationHints, simplify}
+import lazabs.horn.preprocessor.SymbolSplitter.{BoolSort, ClausePropagator, concreteArguments, wrapBool}
 
 import java.io.{File, FilenameFilter, PrintWriter}
 import java.lang.System.currentTimeMillis
@@ -62,6 +67,7 @@ import scala.collection.mutable.{ArrayBuffer, LinkedHashMap, HashSet => MHashSet
 import scala.io.Source
 import play.api.libs.json._
 
+import scala.collection.immutable.BitSet
 import scala.util.Random
 
 case class wrappedHintWithID(ID:Int,head:String, hint:String)
@@ -145,18 +151,19 @@ object HintsSelection {
     //read from unlabeled .tpl file
     //val simpleGeneratedInitialPredicates=transformPredicateMapToVerificationHints(HintsSelection.wrappedReadHints(simplifiedClausesForGraph,"unlabeledPredicates").toInitialPredicates.mapValues(_.filterNot(_.isTrue).filterNot(_.isFalse)))
     //val fullInitialPredicates = HintsSelection.wrappedReadHints(simplifiedClausesForGraph, "unlabeledPredicates")
-    lazy val combTemplates=HintsSelection.generateCombinationTemplates(simplifiedClausesForGraph)
+    val unlabeledPredicateFileName= ".unlabeledPredicates"
+    val labeledPredicateFileName= ".labeledPredicates"
     val fullInitialPredicates =
-      if ((new java.io.File(GlobalParameters.get.fileName + "." + "unlabeledPredicates" + ".tpl")).exists == true)
-        HintsSelection.wrappedReadHints(simplifiedClausesForGraph, "unlabeledPredicates")
-      else
-        combTemplates
+      if (new java.io.File(GlobalParameters.get.fileName + unlabeledPredicateFileName + ".tpl").exists) {
+        HintsSelection. wrappedReadHints(simplifiedClausesForGraph, unlabeledPredicateFileName)
+      } else
+        HintsSelection.generateCombinationTemplates(simplifiedClausesForGraph)
     val emptyInitialPredicates = VerificationHints(Map())
-    val predictedPredicates = HintsSelection.readPredictedHints(simplifiedClausesForGraph, combTemplates)
-    val truePredicates = if ((new java.io.File(GlobalParameters.get.fileName + "." + "labeledPredicates" + ".tpl")).exists == true)
-      HintsSelection.wrappedReadHints(simplifiedClausesForGraph, "labeledPredicates") else emptyInitialPredicates
+    val predictedPredicates = HintsSelection.readPredictedHints(simplifiedClausesForGraph, fullInitialPredicates)
+    val truePredicates = if ((new java.io.File(GlobalParameters.get.fileName + labeledPredicateFileName + ".tpl")).exists == true)
+      HintsSelection.wrappedReadHints(simplifiedClausesForGraph, labeledPredicateFileName) else emptyInitialPredicates
     //val truePredicates = emptyInitialPredicates
-    val randomPredicates = HintsSelection.randomLabelTemplates(combTemplates, 0.2)
+    val randomPredicates = HintsSelection.randomLabelTemplates(fullInitialPredicates, 0.2)
 
     //add other abstract option
     val abstractFold= if (GlobalParameters.get.generateTemplates){
@@ -353,14 +360,17 @@ object HintsSelection {
 
   def getInitialPredicates(simplifiedClausesForGraph:Clauses,simpHints:VerificationHints): VerificationHints ={
     if (GlobalParameters.get.readHints == true) {
-      val initialPredicates = VerificationHints(HintsSelection.wrappedReadHints(simplifiedClausesForGraph, "unlabeledPredicates").toInitialPredicates.mapValues(_.map(sp(_)).map(VerificationHints.VerifHintInitPred(_)))) //simplify after read
+//      val unlabeledPredicateFileName="-"+HintsSelection.getClauseType()+ ".unlabeledPredicates"
+//      val labeledPredicateFileName="-"+HintsSelection.getClauseType()+ ".labeledPredicates"
+val unlabeledPredicateFileName=".unlabeledPredicates"
+      val labeledPredicateFileName= ".labeledPredicates"
+      val initialPredicates = VerificationHints(HintsSelection.wrappedReadHints(simplifiedClausesForGraph, unlabeledPredicateFileName).toInitialPredicates.mapValues(_.map(sp(_)).map(VerificationHints.VerifHintInitPred(_)))) //simplify after read
       val initialHintsCollection = new VerificationHintsInfo(initialPredicates, VerificationHints(Map()), VerificationHints(Map()))
-      val truePositiveHints = if (new java.io.File(GlobalParameters.get.fileName + "." + "labeledPredicates" + ".tpl").exists == true)
-        VerificationHints(HintsSelection.wrappedReadHints(simplifiedClausesForGraph, "labeledPredicates").toInitialPredicates.mapValues(_.map(sp(_)).map(VerificationHints.VerifHintInitPred(_))))
+      val truePositiveHints = if (new java.io.File(GlobalParameters.get.fileName + labeledPredicateFileName + ".tpl").exists == true)
+        VerificationHints(HintsSelection.wrappedReadHints(simplifiedClausesForGraph, labeledPredicateFileName).toInitialPredicates.mapValues(_.map(sp(_)).map(VerificationHints.VerifHintInitPred(_))))
       else HintsSelection.readPredicateLabelFromOneJSON(initialHintsCollection,"templateRelevanceLabel")
       truePositiveHints
-    }
-    else if (GlobalParameters.get.generateSimplePredicates == true) {
+    } else if (GlobalParameters.get.generateSimplePredicates == true) {
       val (simpleGeneratedPredicates, _, _) =
         HintsSelection.getSimplePredicates(simplifiedClausesForGraph,verbose=false,deduplicate = false)
       transformPredicateMapToVerificationHints(simpleGeneratedPredicates) ++simpHints
@@ -592,18 +602,58 @@ object HintsSelection {
   }
 
   def normalizedClausesForGraphs(simplifiedClauses:Clauses,hints:VerificationHints): Clauses ={
-    val uniqueClauses = HintsSelection.distinctByString(simplifiedClauses)
-    val (csSimplifiedClauses,_,_)=cs.process(uniqueClauses.distinct,hints)
+    import lazabs.horn.bottomup.HornWrapper._
     GlobalParameters.get.hornGraphType match {
       case HornGraphType.hyperEdgeGraph | HornGraphType.equivalentHyperedgeGraph | HornGraphType.concretizedHyperedgeGraph=>{
-        val replacedClause=(for ((c,i)<-csSimplifiedClauses.zipWithIndex) yield replaceMultiSamePredicateInBody(c,i)).flatten// replace multiple same predicate in body
-        for (c<-replacedClause) yield HintsSelection.getSimplifiedClauses(DrawHyperEdgeHornGraph.replaceIntersectArgumentInBody(c.normalize()))
-      }
-      case _=>csSimplifiedClauses
-    }
+        val normalizedHornSMT2FileName = GlobalParameters.get.fileName + "-normalized.smt2"
+        if (new java.io.File(normalizedHornSMT2FileName).exists == true) {
+          println("read " + GlobalParameters.get.fileName + "-normalized.smt2")
+          lazabs.horn.parser.HornReader.fromSMT(normalizedHornSMT2FileName) map ((new HornTranslator).transform(_))
+        }else{
+          val uniqueClauses = HintsSelection.distinctByString(simplifiedClauses)
+          val (csSimplifiedClauses,_,_)=cs.process(uniqueClauses.distinct,hints)
 
+          val normalized= for (c<-csSimplifiedClauses) yield c.normalize()
+          val bodyReplaced=(for ((c,i)<-normalized.zipWithIndex) yield replaceMultiSamePredicateInBody(c,i)).flatten// replace multiple same predicate in body
+          val argumentReplaced= for (c<-bodyReplaced) yield DrawHyperEdgeHornGraph.replaceIntersectArgumentInBody(c)
+          val simplified= for (c<-argumentReplaced) yield HintsSelection.getSimplifiedClauses(c)
+          val normalizedClauses=simplified
+          if(GlobalParameters.get.getSMT2){
+            HintsSelection.writeSMTFormatToFile(normalizedClauses, GlobalParameters.get.fileName + "-normalized")
+            outputPrologFile(normalizedClauses,"normalized")
+          }
+          normalizedClauses
+        }
+      }
+      case _=>{getSimplifiedSMT2Files(simplifiedClauses)}
+    }
   }
 
+  def getSimplifiedSMT2Files(simplifiedClauses: Clauses): Clauses ={
+    val simplifiedHornSMT2FileName = GlobalParameters.get.fileName + "-simplified.smt2"
+    if (new java.io.File(simplifiedHornSMT2FileName).exists) {
+      println("read " + GlobalParameters.get.fileName + "-simplified.smt2")
+      lazabs.horn.parser.HornReader.fromSMT(simplifiedHornSMT2FileName) map ((new HornTranslator).transform(_))
+    }else{
+      if(GlobalParameters.get.getSMT2){
+        HintsSelection.writeSMTFormatToFile(simplifiedClauses, GlobalParameters.get.fileName + "-simplified")
+        outputPrologFile(simplifiedClauses,"simplified")
+      }
+      simplifiedClauses
+    }
+  }
+  def getHornGraphTypeString(): Unit = {
+    GlobalParameters.get.hornGraphType match {
+      case HornGraphType.hyperEdgeGraph => {}
+      case HornGraphType.equivalentHyperedgeGraph => {}
+      case HornGraphType.concretizedHyperedgeGraph => {}
+      case HornGraphType.monoDirectionLayerGraph=>{}
+      case HornGraphType.hybridDirectionLayerGraph=>{}
+      case HornGraphType.biDirectionLayerGraph=>{}
+      case HornGraphType.clauseRelatedTaskLayerGraph=>{}
+      case HornGraphType.fineGrainedEdgeTypeLayerGraph=>{}
+    }
+  }
 
 
   def writeInfoToJSON[A](fields:Seq[(String, A)],suffix:String=""): Unit ={
@@ -675,11 +725,18 @@ object HintsSelection {
     measurementList
   }
 
-  def writePredicatesToFiles(unlabeledPredicates:VerificationHints,labeledPredicates:VerificationHints,fileName:String=GlobalParameters.get.fileName): Unit ={
-    Console.withOut(new java.io.FileOutputStream(fileName+".unlabeledPredicates.tpl")) {
-      AbsReader.printHints(unlabeledPredicates)}
-    Console.withOut(new java.io.FileOutputStream(fileName+".labeledPredicates.tpl")) {
-      AbsReader.printHints(labeledPredicates)}
+  def getClauseType(): String = {
+    GlobalParameters.get.hornGraphType match {
+      case HornGraphType.hyperEdgeGraph | HornGraphType.equivalentHyperedgeGraph | HornGraphType.concretizedHyperedgeGraph => "normalized"
+      case _ => "simplified"
+    }
+  }
+  def writePredicatesToFiles(unlabeledPredicates:VerificationHints,labeledPredicates:VerificationHints,minedPredicates:VerificationHints,fileName:String=GlobalParameters.get.fileName): Unit ={
+    val clauseType = ""//"-"+getClauseType()
+    Console.withOut(new java.io.FileOutputStream(fileName+clauseType+".unlabeledPredicates.tpl")) {AbsReader.printHints(unlabeledPredicates)}
+    Console.withOut(new java.io.FileOutputStream(fileName+clauseType+".labeledPredicates.tpl")) {AbsReader.printHints(labeledPredicates)}
+    if(!minedPredicates.isEmpty)
+      Console.withOut(new java.io.FileOutputStream(fileName+clauseType+".minedPredicates.tpl")) {AbsReader.printHints(minedPredicates)}
   }
 
   def writeTemplateDistributionToFiles(simplifiedClauses:Clauses,initialTemplates:VerificationHints,minedTemplates:VerificationHints): Unit ={
@@ -946,7 +1003,7 @@ object HintsSelection {
         val initialHintsCollection = new VerificationHintsInfo(fullInitialPredicates, VerificationHints(Map()), VerificationHints(Map()))
         if (GlobalParameters.get.separateByPredicates == true)
           HintsSelection.readPredicateLabelFromMultipleJSON(initialHintsCollection, simplifiedClausesForGraph, "predictedLabel")
-        else if (new java.io.File(GlobalParameters.get.fileName + ".hyperEdgeHornGraph.JSON").exists)
+        else if (new java.io.File(GlobalParameters.get.fileName + "."+GlobalParameters.get.hornGraphType.toString+".JSON").exists)
           HintsSelection.readPredicateLabelFromOneJSON(initialHintsCollection, "predictedLabel")
         else VerificationHints(Map())
       }
@@ -958,8 +1015,9 @@ object HintsSelection {
     predictedHints
   }
 
+
   def detectIfAJSONFieldExists(readLabel: String = "predictedLabel",fileName:String=GlobalParameters.get.fileName): Boolean ={
-    val input_file = fileName+".hyperEdgeHornGraph.JSON"
+    val input_file = fileName+"."+GlobalParameters.get.hornGraphType.toString+".JSON"
     val json_content = scala.io.Source.fromFile(input_file).mkString
     val json_data = Json.parse(json_content)
     try{(json_data \ readLabel).validate[Array[Int]] match {
@@ -980,8 +1038,9 @@ object HintsSelection {
     val trunk=(totalPredicateNumber/batch_size.toFloat).ceil.toInt
     val fimeNameList= for (t<- (0 until trunk))yield{GlobalParameters.get.fileName+"-"+t.toString}
     val allPositiveList=(for (fileName<-fimeNameList)yield{
-      if(new java.io.File(fileName+".hyperEdgeHornGraph.JSON").exists == true){
-        val currenInitialHints=wrappedReadHints(simplifiedClausesForGraph,"unlabeledPredicates",fileName).predicateHints.toSeq sortBy (_._1.name)
+      if(new java.io.File(fileName+"."+GlobalParameters.get.hornGraphType.toString+".JSON").exists == true){
+        val unlabeledPredicateFileName= ".unlabeledPredicates"
+        val currenInitialHints=wrappedReadHints(simplifiedClausesForGraph,unlabeledPredicateFileName,fileName).predicateHints.toSeq sortBy (_._1.name)
         readPredicateLabelFromJSON(fileName, currenInitialHints, readLabel)
       }else{
         emptyMap
@@ -999,7 +1058,7 @@ object HintsSelection {
 
   def readPredicateLabelFromJSON(fileName:String, initialHints:Seq[(Predicate, Seq[VerifHintElement])],
                                  readLabel:String="predictedLabel"): Map[Predicate, Seq[VerifHintElement]]={
-    val input_file=fileName+".hyperEdgeHornGraph.JSON"
+    val input_file=fileName+"."+GlobalParameters.get.hornGraphType.toString+".JSON"
     if(detectIfAJSONFieldExists(readLabel,fileName)==true){
       val json_content = scala.io.Source.fromFile(input_file).mkString
       val json_data = Json.parse(json_content)
@@ -1022,7 +1081,7 @@ object HintsSelection {
           })
         }).toMap
         res
-      }else{
+      }else{ //read from multi-classification
         val res=(for (((k,v),label)<-initialHints zip splitedPredictedLabel) yield {
           k-> (for ((p,l)<-v zip label if l!=0) yield {
             l match {
@@ -1063,7 +1122,7 @@ object HintsSelection {
 
   def readPredicateLabelFromJSONBinaryClassification(fileName:String, initialHints:Seq[(Predicate, Seq[VerifHintElement])],
                                  readLabel:String="predictedLabel"): Map[Predicate, Seq[VerifHintElement]]={
-    val input_file=fileName+".hyperEdgeHornGraph.JSON"
+    val input_file=fileName+"."+GlobalParameters.get.hornGraphType.toString+".JSON"
     if(detectIfAJSONFieldExists(readLabel,fileName)==true){
       val json_content = scala.io.Source.fromFile(input_file).mkString
       val json_data = Json.parse(json_content)
@@ -1114,7 +1173,8 @@ object HintsSelection {
       (for (Clause(head, body, _) <- simplifiedClausesForGraph.iterator;
             IAtom(p, _) <- (head :: body).iterator)
         yield (p.name -> p)).toMap
-    HintsSelection.readHints(fileName+"."+hintType+".tpl", name2Pred)
+    println("read "+fileName+hintType+".tpl")
+    HintsSelection.readHints(fileName+hintType+".tpl", name2Pred)
   }
 
   def readHints(filename : String,
@@ -1180,30 +1240,36 @@ object HintsSelection {
     //println(Console.BLUE + "clauseConstraintQuantify finished")
     Clause(clause.head, clause.body, simplifyedConstraints)
   }
+
+
   def replaceMultiSamePredicateInBody(clause: Clause,clauseIndex:Int): Clauses ={
     //if head == body: p(x)<-p(a) => p(x)<-p'(a), p'(a)<-p(a)
     //if multiple same relation symbos in the body: p(x)<-p'(a),p'(b)=> p(x)<-p'(a),p''(b), p''(b)<-p'(b)
-    val originalBodyPredicatesList=clause.body
+    var originalBodyPredicatesList:List[IAtom]=List()
     var renamedBodyPredicatesList:List[IAtom]=List()
     val pbodyStrings= new MHashSet[String]
     pbodyStrings.add(clause.head.pred.name)
     var count=1
-    val renamedClauseBody=for(pbody<-clause.body)yield{
-      if (!pbodyStrings.add(pbody.pred.name)){
-        val renamedBodyPredicate=IAtom(new Predicate(pbody.pred.name+"_"+clauseIndex.toString+"_"+count.toString,pbody.pred.arity),pbody.args)
-        //println("replace",pbody,"by",renamedBodyPredicate)
+    val renamedClauseBodys=for(b<-clause.body)yield{
+      if (!pbodyStrings.add(b.pred.name)){ //if there is repeatative body name
+        val newPredicateName=b.pred.name+"_"+clauseIndex.toString+"_"+count.toString
+
+        //val renamedBodyPredicate=IAtom(new Predicate(newPredicateName,b.pred.arity),b.args)
+        val monosortedPredicate = MonoSortedPredicate(newPredicateName, predArgumentSorts(b.pred))
+        val renamedBodyPredicate=IAtom(monosortedPredicate,b.args)
+
         renamedBodyPredicatesList=renamedBodyPredicatesList:+renamedBodyPredicate
+        originalBodyPredicatesList=originalBodyPredicatesList:+b
         count=count+1
         renamedBodyPredicate
       }else{
-        pbody
+        b
       }
-
     }
-    val supplementaryClauses= (for ((b,ob)<- renamedBodyPredicatesList zip originalBodyPredicatesList) yield{
-      Clause(b, List(ob), true)
-    }).toSeq
-    Seq(Clause(clause.head, renamedClauseBody, clause.constraint)) ++ supplementaryClauses
+
+    val supplementaryClauses= for ((rb,ob)<- renamedBodyPredicatesList zip originalBodyPredicatesList) yield{
+      Clause(rb, List(ob), true)}
+    Seq(Clause(clause.head, renamedClauseBodys, clause.constraint)) ++ supplementaryClauses
   }
   def getDataFlowAndGuardWitoutPrint(clause: Clause): (Seq[IFormula], Seq[IFormula]) ={
     val normalizedClause=clause.normalize()
@@ -1540,7 +1606,7 @@ object HintsSelection {
         StandardCopyOption.REPLACE_EXISTING
       )
       if (path != null) {
-        removeRelativeFiles(sourceFilename)
+        removeRelativeFiles(sourceFilename,true)
         println(s"moved the file $sourceFilename to $destinationFilename successfully")
 //        if (GlobalParameters.get.extractTemplates==true || GlobalParameters.get.extractPredicates==true)
 //          removeRelativeFiles(sourceFilename)
@@ -1549,17 +1615,23 @@ object HintsSelection {
       }
     }
   }
-  def removeRelativeFiles(fileName:String): Unit ={
+  def removeRelativeFiles(fileName:String,removeSourceFile:Boolean=false): Unit ={
     val currentDirectory = new java.io.File(GlobalParameters.get.fileName).getParentFile.getPath
     val relativeFiles = new java.io.File(currentDirectory).listFiles(new FilenameFilter {
       override def accept(dir: java.io.File, name: String): Boolean = {
         name.startsWith(HintsSelection.getFileName())
       }
     })
-    try{
-      for (file<-relativeFiles)
-        Files.delete(file.toPath)
-    }catch {case _=>println("no relative files")}
+    try {
+      if (removeSourceFile == true)
+        for (file <- relativeFiles)
+          Files.delete(file.toPath)
+      else
+        for (file <- relativeFiles; if file.toString != GlobalParameters.get.fileName)
+          Files.delete(file.toPath)
+    } catch {
+      case _ => println("no relative files")
+    }
   }
   def copyRenameFile(sourceFilename: String, destinationFilename: String): Unit = {
     val path = Files.copy(

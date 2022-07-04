@@ -65,7 +65,7 @@ def k_fold_data_collection(benchmark="chc-comp21-benchmarks-main-all-extract",se
     print("total test solvability file", len(glob.glob(k_fold_benchmark_test_folder + "/*.smt2.solvability.JSON.zip")))
     print("total test measurement file", len(glob.glob(k_fold_benchmark_test_folder + "/*.smt2.measurement.JSON.zip")))
     print("total test horn graph file",
-          len(glob.glob(k_fold_benchmark_test_folder + "/*.smt2.hyperEdgeHornGraph.JSON.zip")))
+          len(glob.glob(k_fold_benchmark_test_folder + "/*.smt2.hyperEdgeGraph.JSON.zip")))
     wrapped_generate_horn_graph_params = {"benchmark_fold": k_fold_benchmark, "max_nodes_per_batch": max_nodes_per_batch,
                                           "separateByPredicates": separateByPredicates,
                                           "abstract": "-abstract:empty", "move_file": True, "thread_number": 4,
@@ -115,7 +115,7 @@ def end_to_end_training(num_layers=8,benchmark=""):
               "num_node_target_labels":5, #7
               "force_read": True,
               "file_type": ".smt2",
-              "graph_type": "hyperEdgeHornGraph",
+              "graph_type": "hyperEdgeGraph",
               "form_label": True,
               "pickle":True,
               "GPU": False,
@@ -290,7 +290,7 @@ def read_data_and_train(params, hyper_parameters):
     parameters["dense_every_num_layers"]=2
     #parameters["residual_every_num_layers"]=1
     print("graph_type", params["graph_type"])
-    parameters['graph_type'] = params["graph_type"]  # hyperEdgeHornGraph or layerHornGraph
+    parameters['graph_type'] = params["graph_type"]  # hyperEdgeGraph or layerHornGraph
     parameters['hidden_dim'] = nodeFeatureDim  # 64
 
     parameters["global_exchange_dropout_rate"]=0

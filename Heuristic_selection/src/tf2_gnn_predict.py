@@ -33,7 +33,7 @@ def main():
     num_node_target_labels = 2
     verbose = True
     timeout = 300 * 10 if generateTemplates == "-generateTemplates" else 300 * 6
-    graph_type="hyperEdgeHornGraph"
+    graph_type="hyperEdgeGraph"
     #graph_type = "mono-layerHornGraph"
 
     wrapped_generate_horn_graph_params = {"benchmark_fold": benchmark_fold, "max_nodes_per_batch": max_nodes_per_batch,

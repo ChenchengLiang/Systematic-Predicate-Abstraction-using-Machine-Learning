@@ -12,6 +12,7 @@ from multiprocessing import Pool
 import shutil
 from utils import unzip_file
 import zipfile
+from utils_1 import delete_relative_files
 
 # def generate_JSON_field(rootdir, json_file_type=".layerHornGraph.JSON", eldarica_parameters="-getHornGraph"):
 #     for root, subdirs, files in os.walk(rootdir):
@@ -262,17 +263,17 @@ class parameters():
 
 def main():
     # generate_JSON_field("../benchmarks/temp-extract-trainData-datafold")
-    # parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph",json_file_type=".hyperEdgeHornGraph.JSON",graph_type="-getHornGraph:hyperEdgeGraph")
+    # parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph",json_file_type=".hyperEdgeGraph.JSON",graph_type="-getHornGraph:hyperEdgeGraph")
     # parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph",json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph:biDirectionLayerGraph")
     # parameter_for_JSON = parameters(root_dir="../benchmarks/small-dataset-trainData-datafold-bi-direction-layer-graph",json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph:biDirectionLayerGraph")
     # parameter_for_JSON = parameters(root_dir="../benchmarks/small-dataset-trainData-datafold-mono-direction-layer-graph",json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph:monoDirectionLayerGraph")
-    # parameter_for_JSON = parameters(root_dir="../benchmarks/small-dataset-trainData-datafold-hyperedge-graph",json_file_type=".hyperEdgeHornGraph.JSON",graph_type="-getHornGraph:hyperEdgeGraph")
-    # parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph",json_file_type=".hyperEdgeHornGraph.JSON",graph_type="-getHornGraph:hyperEdgeGraph")
+    # parameter_for_JSON = parameters(root_dir="../benchmarks/small-dataset-trainData-datafold-hyperedge-graph",json_file_type=".hyperEdgeGraph.JSON",graph_type="-getHornGraph:hyperEdgeGraph")
+    # parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph",json_file_type=".hyperEdgeGraph.JSON",graph_type="-getHornGraph:hyperEdgeGraph")
     # parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-bi-direction-layer-graph",json_file_type=".layerHornGraph.JSON",graph_type="-getHornGraph:biDirectionLayerGraph")
     # parameter_for_JSON = parameters(
     #     root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-hybrid-direction-layer-graph",
     #     json_file_type=".layerHornGraph.JSON", graph_type="-getHornGraph:hybridDirectionLayerGraph")
-    # parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph",json_file_type=".hyperEdgeHornGraph.JSON", graph_type="-getHornGraph:hyperEdgeGraph")
+    # parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-noInterval-trainData-datafold-hyperedge-graph",json_file_type=".hyperEdgeGraph.JSON", graph_type="-getHornGraph:hyperEdgeGraph")
     # parameter_for_JSON = parameters(root_dir="../benchmarks/LIA-lin-datafold",
     #                                 json_file_type=".layerHornGraph.JSON",
     #                                 eldarica_parameters="-getHornGraph:hybridDirectionLayerGraph")
@@ -284,10 +285,11 @@ def main():
     #clean_extracted_data("linear-layer-CE-union-uppmax/extracted",total_file=3,edge_type="mono-layerHornGraph")
     # extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
-    shuffle_data("../benchmarks/align-lin+non-lin/fifth-task-union-hyperedge+layer-linear+nonlinear",
-                 "../benchmarks/align-lin+non-lin/fifth-task-union-hyperedge+layer-linear+nonlinear-shuffle")
-    # divide_data_to_threads("non-linear-dataset/separated_benchmark-abstract-empty/exceptions/unsat-raw",
-    #                        "non-linear-dataset/separated_benchmark-abstract-empty/exceptions/unsat-raw-divided",three_fold=True,datafold_list=["train_data","valid_data","test_data"],chunk_number=60)#datafold_list=["test_data"]
+    # shuffle_data("../benchmarks/align-lin+non-lin/fifth-task-union-hyperedge+layer-linear+nonlinear",
+    #              "../benchmarks/align-lin+non-lin/fifth-task-union-hyperedge+layer-linear+nonlinear-shuffle")
+    divide_data_to_threads("Template-selection-non-Liner-dateset/solvable-sat-mined-templates",
+                           "Template-selection-non-Liner-dateset/solvable-sat-mined-templates-divided",three_fold=True,datafold_list=["train_data","valid_data","test_data"],
+                           chunk_number=437)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -304,6 +306,9 @@ def main():
     # collect_one_field("linear-extracted-empty/exceptions",field_list=["time-out-exception","shell-timeout","no-predicates-selected",
     #                                                                   "solvable-file","empty-mined-label"],
     #                   target_folder="linear-extracted-empty/collected",source_folder="Linear-dataset/raw/train_data")
+    # collect_differentiated_field("Template-selection-Liner-dateset-1/dataset1/exceptions",
+    #                   field="solvable-file", substract_field_list=["no-simplified-clauses","unsat"],
+    #                              target_folder="Template-selection-Liner-dateset-1/dataset1/collected", source_folder="Template-selection-Liner-dateset-1/dataset1/solvable")
 
     #rebuild_exception_file("exception-LIA-Lin+sv-comp-predicted",["solvable-file"])
     # get_generated_horn_graph()
@@ -315,15 +320,17 @@ def main():
     #                         ,unsolvable_folder="exception-all-LIA-Lin-full-label-with-CEGAR/shell-timeout",
     #                         target_file="all-LIA-Lin-train-fixed-size-unsolvable-predicted")
 
-    # analysis_data_statistics(benchmark="all-LIA-Lin",folder="extracted-fixed-size/train_data",
-    #                          jsonType="predicateDistribution")
-    # analysis_data_statistics(benchmark="all-LIA-Lin-train-fixed-size-unsolvable-predicted",
-    #                          folder="test_data",
-    #                          jsonType="solvability", data_fold=["emptyInitialPredicates", "predictedInitialPredicates",
+
+    # AnalysisJsonFile("all-LIA-Lin/extracted-fixed-size/train_data","predicateDistribution").analysis_data_statistics()
+    # AnalysisJsonFile("all-LIA-Lin/extracted-fixed-size/train_data","predicateDistribution").analysis_data_statistics(data_fold=["emptyInitialPredicates", "predictedInitialPredicates",
     #                                                             "fullInitialPredicates",
-    #                                                             "trueInitialPredicates"])  # solvability
-    # analysis_graph_structure(benchmark="temp-train")
-    #analysis_template_distribution(benchmark="all-LIA-Lin-distribution")
+    #                                                             "trueInitialPredicates"])
+    #
+    # AnalysisJsonFile("all-LIA-Lin-temp-train", "hyperEdgeGraph").analysis_graph_structure()
+    #
+    # AnalysisJsonFile("all-LIA-Lin-distribution","TemplatesDistribution").analysis_template_distribution()
+    #AnalysisJsonFile("template_selection_lin_test_1/train_data", "solvingTime").analysis_solving_time()
+
     #find_deduplicate_benchmarks(benchmarks="temp")#all-LIA-Lin/extractable-horn-hraph
     #separate_extracted_and_left_data("LIA-Lin+sv-comp/all-LIA-Lin-shell-timeout-horn-graphs","train_data")
     #file_compress(["../benchmarks/test/chc-LIA-lin_003.smt2"],"../benchmarks/test/chc-LIA-lin_003.smt2.zip")
@@ -332,13 +339,13 @@ def main():
     # for i in range(0,17):
     #     for fold in ["train_data","valid_data","test_data"]:
     #         compress_all_file_folder("LIA-Lin+sv-comp/LIA-Lin+sv-comp-divided/thread_"+str(i)+"/"+fold)
-    # compress_all_file_folder("Linear-dataset/separated_benchmark-abstract-oct/exceptions/shell-timeout")
+    #compress_all_file_folder("thread_0/train_data")
     # for i in range(0,17):
     #     for fold in ["train_data"]:
     #         unzip_all_file_folder("all-LIA-Lin-train-unsolvable-predicted-measurement-2/temp-1-divided/thread_"+str(i)+"/"+fold)
 
     # for fold in ["train_data"]:
-    #     compress_all_file_folder("Linear-dataset-counter-example-layer-graph-train-full-union-1/temp"+"/"+fold)
+    #     compress_all_file_folder("template_selection_lin_test_1"+"/"+fold)
 
 
     # for i in range(0,17):
@@ -372,7 +379,7 @@ def select_files_with_condition(source_folder_name,target_folder_name):
         unzip_all_file_folder(source_folder)
         file_list=glob.glob("../benchmarks/" + source_folder_name+"/"+fold + "/*.smt2")
         for file in file_list:
-            with open(file+".hyperEdgeHornGraph.JSON") as f:
+            with open(file+".hyperEdgeGraph.JSON") as f:
                 loaded_graph = json.load(f)
             if len(loaded_graph["nodeIds"])>500:
                 #print(file, "nodeIDs > 100, move to " + target_folder_1_fold)
@@ -481,7 +488,7 @@ def separate_extracted_and_left_data(benchmark="",folder=""):
     make_dirct(extracted_folder_name)
     make_dirct(not_extracted_folder_name)
     for file in file_list:
-        if os.path.exists(file+"-0.hyperEdgeHornGraph.JSON"):
+        if os.path.exists(file+"-0.hyperEdgeGraph.JSON"):
             #copy_relative_files(file,extracted_folder_name)
             pass
         else:
@@ -574,138 +581,7 @@ def align_extracted_data(benchmark="chc-comp21-benchmarks-main-all", folder_name
                         "../benchmarks/" + benchmark + "/" + folder_name)
 
 
-def analysis_graph_structure(benchmark=""):
-    structure_d = {"node_number": [], "predicate_number": []}
-    file_list = []
-    for fold in ["train"]:  # ["train","valid","test"]:
-        file_list = file_list + glob.glob("../benchmarks/" + benchmark + "/" + fold + "_data/*.hyperEdgeHornGraph.JSON")
-    print("file_list", len(file_list))
-    for file in file_list:
-        with open(file) as f:
-            loaded_graph = json.load(f)
-            structure_d["node_number"].append(len(loaded_graph["nodeIds"]))
-            structure_d["predicate_number"].append(len(loaded_graph["templateRelevanceLabel"]))
 
-    print("node_number", "average", str(sum(structure_d["node_number"]) / len(structure_d["node_number"])),
-          structure_d["node_number"])
-    print("predicate_number", "average",
-          str(sum(structure_d["predicate_number"]) / len(structure_d["predicate_number"])),
-          structure_d["predicate_number"])
-
-def load_JSON_fields_to_dict(file_list,structure_d):
-    for file in file_list:
-        unzip_file(file)
-        with open(file[:-len(".zip")]) as f:
-            loaded_graph = json.load(f)
-            for k in structure_d:
-                structure_d[k].append(int(loaded_graph[k]))
-                if k=="numberOfBooleanTermsFromMinedTemplates" and int(loaded_graph[k])>0:
-                    print(file)
-        os.remove(file[:-len(".zip")])
-
-    return structure_d
-
-def analysis_template_distribution(benchmark):
-    structure_d = {"numberOfIntegerEqOccurenceInMinedTemplates": [], "numberOfIntegerTermsFromInitialTemplates": [],
-                   "numberOfBooleanTermsFromInitialTemplates": [],"numberOfIntegerTermsFromMinedTemplates": [],
-                   "numberOfBooleanTermsFromMinedTemplates": []}
-    file_list = []
-    for fold in ["train"]:  # ["train","valid","test"]:
-        file_list = file_list + glob.glob("../benchmarks/" + benchmark + "/" + fold + "_data/*.TemplatesDistribution.JSON.zip")
-    print("file_list", len(file_list))
-    loaded_structure=load_JSON_fields_to_dict(file_list,structure_d)
-    print("loaded_structure",loaded_structure)
-    print("number of positive integer terms in all single integer terms",str(sum(loaded_structure["numberOfIntegerTermsFromMinedTemplates"]))+"/"+str(sum(loaded_structure["numberOfIntegerTermsFromInitialTemplates"])))
-    print("number of positive boolean terms in all single boolean terms",str(sum(loaded_structure["numberOfBooleanTermsFromMinedTemplates"]))+"/"+str(sum(loaded_structure["numberOfBooleanTermsFromInitialTemplates"])))
-    print("number of positive Eq integer terms in all single integer terms",str(sum(loaded_structure["numberOfIntegerEqOccurenceInMinedTemplates"]))+"/"+str(sum(loaded_structure["numberOfIntegerTermsFromInitialTemplates"])))
-
-def analysis_data_statistics(benchmark="chc-comp21-benchmarks-main-all-extract",
-                             folder="extracted_data-only-initial-predicates",
-                             jsonType="predicateDistribution", data_fold=[""]):
-    from utils import print_multiple_object
-    file_list = glob.glob(
-        os.path.join("../benchmarks", os.path.join(benchmark, folder)) + "/*.smt2." + jsonType + ".JSON")
-
-    for fold in data_fold:
-        print("-" * 10)
-        print("fold:", fold,"number of file",len(file_list))
-        statistics_d = {"positive_guard_list": [], "total_guard_list": [],"redundant_guard_list":[], "positive_predicate_list": [],
-                        "total_initial_predicate_list": [], "positive_redundant_pairwise_predicate_list": [],
-                        "total_redundant_pairwise_predicate_list": [], "positive_constraint_predicate_list": [],
-                        "total_constraint_predicate_list": [], "predicates_uniquely_from_CEGAR": [],
-                        "positive_predicates_uniquely_from_CEGAR": [], "total_simple_genenerated_predicates": [],
-                        "positive_simple_genenerated_predicates": []}
-
-        for json_file in file_list:
-            with open(json_file) as f:
-                loaded_graph = json.load(f)
-                statistics_d["positive_guard_list"].append(int(loaded_graph["positiveGuards" + fold]))
-                statistics_d["total_guard_list"].append(int(loaded_graph["total guards" + fold]))
-                #statistics_d["redundant_guard_list"].append(int(loaded_graph["redundant guards"]))
-                statistics_d["positive_predicate_list"].append(
-                    int(loaded_graph["minimizedPredicates (initialPredicates go through CEGAR Filter)" + fold]))
-                statistics_d["total_initial_predicate_list"].append(int(loaded_graph[
-                                                                            "initialPredicates (initial predicatesFromCEGAR, heuristic simpleGeneratedPredicates)" + fold]))
-                statistics_d["positive_simple_genenerated_predicates"].append(
-                    int(loaded_graph["positiveSimpleGeneratedPredicates" + fold]))
-                statistics_d["total_simple_genenerated_predicates"].append(
-                    int(loaded_graph["simpleGeneratedPredicates" + fold]))
-                statistics_d["positive_redundant_pairwise_predicate_list"].append(
-                    int(loaded_graph["positiveRedundantPairwisePredicate" + fold]))
-                statistics_d["total_redundant_pairwise_predicate_list"].append(
-                    int(loaded_graph["redundantPairwisePredicate" + fold]))
-                statistics_d["positive_constraint_predicate_list"].append(
-                    int(loaded_graph["positiveConstraintPredicates" + fold]))
-                statistics_d["total_constraint_predicate_list"].append(int(loaded_graph["constraintPredicates" + fold]))
-                statistics_d["predicates_uniquely_from_CEGAR"].append(int(loaded_graph["predicatesFromCEGAR" + fold]))
-                statistics_d["positive_predicates_uniquely_from_CEGAR"].append(
-                    int(loaded_graph["positivePredicatesFromCEGAR" + fold]))
-                # print(json_file)
-        print("-" * 10)
-        print_multiple_object(statistics_d)
-        print("-" * 10)
-        #print("redundant guards",str(sum(statistics_d["redundant_guard_list"])))
-        print("unique guards",str(sum(statistics_d["total_guard_list"])))
-        print("positive guard / positive predicates", str(sum(statistics_d["positive_guard_list"])) + "/" +
-              str(sum(statistics_d["positive_predicate_list"])))
-        print("positive guard / total guards", str(sum(statistics_d["positive_guard_list"])) + "/" +
-              str(sum(statistics_d["total_guard_list"])))
-        print("positive pairwise predicates / positive predicates",
-              str(sum(statistics_d["positive_redundant_pairwise_predicate_list"])) + "/" +
-              str(sum(statistics_d["positive_predicate_list"])))
-        print("positive pairwise predicates / total pairwise predicates",
-              str(sum(statistics_d["positive_redundant_pairwise_predicate_list"])) + "/" +
-              str(sum(statistics_d["total_redundant_pairwise_predicate_list"])))
-        print("positive constraint predicates / positive predicates",
-              str(sum(statistics_d["positive_constraint_predicate_list"])) + "/" +
-              str(sum(statistics_d["positive_predicate_list"])))
-        print("positive constraint predicates / total constraint predicates",
-              str(sum(statistics_d["positive_constraint_predicate_list"])) + "/" +
-              str(sum(statistics_d["total_constraint_predicate_list"])))
-
-        print("positive simple generated predicates / positive predicates",
-              str(sum(statistics_d["positive_simple_genenerated_predicates"])) + "/" +
-              str(sum(statistics_d["positive_predicate_list"])))
-        print("positive simple generated predicates / total simple generated predicates",
-              str(sum(statistics_d["positive_simple_genenerated_predicates"])) + "/" +
-              str(sum(statistics_d["total_simple_genenerated_predicates"])))
-
-        print("positive predicates from CEGAR / positive predicates",
-              str(sum(statistics_d["positive_predicates_uniquely_from_CEGAR"])) + "/" +
-              str(sum(statistics_d["positive_predicate_list"])))
-        print("positive predicates from CEGAR / total predicates from CEGAR",
-              str(sum(statistics_d["positive_predicates_uniquely_from_CEGAR"])) + "/" +
-              str(sum(statistics_d["predicates_uniquely_from_CEGAR"])))
-
-        print("total guard / total relevant predicates from cegar",
-              str(sum(statistics_d["total_guard_list"])) + "/" +
-              str(sum(statistics_d["total_initial_predicate_list"])))
-        print("total constraint predicates / total relevant predicates from cegar",
-              str(sum(statistics_d["total_constraint_predicate_list"])) + "/" +
-              str(sum(statistics_d["total_initial_predicate_list"])))
-        print("total pairwise predicates / total relevant predicates from cegar",
-              str(sum(statistics_d["total_redundant_pairwise_predicate_list"])) + "/" +
-              str(sum(statistics_d["total_initial_predicate_list"])))
 
 
 def get_k_fold_train_data(fold=5, benchmark="chc-comp21-benchmarks-main-all",
@@ -744,27 +620,13 @@ def copy_relative_files(source, des):
         relative_file_list = glob.glob(source + "*")
         for file in relative_file_list:
             copy(file, des)
-        # if os.path.exists(source + ".hyperEdgeHornGraph.JSON"):
-        #     copy(source + ".hyperEdgeHornGraph.JSON", des)
-        # if os.path.exists(source + ".unlabeledPredicates.tpl"):
-        #     copy(source + ".unlabeledPredicates.tpl", des)
-        # if os.path.exists(source + ".labeledPredicates.tpl"):
-        #     copy(source + ".labeledPredicates.tpl", des)
-        # if os.path.exists(source + ".circles.gv"):
-        #     copy(source + ".circles.gv", des)
-        # if os.path.exists(source + ".HornGraph"):
-        #     copy(source + ".HornGraph", des)
-        # if os.path.exists(source + ".hyperEdgeHornGraph.gv"):
-        #     copy(source + ".hyperEdgeHornGraph.gv", des)
-        # if os.path.exists(source + ".predicateDistribution"):
-        #     copy(source + ".predicateDistribution", des)
     except:
         print("file existed")
 
 
 def get_generated_horn_graph(horn_graph_folder="lia-lin-horn_graphs",
                              target_folder="lia-lin-extract-unsolved-fullLabel"):
-    horn_graph_file_list = glob.glob("../benchmarks/" + horn_graph_folder + "/*.hyperEdgeHornGraph.JSON")
+    horn_graph_file_list = glob.glob("../benchmarks/" + horn_graph_folder + "/*.hyperEdgeGraph.JSON")
     horn_graph_smt2_target_file_list = glob.glob("../benchmarks/" + target_folder + "/*.smt2")
     print("horn_graph_smt2_target_file_list", horn_graph_smt2_target_file_list)
     horn_graph_file_name_list = [f[f.find(horn_graph_folder) + len(horn_graph_folder) + 1:] for f in
@@ -772,10 +634,10 @@ def get_generated_horn_graph(horn_graph_folder="lia-lin-horn_graphs",
     print("horn_graph_file_name_list", horn_graph_file_name_list)
     for f in horn_graph_smt2_target_file_list:
         f_name = f[f.rfind(target_folder) + len(target_folder) + 1:]
-        graph_file_name = f_name + ".hyperEdgeHornGraph.JSON"
+        graph_file_name = f_name + ".hyperEdgeGraph.JSON"
         if graph_file_name in horn_graph_file_name_list:
-            shutil.copyfile("../benchmarks/" + horn_graph_folder + "/" + f_name + ".hyperEdgeHornGraph.JSON",
-                            "../benchmarks/" + target_folder + "/" + f_name + ".hyperEdgeHornGraph.JSON")
+            shutil.copyfile("../benchmarks/" + horn_graph_folder + "/" + f_name + ".hyperEdgeGraph.JSON",
+                            "../benchmarks/" + target_folder + "/" + f_name + ".hyperEdgeGraph.JSON")
             shutil.copyfile("../benchmarks/" + horn_graph_folder + "/" + f_name + ".unlabeledPredicates.tpl",
                             "../benchmarks/" + target_folder + "/" + f_name + ".unlabeledPredicates.tpl")
         else:
@@ -792,27 +654,23 @@ def rebuild_exception_file(benchmark="",field_list=["solvability-timeout", "shel
             shutil.copyfile(file_name, new_folder + "/" + f)
 
 
-def clean_extracted_data(benchmark,separated_predicates=False,total_file=5,edge_type="hyperEdgeHornGraph"):
+
+def clean_extracted_data(benchmark,separated_predicates=False,total_file=5,edge_type="hyperEdgeGraph"):
     if(separated_predicates):
         file_list = glob.glob("../benchmarks/" + benchmark + "/*.smt2.zip")
         file_list = [f[:-len(".zip")] for f in file_list]
         for f in file_list:
             if not (os.path.exists(f + "-0."+edge_type+".JSON.zip") ):#and os.path.exists(f + ".unlabeledPredicates.tpl.zip")
                 print(f)
-                relative_files=glob.glob(f+"*")
-                for file in relative_files:
-                    if os.path.exists(file):
-                        os.remove(file)
+                delete_relative_files(f)
+
 
         file_list = glob.glob("../benchmarks/" + benchmark + "/*-0."+edge_type+".JSON.zip")
         file_list = [f[:-len("-0."+edge_type+".JSON.zip")] for f in file_list]
         for f in file_list:
             if not (os.path.exists(f+".zip")):  # and os.path.exists(f + ".unlabeledPredicates.tpl.zip")
                 print(f)
-                relative_files = glob.glob(f + "*")
-                for file in relative_files:
-                    if os.path.exists(file):
-                        os.remove(file)
+                delete_relative_files(f)
 
 
 
@@ -832,6 +690,21 @@ def clean_extracted_data(benchmark,separated_predicates=False,total_file=5,edge_
 
 
 
+def collect_differentiated_field(benchmarks="",field="",substract_field_list=[],target_folder="",source_folder=""):
+    loaded_jsons = read_benchmark_exception_json(benchmarks)
+    file_list = loaded_jsons[field]
+    file_list = [f + ".zip" if f.find(".zip") < 0 else f for f in file_list]
+    for f in substract_field_list:
+        load_field_list=[f + ".zip" if f.find(".zip") < 0 else f for f in loaded_jsons[f]]
+        print("file_list",len(file_list))
+        print("loaded_jsons[f]",len(load_field_list))
+        file_list=set(file_list)-(set(load_field_list))
+        print("file_list", len(file_list))
+        print("----")
+    print(field, len(file_list), file_list)
+    os.mkdir(os.path.join("../benchmarks/" ,target_folder) )
+    for f in file_list:
+        copy("../benchmarks/"+source_folder+"/" + f, "../benchmarks/"+target_folder)
 def collect_one_field(benchmarks="",field_list=[],target_folder="",source_folder=""):
     loaded_jsons=read_benchmark_exception_json(benchmarks)
     make_dirct("../benchmarks/" + target_folder)
@@ -895,5 +768,184 @@ def make_dirct(d):
         os.mkdir(d)
     except:
         print(str(d),"folder existed")
+
+
+class AnalysisJsonFile:
+    def __init__(self, benchmark, file_type):
+        self.benchmark = benchmark
+        self.file_type = file_type
+
+
+
+    def load_JSON_fields_to_dict(self, file):
+        loaded_json=None
+        unzip_file(file)
+        with open(file[:-len(".zip")]) as f:
+            loaded_json = json.load(f)
+        os.remove(file[:-len(".zip")])
+        return loaded_json
+
+    def get_file_list(self):
+        return glob.glob("../benchmarks/" + self.benchmark + "/*.smt2." + self.file_type + ".JSON.zip")
+
+    def analysis_solving_time(self):
+        structure_d=["RelationalEqs_splitClauses_0","Octagon_splitClauses_1","Octagon_splitClauses_0","RelationalIneqs_splitClauses_1",
+                     "Term_splitClauses_0","RelationalIneqs_splitClauses_0","Term_splitClauses_1","RelationalEqs_splitClauses_1"]
+        for prefix in ["solvingTime_", "cegarIterationNumber_"]:
+            output_structure_d={"num_of_"+prefix+d:0 for d in structure_d}
+            for file in self.get_file_list():
+                print("-"*10)
+                print("file",file)
+                loaded_data=self.load_JSON_fields_to_dict(file)
+                print("loaded_data",loaded_data)
+                min_solving_k_v=["",60*60*10*1000]
+                for k in structure_d:
+                    if loaded_data[prefix+k][0]<min_solving_k_v[1]:
+                        min_solving_k_v[0]=prefix+k
+                        min_solving_k_v[1]=loaded_data[prefix+k][0]
+                print("min_solving_k_v",min_solving_k_v)
+                output_structure_d["num_of_"+min_solving_k_v[0]]=output_structure_d["num_of_"+min_solving_k_v[0]]+1
+            print(output_structure_d)
+
+
+
+
+
+    def analysis_template_distribution(self):
+        structure_d = {"numberOfIntegerEqOccurenceInMinedTemplates": [], "numberOfIntegerTermsFromInitialTemplates": [],
+                       "numberOfBooleanTermsFromInitialTemplates": [], "numberOfIntegerTermsFromMinedTemplates": [],
+                       "numberOfBooleanTermsFromMinedTemplates": []}
+        file_list = []
+        for fold in ["train"]:  # ["train","valid","test"]:
+            file_list = file_list + glob.glob(
+                "../benchmarks/" + self.benchmark + "/" + fold + "_data/*."+self.file_type+".JSON.zip")#TemplatesDistribution
+        print("file_list", len(file_list))
+        for file in file_list:
+            unzip_file(file)
+            with open(file[:-len(".zip")]) as f:
+                loaded_graph = json.load(f)
+                for k in structure_d:
+                    structure_d[k].append(int(loaded_graph[k]))
+                    if k == "numberOfBooleanTermsFromMinedTemplates" and int(loaded_graph[k]) > 0:
+                        print(file)
+            os.remove(file[:-len(".zip")])
+        loaded_structure = structure_d
+        print("loaded_structure", loaded_structure)
+        print("number of positive integer terms in all single integer terms",
+              str(sum(loaded_structure["numberOfIntegerTermsFromMinedTemplates"])) + "/" + str(
+                  sum(loaded_structure["numberOfIntegerTermsFromInitialTemplates"])))
+        print("number of positive boolean terms in all single boolean terms",
+              str(sum(loaded_structure["numberOfBooleanTermsFromMinedTemplates"])) + "/" + str(
+                  sum(loaded_structure["numberOfBooleanTermsFromInitialTemplates"])))
+        print("number of positive Eq integer terms in all single integer terms",
+              str(sum(loaded_structure["numberOfIntegerEqOccurenceInMinedTemplates"])) + "/" + str(
+                  sum(loaded_structure["numberOfIntegerTermsFromInitialTemplates"])))
+
+    def analysis_data_statistics(self,data_fold=[""]):
+        from utils import print_multiple_object
+        file_list = self.get_file_list()
+
+        for fold in data_fold:
+            print("-" * 10)
+            print("fold:", fold, "number of file", len(file_list))
+            statistics_d = {"positive_guard_list": [], "total_guard_list": [], "redundant_guard_list": [],
+                            "positive_predicate_list": [],
+                            "total_initial_predicate_list": [], "positive_redundant_pairwise_predicate_list": [],
+                            "total_redundant_pairwise_predicate_list": [], "positive_constraint_predicate_list": [],
+                            "total_constraint_predicate_list": [], "predicates_uniquely_from_CEGAR": [],
+                            "positive_predicates_uniquely_from_CEGAR": [], "total_simple_genenerated_predicates": [],
+                            "positive_simple_genenerated_predicates": []}
+
+            for json_file in file_list:
+                with open(json_file) as f:
+                    loaded_graph = json.load(f)
+                    statistics_d["positive_guard_list"].append(int(loaded_graph["positiveGuards" + fold]))
+                    statistics_d["total_guard_list"].append(int(loaded_graph["total guards" + fold]))
+                    # statistics_d["redundant_guard_list"].append(int(loaded_graph["redundant guards"]))
+                    statistics_d["positive_predicate_list"].append(
+                        int(loaded_graph["minimizedPredicates (initialPredicates go through CEGAR Filter)" + fold]))
+                    statistics_d["total_initial_predicate_list"].append(int(loaded_graph[
+                                                                                "initialPredicates (initial predicatesFromCEGAR, heuristic simpleGeneratedPredicates)" + fold]))
+                    statistics_d["positive_simple_genenerated_predicates"].append(
+                        int(loaded_graph["positiveSimpleGeneratedPredicates" + fold]))
+                    statistics_d["total_simple_genenerated_predicates"].append(
+                        int(loaded_graph["simpleGeneratedPredicates" + fold]))
+                    statistics_d["positive_redundant_pairwise_predicate_list"].append(
+                        int(loaded_graph["positiveRedundantPairwisePredicate" + fold]))
+                    statistics_d["total_redundant_pairwise_predicate_list"].append(
+                        int(loaded_graph["redundantPairwisePredicate" + fold]))
+                    statistics_d["positive_constraint_predicate_list"].append(
+                        int(loaded_graph["positiveConstraintPredicates" + fold]))
+                    statistics_d["total_constraint_predicate_list"].append(
+                        int(loaded_graph["constraintPredicates" + fold]))
+                    statistics_d["predicates_uniquely_from_CEGAR"].append(
+                        int(loaded_graph["predicatesFromCEGAR" + fold]))
+                    statistics_d["positive_predicates_uniquely_from_CEGAR"].append(
+                        int(loaded_graph["positivePredicatesFromCEGAR" + fold]))
+                    # print(json_file)
+            print("-" * 10)
+            print_multiple_object(statistics_d)
+            print("-" * 10)
+            # print("redundant guards",str(sum(statistics_d["redundant_guard_list"])))
+            print("unique guards", str(sum(statistics_d["total_guard_list"])))
+            print("positive guard / positive predicates", str(sum(statistics_d["positive_guard_list"])) + "/" +
+                  str(sum(statistics_d["positive_predicate_list"])))
+            print("positive guard / total guards", str(sum(statistics_d["positive_guard_list"])) + "/" +
+                  str(sum(statistics_d["total_guard_list"])))
+            print("positive pairwise predicates / positive predicates",
+                  str(sum(statistics_d["positive_redundant_pairwise_predicate_list"])) + "/" +
+                  str(sum(statistics_d["positive_predicate_list"])))
+            print("positive pairwise predicates / total pairwise predicates",
+                  str(sum(statistics_d["positive_redundant_pairwise_predicate_list"])) + "/" +
+                  str(sum(statistics_d["total_redundant_pairwise_predicate_list"])))
+            print("positive constraint predicates / positive predicates",
+                  str(sum(statistics_d["positive_constraint_predicate_list"])) + "/" +
+                  str(sum(statistics_d["positive_predicate_list"])))
+            print("positive constraint predicates / total constraint predicates",
+                  str(sum(statistics_d["positive_constraint_predicate_list"])) + "/" +
+                  str(sum(statistics_d["total_constraint_predicate_list"])))
+
+            print("positive simple generated predicates / positive predicates",
+                  str(sum(statistics_d["positive_simple_genenerated_predicates"])) + "/" +
+                  str(sum(statistics_d["positive_predicate_list"])))
+            print("positive simple generated predicates / total simple generated predicates",
+                  str(sum(statistics_d["positive_simple_genenerated_predicates"])) + "/" +
+                  str(sum(statistics_d["total_simple_genenerated_predicates"])))
+
+            print("positive predicates from CEGAR / positive predicates",
+                  str(sum(statistics_d["positive_predicates_uniquely_from_CEGAR"])) + "/" +
+                  str(sum(statistics_d["positive_predicate_list"])))
+            print("positive predicates from CEGAR / total predicates from CEGAR",
+                  str(sum(statistics_d["positive_predicates_uniquely_from_CEGAR"])) + "/" +
+                  str(sum(statistics_d["predicates_uniquely_from_CEGAR"])))
+
+            print("total guard / total relevant predicates from cegar",
+                  str(sum(statistics_d["total_guard_list"])) + "/" +
+                  str(sum(statistics_d["total_initial_predicate_list"])))
+            print("total constraint predicates / total relevant predicates from cegar",
+                  str(sum(statistics_d["total_constraint_predicate_list"])) + "/" +
+                  str(sum(statistics_d["total_initial_predicate_list"])))
+            print("total pairwise predicates / total relevant predicates from cegar",
+                  str(sum(statistics_d["total_redundant_pairwise_predicate_list"])) + "/" +
+                  str(sum(statistics_d["total_initial_predicate_list"])))
+
+    def analysis_graph_structure(self):
+        structure_d = {"node_number": [], "predicate_number": []}
+        file_list = []
+        for fold in ["train"]:  # ["train","valid","test"]:
+            file_list = file_list + glob.glob("../benchmarks/" + self.benchmark + "/" + fold + "_data/*."+self.file_type+".JSON")#hyperEdgeGraph
+        print("file_list", len(file_list))
+        for file in file_list:
+            with open(file) as f:
+                loaded_graph = json.load(f)
+                structure_d["node_number"].append(len(loaded_graph["nodeIds"]))
+                structure_d["predicate_number"].append(len(loaded_graph["templateRelevanceLabel"]))
+
+        print("node_number", "average", str(sum(structure_d["node_number"]) / len(structure_d["node_number"])),
+              structure_d["node_number"])
+        print("predicate_number", "average",
+              str(sum(structure_d["predicate_number"]) / len(structure_d["predicate_number"])),
+              structure_d["predicate_number"])
+
 if __name__ == '__main__':
     main()

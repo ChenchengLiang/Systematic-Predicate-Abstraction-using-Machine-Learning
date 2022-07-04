@@ -67,7 +67,7 @@ def main():
         parameter_list.append(
             parameters(relative_path="../benchmarks/" + benchmark_name,
                        absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
-                       json_type=".hyperEdgeHornGraph.JSON", label=label))
+                       json_type=".hyperEdgeGraph.JSON", label=label))
     GPU_switch(GPU)
     # train
     trained_model_path_list = []
@@ -101,7 +101,7 @@ def main():
     benchmark_fold_list.append(benchmark + "-" + "valid")
     benchmark_fold_list.append(benchmark + "-" + "test")
     # benchmark_fold_list.append(benchmark + "-" + "test-simple-generator")
-    json_type = ".hyperEdgeHornGraph.JSON"
+    json_type = ".hyperEdgeGraph.JSON"
     graph_type = json_type[1:json_type.find(".JSON")]
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
                                                  "argument_upper_bound_existence", "argument_occurrence_binary",

@@ -34,8 +34,7 @@ import IExpression._
 import ap.SimpleAPI
 import ap.SimpleAPI.ProverStatus
 import ap.types.MonoSortedPredicate
-import lazabs.GlobalParameters
-import lazabs.ParallelComputation
+import lazabs.{GlobalParameters, ParallelComputation}
 import lazabs.Main.{PrintingFinishedException, StoppedException, TimeoutException}
 import lazabs.horn.preprocessor.{DefaultPreprocessor, HornPreprocessor}
 import HornPreprocessor.BackTranslator
@@ -53,8 +52,12 @@ import lazabs.horn.concurrency.DrawHornGraph.HornGraphType
 
 import scala.collection.mutable.{LinkedHashMap, HashMap => MHashMap, HashSet => MHashSet}
 import lazabs.horn.concurrency.{ClauseInfo, DrawHornGraph, DrawHyperEdgeHornGraph, DrawLayerHornGraph, FormLearningLabels, GraphTranslator, HintsSelection, ReaderMain, VerificationHintsInfo, simplifiedHornPredAbsForArgumentBounds}
-import lazabs.horn.concurrency.HintsSelection.{conjunctTwoPredicates, generateCombinationTemplates, getClausesInCounterExamples, getFileName, getInitialPredicates, getLoopHeadsWithSort, getParametersFromVerifHintElement, getPredGenerator, getReconstructedInitialTemplatesForPrediction, getSimplifiedClauses, mergeTemplates, sp, transformPredicateMapToVerificationHints}
+import lazabs.horn.concurrency.HintsSelection.{conjunctTwoPredicates, detectIfAJSONFieldExists, generateCombinationTemplates, getClausesInCounterExamples, getFileName, getInitialPredicates, getLoopHeadsWithSort, getParametersFromVerifHintElement, getPredGenerator, getReconstructedInitialTemplatesForPrediction, getSimplifiedClauses, mergeTemplates, sp, transformPredicateMapToVerificationHints}
+import lazabs.horn.concurrency.TemplateSelectionUtils._
+import play.api.libs.json.JsValue.jsValueToJsLookup
+import play.api.libs.json.{JsSuccess, Json}
 
+import java.io.{File, PrintWriter}
 import scala.collection.immutable.Set
 
 
@@ -268,22 +271,19 @@ class HornWrapper(constraints  : Seq[HornClause],
           simplifiedClauses.map(_ toFormula))
         throw PrintingFinishedException
       }
+      val postHints: VerificationHints = {
+        val name2Pred =
+          (for (Clause(head, body, _) <- simplifiedClauses.iterator;
+                IAtom(p, _) <- (head :: body).iterator)
+          yield (p.name -> p)).toMap
+        readHints(GlobalParameters.get.cegarPostHintsFile, name2Pred)
+      }
+      if (!postHints.predicateHints.isEmpty)
+        postHints.pretyPrintHints()
+
+      val allHints = simpPreHints ++ postHints
       (simplifiedClauses, simpPreHints, backTranslator)
     }
-    val (simplifiedClauses, simpPreHints, preprocBackTranslator) =preprocessClauses(unsimplifiedClauses,hints)
-
-  val postHints: VerificationHints = {
-    val name2Pred =
-      (for (Clause(head, body, _) <- simplifiedClauses.iterator;
-            IAtom(p, _) <- (head :: body).iterator)
-      yield (p.name -> p)).toMap
-    readHints(GlobalParameters.get.cegarPostHintsFile, name2Pred)
-  }
-  if (!postHints.predicateHints.isEmpty)
-    postHints.pretyPrintHints()
-
-  val allHints = simpPreHints ++ postHints
-
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -442,16 +442,32 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
 
 
 
-  val simplifiedClausesForGraph = GlobalParameters.get.hornGraphType match {
-    case HornGraphType.hyperEdgeGraph | HornGraphType.equivalentHyperedgeGraph | HornGraphType.concretizedHyperedgeGraph => HintsSelection.normalizedClausesForGraphs(simplifiedClauses, simpHints)
-    case _ => simplifiedClauses
-  }
 
   if (GlobalParameters.get.getSMT2 == true) {
-    HintsSelection.writeSMTFormatToFile(for (c <- simplifiedClauses) yield DrawHyperEdgeHornGraph.replaceIntersectArgumentInBody(c), GlobalParameters.get.fileName + "-simplified")
-    HintsSelection.writeSMTFormatToFile(for (c <- HintsSelection.normalizedClausesForGraphs(simplifiedClauses, simpHints)) yield DrawHyperEdgeHornGraph.replaceIntersectArgumentInBody(c), GlobalParameters.get.fileName + "-normalized")
+    GlobalParameters.get.hornGraphType=HornGraphType.monoDirectionLayerGraph
+    HintsSelection.normalizedClausesForGraphs(simplifiedClauses, VerificationHints(Map()))
+    GlobalParameters.get.hornGraphType=HornGraphType.hyperEdgeGraph
+    HintsSelection.normalizedClausesForGraphs(simplifiedClauses, VerificationHints(Map()))
     sys.exit()
   }
+
+
+  val simplifiedClausesForGraph =
+    if (GlobalParameters.get.readSMT2) {
+      println("read " + GlobalParameters.get.fileName)
+      lazabs.horn.parser.HornReader.fromSMT(GlobalParameters.get.fileName) map ((new HornTranslator).transform(_))
+    }
+    else
+      HintsSelection.normalizedClausesForGraphs(simplifiedClauses, VerificationHints(Map()))
+
+  if (GlobalParameters.get.debugLog)
+    simplifiedClausesForGraph.map(_.toPrologString).foreach(println)
+
+  if (GlobalParameters.get.getHornGraph == true) {
+    HintsSelection.filterInvalidInputs(simplifiedClausesForGraph)
+    HintsSelection.checkMaxNode(simplifiedClausesForGraph)
+  }
+
 
   if (GlobalParameters.get.graphPrettyPrint==true){
     println("--------simplified clauses--------")
@@ -459,19 +475,18 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
     println("--------normalized clauses--------")
     simplifiedClausesForGraph.map(_.toPrologString).foreach(println(_))
   }
-  HintsSelection.filterInvalidInputs(simplifiedClausesForGraph)
-  HintsSelection.checkMaxNode(simplifiedClausesForGraph)
 
-  val sp = new Simplifier
-  val fileName=GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"), GlobalParameters.get.fileName.length)
 
+  //val sp = new Simplifier
 
   if (simplifiedClausesForGraph.isEmpty) {
-    HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/exceptions/no-simplified-clauses/" + fileName, message = "no simplified clauses")
+    HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/exceptions/no-simplified-clauses/" + HintsSelection.getFileName(), message = "no simplified clauses")
     sys.exit()
   }
 
-
+  val unlabeledPredicateFileName=".unlabeledPredicates"//"-"+HintsSelection.getClauseType()+ ".unlabeledPredicates"
+  val labeledPredicateFileName=".labeledPredicates"//"-"+HintsSelection.getClauseType()+ ".labeledPredicates"
+  val minedPredicateFileName=".minedPredicates"
   private val predGenerator =
     if (GlobalParameters.get.generateTemplates == true) {
       val combTemplates = generateCombinationTemplates(simplifiedClausesForGraph,onlyLoopHead = false)
@@ -480,15 +495,14 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
           HintsSelection.randomLabelTemplates(combTemplates, 0.2)
         } else if (GlobalParameters.get.readTemplates) {
           val fullTemplates =
-            if (new java.io.File(GlobalParameters.get.fileName + "." + "unlabeledPredicates" + ".tpl").exists == true)
-              HintsSelection.wrappedReadHints(simplifiedClausesForGraph, "unlabeledPredicates")
+            if (new java.io.File(GlobalParameters.get.fileName +unlabeledPredicateFileName+ ".tpl").exists == true)
+              HintsSelection.wrappedReadHints(simplifiedClausesForGraph, unlabeledPredicateFileName)
             else
               combTemplates
           val predictedTemplates = HintsSelection.readPredictedHints(simplifiedClausesForGraph, fullTemplates)
           predictedTemplates
-        }
-        else if ((new java.io.File(GlobalParameters.get.fileName + "." + "labeledPredicates" + ".tpl")).exists && GlobalParameters.get.readTrueLabel){
-          HintsSelection.wrappedReadHints(simplifiedClausesForGraph, "labeledPredicates")
+        } else if ((new java.io.File(GlobalParameters.get.fileName +labeledPredicateFileName+ ".tpl")).exists && GlobalParameters.get.readTrueLabel){
+          HintsSelection.wrappedReadHints(simplifiedClausesForGraph, labeledPredicateFileName)
         }
         else combTemplates
       if (GlobalParameters.get.log) {
@@ -503,145 +517,158 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
 
 
 
-  if (GlobalParameters.get.getHornGraph == true && GlobalParameters.get.getLabelFromCounterExample==false) {
-    val initialPredicates =
-      if (GlobalParameters.get.generateSimplePredicates == true) {
-        val (simpleGeneratedPredicates, constraintPredicates, pairwisePredicates)
-        = HintsSelection.getSimplePredicates(simplifiedClausesForGraph, deduplicate = false)
-        if (!simpleGeneratedPredicates.isEmpty) {
-          Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName + ".constraintPredicates.tpl")) {
-            AbsReader.printHints(transformPredicateMapToVerificationHints(constraintPredicates))
-          }
-          Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName + ".pairwisePredicates.tpl")) {
-            AbsReader.printHints(transformPredicateMapToVerificationHints(pairwisePredicates))
-          }
-        }
-        transformPredicateMapToVerificationHints(simpleGeneratedPredicates) ++ (simpHints)
-      }else if(GlobalParameters.get.generateTemplates){
-        if (GlobalParameters.get.withoutGraphJSON)
-         HintsSelection.wrappedReadHints(simplifiedClausesForGraph, "unlabeledPredicates")//todo:boolean template predicate-2 will be treated as Eq term
-        else {generateCombinationTemplates(simplifiedClausesForGraph,onlyLoopHead = true)}
-      } else{
-        VerificationHints(Map()) ++ simpHints
-      }
-
-
-    if (initialPredicates.totalPredicateNumber == 0 && (GlobalParameters.get.generateSimplePredicates == true||GlobalParameters.get.generateTemplates==true)) {
-      HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/exceptions/no-initial-predicates/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"), GlobalParameters.get.fileName.length), message = "no initial predicates")
-      sys.exit()
-    }
-
-    val argumentInfo = HintsSelection.getArgumentLabel(simplifiedClausesForGraph,simpHints,predGenerator,disjunctive,
-      argumentOccurrence = GlobalParameters.get.argumentOccurenceLabel,argumentBound =GlobalParameters.get.argumentBoundLabel)
-
-    val clauseCollection = new ClauseInfo(simplifiedClausesForGraph, Seq())
-
-    if (GlobalParameters.get.separateByPredicates == true) {
-      GraphTranslator.separateGraphByPredicates(initialPredicates, VerificationHints(Map()), clauseCollection, argumentInfo)
-    } else {
-      //read labeled and predicted
-      val truePredicates = if ((new java.io.File(GlobalParameters.get.fileName + "." + "labeledPredicates" + ".tpl")).exists)
-        HintsSelection.wrappedReadHints(simplifiedClausesForGraph, "labeledPredicates")
-      else if ((new java.io.File(GlobalParameters.get.fileName + "." + "hyperEdgeHornGraph" + ".JSON")).exists)
-        HintsSelection.readPredicateLabelFromOneJSON(new VerificationHintsInfo(initialPredicates, VerificationHints(Map()), VerificationHints(Map())), "templateRelevanceLabel")
-      else VerificationHints(Map())
-      val predictedPredicates = if ((new java.io.File(GlobalParameters.get.fileName + "." + "hyperEdgeHornGraph" + ".JSON")).exists)
-        HintsSelection.readPredictedHints(simplifiedClausesForGraph, initialPredicates)
-      else
-        VerificationHints(Map())
-      val hintsCollection = new VerificationHintsInfo(initialPredicates, truePredicates, VerificationHints(Map()),predictedPredicates) //labeledPredicates
-      GraphTranslator.drawAllHornGraph(clauseCollection, hintsCollection, argumentInfo)
-    }
-    if (GlobalParameters.get.generateSimplePredicates == true||GlobalParameters.get.generateTemplates==true){
-      Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName + ".unlabeledPredicates.tpl")) {
-        AbsReader.printHints(initialPredicates)}
-    }
-    sys.exit()
-  }
-
 
   if (GlobalParameters.get.checkSolvability == true) {
-    val predicateMap=HintsSelection.getAllOptionFold(simplifiedClausesForGraph,disjunctive)
-    val fullInitialPredicates= predicateMap("fullInitialPredicates")._1
-    val predictedPredicates= predicateMap("predictedInitialPredicates")._1
-    val truePredicates= predicateMap("trueInitialPredicates")._1
-    val counterexampleMethod = HintsSelection.getCounterexampleMethod(disjunctive)
+    // use simplified clauses
+    val simpClauses=HintsSelection.getSimplifiedSMT2Files(simplifiedClauses)
+    // initialize .solvability.JSON file
+    val solvabilityFileName=GlobalParameters.get.fileName + ".solvability.JSON"
+    val abstractFields=Seq(AbstractionType.Empty ,AbstractionType.Unlabeled ,AbstractionType.Labeled,
+      AbstractionType.PredictedCG,AbstractionType.PredictedCDHG ,AbstractionType.Random,AbstractionType.Term ,AbstractionType.Octagon,AbstractionType.RelationalEqs,
+      AbstractionType.RelationalIneqs,AbstractionType.Mined).map(_.toString):+"Off"
+    val solving_time_ = 60 * 60 * 3
+    val number_of_templates_ = 0
+    val solvability_ = 0
+    val cegar_time_ = 60 * 60 * 3
+    val initialSolvabilityMap=(for (af <- abstractFields; f <- Seq(("solving_time_", solving_time_), ("number_of_templates_", number_of_templates_),
+      ("solvability_", solvability_),("cegar_time_", cegar_time_))) yield {
+      (f._1 + af + "_splitClauses_"+GlobalParameters.get.splitClauses.toString) -> f._2
+    }).toMap
+    if (!new java.io.File(solvabilityFileName).exists) //initialize solvability file
+      writeSolvingTimeToJSON(solvabilityFileName, initialSolvabilityMap)
 
-
-    val solvabilityList = {
-      if (GlobalParameters.get.generateTemplates) { //template slection task
-        (for ((fieldName, initialTemplates) <- predicateMap) yield {
-//          val reconstructedInitialTemplates =
-//            if (fieldName == "predictedInitialPredicates" || fieldName == "fullInitialPredicates")
-//              getReconstructedInitialTemplatesForPrediction(simplifiedClausesForGraph, initialTemplates)
-//            else if (fieldName == "randomInitialPredicates")
-//              getReconstructedInitialTemplatesForPrediction(simplifiedClausesForGraph, HintsSelection.randomLabelTemplates(initialTemplates, 0.2))
-//            else initialTemplates
-//          if (fieldName=="predictedInitialPredicates"){
-//            println("predicted templates")
-//            initialTemplates.pretyPrintHints()
-//            println("reconstructed predicted templates")
-//            reconstructedInitialTemplates.pretyPrintHints()
-//          }
-
-          val initialTemplatesAbstraction=initialTemplates._2.loopDetector.hints2AbstractionRecord(initialTemplates._1)
-          val solvabilityPredGenerator = getPredGenerator(Seq(initialTemplatesAbstraction), outStream)
-          val (solveTime, predicateFromCegar, _) = HintsSelection.checkSolvability(simplifiedClausesForGraph,
-            Map(), solvabilityPredGenerator, counterexampleMethod, outStream, moveFile = GlobalParameters.get.moveFile,
-            exit = false, coefficient = 1,message = fieldName)
-          val solvability = if (solveTime >= (GlobalParameters.get.solvabilityTimeout / 1000).toInt) false else true
-          println("solveTime", solveTime)
-          println("solvability", solvability)
-          Seq(("solveTime" + fieldName, solveTime), ("solvability" + fieldName, solvability),
-            ("numberOfinitialTemplates" + fieldName, initialTemplates._1.totalPredicateNumber))
-        }).flatten.toSeq
-      } else { //predicate selection
-        val constraintPredicates = transformPredicateMapToVerificationHints(HintsSelection.wrappedReadHints(simplifiedClausesForGraph, "constraintPredicates").toInitialPredicates.mapValues(_.filterNot(_.isTrue).filterNot(_.isFalse)))
-        val pairwisePredicates = transformPredicateMapToVerificationHints(HintsSelection.wrappedReadHints(simplifiedClausesForGraph, "pairwisePredicates").toInitialPredicates.mapValues(_.filterNot(_.isTrue).filterNot(_.isFalse)))
-        (for ((fieldName, initialPredicate) <- predicateMap) yield {
-          //val simplifiedInitialpredicates
-          val solvabilityPredGenerator = if (GlobalParameters.get.onlyInitialPredicates == true) HintsSelection.getExceptionalPredicatedGenerator() else predGenerator
-          val (solveTime, predicateFromCegar, _) = HintsSelection.checkSolvability(simplifiedClausesForGraph, initialPredicate._1.toInitialPredicates, solvabilityPredGenerator, counterexampleMethod, outStream, moveFile = GlobalParameters.get.moveFile, exit = false, coefficient = 1)
-          val solvability = if (solveTime >= (GlobalParameters.get.solvabilityTimeout / 1000).toInt) false else true
-          println("solveTime", solveTime)
-          println("solvability", solvability)
-          //get minimized useful set and see how many initial predicates are in it
-          val (minimizedPredicateFromCegar, _) = HintsSelection.getMinimumSetPredicates(predicateFromCegar, simplifiedClausesForGraph, counterexampleMethod = counterexampleMethod)
-          //minimized predicates intersect initialPredicate
-          val initialPredicatesUsedInMinimizedPredicateFromCegar = conjunctTwoPredicates(initialPredicate._1.toInitialPredicates, minimizedPredicateFromCegar)
-          if (GlobalParameters.get.debugLog == true) {
-            Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName + ".initial-" + fieldName + ".tpl")) {
-              AbsReader.printHints(initialPredicate._1)
-            }
-            Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName + ".minimizedPredicateFromCegar-" + fieldName + ".tpl")) {
-              AbsReader.printHints(transformPredicateMapToVerificationHints(minimizedPredicateFromCegar))
-            }
-            Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName + ".initialPredicatesUsedInMinimizedPredicateFromCegar-" + fieldName + ".tpl")) {
-              AbsReader.printHints(transformPredicateMapToVerificationHints(initialPredicatesUsedInMinimizedPredicateFromCegar))
-            }
-          }
-          val currentConstraintPredicates = transformPredicateMapToVerificationHints(conjunctTwoPredicates(initialPredicate._1.toInitialPredicates, constraintPredicates.toInitialPredicates))
-          val currentPairwisePredicates = transformPredicateMapToVerificationHints(conjunctTwoPredicates(initialPredicate._1.toInitialPredicates, pairwisePredicates.toInitialPredicates))
-          val statisticFields = HintsSelection.writePredicateDistributionToFiles(
-            transformPredicateMapToVerificationHints(predicateFromCegar),
-            transformPredicateMapToVerificationHints(minimizedPredicateFromCegar)
-            , VerificationHints(Map()), VerificationHints(Map()), initialPredicate._1,
-            currentConstraintPredicates, currentPairwisePredicates,
-            simplifiedClausesForGraph, writeToFile = false).map(x => (x._1 + fieldName, x._2))
-          Seq(("solveTime" + fieldName, solveTime), ("solvability" + fieldName, solvability),
-            ("numberOfinitialPredicates" + fieldName, initialPredicate._1.totalPredicateNumber),
-            ("minimizedPredicateFromCegar" + fieldName, minimizedPredicateFromCegar.values.flatten.size),
-            ("initialPredicatesUsedInMinimizedPredicateFromCegar" + fieldName,
-              initialPredicatesUsedInMinimizedPredicateFromCegar.values.flatten.size)) ++ statisticFields
-        }).flatten.toSeq
+    // get templates from differernt abstract options
+    val predGeneratorTemplates = {
+      val unlabeledTempaltes= if (new java.io.File(GlobalParameters.get.fileName + unlabeledPredicateFileName + ".tpl").exists)
+        HintsSelection.wrappedReadHints(simpClauses, unlabeledPredicateFileName)
+      else
+        HintsSelection.generateCombinationTemplates(simpClauses)
+      GlobalParameters.get.templateBasedInterpolationType match {
+      case AbstractionType.Empty =>VerificationHints(Map())
+      case AbstractionType.Unlabeled => unlabeledTempaltes
+      case AbstractionType.Labeled => {
+        if ((new java.io.File(GlobalParameters.get.fileName + labeledPredicateFileName + ".tpl")).exists)
+          HintsSelection.wrappedReadHints(simpClauses, labeledPredicateFileName)
+        else
+          VerificationHints(Map())
       }
-    }
-    HintsSelection.writeInfoToJSON(solvabilityList, "solvability")
+      case AbstractionType.Mined => {
+        if ((new java.io.File(GlobalParameters.get.fileName + minedPredicateFileName + ".tpl")).exists)
+          HintsSelection.wrappedReadHints(simpClauses, minedPredicateFileName)
+        else
+          VerificationHints(Map())
+      }
 
-    if (GlobalParameters.get.measurePredictedPredicates == true) {
-      HintsSelection.measurePredicates(simplifiedClausesForGraph, predGenerator, counterexampleMethod, outStream,
-        predictedPredicates, fullInitialPredicates, truePredicates,predicateMap)
-    }
+      case AbstractionType.PredictedCG| AbstractionType.PredictedCDHG=> {HintsSelection.readPredictedHints(simpClauses, unlabeledTempaltes)}
+      case AbstractionType.Random => {HintsSelection.randomLabelTemplates(unlabeledTempaltes, 0.2)}
+      case AbstractionType.Term | AbstractionType.Octagon | AbstractionType.RelationalEqs | AbstractionType.RelationalIneqs  => {absBuilder.abstractionHints}
+      case _=>VerificationHints(Map())
+      }}
+    // call CEGAR, if stopped by Python, the solvable info will not change
+    val predGenerator_ = getPredGenerator(Seq(absBuilder.loopDetector.hints2AbstractionRecord(predGeneratorTemplates)), outStream)
+    val CounterexampleMethod_ = HintsSelection.getCounterexampleMethod(disjunctive)
+    val predAbs=new HornPredAbs(simpClauses, Map(), predGenerator_, CounterexampleMethod_)
+    // collect solvable info
+    val solvingTime=(predAbs.cegar.cegarEndTime - predAbs.cegar.cegarStartTime).toInt//milliseconds
+    val cegarIterationNumber=predAbs.cegar.iterationNum
+    val solvability=1
+    val numberOfTemplates=predGeneratorTemplates.totalPredicateNumber
+    // write solvable info to JSON file
+    val templateBasedInterpolationTypeName= if (GlobalParameters.get.templateBasedInterpolation)
+      GlobalParameters.get.templateBasedInterpolationType.toString
+    else
+      "Off"
+    writeSolvingTimeToJSON(solvabilityFileName,
+      readJSONFieldToMap(solvabilityFileName,fieldNames=initialSolvabilityMap.keySet.toSeq).updated("solving_time_"+templateBasedInterpolationTypeName+"_splitClauses_"+GlobalParameters.get.splitClauses.toString,solvingTime))
+    writeSolvingTimeToJSON(solvabilityFileName,
+      readJSONFieldToMap(solvabilityFileName,fieldNames=initialSolvabilityMap.keySet.toSeq).updated("cegar_time_"+templateBasedInterpolationTypeName+"_splitClauses_"+GlobalParameters.get.splitClauses.toString,cegarIterationNumber))
+    writeSolvingTimeToJSON(solvabilityFileName,
+      readJSONFieldToMap(solvabilityFileName,fieldNames=initialSolvabilityMap.keySet.toSeq).updated("solvability_"+templateBasedInterpolationTypeName+"_splitClauses_"+GlobalParameters.get.splitClauses.toString,solvability))
+    writeSolvingTimeToJSON(solvabilityFileName,
+      readJSONFieldToMap(solvabilityFileName,fieldNames=initialSolvabilityMap.keySet.toSeq).updated("number_of_templates_"+templateBasedInterpolationTypeName+"_splitClauses_"+GlobalParameters.get.splitClauses.toString,numberOfTemplates))
+
+
+
+
+//    val predicateMap=HintsSelection.getAllOptionFold(simplifiedClausesForGraph,disjunctive)
+//    val fullInitialPredicates= predicateMap("fullInitialPredicates")._1
+//    val predictedPredicates= predicateMap("predictedInitialPredicates")._1
+//    val truePredicates= predicateMap("trueInitialPredicates")._1
+//    val counterexampleMethod = HintsSelection.getCounterexampleMethod(disjunctive)
+
+//
+//    val solvabilityList = {
+//      if (GlobalParameters.get.generateTemplates) { //template selection task
+//        (for ((fieldName, initialTemplates) <- predicateMap) yield {
+////          val reconstructedInitialTemplates =
+////            if (fieldName == "predictedInitialPredicates" || fieldName == "fullInitialPredicates")
+////              getReconstructedInitialTemplatesForPrediction(simplifiedClausesForGraph, initialTemplates)
+////            else if (fieldName == "randomInitialPredicates")
+////              getReconstructedInitialTemplatesForPrediction(simplifiedClausesForGraph, HintsSelection.randomLabelTemplates(initialTemplates, 0.2))
+////            else initialTemplates
+////          if (fieldName=="predictedInitialPredicates"){
+////            println("predicted templates")
+////            initialTemplates.pretyPrintHints()
+////            println("reconstructed predicted templates")
+////            reconstructedInitialTemplates.pretyPrintHints()
+////          }
+//
+//          val initialTemplatesAbstraction=initialTemplates._2.loopDetector.hints2AbstractionRecord(initialTemplates._1)
+//          val solvabilityPredGenerator = getPredGenerator(Seq(initialTemplatesAbstraction), outStream)
+//          val (solveTime, predicateFromCegar, _) = HintsSelection.checkSolvability(simplifiedClausesForGraph,
+//            Map(), solvabilityPredGenerator, counterexampleMethod, outStream, moveFile = GlobalParameters.get.moveFile,
+//            exit = false, coefficient = 1,message = fieldName)
+//          val solvability = if (solveTime >= (GlobalParameters.get.solvabilityTimeout / 1000).toInt) false else true
+////          println("solveTime", solveTime)
+////          println("solvability", solvability)
+//          Seq(("solveTime" + fieldName, solveTime),
+//            ("solvability" + fieldName, solvability),
+//            ("numberOfinitialTemplates" + fieldName, initialTemplates._1.totalPredicateNumber))
+//        }).flatten.toSeq
+//      } else { //predicate selection
+//        val constraintPredicates = transformPredicateMapToVerificationHints(HintsSelection.wrappedReadHints(simplifiedClausesForGraph, "constraintPredicates").toInitialPredicates.mapValues(_.filterNot(_.isTrue).filterNot(_.isFalse)))
+//        val pairwisePredicates = transformPredicateMapToVerificationHints(HintsSelection.wrappedReadHints(simplifiedClausesForGraph, "pairwisePredicates").toInitialPredicates.mapValues(_.filterNot(_.isTrue).filterNot(_.isFalse)))
+//        (for ((fieldName, initialPredicate) <- predicateMap) yield {
+//          //val simplifiedInitialpredicates
+//          val solvabilityPredGenerator = if (GlobalParameters.get.onlyInitialPredicates == true) HintsSelection.getExceptionalPredicatedGenerator() else predGenerator
+//          val (solveTime, predicateFromCegar, _) = HintsSelection.checkSolvability(simplifiedClausesForGraph, initialPredicate._1.toInitialPredicates, solvabilityPredGenerator, counterexampleMethod, outStream, moveFile = GlobalParameters.get.moveFile, exit = false, coefficient = 1)
+//          val solvability = if (solveTime >= (GlobalParameters.get.solvabilityTimeout / 1000).toInt) false else true
+//          println("solveTime", solveTime)
+//          println("solvability", solvability)
+//          //get minimized useful set and see how many initial predicates are in it
+//          val (minimizedPredicateFromCegar, _) = HintsSelection.getMinimumSetPredicates(predicateFromCegar, simplifiedClausesForGraph, counterexampleMethod = counterexampleMethod)
+//          //minimized predicates intersect initialPredicate
+//          val initialPredicatesUsedInMinimizedPredicateFromCegar = conjunctTwoPredicates(initialPredicate._1.toInitialPredicates, minimizedPredicateFromCegar)
+//          if (GlobalParameters.get.debugLog == true) {
+//            Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName + ".initial-" + fieldName + ".tpl")) {
+//              AbsReader.printHints(initialPredicate._1)
+//            }
+//            Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName + ".minimizedPredicateFromCegar-" + fieldName + ".tpl")) {
+//              AbsReader.printHints(transformPredicateMapToVerificationHints(minimizedPredicateFromCegar))
+//            }
+//            Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName + ".initialPredicatesUsedInMinimizedPredicateFromCegar-" + fieldName + ".tpl")) {
+//              AbsReader.printHints(transformPredicateMapToVerificationHints(initialPredicatesUsedInMinimizedPredicateFromCegar))
+//            }
+//          }
+//          val currentConstraintPredicates = transformPredicateMapToVerificationHints(conjunctTwoPredicates(initialPredicate._1.toInitialPredicates, constraintPredicates.toInitialPredicates))
+//          val currentPairwisePredicates = transformPredicateMapToVerificationHints(conjunctTwoPredicates(initialPredicate._1.toInitialPredicates, pairwisePredicates.toInitialPredicates))
+//          val statisticFields = HintsSelection.writePredicateDistributionToFiles(
+//            transformPredicateMapToVerificationHints(predicateFromCegar),
+//            transformPredicateMapToVerificationHints(minimizedPredicateFromCegar)
+//            , VerificationHints(Map()), VerificationHints(Map()), initialPredicate._1,
+//            currentConstraintPredicates, currentPairwisePredicates,
+//            simplifiedClausesForGraph, writeToFile = false).map(x => (x._1 + fieldName, x._2))
+//          Seq(("solveTime" + fieldName, solveTime),
+//            ("solvability" + fieldName, solvability),
+//            ("numberOfinitialPredicates" + fieldName, initialPredicate._1.totalPredicateNumber),
+//            ("minimizedPredicateFromCegar" + fieldName, minimizedPredicateFromCegar.values.flatten.size),
+//            ("initialPredicatesUsedInMinimizedPredicateFromCegar" + fieldName,
+//              initialPredicatesUsedInMinimizedPredicateFromCegar.values.flatten.size)) ++ statisticFields
+//        }).flatten.toSeq
+//      }
+//    }
+//    HintsSelection.writeInfoToJSON(solvabilityList, "solvability")
+
     sys.exit()
   }
 
@@ -653,6 +680,71 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
     val counterexampleMethod = HintsSelection.getCounterexampleMethod(disjunctive)
     HintsSelection.measurePredicates(simplifiedClausesForGraph, predGenerator, counterexampleMethod, outStream,
       predictedPredicates, fullInitialPredicates, truePredicates,predicateMap)
+    sys.exit()
+  }
+
+
+
+  if (GlobalParameters.get.getHornGraph == true && GlobalParameters.get.getLabelFromCounterExample==false) {
+    val initialPredicates =
+      if (GlobalParameters.get.generateSimplePredicates == true) {
+        val (simpleGeneratedPredicates, constraintPredicates, pairwisePredicates)
+        = HintsSelection.getSimplePredicates(simplifiedClausesForGraph, deduplicate = false)
+        if (!simpleGeneratedPredicates.isEmpty) {
+          Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName + ".constraintPredicates.tpl")) {
+            AbsReader.printHints(transformPredicateMapToVerificationHints(constraintPredicates))}
+          Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName + ".pairwisePredicates.tpl")) {
+            AbsReader.printHints(transformPredicateMapToVerificationHints(pairwisePredicates))}
+          Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName + unlabeledPredicateFileName+".tpl")) {
+            AbsReader.printHints(transformPredicateMapToVerificationHints(simpleGeneratedPredicates))}
+        }
+        transformPredicateMapToVerificationHints(simpleGeneratedPredicates) ++ (simpHints)
+      } else if (GlobalParameters.get.generateTemplates) {
+        if (GlobalParameters.get.withoutGraphJSON)
+          HintsSelection.wrappedReadHints(simplifiedClausesForGraph, unlabeledPredicateFileName) //todo:boolean template predicate-2 will be treated as Eq term
+        else {
+          if (new java.io.File(GlobalParameters.get.fileName + unlabeledPredicateFileName + ".tpl").exists)
+            HintsSelection.wrappedReadHints(simplifiedClausesForGraph, unlabeledPredicateFileName)
+          else {
+            val generatedTpl = generateCombinationTemplates(simplifiedClausesForGraph, onlyLoopHead = true) //false
+            Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName + unlabeledPredicateFileName + ".tpl")) {AbsReader.printHints(generatedTpl)}
+            generatedTpl
+          }
+        }
+      } else if (new java.io.File(GlobalParameters.get.fileName + unlabeledPredicateFileName + ".tpl").exists) {
+        HintsSelection.wrappedReadHints(simplifiedClausesForGraph, unlabeledPredicateFileName)
+      } else {
+        VerificationHints(Map()) ++ simpHints
+      }
+
+    if (initialPredicates.totalPredicateNumber == 0 && (GlobalParameters.get.generateSimplePredicates == true||GlobalParameters.get.generateTemplates==true)) {
+      HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/exceptions/no-initial-predicates/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"), GlobalParameters.get.fileName.length), message = "no initial predicates")
+      sys.exit()
+    }
+
+    val argumentInfo = HintsSelection.getArgumentLabel(simplifiedClausesForGraph,simpHints,predGenerator,disjunctive,
+      argumentOccurrence = GlobalParameters.get.argumentOccurenceLabel,argumentBound =GlobalParameters.get.argumentBoundLabel)
+
+    val clauseCollection = new ClauseInfo(simplifiedClausesForGraph, Seq())
+
+    val truePredicates = if (new java.io.File(GlobalParameters.get.fileName + labeledPredicateFileName + ".tpl").exists)
+      HintsSelection.wrappedReadHints(simplifiedClausesForGraph, labeledPredicateFileName)
+    else if (new java.io.File(GlobalParameters.get.fileName + "." + GlobalParameters.get.hornGraphType.toString + ".JSON").exists)
+      HintsSelection.readPredicateLabelFromOneJSON(new VerificationHintsInfo(initialPredicates, VerificationHints(Map()), VerificationHints(Map())), "templateRelevanceLabel")
+    else VerificationHints(Map())
+
+    if (GlobalParameters.get.separateByPredicates == true) {
+      GraphTranslator.separateGraphByPredicates(initialPredicates, truePredicates, clauseCollection, argumentInfo)
+    } else {
+      //read predicted
+      val predictedPredicates = if ((new java.io.File(GlobalParameters.get.fileName + "." + GlobalParameters.get.hornGraphType.toString + ".JSON")).exists)
+        HintsSelection.readPredictedHints(simplifiedClausesForGraph, initialPredicates)
+      else
+        VerificationHints(Map())
+
+      val hintsCollection = new VerificationHintsInfo(initialPredicates, truePredicates, VerificationHints(Map()),predictedPredicates)
+      GraphTranslator.drawAllHornGraph(clauseCollection, hintsCollection, argumentInfo)
+    }
     sys.exit()
   }
 
@@ -683,12 +775,23 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
 //      sys.exit()
 //      //throw PrintingFinishedException
 //    }
+    //write solving time upper bound to json file
+    val solvingTimeFileName = GlobalParameters.get.fileName + "." + "solvingTime" + ".JSON"
+    val initialFieldsSeq=Seq("solvingTime_RelationalEqs_splitClauses_0","solvingTime_Term_splitClauses_0","solvingTime_Octagon_splitClauses_0","solvingTime_RelationalIneqs_splitClauses_0",
+      "solvingTime_RelationalEqs_splitClauses_1","solvingTime_Term_splitClauses_1","solvingTime_Octagon_splitClauses_1","solvingTime_RelationalIneqs_splitClauses_1",
+      "cegarIterationNumber_RelationalEqs_splitClauses_0","cegarIterationNumber_Term_splitClauses_0","cegarIterationNumber_Octagon_splitClauses_0","cegarIterationNumber_RelationalIneqs_splitClauses_0",
+      "cegarIterationNumber_RelationalEqs_splitClauses_1","cegarIterationNumber_Term_splitClauses_1","cegarIterationNumber_Octagon_splitClauses_1","cegarIterationNumber_RelationalIneqs_splitClauses_1")
+    if(GlobalParameters.get.getSolvingTime && !new java.io.File(solvingTimeFileName).exists){
+      //create solving time JSON file
+      val timeout = 60 * 60 * 3 * 1000 //milliseconds
+      val initialFields: Map[String, Int] = (for (e<-initialFieldsSeq) yield e->timeout).toMap
+      writeSolvingTimeToJSON(solvingTimeFileName, initialFields)
+    }
 
     val predAbs = Console.withOut(outStream) {
       println
       println(
         "----------------------------------- CEGAR --------------------------------------")
-
       val predAbs =
         new HornPredAbs(simplifiedClausesForGraph,
           initialPredicatesForCEGAR.toInitialPredicates, predGenerator,
@@ -754,6 +857,13 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
       }
 
       predAbs
+    }
+
+    if (new java.io.File(solvingTimeFileName).exists){ //update the solving time for current abstract option in JSON file
+      val cegarIterationNumber=predAbs.cegar.iterationNum
+      val solvingTime=(predAbs.cegar.cegarEndTime - predAbs.cegar.cegarStartTime).toInt//milliseconds
+      writeSolvingTimeToJSON(solvingTimeFileName,readJSONFieldToMap(solvingTimeFileName,fieldNames=initialFieldsSeq).updated("solvingTime_"+GlobalParameters.get.templateBasedInterpolationType.toString+"_splitClauses_"+GlobalParameters.get.splitClauses.toString,solvingTime))
+      writeSolvingTimeToJSON(solvingTimeFileName,readJSONFieldToMap(solvingTimeFileName,fieldNames=initialFieldsSeq).updated("cegarIterationNumber_"+GlobalParameters.get.templateBasedInterpolationType.toString+"_splitClauses_"+GlobalParameters.get.splitClauses.toString,cegarIterationNumber))
     }
 
     // save the current configuration, to make sure that the lazily

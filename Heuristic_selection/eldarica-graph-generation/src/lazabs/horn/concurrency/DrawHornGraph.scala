@@ -32,12 +32,13 @@ import java.io.{File, PrintWriter}
 import ap.parser.IExpression._
 import ap.parser.{IExpression, _}
 import lazabs.GlobalParameters
-import lazabs.horn.abstractions.{TemplateType, TemplateTypeUsefulNess}
+import lazabs.horn.abstractions.{TemplateType, TemplateTypeUsefulNess, VerificationHints}
 import lazabs.horn.bottomup.HornClauses.Clause
 import lazabs.horn.preprocessor.HornPreprocessor.{Clauses, VerificationHints}
 import lazabs.horn.concurrency.DrawHornGraph.{HornGraphType, addQuotes, isNumeric}
-import lazabs.horn.concurrency.HintsSelection.{detectIfAJSONFieldExists, getParametersFromVerifHintElement, replaceMultiSamePredicateInBody, spAPI}
+import lazabs.horn.concurrency.HintsSelection.{detectIfAJSONFieldExists, getParametersFromVerifHintElement, replaceMultiSamePredicateInBody, spAPI, termContains}
 import play.api.libs.json.{JsSuccess, Json}
+import lazabs.horn.concurrency.TemplateSelectionUtils._
 
 import scala.collection.mutable.{ArrayBuffer, HashMap => MHashMap, Map => MuMap}
 
@@ -211,19 +212,19 @@ class GNNInput(simpClauses:Clauses,clausesInCE:Clauses) {
           case "AST_0" => AST_0Edges.incrementBinaryEdge(fromID, toID)
           case "AST_1" => AST_1Edges.incrementBinaryEdge(fromID, toID)
           case "AST_2" => AST_2Edges.incrementBinaryEdge(fromID, toID)
-          case "templateAST" => templateASTEdges.incrementBinaryEdge(fromID, toID)
-          case "template" => templateEdges.incrementBinaryEdge(fromID, toID)
-          case "verifHintTplPred" => incrementTemplates("verifHintTplPred",fromID, toID)
-          case "verifHintTplPredPosNeg" => incrementTemplates("verifHintTplPredPosNeg",fromID, toID)
-          case "verifHintTplEqTerm" => incrementTemplates("verifHintTplEqTerm",fromID, toID)
-          case "verifHintTplInEqTerm" => incrementTemplates("verifHintTplInEqTerm",fromID, toID)
-          case "verifHintTplInEqTermPosNeg" => incrementTemplates("verifHintTplInEqTermPosNeg",fromID, toID)
           case "argument" => argumentEdges.incrementBinaryEdge(fromID, toID)
           case "clause" => clauseEdges.incrementBinaryEdge(fromID,toID)
           case "controlFlowHyperEdge"=> controlFlowHyperEdges.incrementBinaryEdge(fromID,toID)
           case "dataFlowHyperEdge" => dataFlowHyperEdges.incrementBinaryEdge(fromID,toID)
           case "controlLocationEdgeForSCC" => controlLocationEdgeForSCC.incrementBinaryEdge(fromID,toID)
           case "transitive" => predicateTransitiveEdges.incrementBinaryEdge(fromID,toID)
+          case "template" => templateEdges.incrementBinaryEdge(fromID, toID)
+          case "templateAST" => templateASTEdges.incrementBinaryEdge(fromID, toID)
+          case "verifHintTplPred" => incrementTemplates("verifHintTplPred",fromID, toID)
+          case "verifHintTplPredPosNeg" => incrementTemplates("verifHintTplPredPosNeg",fromID, toID)
+          case "verifHintTplEqTerm" => incrementTemplates("verifHintTplEqTerm",fromID, toID)
+          case "verifHintTplInEqTerm" => incrementTemplates("verifHintTplInEqTerm",fromID, toID)
+          case "verifHintTplInEqTermPosNeg" => incrementTemplates("verifHintTplInEqTermPosNeg",fromID, toID)
           case _ => unknownEdges.incrementBinaryEdge(fromID, toID)
         }
       }
@@ -240,8 +241,6 @@ class GNNInput(simpClauses:Clauses,clausesInCE:Clauses) {
           case "guard" => guardEdges.incrementBinaryEdge(fromID, toID)
           case "data" => dataEdges.incrementBinaryEdge(fromID, toID)
           case "subTerm" => subTermEdges.incrementBinaryEdge(fromID, toID)
-          case "templateAST" => templateASTEdges.incrementBinaryEdge(fromID, toID)
-          case "template" => templateEdges.incrementBinaryEdge(fromID, toID)
           case "predicateInstanceHead"=> predicateInstanceHeadEdges.incrementBinaryEdge(fromID, toID)
           case "predicateInstanceBody"=> predicateInstanceBodyEdges.incrementBinaryEdge(fromID, toID)
           case "controlArgumentHead"=> controlArgumentHeadEdges.incrementBinaryEdge(fromID, toID)
@@ -255,7 +254,14 @@ class GNNInput(simpClauses:Clauses,clausesInCE:Clauses) {
           case "subTermConstantOperator"=>subTermConstantOperatorEdges.incrementBinaryEdge(fromID, toID)
           case "subTermOperatorOperator"=>subTermOperatorOperatorEdges.incrementBinaryEdge(fromID, toID)
           case "subTermScOperator"=>subTermScOperatorEdges.incrementBinaryEdge(fromID, toID)
-
+          case "template" => templateEdges.incrementBinaryEdge(fromID, toID)
+          case "templateAST" => templateASTEdges.incrementBinaryEdge(fromID, toID)
+          case "verifHintTplPred" => incrementTemplates("verifHintTplPred",fromID, toID)
+          case "verifHintTplPredPosNeg" => incrementTemplates("verifHintTplPredPosNeg",fromID, toID)
+          case "verifHintTplEqTerm" => incrementTemplates("verifHintTplEqTerm",fromID, toID)
+          case "verifHintTplInEqTerm" => incrementTemplates("verifHintTplInEqTerm",fromID, toID)
+          case "verifHintTplInEqTermPosNeg" => incrementTemplates("verifHintTplInEqTermPosNeg",fromID, toID)
+          case _ => unknownEdges.incrementBinaryEdge(fromID, toID)
         }
       }
     }
@@ -354,7 +360,7 @@ class GNNInput(simpClauses:Clauses,clausesInCE:Clauses) {
     //check if total node number larger than max_node
     if(nodeIds.size>GlobalParameters.get.maxNode){
       HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/exceed-max-node/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"),GlobalParameters.get.fileName.length),message = "node number >= maxNode" )
-      //HintsSelection.removeRelativeFiles(GlobalParameters.get.fileName)
+      HintsSelection.removeRelativeFiles(GlobalParameters.get.fileName)
       sys.exit()
     }
     nodeIds :+= GNNNodeID
@@ -456,16 +462,17 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
   val spAPI = ap.SimpleAPI.spawn
   val simpClauses= clausesCollection.simplifiedClause
   val clausesInCE = clausesCollection.clausesInCounterExample
-  val graphType = GlobalParameters.get.hornGraphType match {
-    case DrawHornGraph.HornGraphType.hyperEdgeGraph => "hyperEdgeHornGraph"
-    case DrawHornGraph.HornGraphType.hybridDirectionLayerGraph => "hybrid-layerHornGraph"
-    case DrawHornGraph.HornGraphType.biDirectionLayerGraph => "bi-layerHornGraph"
-    case DrawHornGraph.HornGraphType.monoDirectionLayerGraph => "mono-layerHornGraph"
-    case DrawHornGraph.HornGraphType.clauseRelatedTaskLayerGraph => "clause-related-task-layerHornGraph"
-    case DrawHornGraph.HornGraphType.fineGrainedEdgeTypeLayerGraph => "fine-grained-edge-type-layerHornGraph"
-    case DrawHornGraph.HornGraphType.equivalentHyperedgeGraph => "equivalent-hyperedgeGraph"
-    case DrawHornGraph.HornGraphType.concretizedHyperedgeGraph => "concretized-hyperedgeGraph"
-  }
+  val graphType = GlobalParameters.get.hornGraphType.toString
+//  match {
+//    case DrawHornGraph.HornGraphType.hyperEdgeGraph => "hyperEdgeHornGraph"
+//    case DrawHornGraph.HornGraphType.hybridDirectionLayerGraph => "hybrid-layerHornGraph"
+//    case DrawHornGraph.HornGraphType.biDirectionLayerGraph => "bi-layerHornGraph"
+//    case DrawHornGraph.HornGraphType.monoDirectionLayerGraph => "mono-layerHornGraph"
+//    case DrawHornGraph.HornGraphType.clauseRelatedTaskLayerGraph => "clause-related-task-layerHornGraph"
+//    case DrawHornGraph.HornGraphType.fineGrainedEdgeTypeLayerGraph => "fine-grained-edge-type-layerHornGraph"
+//    case DrawHornGraph.HornGraphType.equivalentHyperedgeGraph => "equivalent-hyperedgeGraph"
+//    case DrawHornGraph.HornGraphType.concretizedHyperedgeGraph => "concretized-hyperedgeGraph"
+//  }
   val templateNodePrefix = "template_"
   var edgeNameMap: Map[String, String] = Map()
   var edgeDirectionMap: scala.collection.immutable.Map[String,Boolean] = Map()
@@ -483,7 +490,13 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
   val writerGraph = new PrintWriter(new File(file + "." + graphType + ".gv"))
 
   edgeNameMap += ("templateAST"->"tplAST")
-  edgeNameMap += ("template"->"predicate")
+  //edgeNameMap += ("template"->"predicate")
+  edgeNameMap += ("template" -> "template")
+  edgeNameMap += ("verifHintTplPred" -> "Pred")
+  edgeNameMap += ("verifHintTplPredPosNeg" -> "PredPosNeg")
+  edgeNameMap += ("verifHintTplEqTerm" -> "EqTerm (tpl)")
+  edgeNameMap += ("verifHintTplInEqTerm" -> "InEqTerm (tpl)")
+  edgeNameMap += ("verifHintTplInEqTermPosNeg" -> "InEqTermPosNeg")
   edgeDirectionMap += ("templateAST"->false)
   edgeDirectionMap += ("template" -> false)
   nodeShapeMap += ("template" -> "component")
@@ -845,6 +858,13 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
     writeGNNInputFieldToJSONFile("predicateIndices", IntArray(gnn_input.predicateIndices), writer, lastFiledFlag)
     writeGNNInputFieldToJSONFile("predicateOccurrenceInClause", IntArray(gnn_input.predicateOccurrenceInClause), writer, lastFiledFlag)
     writeGNNInputFieldToJSONFile("predicateStrongConnectedComponent", IntArray(gnn_input.predicateStrongConnectedComponent), writer, lastFiledFlag)
+    writeGNNInputFieldToJSONFile("templateASTEdges", PairArray(gnn_input.templateASTEdges.binaryEdge), writer, lastFiledFlag)
+    writeGNNInputFieldToJSONFile("templateEdges", PairArray(gnn_input.templateEdges.binaryEdge), writer, lastFiledFlag)
+    writeGNNInputFieldToJSONFile("verifHintTplPredEdges", PairArray(gnn_input.verifHintTplPredEdges.binaryEdge), writer, lastFiledFlag)
+    writeGNNInputFieldToJSONFile("verifHintTplPredPosNegEdges", PairArray(gnn_input.verifHintTplPredPosNegEdges.binaryEdge), writer, lastFiledFlag)
+    writeGNNInputFieldToJSONFile("verifHintTplEqTermEdges", PairArray(gnn_input.verifHintTplEqTermEdges.binaryEdge), writer, lastFiledFlag)
+    writeGNNInputFieldToJSONFile("verifHintTplInEqTermEdges", PairArray(gnn_input.verifHintTplInEqTermEdges.binaryEdge), writer, lastFiledFlag)
+    writeGNNInputFieldToJSONFile("verifHintTplInEqTermPosNegEdges", PairArray(gnn_input.verifHintTplInEqTermPosNegEdges.binaryEdge), writer, lastFiledFlag)
     GlobalParameters.get.hornGraphType match {
       case DrawHornGraph.HornGraphType.hyperEdgeGraph=> {
 //        if (gnn_input.AST_1Edges.binaryEdge.length==0 || gnn_input.AST_2Edges.binaryEdge.length==0){
@@ -856,13 +876,6 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
         writeGNNInputFieldToJSONFile("AST_0Edges", PairArray(gnn_input.AST_0Edges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("AST_1Edges", PairArray(gnn_input.AST_1Edges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("AST_2Edges", PairArray(gnn_input.AST_2Edges.binaryEdge), writer, lastFiledFlag)
-        writeGNNInputFieldToJSONFile("templateASTEdges", PairArray(gnn_input.templateASTEdges.binaryEdge), writer, lastFiledFlag)
-        writeGNNInputFieldToJSONFile("templateEdges", PairArray(gnn_input.templateEdges.binaryEdge), writer, lastFiledFlag)
-        writeGNNInputFieldToJSONFile("verifHintTplPredEdges", PairArray(gnn_input.verifHintTplPredEdges.binaryEdge), writer, lastFiledFlag)
-        writeGNNInputFieldToJSONFile("verifHintTplPredPosNegEdges", PairArray(gnn_input.verifHintTplPredPosNegEdges.binaryEdge), writer, lastFiledFlag)
-        writeGNNInputFieldToJSONFile("verifHintTplEqTermEdges", PairArray(gnn_input.verifHintTplEqTermEdges.binaryEdge), writer, lastFiledFlag)
-        writeGNNInputFieldToJSONFile("verifHintTplInEqTermEdges", PairArray(gnn_input.verifHintTplInEqTermEdges.binaryEdge), writer, lastFiledFlag)
-        writeGNNInputFieldToJSONFile("verifHintTplInEqTermPosNegEdges", PairArray(gnn_input.verifHintTplInEqTermPosNegEdges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("dataFlowASTEdges", PairArray(gnn_input.dataFlowASTEdges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("controlFlowHyperEdges", TripleArray(gnn_input.controlFlowHyperEdges.ternaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("dataFlowHyperEdges", TripleArray(gnn_input.dataFlowHyperEdges.ternaryEdge), writer, lastFiledFlag)
@@ -876,8 +889,6 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
         writeGNNInputFieldToJSONFile("AST_0Edges", PairArray(gnn_input.AST_0Edges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("AST_1Edges", PairArray(gnn_input.AST_1Edges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("AST_2Edges", PairArray(gnn_input.AST_2Edges.binaryEdge), writer, lastFiledFlag)
-        writeGNNInputFieldToJSONFile("templateASTEdges", PairArray(gnn_input.templateASTEdges.binaryEdge), writer, lastFiledFlag)
-        writeGNNInputFieldToJSONFile("templateEdges", PairArray(gnn_input.templateEdges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("dataFlowASTEdges", PairArray(gnn_input.dataFlowASTEdges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("controlFlowHyperEdges", PairArray(gnn_input.controlFlowHyperEdges.binaryEdge), writer, lastFiledFlag)
         writeGNNInputFieldToJSONFile("dataFlowHyperEdges", PairArray(gnn_input.dataFlowHyperEdges.binaryEdge), writer, lastFiledFlag)
@@ -934,108 +945,6 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
     (argumentIDList, argumentNameList, argumentOccurrenceList,argumentBoundList,argumentIndicesList,argumentBinaryOccurrenceList)
   }
 
-  def writeGNNInputFieldToJSONFile(fieldName: String, fiedlContent: Arrays, writer: PrintWriter, lastFiledFlag: Boolean): Unit = {
-    fiedlContent match {
-      case StringArray(x) => writeOneField(fieldName, x, writer)
-      case IntArray(x) => writeOneField(fieldName, x, writer)
-      case PairArray(x) => writeOneField(fieldName, x, writer)
-      case TripleArray(x) => writeOneField(fieldName, x, writer)
-      case PairStringArray(x)=> writePairStringArrayField(fieldName, x, writer)
-    }
-    if (lastFiledFlag == false)
-      writer.write(",\n")
-    else
-      writer.write("\n")
-  }
-
-  sealed abstract class Arrays
-
-  case class StringArray(x: Array[String]) extends Arrays
-
-  case class IntArray(x: Array[Int]) extends Arrays
-
-  case class PairArray(x: Array[Pair[Int, Int]]) extends Arrays
-  case class PairStringArray(x: Array[Pair[String, String]]) extends Arrays
-
-  case class TripleArray(x: Array[Triple[Int, Int, Int]]) extends Arrays
-
-  def writeOneField(fieldName: String, fiedlContent: Array[Pair[Int, Int]], writer: PrintWriter): Unit = {
-    writer.write(addQuotes(fieldName))
-    writer.write(":")
-    writer.write("[")
-    val filedSize = fiedlContent.size - 1
-    for ((p, i) <- fiedlContent.zipWithIndex) {
-      writer.write("[")
-      writer.write(p._1.toString)
-      writer.write(",")
-      writer.write(p._2.toString)
-      writer.write("]")
-      if (i < filedSize)
-        writer.write(",")
-    }
-    writer.write("]")
-  }
-  def writePairStringArrayField(fieldName: String, fiedlContent: Array[Pair[String, String]], writer: PrintWriter): Unit = {
-    writer.write(addQuotes(fieldName))
-    writer.write(":")
-    writer.write("[")
-    val filedSize = fiedlContent.size - 1
-    for ((p, i) <- fiedlContent.zipWithIndex) {
-      writer.write("[")
-      writer.write(p._1)
-      writer.write(",")
-      writer.write(p._2)
-      writer.write("]")
-      if (i < filedSize)
-        writer.write(",")
-    }
-    writer.write("]")
-  }
-
-  def writeOneField(fieldName: String, fiedlContent: Array[Triple[Int, Int, Int]], writer: PrintWriter): Unit = {
-    writer.write(addQuotes(fieldName))
-    writer.write(":")
-    writer.write("[")
-    val filedSize = fiedlContent.size - 1
-    for ((p, i) <- fiedlContent.zipWithIndex) {
-      writer.write("[")
-      writer.write(p._1.toString)
-      writer.write(",")
-      writer.write(p._2.toString)
-      writer.write(",")
-      writer.write(p._3.toString)
-      writer.write("]")
-      if (i < filedSize)
-        writer.write(",")
-    }
-    writer.write("]")
-  }
-
-  def writeOneField(fieldName: String, fiedlContent: Array[Int], writer: PrintWriter): Unit = {
-    writer.write(addQuotes(fieldName))
-    writer.write(":")
-    writer.write("[")
-    val filedSize = fiedlContent.size - 1
-    for ((p, i) <- fiedlContent.zipWithIndex) {
-      writer.write(p.toString)
-      if (i < filedSize)
-        writer.write(",")
-    }
-    writer.write("]")
-  }
-
-  def writeOneField(fieldName: String, fiedlContent: Array[String], writer: PrintWriter): Unit = {
-    writer.write(addQuotes(fieldName))
-    writer.write(":")
-    writer.write("[")
-    val filedSize = fiedlContent.size - 1
-    for ((p, i) <- fiedlContent.zipWithIndex) {
-      writer.write(addQuotes(p.toString))
-      if (i < filedSize)
-        writer.write(",")
-    }
-    writer.write("]")
-  }
   def drawPredicatesWithNode(clauseGuardMap: Map[Predicate, Seq[Tuple2[String,IFormula]]]=Map()): Seq[(String,Seq[String])] ={ //with template node
     val quantifiedClauseGuardMap = {
       for ((k, v) <- clauseGuardMap) yield k -> {
@@ -1043,19 +952,24 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
       }.filter(!_._2.isTrue).filter(!_._2.isFalse)
     }
     val tempHeadMap=
-    for((hp,templates)<-hints.initialHints.toInitialPredicates.toSeq.sortBy(_._1.name)) yield {
+    for((hp,templates)<-hints.initialHints.predicateHints.toSeq.sortBy(_._1.name)) yield {
       constantNodeSetInOneClause.clear()
       val templateNameList=
       for (t<-templates) yield {
         val templateNodeName=templateNodePrefix+gnn_input.templateCanonicalID.toString
         val templateNodeLabelName="predicate_"+gnn_input.templateCanonicalID.toString
         //templateNameList:+=templateNodeName
-        val hintLabel = if (hints.positiveHints.toInitialPredicates.keySet.map(_.toString).contains(hp.toString) && HintsSelection.containsPred(t,hints.positiveHints.toInitialPredicates(hp))) 1 else 0
+        //use termContains instead of containsPred
+        //val hintLabel = if (hints.positiveHints.toInitialPredicates.keySet.map(_.toString).contains(hp.toString) && HintsSelection.containsPred(t,hints.positiveHints.toInitialPredicates(hp))) 1 else 0
+        val hintLabel= if (hints.positiveHints.toInitialPredicates.keySet.map(_.toString).contains(hp.toString) && termContains(hints.positiveHints.predicateHints(hp).map(getParametersFromVerifHintElement(_)),getParametersFromVerifHintElement(t))._1) 1 else 0
+        println(t.toString,hintLabel)
         createNode(templateNodeName,templateNodeLabelName,"template",nodeShapeMap("template"),hintLabel=hintLabel)
         //drawAST(e,templateNodeName)
-        val existedSubGraphRoot = for ((s, f) <- quantifiedClauseGuardMap(hp) if (HintsSelection.containsPred(t, Seq(f)))) yield s
+        //val existedSubGraphRoot = for ((s, f) <- quantifiedClauseGuardMap(hp) if (HintsSelection.containsPred(t, Seq(f)))) yield s
+        val existedSubGraphRoot = for ((s, f) <- quantifiedClauseGuardMap(hp) if (HintsSelection.containsPred(getParametersFromVerifHintElement(t)._1.asInstanceOf[IFormula], Seq(f)))) yield s
         if (existedSubGraphRoot.isEmpty) {
-          val predicateASTRootName=drawAST(t)
+
+          val predicateASTRootName=drawAST(getParametersFromVerifHintElement(t)._1)
           addBinaryEdge(predicateASTRootName,templateNodeName,"templateAST")
         } else
           addBinaryEdge(existedSubGraphRoot.head,templateNodeName,"templateAST")//astEdgeType
@@ -1068,13 +982,14 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
 
   def drawPredicate(): Seq[(String,Seq[(String,String)])] ={
     val tempHeadMap=
-      for((hp,templates)<-hints.initialHints.toInitialPredicates.toSeq.sortBy(_._1.name)) yield {
+      for((hp,templates)<-hints.initialHints.predicateHints.toSeq.sortBy(_._1.name)) yield {
         constantNodeSetInOneClause.clear()
         val templateNameList=
           for (t<-templates) yield {
-            val predicateASTRootName=drawAST(t)
+            val predicateASTRootName=drawAST(getParametersFromVerifHintElement(t)._1)
             //update JSON
-            val hintLabel = if (hints.positiveHints.toInitialPredicates.keySet.map(_.toString).contains(hp.toString) && HintsSelection.containsPred(t,hints.positiveHints.toInitialPredicates(hp))) 1 else 0
+            //val hintLabel = if (hints.positiveHints.toInitialPredicates.keySet.map(_.toString).contains(hp.toString) && HintsSelection.containsPred(t,hints.positiveHints.toInitialPredicates(hp))) 1 else 0
+            val hintLabel= if (hints.positiveHints.toInitialPredicates.keySet.map(_.toString).contains(hp.toString) && termContains(hints.positiveHints.predicateHints(hp).map(getParametersFromVerifHintElement(_)),getParametersFromVerifHintElement(t))._1) 1 else 0
             gnn_input.updateTemplateIndicesAndNodeIds(predicateASTRootName,hintLabel)
             (predicateASTRootName,"template")
           }
@@ -1092,7 +1007,7 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
 
 
   def readPredictedLabelFromJson(): Array[Int] ={
-    val input_file=GlobalParameters.get.fileName+".hyperEdgeHornGraph.JSON"
+    val input_file=GlobalParameters.get.fileName+"."+GlobalParameters.get.hornGraphType.toString+".JSON"
     if(new java.io.File(input_file).exists&&detectIfAJSONFieldExists("predictedLabel",GlobalParameters.get.fileName)==true){
       val json_content = scala.io.Source.fromFile(input_file).mkString
       val json_data = Json.parse(json_content)
@@ -1109,10 +1024,10 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
 
     val predictedLabel=readPredictedLabelFromJson()
 
-
     var counter=0
     val tempHeadMap=
       for((hp,templates)<-unlabeledTemplates) yield {
+        //println(hp)
         argumentNodeSetInPredicates.clear()
         for (a<-argumentNodeSetCrossGraph(hp.name)){
           argumentNodeSetInPredicates(a._1)=a._2
@@ -1125,6 +1040,7 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
             //encode label to multi-class
             //val (hintLabel,cost) = getHintLabelAndCost(positiveTemplates,t,hp)
             val (hintLabel,cost) = encodeLabelToMultiClass(positiveTemplates,t,hp,templates)
+            //println(t,hintLabel)
             //draw boolean predicate as single term node
             val transfomedT=transformBooleanPredicateToTerm(t)
             val templateASTRootName=drawAST(transfomedT._1)
@@ -1212,6 +1128,7 @@ class DrawHornGraph(file: String, clausesCollection: ClauseInfo, hints: Verifica
   def getHintLabelUsefulness(positiveSeq: Seq[(IExpression, Int, TemplateType.Value)],t:(IExpression, Int, TemplateType.Value)):
   (TemplateTypeUsefulNess.Value,Int) ={
       val (b, c) = HintsSelection.termContains(positiveSeq, t)
+    //println(Console.BLUE+ t.toString()+":"+b.toString)
       b match {
         case true=>
           t._3 match {

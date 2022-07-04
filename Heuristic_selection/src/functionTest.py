@@ -243,7 +243,7 @@ def main():
 
     print(np.unique(np.array([[0,0],[0,0],[0,1]]), axis=0))
 
-    with open("../benchmarks/align-lin+non-lin-predict/wrong_predicted/chc-LIA-lin_495.smt2.hyperEdgeHornGraph.JSON") as f:
+    with open("../benchmarks/align-lin+non-lin-predict/wrong_predicted/chc-LIA-lin_495.smt2.hyperEdgeGraph.JSON") as f:
         loaded_graph = json.load(f)
         nodeIds=loaded_graph["nodeIds"]
         AST_1Edges = loaded_graph["AST_1Edges"]

@@ -22,7 +22,7 @@ def main():
     #label = "rank"
     #label = "argument_identify_no_batchs"
     #label = "control_location_identify"
-    label_list.append("argument_identify")
+    #label_list.append("argument_identify")
     #label_list.append("predicate_occurrence_in_clauses")
     #label_list.append("predicate_occurrence_in_SCG")
     #label_list.append("scc_test")
@@ -34,18 +34,18 @@ def main():
     # label_list.append("argument_upper_bound")
     #label_list.append("argument_occurrence_binary")
     #label_list.append("template_relevance")
-    #label_list.append("node_multiclass")
+    label_list.append("node_multiclass")
 
-    # json_type = ".hyperEdgeHornGraph.JSON"
-    # json_type = ".layerHornGraph.JSON"
+    # json_type = ".hyperEdgeGraph.JSON"
+    # json_type = ".monoDirectionLayerGraph.JSON"
     force_read = True
     form_label = True
     file_type = ".smt2"
     GPU=False
     use_class_weight=False
     pickle = True
-    benchmark_name = "align-lin+non-lin-first-task-debug/"#"align-lin+non-lin/"#"Linear-dataset-counter-example-task-hyper-edge-graph/"
-    num_node_target_labels=2
+    benchmark_name = "template_selection_train_non_linear/" #"template_selection_train/"
+    num_node_target_labels=5
 
     # random.seed(0)
     # np.random.seed(0)
@@ -56,7 +56,7 @@ def main():
     for num_layers in num_layers_list:
         hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers, "regression_hidden_layer_size": [64, 64],
                             "threshold": 0.5, "max_nodes_per_batch": 10000,
-                            "max_epochs": 500, "patience": 20, "num_node_target_labels": num_node_target_labels,
+                            "max_epochs": 500, "patience": 50, "num_node_target_labels": num_node_target_labels,
                             "fix_y_axis": False}
 
         relative_path = os.path.join("../benchmarks/", benchmark_name)
@@ -64,39 +64,40 @@ def main():
         for label in label_list:
             parameter_list.append(parameters(relative_path=relative_path,
                           absolute_path=absolute_path,
-                          json_type=".hyperEdgeHornGraph.JSON", label=label,label_field=label_pairs[label]))#templateRelevanceLabel,templateCostLabel,argumentIndices
+                          json_type=".hyperEdgeGraph.JSON", label=label,label_field=label_pairs[label]))#templateRelevanceLabel,templateCostLabel,argumentIndices
             # parameter_list.append(
             #     parameters(relative_path=relative_path,
             #                absolute_path=absolute_path,
-            #                json_type=".equivalent-hyperedgeGraph.JSON", label=label))
+            #                json_type=".equivalentHyperedgeGraph.JSON", label=label))
             # parameter_list.append(
             #     parameters(relative_path=relative_path,
             #                absolute_path=absolute_path,
-            #                json_type=".concretized-hyperedgeGraph.JSON", label=label))
-            # parameter_list.append(parameters(relative_path=relative_path,
-            #                absolute_path=absolute_path,
-            #                json_type=".mono-layerHornGraph.JSON", label=label,label_field=label_pairs[label]))
+            #                json_type=".concretizedHyperedgeGraph.JSON", label=label))
+            parameter_list.append(parameters(relative_path=relative_path,
+                           absolute_path=absolute_path,
+                           json_type=".monoDirectionLayerGraph.JSON", label=label,label_field=label_pairs[label]))
             # parameter_list.append(
             #     parameters(relative_path=relative_path,
             #                absolute_path=absolute_path,
-            #                json_type=".hybrid-layerHornGraph.JSON", label=label))
+            #                json_type=".hybridDirectionLayerGraph.JSON", label=label))
             # parameter_list.append(
             #     parameters(relative_path=relative_path,
             #                absolute_path=absolute_path,
-            #                json_type=".bi-layerHornGraph.JSON", label=label,label_field=label_pairs[label]))
+            #                json_type=".biDirectionLayerGraph.JSON", label=label,label_field=label_pairs[label]))
             # parameter_list.append(
             #     parameters(relative_path=relative_path,
             #                absolute_path=absolute_path,
-            #                json_type=".clause-related-task-layerHornGraph.JSON", label=label))
+            #                json_type=".clauseRelatedTaskLayerGraph.JSON", label=label))
             # parameter_list.append(
             #     parameters(relative_path=relative_path,
             #                absolute_path=absolute_path,
-            #                json_type=".fine-grained-edge-type-layerHornGraph.JSON", label=label))
+            #                json_type=".fineGrainedEdgeTypeLayerGraph.JSON", label=label))
 
         GPU_switch(GPU)
 
 
         for param in parameter_list:
+            tf.keras.backend.clear_session()
             if pickle==False:
                 train_on_graphs(benchmark_name=param.absolute_path[param.absolute_path.find("/benchmarks/")+len("/benchmarks/"):-1], label=param.label, force_read=force_read,
                                 train_n_times=1,path=param.absolute_path, file_type=file_type, form_label=form_label,
@@ -108,7 +109,7 @@ def main():
                                 train_n_times=1, path=param.relative_path, file_type=file_type, form_label=form_label,
                                 json_type=param.json_type, GPU=GPU, pickle=pickle,use_class_weight=use_class_weight,label_field=param.label_field,
                                 hyper_parameters=hyper_parameters)
-            tf.keras.backend.clear_session()
+
 
         parameter_list=[]
 

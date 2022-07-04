@@ -7,6 +7,51 @@ import os
 import time
 
 
+
+def get_solvability_and_measurement_from_eldarica(params):
+
+    # -measurePredictedPredicates -varyGeneratedPredicates
+    check_solvability_parameter_list=[]
+    check_solvability_parameter_list.append("-checkSolvability  -abstract:empty -t:"+str(params["timeout"]) + " -getHornGraph:monoDirectionLayerGraph")
+    check_solvability_parameter_list.append("-checkSolvability  -abstract:unlabeled -t:" + str(params["timeout"]) + " -getHornGraph:monoDirectionLayerGraph")
+    check_solvability_parameter_list.append("-checkSolvability  -abstract:labeled -t:" + str(params["timeout"]) + " -getHornGraph:monoDirectionLayerGraph")
+    check_solvability_parameter_list.append("-checkSolvability  -abstract:predictedCG -t:" + str(params["timeout"]) + " -getHornGraph:monoDirectionLayerGraph")
+    check_solvability_parameter_list.append("-checkSolvability  -abstract:predictedCDHG -t:" + str(params["timeout"]) + " -getHornGraph:hyperEdgeGraph")
+    check_solvability_parameter_list.append("-checkSolvability  -abstract:random -t:" + str(params["timeout"]) + " -getHornGraph:monoDirectionLayerGraph")
+    check_solvability_parameter_list.append("-checkSolvability  -abstract:term -t:" + str(params["timeout"]) + " -getHornGraph:monoDirectionLayerGraph")
+    check_solvability_parameter_list.append("-checkSolvability  -abstract:oct -t:" + str(params["timeout"])+ " -getHornGraph:monoDirectionLayerGraph")
+    check_solvability_parameter_list.append("-checkSolvability  -abstract:relEqs -t:" + str(params["timeout"]) + " -getHornGraph:monoDirectionLayerGraph")
+    check_solvability_parameter_list.append("-checkSolvability  -abstract:relIneqs -t:" + str(params["timeout"]) + " -getHornGraph:monoDirectionLayerGraph")
+    check_solvability_parameter_list.append("-checkSolvability  -abstract:mined -t:" + str(params["timeout"]) + " -getHornGraph:monoDirectionLayerGraph")
+    check_solvability_parameter_list.append("-checkSolvability  -abstract:off -t:" + str(params["timeout"]) + " -getHornGraph:monoDirectionLayerGraph")
+
+    # one thread
+    for file in params["filtered_file_list"]:
+        for check_solvability_parameter in check_solvability_parameter_list:
+            file_and_param = [file, check_solvability_parameter, params["timeout"], params["move_file"], 1,
+                              params["splitClauses"]]
+            run_eldarica_with_shell(file_and_param)
+
+
+    # multi-thread
+    check_solvability_parameter_list=params["checkSolvability"] + " " + params["separateByPredicates"] + " " + params["measurePredictedPredicates"] \
+                                     + " " + params["onlyInitialPredicates"] + " " + params["generateTemplates"] + " " + params["abstract"] + " " + \
+                                     params["noIntervals"] + " -solvabilityTimeout:" + params["solvabilityTimeout"] + " " + params["getHornGraph"]
+    # file_list_with_parameters = (lambda: [
+    #     [file, check_solvability_parameter_list, params["timeout"], params["move_file"]] if not os.path.exists(
+    #         file + ".solvability.JSON.zip") else [] for
+    #     file in params["filtered_file_list"]] if params["continuous_extracting"] == True
+    # else [[file, check_solvability_parameter_list, params["timeout"], params["move_file"]] for
+    #       file in params["filtered_file_list"]])()
+    # file_list_for_solvability_check = list(filter(lambda x: len(x) != 0, file_list_with_parameters))
+    # print("file_list_for_solvability_check", len(file_list_for_solvability_check))
+    # run_eldarica_with_shell_pool_with_file_list(params["thread_number"], run_eldarica_with_shell, file_list_for_solvability_check)
+
+
+
+
+
+
 def measurement_control_by_python(benchmark_fold):
     thread_number = 4
     continuous_extracting = True
@@ -87,28 +132,14 @@ def get_exceptions_folder_names():
     return folder_name_list, file_list
 
 
-def get_solvability_and_measurement_from_eldarica(params):
-
-    # -measurePredictedPredicates -varyGeneratedPredicates
-    check_solvability_parameter_list=params["checkSolvability"] + " " + params["separateByPredicates"] + " " + params["measurePredictedPredicates"] \
-                                     + " " + params["onlyInitialPredicates"] + " " + params["generateTemplates"] + " " + params["abstract"] + " " + \
-                                     params["noIntervals"] + " -solvabilityTimeout:" + params["solvabilityTimeout"]
-
-    file_list_with_parameters = (lambda: [
-        [file, check_solvability_parameter_list, params["timeout"], params["move_file"]] if not os.path.exists(
-            file + ".solvability.JSON.zip") else [] for
-        file in params["filtered_file_list"]] if params["continuous_extracting"] == True
-    else [[file, check_solvability_parameter_list, params["timeout"], params["move_file"]] for
-          file in params["filtered_file_list"]])()
-    file_list_for_solvability_check = list(filter(lambda x: len(x) != 0, file_list_with_parameters))
-    print("file_list_for_solvability_check", len(file_list_for_solvability_check))
-    run_eldarica_with_shell_pool_with_file_list(params["thread_number"], run_eldarica_with_shell, file_list_for_solvability_check)
-
 def wrapped_generate_horn_graph(params):
     file_list=[]
     for fold in params["data_fold"]:
         current_folder="../benchmarks/" + params["benchmark_fold"] + "/"+fold
-        current_file_list=glob.glob(current_folder+"/*.smt2.zip")
+        current_file_list=[]
+        for f in glob.glob(current_folder+"/*.smt2.zip"):
+            if "normalized" not in f and "simplified" not in f:
+                current_file_list.append(f)
         file_list = file_list + current_file_list
         # if horn_graph_folder!="": #before continous genereate horn graphs, copy from prepared horn graph
         #     for f in current_file_list:
@@ -121,39 +152,67 @@ def wrapped_generate_horn_graph(params):
     file_list=[f[:-len(".zip")] for f in file_list]
 
     # description: generate horn graph
-    generate_horn_graph_params={"file_list":file_list,"max_nodes_per_batch":params["max_nodes_per_batch"],"move_file":params["move_file"],
+    generate_horn_graph_params={"file_list":file_list,"max_nodes_per_batch":params["max_nodes_per_batch"],"move_file":params["move_file"],"timeout":params["timeout"],
                                 "thread_number":params["thread_number"],"generateSimplePredicates":params["generateSimplePredicates"],
                                 "generateTemplates":params["generateTemplates"],"separateByPredicates":params["separateByPredicates"],
-                                "abstract":params["abstract"],"noIntervals":params["noIntervals"]}
+                                "abstract":params["abstract"],"noIntervals":params["noIntervals"],"graph_type":params["graph_type"],"splitClauses":params["splitClauses"]}
     generate_horn_graph(generate_horn_graph_params)
     suffix = (lambda: "-0" if params["separateByPredicates"] else "")()
-    file_list = [file if os.path.exists(file +suffix + ".hyperEdgeHornGraph.JSON.zip") else None for file in file_list]
+    file_list = [file if os.path.exists(file +suffix + "."+params["graph_type"]+".JSON.zip") else None for file in file_list]
     file_list = list(filter(None, file_list))
     file_list_with_horn_graph = "file with horn graph " + str(len(file_list)) + "/" + str(initial_file_number)
     print("file_list_with_horn_graph", file_list_with_horn_graph)
     # description: filter files by max_nodes_per_batch
     filtered_file_list = filter_file_list_by_max_node(file_list, params["max_nodes_per_batch"],separateByPredicates=params["separateByPredicates"],
-                                                      benchmark_fold=params["benchmark_fold"],data_fold=params["data_fold"])
+                                                      benchmark_fold=params["benchmark_fold"],data_fold=params["data_fold"],graph_type=params["graph_type"])
     print("filtered_file_list",len(filtered_file_list))
     return filtered_file_list,file_list_with_horn_graph,file_list
 
+
+
+
 def generate_horn_graph(params):
     # description: generate horn graph
-    timeout = 60*15  # second
-    move_file_parameter_eldarica = (lambda: " -moveFile " if params["move_file"] == True else " ")()
-    # todo: use intervals and abstract:off -varyGeneratedPredicates
-    eldarica_parameters = "-getHornGraph:hyperEdgeGraph "+params["separateByPredicates"]+" "+\
-                          params["generateSimplePredicates"] +" "+params["generateTemplates"]+" " + move_file_parameter_eldarica + " -maxNode:" + str(
-        params["max_nodes_per_batch"]) + " "+params["abstract"] +" "+params["noIntervals"]+" -mainTimeout:3600"
+    timeout = 60*60  # second
     suffix = (lambda: "-0" if params["separateByPredicates"] else "")()
+    # todo: use intervals and abstract:off -varyGeneratedPredicates
+    # move_file_parameter_eldarica = (lambda: " -moveFile " if params["move_file"] == True else " ")()
+    # eldarica_parameters = "-getHornGraph:" + params["graph_type"] + " " + params["separateByPredicates"] + " " + \
+    #                       params["generateSimplePredicates"] + " " + params[
+    #                           "generateTemplates"] + " " + move_file_parameter_eldarica + " -maxNode:" + str(
+    #     params["max_nodes_per_batch"]) + \
+    #                       " " + params["abstract"] + " " + params["noIntervals"] + " " + params[
+    #                           "splitClauses"]  # +" -mainTimeout:3600"
+    #multiple thread
+    # file_list_with_parameters = [
+    #     [file, eldarica_parameters, timeout, params["move_file"]] if not os.path.exists(
+    #         file + suffix + "." + params["graph_type"] + ".JSON.zip") else []
+    #     for file in params["file_list"]]
+    # file_list_for_horn_graph_generation = list(filter(lambda x: len(x) != 0, file_list_with_parameters))
+    # print("file_list_for_horn_graph_generation", len(file_list_for_horn_graph_generation))
+    # run_eldarica_with_shell_pool_with_file_list(params["thread_number"], run_eldarica_with_shell,
+    #                                             file_list_for_horn_graph_generation)  # continuous extracting
 
-    file_list_with_parameters = [
-        [file, eldarica_parameters, timeout, params["move_file"]] if not os.path.exists(file+suffix + ".hyperEdgeHornGraph.JSON.zip") else []
-        for file in params["file_list"]]
+    #one thread
+    eldarica_parameters_list=[]
+    eldarica_parameters_list.append("-getHornGraph:monoDirectionLayerGraph -extractTemplates -generateTemplates -maxNode:10000 -abstract:empty " +params["splitClauses"])
+    eldarica_parameters_list.append("-getSMT2 -abstract:empty " + params["splitClauses"])
+    eldarica_parameters_list.append("-getHornGraph:monoDirectionLayerGraph -maxNode:10000 -abstract:empty " + params["splitClauses"])
+    eldarica_parameters_list.append("-getHornGraph:hyperEdgeGraph -generateTemplates -maxNode:10000  -abstract:empty " + params["splitClauses"])
 
-    file_list_for_horn_graph_generation = list(filter(lambda x: len(x) != 0, file_list_with_parameters))
-    print("file_list_for_horn_graph_generation", len(file_list_for_horn_graph_generation))
-    run_eldarica_with_shell_pool_with_file_list(params["thread_number"], run_eldarica_with_shell, file_list_for_horn_graph_generation) #continuous extracting
+    file_list=[]
+    for f in params["file_list"]:
+        if "normalized" not in f and "simplified" not in f and not os.path.exists(f + suffix + "." + params["graph_type"] + ".JSON.zip"):
+            file_list.append(f)
+    print("file_list_for_horn_graph_generation", len(file_list),file_list)
+    split_clause_option=params["splitClauses"]
+    runtime=1
+    move_file=True
+    shell_timeout=params["timeout"]
+    for file in file_list:
+        for eldarica_parameters in eldarica_parameters_list:
+            file_and_param = [file, eldarica_parameters, shell_timeout, move_file, runtime, split_clause_option]
+            run_eldarica_with_shell(file_and_param)
 
 def call_eldarica(file,parameter_list,message="",supplementary_command=[]):
     print("call eldarica for " + message,file)
@@ -166,15 +225,15 @@ def call_eldarica_in_batch(file_list,parameter_list=["-abstract", "-noIntervals"
     for file in file_list:
         call_eldarica(file, parameter_list)
 
-def filter_file_list_by_max_node(file_list,max_nodes_per_batch,separateByPredicates="",benchmark_fold="",data_fold=["test_data"]):
+def filter_file_list_by_max_node(file_list,max_nodes_per_batch,separateByPredicates="",benchmark_fold="",data_fold=["test_data"],graph_type="hyperEdgeGraph"):
     suffix=""
     if separateByPredicates:
         file_list = []
         for df in data_fold:
-            file_list=file_list+glob.glob("../benchmarks/"+benchmark_fold+"/"+df+"/*.hyperEdgeHornGraph.JSON.zip")
+            file_list=file_list+glob.glob("../benchmarks/"+benchmark_fold+"/"+df+"/*."+graph_type+".JSON.zip")
         file_list = [file[:-len(".zip")] for file in file_list]
     else:
-        suffix=".hyperEdgeHornGraph.JSON"
+        suffix="."+graph_type+".JSON"
     filtered_file_list=[]
     for file in file_list:
         file_name=file + suffix
@@ -189,10 +248,9 @@ def filter_file_list_by_max_node(file_list,max_nodes_per_batch,separateByPredica
     return list(set(filtered_file_list))
 
 
-
 def run_eldarica_with_shell_pool(filePath, fun, eldarica_parameters,timeout=60,thread=4,countinous_extract=True,
-                                 graphtype="hyperEdgeHornGraph",runtime=1):
-    file_list = []
+                                 graphtype="hyperEdgeGraph",runtime=1):
+    param_list = []
     for root, subdirs, files in os.walk(filePath):
         if len(subdirs) == 0:
 
@@ -205,13 +263,13 @@ def run_eldarica_with_shell_pool(filePath, fun, eldarica_parameters,timeout=60,t
                 for file in glob.glob(root + "/*.smt2.zip"):
                     #if not os.path.exists(file + ".circles.gv"):
                     file_name=file[:-len(".zip")]
-                    if not os.path.exists(file_name +".circles.gv.zip") :
-                        file_list.append([file_name,eldarica_parameters,timeout,True,runtime])
+                    if not os.path.exists(file_name +".gv.zip") :
+                        param_list.append([file_name,eldarica_parameters,timeout,True,runtime])
             else:
                 for file in glob.glob(root + "/*.smt2.zip"):
-                    file_list.append([file,eldarica_parameters,timeout,True,runtime])
-    run_eldarica_with_shell_pool_with_file_list(thread,fun,file_list)
-    return file_list
+                    param_list.append([file,eldarica_parameters,timeout,True,runtime])
+    run_eldarica_with_shell_pool_with_file_list(thread,fun,param_list)
+    return param_list
 
 def run_eldarica_with_shell_pool_with_file_list(thread,fun,file_list):
     pool = Pool(processes=thread)
@@ -221,6 +279,7 @@ def run_eldarica_with_shell_pool_with_file_list(thread,fun,file_list):
 def run_eldarica_with_shell(file_and_param):
     move_file= (lambda : file_and_param[3] if len(file_and_param)>3 else True)()
     runtime = (lambda: file_and_param[4] if len(file_and_param) > 4 else 1)()
+    split_clause_option = (lambda: file_and_param[5] if len(file_and_param) > 5 else "")()
     file = file_and_param[0]
     for f in glob.glob(file+"*"):
         unzip_file(f)
@@ -229,6 +288,8 @@ def run_eldarica_with_shell(file_and_param):
     # file = "../benchmarks/ulimit-test/Problem19_label06_true-unreach-call.c.flat_000.smt2"
     file_name = file[file.rfind("/") + 1:]
     parameter_list = file_and_param[1]
+    parameter_list=changeEldaricaOptionBySolvingTime(file,parameter_list,split_clause_option)
+    #parameter_list=parameter_list+ " -log:1"
     timeout=file_and_param[2]
     shell_file_name = "run-ulimit" + "-" + file_name + ".sh"
     timeout_command = "timeout "+str(timeout)
@@ -250,13 +311,15 @@ def run_eldarica_with_shell(file_and_param):
     os.remove(shell_file_name)
 
     if move_file==True:
-        if used_time>timeout and os.path.exists(file) and (not os.path.exists(file+"circles.gv")):
+        if used_time>timeout and os.path.exists(file) and (not os.path.exists(file+".gv")):
             new_file="../benchmarks/exceptions/shell-timeout/"+file_name
             os.rename(file,new_file)
             print("extracting " + file_name + " failed due to time out, move file to shell-timeout")
             #compress
             file_compress([new_file], new_file + ".zip")
             os.remove(new_file)
+            delete_relative_files(file)
+
 
     # compress files
     if os.path.exists(file):
@@ -264,6 +327,37 @@ def run_eldarica_with_shell(file_and_param):
         for f in file_list:
             file_compress([f], f + ".zip")
             os.remove(f)
+
+
+def changeEldaricaOptionBySolvingTime(file,parameter_list,split_clause_option):
+    #use abstract option according to solving time
+    json_file = file + ".solvingTime.JSON"
+    if os.path.exists(json_file) and "-abstract" not in parameter_list:
+        abstracOptionDict = {"solvingTime_RelationalEqs_splitClauses_0": "-abstract:relEqs -splitClauses:0",
+                             "solvingTime_RelationalEqs_splitClauses_1": "-abstract:relEqs -splitClauses:1",
+                             "solvingTime_Octagon_splitClauses_0": "-abstract:oct -splitClauses:0",
+                             "solvingTime_Octagon_splitClauses_1": "-abstract:oct -splitClauses:1",
+                             "solvingTime_RelationalIneqs_splitClauses_0": "-abstract:relIneqs -splitClauses:0",
+                             "solvingTime_RelationalIneqs_splitClauses_1": "-abstract:relIneqs -splitClauses:1",
+                             "solvingTime_Term_splitClauses_0": "-abstract:term -splitClauses:0",
+                             "solvingTime_Term_splitClauses_1": "-abstract:term -splitClauses:1"}
+        maxKeyValue = ["", 60*60*3*1000*10]
+        # print("read",json_file)
+        with open(json_file) as f:
+            loaded_graph = json.load(f)
+            for k in loaded_graph:
+                #print(k,np.array(loaded_graph[k]))
+                if "solvingTime" in k and split_clause_option in k:
+                    solvingTime = int(np.array(loaded_graph[k])[0])
+                    if solvingTime < maxKeyValue[1]:
+                        maxKeyValue[0] = k
+                        maxKeyValue[1] = solvingTime
+        # add abstract and splitClause otpion
+        print(file, "maxKeyValue", maxKeyValue[0],":", maxKeyValue[1])
+        parameter_list = parameter_list + " " + abstracOptionDict[maxKeyValue[0]]
+        return parameter_list
+    else:
+        return parameter_list
 
 
 def run_eldarica_with_shell_get_measurement(file_and_param):
@@ -333,7 +427,11 @@ def run_eldarica_with_shell_get_measurement(file_and_param):
             file_compress([f], f + ".zip")
             os.remove(f)
 
-
+def delete_relative_files(f):
+    relative_files = glob.glob(f + "*")
+    for file in relative_files:
+        if os.path.exists(file):
+            os.remove(file)
 
 def run_eldarica_with_shell_get_solvability(file_and_param):
     #todo:debug for ""File is not a zip file""
@@ -407,6 +505,7 @@ def run_eldarica_with_shell_get_solvability(file_and_param):
 
 
 def call_Eldarica_one_time(file_name,parameter_list,supplementary_command,runtime_progress):
+    print("-" * 20)
     print("extracting " + file_name, parameter_list,runtime_progress)
     start = time.time()
     eld = subprocess.Popen(supplementary_command, stdout=subprocess.DEVNULL, shell=False)
@@ -437,6 +536,8 @@ def unzip_file(zip_file):
             zip_ref.extractall(os.path.dirname(zip_file))
     else:
         print("zip file "+zip_file+" not existed")
+
+
 
 
 

@@ -19,7 +19,7 @@ def main():
     # file_list=[f[0] for f in file_list]
     # for f in file_list:
     #     print(f)
-    #     commmand="dot -Tpng " + f + ".hyperEdgeHornGraph.gv -o "+ f+".png"
+    #     commmand="dot -Tpng " + f + ".hyperEdgeGraph.gv -o "+ f+".png"
     #     os.system(commmand)
 
 

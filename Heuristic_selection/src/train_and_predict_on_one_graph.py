@@ -36,7 +36,7 @@ def wrapped_train_and_predict_on_one_graph(benchmark,num_layers):
     parameter_list.append(
         parameters(relative_path="../benchmarks/" + benchmark_name,
                    absolute_path="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/" + benchmark_name,
-                   json_type=".hyperEdgeHornGraph.JSON", label=label,
+                   json_type=".hyperEdgeGraph.JSON", label=label,
                    label_field=label_field))
 
     GPU_switch(GPU)

@@ -6,7 +6,8 @@ import tf2_gnn
 from tf2_gnn.data import DataFold, HornGraphDataset
 from tf2_gnn.cli_utils.training_utils import train, log_line, make_run_id
 from tf2_gnn.models import  InvariantNodeIdentifyTask
-from utils import plot_confusion_matrix,get_recall_and_precision,plot_ROC,assemble_name,my_round_fun
+from utils import get_recall_and_precision,assemble_name
+from utils_tf import plot_confusion_matrix,plot_ROC,my_round_fun
 import numpy as np
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt

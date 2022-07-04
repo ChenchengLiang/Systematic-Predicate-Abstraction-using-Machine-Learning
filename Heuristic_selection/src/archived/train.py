@@ -1,6 +1,5 @@
 
 import os
-import gensim
 
 from Miscellaneous import pickleRead
 from plot import plotHistory

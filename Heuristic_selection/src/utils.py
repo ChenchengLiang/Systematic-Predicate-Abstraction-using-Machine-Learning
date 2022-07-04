@@ -8,77 +8,6 @@ import glob
 import os
 import time
 import seaborn
-from sklearn.metrics import confusion_matrix,multilabel_confusion_matrix
-
-
-def get_solvability_and_measurement_from_eldarica(params):
-
-    # -measurePredictedPredicates -varyGeneratedPredicates
-    check_solvability_parameter_list=params["checkSolvability"] + " " + params["separateByPredicates"] + " " + params["measurePredictedPredicates"] \
-                                     + " " + params["onlyInitialPredicates"] + " " + params["generateTemplates"] + " " + params["abstract"] + " " + \
-                                     params["noIntervals"] + " -solvabilityTimeout:" + params["solvabilityTimeout"]
-
-    file_list_with_parameters = (lambda: [
-        [file, check_solvability_parameter_list, params["timeout"], params["move_file"]] if not os.path.exists(
-            file + ".solvability.JSON.zip") else [] for
-        file in params["filtered_file_list"]] if params["continuous_extracting"] == True
-    else [[file, check_solvability_parameter_list, params["timeout"], params["move_file"]] for
-          file in params["filtered_file_list"]])()
-    file_list_for_solvability_check = list(filter(lambda x: len(x) != 0, file_list_with_parameters))
-    print("file_list_for_solvability_check", len(file_list_for_solvability_check))
-    run_eldarica_with_shell_pool_with_file_list(params["thread_number"], run_eldarica_with_shell, file_list_for_solvability_check)
-
-def wrapped_generate_horn_graph(params):
-    file_list=[]
-    for fold in params["data_fold"]:
-        current_folder="../benchmarks/" + params["benchmark_fold"] + "/"+fold
-        current_file_list=glob.glob(current_folder+"/*.smt2.zip")
-        file_list = file_list + current_file_list
-        # if horn_graph_folder!="": #before continous genereate horn graphs, copy from prepared horn graph
-        #     for f in current_file_list:
-        #         graph_file=f+".hyperEdgeHornGraph.JSON"
-        #         if not os.path.exists(graph_file):
-        #             shutil.copy(os.path.join("../benchmarks/",horn_graph_folder)+"/"+graph_file,current_folder)
-
-    initial_file_number = len(file_list)
-    print("file_list " + str(initial_file_number))
-    file_list=[f[:-len(".zip")] for f in file_list]
-
-    # description: generate horn graph
-    generate_horn_graph_params={"file_list":file_list,"max_nodes_per_batch":params["max_nodes_per_batch"],"move_file":params["move_file"],
-                                "thread_number":params["thread_number"],"generateSimplePredicates":params["generateSimplePredicates"],
-                                "generateTemplates":params["generateTemplates"],"separateByPredicates":params["separateByPredicates"],
-                                "abstract":params["abstract"],"noIntervals":params["noIntervals"],"graph_type":params["graph_type"]}
-    generate_horn_graph(generate_horn_graph_params)
-    suffix = (lambda: "-0" if params["separateByPredicates"] else "")()
-    file_list = [file if os.path.exists(file +suffix + "."+params["graph_type"]+".JSON.zip") else None for file in file_list]
-    file_list = list(filter(None, file_list))
-    file_list_with_horn_graph = "file with horn graph " + str(len(file_list)) + "/" + str(initial_file_number)
-    print("file_list_with_horn_graph", file_list_with_horn_graph)
-    # description: filter files by max_nodes_per_batch
-    filtered_file_list = filter_file_list_by_max_node(file_list, params["max_nodes_per_batch"],separateByPredicates=params["separateByPredicates"],
-                                                      benchmark_fold=params["benchmark_fold"],data_fold=params["data_fold"],graph_type=params["graph_type"])
-    print("filtered_file_list",len(filtered_file_list))
-    return filtered_file_list,file_list_with_horn_graph,file_list
-
-def generate_horn_graph(params):
-    # description: generate horn graph
-    graph_type_eldarica_dirct={"mono-layerHornGraph":"monoDirectionLayerGraph","hyperEdgeHornGraph":"hyperEdgeGraph"}
-    timeout = 60*60  # second
-    move_file_parameter_eldarica = (lambda: " -moveFile " if params["move_file"] == True else " ")()
-    # todo: use intervals and abstract:off -varyGeneratedPredicates
-    eldarica_parameters = "-getHornGraph:"+graph_type_eldarica_dirct[params["graph_type"]]+" "+params["separateByPredicates"]+" "+\
-                          params["generateSimplePredicates"] +" "+params["generateTemplates"]+" " + move_file_parameter_eldarica + " -maxNode:" + str(
-        params["max_nodes_per_batch"]) + " "+params["abstract"] +" "+params["noIntervals"]+" -mainTimeout:3600"
-    suffix = (lambda: "-0" if params["separateByPredicates"] else "")()
-
-    file_list_with_parameters = [
-        [file, eldarica_parameters, timeout, params["move_file"]] if not os.path.exists(file+suffix + "."+params["graph_type"]+".JSON.zip") else []
-        for file in params["file_list"]]
-
-    file_list_for_horn_graph_generation = list(filter(lambda x: len(x) != 0, file_list_with_parameters))
-    print("file_list_for_horn_graph_generation", len(file_list_for_horn_graph_generation))
-    run_eldarica_with_shell_pool_with_file_list(params["thread_number"], run_eldarica_with_shell, file_list_for_horn_graph_generation) #continuous extracting
 
 def call_eldarica(file,parameter_list,message="",supplementary_command=[]):
     print("call eldarica for " + message,file)
@@ -91,83 +20,10 @@ def call_eldarica_in_batch(file_list,parameter_list=["-abstract", "-noIntervals"
     for file in file_list:
         call_eldarica(file, parameter_list)
 
-def filter_file_list_by_max_node(file_list,max_nodes_per_batch,separateByPredicates="",benchmark_fold="",data_fold=["test_data"],graph_type="hyperEdgeHornGraph"):
-    suffix=""
-    if separateByPredicates:
-        file_list = []
-        for df in data_fold:
-            file_list=file_list+glob.glob("../benchmarks/"+benchmark_fold+"/"+df+"/*."+graph_type+".JSON.zip")
-        file_list = [file[:-len(".zip")] for file in file_list]
-    else:
-        suffix="."+graph_type+".JSON"
-    filtered_file_list=[]
-    for file in file_list:
-        file_name=file + suffix
-        unzip_file(file_name+".zip")
-        with open(file_name) as f:
-            loaded_graph = json.load(f)
-            if len(loaded_graph["nodeIds"]) < max_nodes_per_batch:
-                filtered_file_list.append(file[:file.rfind("smt2") + 4])
-        if os.path.exists(file_name+".zip"):
-            os.remove(file_name)
-
-    return list(set(filtered_file_list))
-
-def plot_scatter(true_Y,predicted_Y,name="",range=[0,0],x_label="True Values",y_label="Predictions"):
-    #a = plt.axes(aspect='equal')
-    upperBound=np.max([np.max(true_Y), np.max(predicted_Y)])
-    plt.scatter(true_Y, predicted_Y,marker="x",s=10)#s=10,marker="x"
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.grid(linewidth = 0.5)
-    plt.plot([0, upperBound], [0, upperBound],color="black", linewidth=0.5)
-    plt.xlim([0,upperBound])
-    plt.ylim([0,upperBound])
-    # small_lims = range
-    # lims = np.logspace(0, np.max([np.max(true_Y), np.max(predicted_Y)]), num=10)
-    # #lims = [0, np.max([np.max(true_Y), np.max(predicted_Y)])]
-    # lims = (lambda : small_lims if range!=[0,0] else lims)()
-    # plt.xlim(lims)
-    # plt.ylim(lims)
-    # _ = plt.plot(lims, lims)
-    plt.savefig("trained_model/" + name+ "-scatter.png")
-    plt.clf()
-
-def plot_confusion_matrix(predicted_Y_loaded_model,true_Y,saving_path,recall=0,precision=0,f1_score=0,threshold=0.5,label="template_relevance",accuracy=0):
-    predicted_Y_loaded_model = my_round_fun(np.array(predicted_Y_loaded_model),label=label)
-    #predicted_Y_loaded_model =  list(map(my_round_fun,np.array(predicted_Y_loaded_model)))#tf.math.round(predicted_Y_loaded_model)
-    if label=="node_multiclass":
-        predicted_Y_loaded_model=[np.argmax(x) for x in predicted_Y_loaded_model]
-        true_Y = [np.argmax(x) for x in true_Y]
-        cm = confusion_matrix(true_Y, predicted_Y_loaded_model)
-    else:
-        cm = confusion_matrix(true_Y, predicted_Y_loaded_model)
-    plt.figure(figsize=(5, 5))
-    seaborn.heatmap(cm, annot=True, fmt="d")
-    plt.title("recall:"+str(recall)+", precision:"+str(precision)+",f1_score:"+str(f1_score))
-    plt.ylabel('Actual label')
-    plt.xlabel('Predicted label' + ",acc:"+str(accuracy))
-    plt.savefig(saving_path)
-    plt.clf()
-    seaborn.reset_defaults()
-def plot_ROC(FP_rate,TP_rate,saving_path):
-    plt.clf()
-    plt.xlabel('FP rate')
-    plt.ylabel('TP rate')
-    plt.xlim([0,1])
-    plt.ylim([0,1])
-    plt.plot(FP_rate,TP_rate, label="ROC")
-    plt.scatter(FP_rate, TP_rate)
-    plt.legend()
-    plt.savefig(saving_path)
-    plt.clf()
-
 
 
 def run_eldarica_with_shell_pool(filePath, fun, eldarica_parameters,timeout=60,thread=4,countinous_extract=True,
-                                 graphtype="hyperEdgeHornGraph",runtime=1):
+                                 graphtype="hyperEdgeGraph",runtime=1):
     file_list = []
     for root, subdirs, files in os.walk(filePath):
         if len(subdirs) == 0:
@@ -257,43 +113,6 @@ def file_compress(inp_file_names, out_zip_file):
         print("*** Exception occurred during zip process -" ,str(e))
     finally:
         zf.close()
-def get_statistic_data(file_list,benchmark_fold="",separateByPredicates="",max_nodes_per_batch=10000,graph_type="hyperEdgeHornGraph"):
-    true_label = []
-    predicted_label = []
-    predicted_label_logit=[]
-    file_list=glob.glob("../benchmarks/"+benchmark_fold+"/test_data/*."+graph_type+".JSON")
-    for file in file_list:
-        with open(file) as f:
-            loaded_graph = json.load(f)
-            if len(loaded_graph["nodeIds"])< max_nodes_per_batch:
-                predicted_label.append(loaded_graph["predictedLabel"])
-                true_label.append(loaded_graph["templateRelevanceLabel"])
-                predicted_label_logit.append(loaded_graph["predictedLabelLogit"])
-    true_label = flattenList(true_label)
-    predicted_label = flattenList(predicted_label)
-    predicted_label_logit = flattenList(predicted_label_logit)
-    predicted_label_logit=[float(l) for l in predicted_label_logit]
-
-    recall,precision,f1_score,false_positive_rate=get_recall_and_precision(true_label, predicted_label,verbose=True)
-
-    #saving_path_confusion_matrix="../benchmarks/"+benchmark_fold+"/confusion-matrix.png"
-    #saving_path_roc = "../benchmarks/" + benchmark_fold + "/ROC.png"
-    saving_path_confusion_matrix="trained_model/"+benchmark_fold+"-confusion-matrix.png"
-    saving_path_roc="trained_model/"+benchmark_fold+"-ROC.png"
-    plot_confusion_matrix(predicted_label,true_label,saving_path_confusion_matrix,recall,precision,f1_score)
-    #ROC
-    false_positive_rate_list=[]
-    recall_list=[]
-    step=0.05
-    for t in np.arange(0,1+step,step):
-        predicted_label_with_threshold=[1 if l>=t else 0 for l in predicted_label_logit]
-        recall, precision, f1_score, false_positive_rate = get_recall_and_precision(true_label, predicted_label_with_threshold)
-        recall_list.append(recall)
-        false_positive_rate_list.append(false_positive_rate)
-    recall_list.append(0)
-    false_positive_rate_list.append(0)
-    plot_ROC(false_positive_rate_list,recall_list,saving_path_roc)
-
 
 def get_recall_and_precision(true_label,predicted_label,verbose=False):
     truePositive, trueNegative, faslePositive, falseNegative = 0, 0, 0, 0
@@ -348,39 +167,6 @@ def read_minimizedPredicateFromCegar(fild_name, json_solvability_obj_list):
         s[fild_name]
         for s in json_solvability_obj_list]
     return list(map(lambda x: int(x), minimizedPredicateFromCegar_for_empty_initial_predicates))
-def get_recall_scatter(solvability_name_fold,json_solvability_obj_list,filtered_file_list):
-    # description: how many predicates used in end
-    print("----- out of test set recall info -----")
-    minimizedPredicateFromCegar_name_list = ["minimizedPredicateFromCegar" + name + "InitialPredicates" for name in
-                                             solvability_name_fold]
-
-    minimizedPredicateFromCegar_list = {name: read_minimizedPredicateFromCegar(name, json_solvability_obj_list) for name
-                                        in minimizedPredicateFromCegar_name_list}
-    initialPredicatesUsedInMinimizedPredicateFromCegar_list = {
-        name: read_minimizedPredicateFromCegar("initialPredicatesUsedInM" + name[1:], json_solvability_obj_list) for
-        name in minimizedPredicateFromCegar_name_list}
-    for name in minimizedPredicateFromCegar_name_list:
-        print("number of initial predicates in minimized predicates/minimized predicates," + name[len(
-            "minimizedPredicateFromCegar"):] + ":" + str(
-            sum(initialPredicatesUsedInMinimizedPredicateFromCegar_list[name])) + "/" + str(
-            sum(minimizedPredicateFromCegar_list[name])))
-        print(str(initialPredicatesUsedInMinimizedPredicateFromCegar_list[name]))
-        print(str(minimizedPredicateFromCegar_list[name]))
-    scatter_plot_range = [0, 0]
-    for name in minimizedPredicateFromCegar_name_list:
-        fold_name = name[len("minimizedPredicateFromCegar"):]
-        plot_scatter(minimizedPredicateFromCegar_list[name],
-                     initialPredicatesUsedInMinimizedPredicateFromCegar_list[name],
-                     name=fold_name + "_used_in_the_end", range=scatter_plot_range,
-                     x_label="minimized_useful_predicate_number", y_label=fold_name + "_predicates")
-        print("initialPredicatesUsedInMinimizedPredicate > minimizedPredicateFromCegar", name)
-        f_number=0
-        for i, (x, y) in enumerate(zip(minimizedPredicateFromCegar_list[name],
-                                       initialPredicatesUsedInMinimizedPredicateFromCegar_list[name])):
-            if x < y:
-                f_number=f_number+1
-                #print(filtered_file_list[i])
-        print(f_number)
 
 def flattenList(t):
     return [item for sublist in t for item in sublist]
@@ -396,14 +182,7 @@ def mutual_differences(set_1,set_2):
     set_2=set(set_2)
     return set_1.difference(set_2).union(set_2.difference(set_1))
 
-def my_round_fun(num_list,threshold=0.5,label="template_relevance"):
-    if label=="node_multiclass":
-        num_list=np.array(num_list[0])
-        return [np.where(r==max(r),1,0)for r in num_list]
-    elif label=="predicate_occurrence_in_clauses":
-        return num_list
-    else:
-        return list(np.where(num_list > threshold, 1, 0))
+
 
 def print_multiple_object(d):
     for k in d:

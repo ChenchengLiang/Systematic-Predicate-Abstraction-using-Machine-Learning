@@ -14,11 +14,14 @@ def main():
         for t in range(0,int(command_input2)+1):
             json_file='../benchmarks/exceptions/benchmark_info_' + "thread_"+str(t) + '.JSON'
             print(json_file)
-            with open(json_file) as f:
-                loaded_content=json.load(f)
-                for fold in benchmark_folds:
-                    new_dict[fold]= (lambda : new_dict[fold]+loaded_content[fold] if new_dict.get(fold)!=None else loaded_content[fold])()
-                    new_dict[fold]=list(set(new_dict[fold]))
+            try:
+                with open(json_file) as f:
+                    loaded_content=json.load(f)
+                    for fold in benchmark_folds:
+                        new_dict[fold]= (lambda : new_dict[fold]+loaded_content[fold] if new_dict.get(fold)!=None else loaded_content[fold])()
+                        new_dict[fold]=list(set(new_dict[fold]))
+            except:
+                get_solvability_log(["train_data","valid_data","test_data"], "thread_"+str(t))
 
         sorted_dict={}
         for fold in benchmark_folds:
@@ -60,8 +63,9 @@ def compress_files_in_exceptions():
     for benchmark in benckmarks:
         from utils import file_compress
         for f in glob.glob("../benchmarks/" + benchmark + "/*"):
-            file_compress([f], f + ".zip")
-            os.remove(f)
+            if ".zip" not in f:
+                file_compress([f], f + ".zip")
+                os.remove(f)
 
 
 

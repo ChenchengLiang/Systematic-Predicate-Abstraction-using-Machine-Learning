@@ -74,7 +74,7 @@ def main():
     # parameters['regression_mlp_dropout'] = 0.1
     # parameters["regression_mlp_layers"]= [64, 32]
 
-    parameters['graph_type'] = "hyperEdgeHornGraph"
+    parameters['graph_type'] = "hyperEdgeGraph"
     hyper_parameters["num_node_target_labels"] = 2
     parameters["num_node_target_labels"] = hyper_parameters["num_node_target_labels"]
     parameters["pickle"] = True

@@ -7,8 +7,9 @@ from utils import call_eldarica
 from Miscellaneous import add_JSON_field, GPU_switch, pickleRead, pickleWrite
 from horn_dataset import write_graph_to_pickle, form_GNN_inputs_and_labels, get_test_loss_with_class_weight, \
     compute_loss, HornGraphDataset
-from utils import my_round_fun, plot_scatter, file_compress, unzip_file,plot_confusion_matrix,get_recall_and_precision,plot_ROC
-from utils_tf import get_classification_accuracy
+from plot import plot_scatter
+from utils import file_compress, unzip_file,get_recall_and_precision
+from utils_tf import get_classification_accuracy,my_round_fun,plot_confusion_matrix,plot_ROC
 
 def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score_list,graph_type=".layerHornGraph.JSON"):
     # write predicted_argument_score to JSON file
@@ -101,17 +102,20 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
                      "argumentOccurrence", "predicateIndices", "predicateOccurrenceInClause",
                      "predicateStrongConnectedComponent",
                      "argumentBoundList", "argumentBinaryOccurrenceList", "templateIndices", "templateRelevanceLabel", #"templateCostLabel",
+                     "verifHintTplPredEdges", "verifHintTplPredPosNegEdges", "verifHintTplEqTermEdges",
+                     "verifHintTplInEqTermEdges", "verifHintTplInEqTermPosNegEdges", "templateEdges",
                      "clauseIndices","clauseBinaryOccurrenceInCounterExampleList",
                      "binaryAdjacentList",
                      "ternaryAdjacencyList",
                      "dummyFiled"]
 
-        if graph_type[1:-5]=="hyperEdgeHornGraph":
+        if graph_type[1:-5]=="hyperEdgeGraph":
             old_field=old_field+["argumentEdges","guardASTEdges","dataFlowASTEdges","templateASTEdges","controlFlowHyperEdges","dataFlowHyperEdges",
                                  "ASTEdges","AST_1Edges","AST_2Edges", "templateEdges","verifHintTplEqTermEdges","verifHintTplInEqTermEdges","verifHintTplPredPosNegEdges",
                                  "controlLocationEdgeForSCC","predicateTransitiveEdges"]
         else:
-            old_field=old_field+["predicateArgumentEdges","predicateInstanceEdges"]
+            old_field=old_field+["predicateArgumentEdges","predicateInstanceEdges","argumentInstanceEdges","controlHeadEdges","controlBodyEdges","controlArgumentEdges",
+                                 "subTermEdges","guardEdges","dataEdges"]
         json_file_name=file_name+graph_type
         if os.path.exists(json_file_name + ".zip"):
             unzip_file(json_file_name + ".zip")
@@ -184,13 +188,13 @@ def write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,la
     return best_set_threshold
 
 def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",label="template_relevance",force_read=True,form_label=True,
-                       json_type=".hyperEdgeHornGraph.JSON",graph_type="hyperEdgeHornGraph",verbose=False,
+                       json_type=".hyperEdgeGraph.JSON",graph_type="hyperEdgeGraph",verbose=False,
                        gathered_nodes_binary_classification_task=["template_relevance"],hyper_parameter={},
                        set_max_nodes_per_batch=False,file_list=[],num_node_target_labels=2):
 
     path = "../benchmarks/" + benchmark_fold + "/"
     benchmark_name = path[len("../benchmarks/"):-1]
-    parameters = pickleRead(benchmark + "-" + label + "-parameters", "../src/trained_model/")
+    parameters = pickleRead(benchmark + "-" +graph_type+"-"+ label + "-parameters", "../src/trained_model/")
     parameters["benchmark"] = benchmark_name
     print("vocabulary size:", parameters["node_vocab_size"])
 
@@ -283,11 +287,11 @@ def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",labe
 
 
 def predict_label(benchmark,max_nodes_per_batch,benchmark_fold,file_list,trained_model_path,use_test_threshold,label = "template_relevance",
-                  separateByPredicates="",verbose=True,num_node_target_labels=2,GPU=False,graph_type="hyperEdgeHornGraph"):
+                  separateByPredicates="",verbose=True,num_node_target_labels=2,GPU=False,graph_type="hyperEdgeGraph"):
     if separateByPredicates:
         file_list=[]
     # read best threshold from pickle
-    parameters = pickleRead(benchmark + "-" + label + "-parameters", "../src/trained_model/")
+    parameters = pickleRead(benchmark + "-"+ graph_type + "-" + label + "-parameters", "../src/trained_model/")
     print("parameters",parameters)
     hyper_parameter = {"max_nodes_per_batch": max_nodes_per_batch,
                        "best_threshold_set": (lambda : parameters["best_threshold_set"] if use_test_threshold== True else {"threshold":0.5,"accuracy":0})(),

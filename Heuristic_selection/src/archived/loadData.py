@@ -6,19 +6,18 @@ import keras as k
 import os,shutil
 from keras.preprocessing.text import text_to_word_sequence,Tokenizer,hashing_trick,one_hot
 from keras.preprocessing.sequence import pad_sequences
-from keras.models import Model,load_model
+from keras.models import Model
 import glob
 import random
-import gensim
 import nltk
-from graphProcessing import readGraphFromGraphvizFromTrainData,getGraphEmbeddingNode2vec,callEldaricaGenerateGraphs,getGraphNode2vecWalks
+from graphProcessing import readGraphFromGraphvizFromTrainData, getGraphNode2vecWalks
 nltk.download('punkt')
 import logging
 from collections import Counter
 from datetime import datetime
 from keras.layers import Conv1D, Dense,Input,concatenate, Flatten
 from Miscellaneous import data2list, recoverPredictedText,printOnePredictedTextInStringForm,\
-    doc2vecModelInferNewData,testAccuracy,pickleWrite,pickleRead,printList,sortHints
+    doc2vecModelInferNewData,testAccuracy,pickleWrite
 from plot import plotHistory
 #from trainDoc2VecModel import trainDoc2VectModel
 from distutils.dir_util import copy_tree
@@ -421,7 +420,7 @@ def readHornClausesAndHints_graph_predict(path,dataset,discardNegativeData=False
 
         # read program graph
         print(fileGraph)
-        from graphProcessing import readGraphFromGraphvizFromTrainData,getGraphEmbeddingNode2vec
+        from graphProcessing import readGraphFromGraphvizFromTrainData
         graph = readGraphFromGraphvizFromTrainData(fileGraph, vitualize=False)
         #graphEmbededProgram=getGraphEmbeddingNode2vec(graph, dimension=100,p=False)
         programGraphWalks = getGraphNode2vecWalks(graph, dimension=100)
@@ -467,7 +466,7 @@ def readHornClausesAndHints_graph_predict(path,dataset,discardNegativeData=False
 
         # read program graph
         print(fileGraph)
-        from graphProcessing import readGraphFromGraphvizFromTrainData,getGraphEmbeddingNode2vec
+        from graphProcessing import readGraphFromGraphvizFromTrainData
         graph = readGraphFromGraphvizFromTrainData(fileGraph, vitualize=False)
         #graphEmbededProgram=getGraphEmbeddingNode2vec(graph, dimension=100,p=False)
         programGraphWalks = getGraphNode2vecWalks(graph, dimension=100)
