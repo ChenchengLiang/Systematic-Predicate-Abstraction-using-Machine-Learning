@@ -5,6 +5,7 @@ from multiprocessing import Pool
 import glob
 import os
 import time
+from measurement_functions import read_measurement_from_JSON
 
 
 
@@ -23,20 +24,19 @@ def get_solvability_and_measurement_from_eldarica(params):
     check_solvability_parameter_list.append("-checkSolvability  -abstract:relEqs -t:" + str(params["timeout"]) + " -getHornGraph:monoDirectionLayerGraph")
     check_solvability_parameter_list.append("-checkSolvability  -abstract:relIneqs -t:" + str(params["timeout"]) + " -getHornGraph:monoDirectionLayerGraph")
     check_solvability_parameter_list.append("-checkSolvability  -abstract:mined -t:" + str(params["timeout"]) + " -getHornGraph:monoDirectionLayerGraph")
-    check_solvability_parameter_list.append("-checkSolvability  -abstract:off -t:" + str(params["timeout"]) + " -getHornGraph:monoDirectionLayerGraph")
-
+    #check_solvability_parameter_list.append("-checkSolvability  -abstract:off -t:" + str(params["timeout"]) + " -getHornGraph:monoDirectionLayerGraph")
     # one thread
     for file in params["filtered_file_list"]:
         for check_solvability_parameter in check_solvability_parameter_list:
-            file_and_param = [file, check_solvability_parameter, params["timeout"], params["move_file"], 1,
+            file_and_param = [file, check_solvability_parameter, params["shell_timeout"], params["move_file"], 1,
                               params["splitClauses"]]
             run_eldarica_with_shell(file_and_param)
 
 
     # multi-thread
-    check_solvability_parameter_list=params["checkSolvability"] + " " + params["separateByPredicates"] + " " + params["measurePredictedPredicates"] \
-                                     + " " + params["onlyInitialPredicates"] + " " + params["generateTemplates"] + " " + params["abstract"] + " " + \
-                                     params["noIntervals"] + " -solvabilityTimeout:" + params["solvabilityTimeout"] + " " + params["getHornGraph"]
+    # check_solvability_parameter_list=params["checkSolvability"] + " " + params["separateByPredicates"] + " " + params["measurePredictedPredicates"] \
+    #                                  + " " + params["onlyInitialPredicates"] + " " + params["generateTemplates"] + " " + params["abstract"] + " " + \
+    #                                  params["noIntervals"] + " -solvabilityTimeout:" + params["solvabilityTimeout"] + " " + params["getHornGraph"]
     # file_list_with_parameters = (lambda: [
     #     [file, check_solvability_parameter_list, params["timeout"], params["move_file"]] if not os.path.exists(
     #         file + ".solvability.JSON.zip") else [] for
@@ -50,6 +50,52 @@ def get_solvability_and_measurement_from_eldarica(params):
 
 
 
+def read_solvability(filtered_file_list,benchmark_fold,splitClauses):
+    json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
+    abstract_option = ["Empty", "Term", "Octagon", "RelationalEqs", "RelationalIneqs", "Random", "Unlabeled", "Labeled",
+                       "PredictedCG", "PredictedCDHG", "Mined"]
+    solvability_summary = {
+        op: {"solvable_number": 0, "solvable_list": [], "unique_solvable_number": 0, "unique_solvable_list": []} for op
+        in abstract_option}
+    print("json_solvability_obj_list", json_solvability_obj_list)
+    splitClauses_name = "_splitClauses_1" if splitClauses == "-splitClauses:1" else "_splitClauses_0"
+    for f in json_solvability_obj_list:
+        for op in abstract_option:
+            if list(f["solvability_" + op + splitClauses_name])[0] == "1":
+                solvability_summary[op]["solvable_number"] = solvability_summary[op]["solvable_number"] + 1
+                solvability_summary[op]["solvable_list"].append(
+                    f["file_name"][f["file_name"].rfind("/") + 1:-len(".solvability.JSON")])
+
+    # get unique solved list by differernt abstract option
+    for i in solvability_summary:
+        solvable_set_from_other_option = []
+        for j in solvability_summary:
+            if j != i:
+                solvable_set_from_other_option = solvable_set_from_other_option + solvability_summary[j][
+                    "solvable_list"]
+        solvable_set_from_other_option = list(set(solvable_set_from_other_option))
+        unique_solved_list = set(solvability_summary[i]["solvable_list"]).difference(
+            set(solvable_set_from_other_option))
+        if len(unique_solved_list) != 0:
+            solvability_summary[i]["unique_solvable_number"] = len(unique_solved_list)
+            solvability_summary[i]["unique_solvable_list"] = list(unique_solved_list)
+
+    # write solvalbility summary to json file
+    print("solvability_summary",solvability_summary)
+    summary_json_file_name = "../benchmarks/" + benchmark_fold + "/solvability_summary.JSON"
+    import json
+    with open(summary_json_file_name, 'w') as f:
+        json.dump(solvability_summary, f, indent=4, sort_keys=True)
+
+
+    #write to spreadsheet
+    import pandas as pd
+    list1 = [10, 20, 30, 40]
+    list2 = [40, 30, 20, 10]
+    col1 = "X"
+    col2 = "Y"
+    data = pd.DataFrame({col1: list1, col2: list2})
+    data.to_excel("../benchmarks/" + benchmark_fold + "/solvability_summary.xlsx", sheet_name='sheet1', index=False)
 
 
 def measurement_control_by_python(benchmark_fold):
@@ -195,10 +241,10 @@ def generate_horn_graph(params):
 
     #one thread
     eldarica_parameters_list=[]
-    eldarica_parameters_list.append("-getHornGraph:monoDirectionLayerGraph -extractTemplates -generateTemplates -maxNode:10000 -abstract:empty " +params["splitClauses"])
-    eldarica_parameters_list.append("-getSMT2 -abstract:empty " + params["splitClauses"])
-    eldarica_parameters_list.append("-getHornGraph:monoDirectionLayerGraph -maxNode:10000 -abstract:empty " + params["splitClauses"])
-    eldarica_parameters_list.append("-getHornGraph:hyperEdgeGraph -generateTemplates -maxNode:10000  -abstract:empty " + params["splitClauses"])
+    eldarica_parameters_list.append("-getHornGraph:monoDirectionLayerGraph -extractTemplates -generateTemplates -maxNode:10000 -abstract:empty ")
+    #eldarica_parameters_list.append("-getSMT2 -abstract:empty " )
+    eldarica_parameters_list.append("-getHornGraph:monoDirectionLayerGraph -maxNode:10000 -abstract:empty " )
+    eldarica_parameters_list.append("-getHornGraph:hyperEdgeGraph -maxNode:10000  -abstract:empty " )
 
     file_list=[]
     for f in params["file_list"]:
@@ -432,6 +478,16 @@ def delete_relative_files(f):
     for file in relative_files:
         if os.path.exists(file):
             os.remove(file)
+
+def copy_relative_files(source, des):
+    from shutil import copy
+    try:
+        #copy(source, des)
+        relative_file_list = glob.glob(source + "*")
+        for file in relative_file_list:
+            copy(file, des)
+    except:
+        print("file existed")
 
 def run_eldarica_with_shell_get_solvability(file_and_param):
     #todo:debug for ""File is not a zip file""

@@ -6,8 +6,8 @@ from sklearn.metrics import confusion_matrix,multilabel_confusion_matrix
 import glob
 import json
 from utils import flattenList,get_recall_and_precision
-def get_classification_accuracy(true_Y,rounded_predicted_Y_loaded_model,label,predicted_Y_loaded_model_from_memory,predicted_Y_loaded_model):
-    if label=="node_multiclass":
+def get_classification_accuracy(true_Y,rounded_predicted_Y_loaded_model,label,predicted_Y_loaded_model_from_memory,predicted_Y_loaded_model,gathered_nodes_multi_classification_task):
+    if label in gathered_nodes_multi_classification_task:
         true_Y=np.argmax(true_Y, axis=1)
         rounded_predicted_Y_loaded_model = np.argmax(rounded_predicted_Y_loaded_model, axis=1)
     if len(true_Y)<100:
@@ -23,8 +23,8 @@ def get_classification_accuracy(true_Y,rounded_predicted_Y_loaded_model,label,pr
     print("accuracy", accuracy)
     return accuracy
 
-def my_round_fun(num_list,threshold=0.5,label="template_relevance"):
-    if label=="node_multiclass":
+def my_round_fun(num_list,threshold=0.5,label="template_relevance",gathered_nodes_multi_classification_task=[]):
+    if label in gathered_nodes_multi_classification_task:
         num_list=np.array(num_list[0])
         return [np.where(r==max(r),1,0)for r in num_list]
     elif label=="predicate_occurrence_in_clauses":
@@ -34,10 +34,11 @@ def my_round_fun(num_list,threshold=0.5,label="template_relevance"):
         return tf.math.round(num_list)
 
 
-def plot_confusion_matrix(predicted_Y_loaded_model,true_Y,saving_path,recall=0,precision=0,f1_score=0,threshold=0.5,label="template_relevance",accuracy=0):
-    predicted_Y_loaded_model = my_round_fun(np.array(predicted_Y_loaded_model),label=label)
+def plot_confusion_matrix(predicted_Y_loaded_model,true_Y,saving_path,recall=0,precision=0,f1_score=0,threshold=0.5,
+                          label="template_relevance",accuracy=0,gathered_nodes_multi_classification_task=[]):
+    predicted_Y_loaded_model = my_round_fun(np.array(predicted_Y_loaded_model),label=label,gathered_nodes_multi_classification_task=gathered_nodes_multi_classification_task)
     #predicted_Y_loaded_model =  list(map(my_round_fun,np.array(predicted_Y_loaded_model)))#tf.math.round(predicted_Y_loaded_model)
-    if label=="node_multiclass":
+    if label in gathered_nodes_multi_classification_task:
         predicted_Y_loaded_model=[np.argmax(x) for x in predicted_Y_loaded_model]
         true_Y = [np.argmax(x) for x in true_Y]
         cm = confusion_matrix(true_Y, predicted_Y_loaded_model)
@@ -64,7 +65,7 @@ def plot_ROC(FP_rate,TP_rate,saving_path):
     plt.clf()
 
 
-def get_statistic_data(file_list,benchmark_fold="",separateByPredicates="",max_nodes_per_batch=10000,graph_type="hyperEdgeGraph"):
+def get_statistic_data(file_list,benchmark_fold="",separateByPredicates="",max_nodes_per_batch=10000,graph_type="hyperEdgeGraph",gathered_nodes_multi_classification_task=[]):
     true_label = []
     predicted_label = []
     predicted_label_logit=[]
@@ -87,7 +88,7 @@ def get_statistic_data(file_list,benchmark_fold="",separateByPredicates="",max_n
     #saving_path_roc = "../benchmarks/" + benchmark_fold + "/ROC.png"
     saving_path_confusion_matrix="trained_model/"+benchmark_fold+"-confusion-matrix.png"
     saving_path_roc="trained_model/"+benchmark_fold+"-ROC.png"
-    plot_confusion_matrix(predicted_label,true_label,saving_path_confusion_matrix,recall,precision,f1_score)
+    plot_confusion_matrix(predicted_label,true_label,saving_path_confusion_matrix,recall,precision,f1_score,gathered_nodes_multi_classification_task=gathered_nodes_multi_classification_task)
     #ROC
     false_positive_rate_list=[]
     recall_list=[]

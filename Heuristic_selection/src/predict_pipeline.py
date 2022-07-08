@@ -1,4 +1,4 @@
-from utils_1 import generate_horn_graph,wrapped_generate_horn_graph,get_solvability_and_measurement_from_eldarica
+from utils_1 import generate_horn_graph,wrapped_generate_horn_graph,get_solvability_and_measurement_from_eldarica,read_solvability
 from utils import mutual_differences,flattenList
 from plot import get_recall_scatter,plot_scatter
 import tensorflow as tf
@@ -22,8 +22,16 @@ def predict_pipeline(fold_number=0):
 
     #/home/cheli243/PycharmProjects/HintsLearning/src/
     graph_type = "monoDirectionLayerGraph"  # "hyperEdgeGraph"
-    graph_type_model_pairs={"hyperEdgeGraph":"trained_model/GNN_Argument_selection__2022-06-29_16-31-21_best.pkl",
-                            "monoDirectionLayerGraph":"trained_model/GNN_Argument_selection__2022-06-29_16-40-58_best.pkl"}
+    graph_type_model_pairs={"hyperEdgeGraph":"trained_model/GNN_Argument_selection__2022-07-06_00-19-33_best.pkl",
+                            "monoDirectionLayerGraph":"trained_model/GNN_Argument_selection__2022-07-06_04-59-34_best.pkl"}
+    gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
+                                                 "argument_upper_bound_existence", "argument_occurrence_binary",
+                                                 "template_relevance", "clause_occurrence_in_counter_examples_binary",
+                                                 "template_relevance_boolean_usefulness"]
+    gathered_nodes_multi_classification_task = ["node_multiclass", "template_relevance_Eq_usefulness"]
+    # binary classification and regression's num_node_target_labels is arbitrary
+    label_to_num_node_target_labels = {"template_relevance_boolean_usefulness": 1,
+                                       "template_relevance_Eq_usefulness": 4, "node_multiclass": 5}
     thread_number = 4
     continuous_extracting=True
     move_file = False
@@ -38,73 +46,48 @@ def predict_pipeline(fold_number=0):
     label="node_multiclass"
     num_node_target_labels=5
     verbose=True
-    timeout = 60
+    timeout = 60*60*3
+    shell_timeout=60*60*4
 
     # description: generate both graphs
     wrapped_generate_horn_graph_params={"benchmark_fold":benchmark_fold,"max_nodes_per_batch":max_nodes_per_batch,"separateByPredicates":separateByPredicates,
                                         "abstract":abstract,"move_file":move_file,"thread_number":thread_number,"generateSimplePredicates":generateSimplePredicates,
                                         "generateTemplates":generateTemplates,"data_fold":["test_data"],"horn_graph_folder":"","noIntervals":noIntervals,
-                                        "graph_type":graph_type,"splitClauses":splitClauses,"timeout":60*60}
+                                        "graph_type":graph_type,"splitClauses":splitClauses,"timeout":timeout}
     filtered_file_list, file_list_with_horn_graph, file_list = \
         wrapped_generate_horn_graph(wrapped_generate_horn_graph_params)
 
-
-    for gt in graph_type_model_pairs:
-        # description: predict label one by one
-        # for f in filtered_file_list:
-        #     print("file_name:",f)
-        #     predict_label(benchmark, max_nodes_per_batch, benchmark_fold, [f],graph_type_model_pairs[gt],use_test_threshold,
-        #                   separateByPredicates=separateByPredicates,label=label,verbose=verbose,num_node_target_labels=num_node_target_labels,
-        #                   graph_type=gt)#file_list
-        #     gc.collect()
-        #     tf.keras.backend.clear_session()
-
-        # description: predict label together
-        predict_label(benchmark, max_nodes_per_batch, benchmark_fold, filtered_file_list, graph_type_model_pairs[gt], use_test_threshold,
-                      separateByPredicates=separateByPredicates, label=label, verbose=verbose,
-                      num_node_target_labels=num_node_target_labels,graph_type=gt)  # file_list
+    #
+    # #description: prediction
+    # for gt in graph_type_model_pairs:
+    #     predict_label_params={"benchmark":benchmark,"max_nodes_per_batch":max_nodes_per_batch,"benchmark_fold":benchmark_fold,
+    #                           "file_list":filtered_file_list,"trained_model_path":graph_type_model_pairs[gt],"use_test_threshold":use_test_threshold,
+    #                           "separateByPredicates":separateByPredicates,"label":label,"verbose":verbose,
+    #                           "num_node_target_labels":label_to_num_node_target_labels[label],"GPU":False,"graph_type":gt,
+    #                           "gathered_nodes_binary_classification_task":gathered_nodes_binary_classification_task,
+    #                           "gathered_nodes_multi_classification_task":gathered_nodes_multi_classification_task}
+    #     # description: predict label one by one
+    #     for f in filtered_file_list:
+    #         predict_label_params["file_list"]=[f]
+    #         print("file_name:",f)
+    #         predict_label(predict_label_params)#file_list
+    #         gc.collect()
+    #         tf.keras.backend.clear_session()
+    #
+    #     # description: predict label together
+    #     predict_label(predict_label_params)
 
     # description: get solvability and measurement info with different predicate setting for unseen data
-    get_solvability_and_measurement_from_eldarica_params={"filtered_file_list":filtered_file_list,"thread_number":thread_number,"continuous_extracting":continuous_extracting,
-                                                          "move_file":move_file,"checkSolvability":"-checkSolvability","generateTemplates":generateTemplates,
-                                                          "measurePredictedPredicates":"","onlyInitialPredicates":"","abstract":abstract,"noIntervals":noIntervals,
-                                                          "separateByPredicates":separateByPredicates,"solvabilityTimeout":"300",
-                                                          "timeout":timeout,"splitClauses":splitClauses,"getHornGraph":"-getHornGraph:"+graph_type}#"solvabilityTimeout":"3600","timeout":60*60*4
-    get_solvability_and_measurement_from_eldarica(get_solvability_and_measurement_from_eldarica_params)
+    # get_solvability_and_measurement_from_eldarica_params={"filtered_file_list":filtered_file_list,"thread_number":thread_number,"continuous_extracting":continuous_extracting,
+    #                                                       "move_file":move_file,"checkSolvability":"-checkSolvability","generateTemplates":generateTemplates,
+    #                                                       "measurePredictedPredicates":"","onlyInitialPredicates":"","abstract":abstract,"noIntervals":noIntervals,
+    #                                                       "separateByPredicates":separateByPredicates,"solvabilityTimeout":"300",
+    #                                                       "timeout":timeout,"splitClauses":splitClauses,"getHornGraph":"-getHornGraph:"+graph_type,
+    #                                                       "shell_timeout":shell_timeout}#"solvabilityTimeout":"3600","timeout":60*60*4
+    # get_solvability_and_measurement_from_eldarica(get_solvability_and_measurement_from_eldarica_params)
 
     # description: read solvability results
-    json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
-    abstract_option=["Empty", "Term", "Octagon", "RelationalEqs", "RelationalIneqs","Random","Unlabeled","Labeled","PredictedCG","PredictedCDHG","Mined","Off"]
-    solvability_summary={op:{"solvable_number":0,"solvable_list":[],"unique_solvable_number":0,"unique_solvable_list":[]} for op in abstract_option}
-    print("json_solvability_obj_list",json_solvability_obj_list)
-    splitClauses_name="_splitClauses_1" if splitClauses=="-splitClauses:1" else "_splitClauses_0"
-    for f in json_solvability_obj_list:
-        for op in abstract_option:
-            if list(f["solvability_"+op+splitClauses_name])[0]==1:
-                solvability_summary[op]["solvable_number"]=solvability_summary[op]["solvable_number"]+1
-                solvability_summary[op]["solvable_list"].append(f["file_name"][f["file_name"].rfind("/")+1:-len(".solvability.JSON")])
-
-
-    # get unique solved list by differernt abstract option
-    for i in solvability_summary:
-        solvable_set_from_other_option=[]
-        for j in solvability_summary:
-            if j!=i:
-                solvable_set_from_other_option=solvable_set_from_other_option+solvability_summary[j]["solvable_list"]
-        solvable_set_from_other_option=list(set(solvable_set_from_other_option))
-        unique_solved_list= set(solvability_summary[i]["solvable_list"]).difference(set(solvable_set_from_other_option))
-        if len(unique_solved_list)!=0:
-            solvability_summary[i]["unique_solvable_number"]=len(unique_solved_list)
-            solvability_summary[i]["unique_solvable_list"]=unique_solved_list
-
-
-    #write solvalbility summary to json file
-    summary_json_file_name="../benchmarks/"+benchmark_fold+"/solvability_summary.JSON"
-    import json
-    with open(summary_json_file_name, 'w') as f:
-        json.dump(solvability_summary, f,indent=4, sort_keys=True)
-
-
+    read_solvability(filtered_file_list, benchmark_fold, splitClauses)
 
 
 

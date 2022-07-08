@@ -17,10 +17,6 @@ def extract_data_by_shell():
     thread_number = 1
     shell_timeout = 60*60*4
     eldarica_timeout= 60*60*3
-    # not use -abstract:all but try them separately
-    # separateMultiplePredicatesInBody,-getLabelFromCounterExample,-argumentOccurenceLabel,-argumentBoundLabel,extractTemplates,-onlyInitialPredicates -noIntervals -separateByPredicates  -generateTemplates
-    # monoDirectionLayerGraph,hyperEdgeGraph
-    # -maxNode:
     parameters_solvability_1 = "-moveFile -splitClauses:0 -abstract:oct -t:"+str(eldarica_timeout)
     parameters_solvability_2 = "-moveFile -splitClauses:0 -abstract:term -t:" + str(eldarica_timeout)
     parameters_solvability_3 = "-moveFile -splitClauses:0 -abstract:relEqs -t:" + str(eldarica_timeout)
@@ -51,6 +47,7 @@ def extract_data_by_shell():
         60*60*3) + " -boundsAnalysisTO:3 -maxNode:10000"
 
     parameters_pipeline=[]
+    #description: get solving time
     # parameters_pipeline = ["-splitClauses:0 -abstract:oct -getSolvingTime -t:"+str(eldarica_timeout),
     #                                "-splitClauses:0 -abstract:term -getSolvingTime -t:"+str(eldarica_timeout),
     #                                "-splitClauses:0 -abstract:relEqs -getSolvingTime -t:"+str(eldarica_timeout),
@@ -60,11 +57,34 @@ def extract_data_by_shell():
     #                                "-splitClauses:1 -abstract:relEqs -getSolvingTime -t:"+str(eldarica_timeout),
     #                                "-splitClauses:1 -abstract:relIneqs -getSolvingTime -t:"+str(eldarica_timeout),
     #                       ]
+    #description: mine templates
     #parameters_pipeline.append(parameters_extract_train_data_for_template_selection_without_graph) #label templates and generate simplified smt2
-    parameters_pipeline.append(parameters_get_smt2)#generate normalized smt2
-    #parameters_pipeline.append(parameters_draw_CG_using_labeled_templates) #draw constraint graph
-    #parameters_pipeline.append(parameters_draw_CDHG_using_labeled_templates) # draw hyperedge graph
-    #parameters_pipeline.append(parameters_abstract_off)
+    #description: draw two graphs
+    # parameters_pipeline.append(parameters_draw_CG_using_labeled_templates) #draw constraint graph
+    # parameters_pipeline.append(parameters_draw_CDHG_using_labeled_templates) # draw hyperedge graph
+    # description: get smt2 file
+    #parameters_pipeline.append(parameters_get_smt2)#generate normalized smt2
+    # parameters_pipeline.append(parameters_abstract_off)
+
+    #description:get horn graph for unsolvable problems
+    # parameters_pipeline.append("-getHornGraph:monoDirectionLayerGraph -extractTemplates -generateTemplates -maxNode:10000 -abstract:empty " ) #get unlabeled.tpl
+    # parameters_pipeline.append("-getHornGraph:monoDirectionLayerGraph -maxNode:10000 -abstract:empty ")
+    # parameters_pipeline.append("-getHornGraph:hyperEdgeGraph -maxNode:10000  -abstract:empty ")
+    #parameters_pipeline.append("-getSMT2 -abstract:empty ")
+
+    #description: get solvability
+    # parameters_pipeline.append("-checkSolvability  -abstract:empty -t:" + str(eldarica_timeout) )
+    # parameters_pipeline.append("-checkSolvability  -abstract:unlabeled -t:" + str(eldarica_timeout) )
+    # parameters_pipeline.append("-checkSolvability  -abstract:labeled -t:" + str(eldarica_timeout) )
+    # parameters_pipeline.append("-checkSolvability  -abstract:predictedCG -t:" + str(eldarica_timeout) )
+    # parameters_pipeline.append("-checkSolvability  -abstract:predictedCDHG -t:" + str(eldarica_timeout) )
+    # parameters_pipeline.append( "-checkSolvability  -abstract:random -t:" + str(eldarica_timeout) )
+    # parameters_pipeline.append("-checkSolvability  -abstract:term -t:" + str(eldarica_timeout) )
+    # parameters_pipeline.append("-checkSolvability  -abstract:oct -t:" + str(eldarica_timeout) )
+    # parameters_pipeline.append("-checkSolvability  -abstract:relEqs -t:" + str(eldarica_timeout) )
+    # parameters_pipeline.append( "-checkSolvability  -abstract:relIneqs -t:" + str(eldarica_timeout) +
+    parameters_pipeline.append("-checkSolvability  -abstract:mined -t:" + str(eldarica_timeout) )
+
 
 
     #no multi-threads

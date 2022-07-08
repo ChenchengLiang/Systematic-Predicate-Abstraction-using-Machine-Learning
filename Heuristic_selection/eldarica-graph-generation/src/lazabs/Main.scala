@@ -98,7 +98,7 @@ class GlobalParameters extends Cloneable {
   var getSolvingTime=false
   var getHornGraph=false
   var getAllHornGraph=false
-  var hornGraphType:HornGraphType.Value=HornGraphType.hyperEdgeGraph
+  var hornGraphType:HornGraphType.Value=HornGraphType.monoDirectionLayerGraph
   var in: InputStream = null
   var fileName = ""
   var funcName = "main"
@@ -555,11 +555,6 @@ object Main {
       case "-abstract:relIneqs" :: rest => {
         templateBasedInterpolation = true
         templateBasedInterpolationType = AbstractionType.RelationalIneqs
-        arguments(rest)
-      }
-      case "-abstract:learnedTerm" :: rest => {
-        templateBasedInterpolation = true
-        templateBasedInterpolationType = AbstractionType.LearnedTerm
         arguments(rest)
       }
       case "-abstract:off" :: rest => {

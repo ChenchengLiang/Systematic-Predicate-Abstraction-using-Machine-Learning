@@ -10,9 +10,9 @@ import subprocess
 import json
 from multiprocessing import Pool
 import shutil
-from utils import unzip_file
+from utils import unzip_file,folder_compress
 import zipfile
-from utils_1 import delete_relative_files
+from utils_1 import delete_relative_files,copy_relative_files
 
 # def generate_JSON_field(rootdir, json_file_type=".layerHornGraph.JSON", eldarica_parameters="-getHornGraph"):
 #     for root, subdirs, files in os.walk(rootdir):
@@ -150,7 +150,10 @@ def shuffle_data(rootdir, target_folder):
     '''
     file_list = glob.glob(rootdir + "/*.smt2")
     if len(file_list)==0:
-        file_list = glob.glob(rootdir + "/*.smt2.zip")
+        file_list=[]
+        for f in glob.glob(rootdir + "/*.smt2.zip"):
+            if "normalized" not in f and "simplified" not in f:
+                file_list.append(f)
     print("total file ", len(file_list))
     for i in range(5):
         random.shuffle(file_list)
@@ -167,7 +170,7 @@ def shuffle_data(rootdir, target_folder):
         final_target_folder = os.path.join("../benchmarks/" + target_folder + "/", fold_name)
         for f in file:
             #copy(f, final_target_folder)
-            print(f[:-len(".zip")])
+            #print(f[:-len(".zip")])
             copy_relative_files(f[:-len(".zip")], final_target_folder)
 
     #make_dirct(os.path.join("../benchmarks/"+target_folder+"/", "test_data_simple_generator"))
@@ -285,11 +288,11 @@ def main():
     #clean_extracted_data("linear-layer-CE-union-uppmax/extracted",total_file=3,edge_type="mono-layerHornGraph")
     # extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
-    # shuffle_data("../benchmarks/align-lin+non-lin/fifth-task-union-hyperedge+layer-linear+nonlinear",
-    #              "../benchmarks/align-lin+non-lin/fifth-task-union-hyperedge+layer-linear+nonlinear-shuffle")
-    divide_data_to_threads("Template-selection-non-Liner-dateset/solvable-sat-mined-templates",
-                           "Template-selection-non-Liner-dateset/solvable-sat-mined-templates-divided",three_fold=True,datafold_list=["train_data","valid_data","test_data"],
-                           chunk_number=437)#datafold_list=["test_data"]
+    # shuffle_data("../benchmarks/template_selection_train_non_linear/train_data",
+    #              "../benchmarks/template_selection_train_non_linear/shuffle")
+    divide_data_to_threads("Template-selection-non-Liner-dateset/unsolvable-8",
+                           "Template-selection-non-Liner-dateset/unsolvable-8-divided",three_fold=True,datafold_list=["train_data","valid_data","test_data"],
+                           chunk_number=410)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -363,6 +366,24 @@ def main():
     #                      out_put_folder="align-lin+non-lin/fifth-task-union-hyperedge+layer-linear+nonlinear")
     # source_folder="Linear-dataset-pure-argument-identification-task"
     # select_files_with_condition(source_folder, source_folder+"-separate-by-node-number")
+
+    # compile_dataset("Template-selection-non-Liner-dateset-debug")
+
+
+def compile_dataset(folder):
+    file_list=[]
+    for f in glob.glob("../benchmarks/" + folder +"/train_data/"+ "*.smt2.zip"):
+        if "normalized" not in f and "simplified" not in f:
+            file_list.append(f)
+    for f in file_list:
+        raw_file_name=f[f.rfind("/")+1:-len(".zip")]
+        file_folder=os.path.join("../benchmarks/"+folder ,raw_file_name)
+        os.mkdir(file_folder)
+        copy_relative_files(f[:-len(".zip")],file_folder)
+        unzip_all_file_folder(file_folder)
+        folder_compress(file_folder,file_folder)
+        shutil.rmtree(file_folder)
+
 
 
 def select_files_with_condition(source_folder_name,target_folder_name):
@@ -613,15 +634,6 @@ def get_k_fold_train_data(fold=5, benchmark="chc-comp21-benchmarks-main-all",
                     separated_file_list[(f + 4) % (fold - 1)]:  # train
             copy_relative_files(file, os.path.join(fold_folder, "train_data"))
 
-
-def copy_relative_files(source, des):
-    try:
-        #copy(source, des)
-        relative_file_list = glob.glob(source + "*")
-        for file in relative_file_list:
-            copy(file, des)
-    except:
-        print("file existed")
 
 
 def get_generated_horn_graph(horn_graph_folder="lia-lin-horn_graphs",

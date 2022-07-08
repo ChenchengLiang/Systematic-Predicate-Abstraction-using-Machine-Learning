@@ -134,12 +134,12 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
         os.remove(json_file_name)
 
 
-def set_threshold_by_roundings(true_Y,predicted_Y_loaded_model,label):
+def set_threshold_by_roundings(true_Y,predicted_Y_loaded_model,label,gathered_nodes_multi_classification_task):
     threshold_list=np.arange(0,1,0.1)
     #threshold_list=[1e-13,1e-12,1e-11,1e-10,1e-9,1e-8,1e-7,1e-6,1e-5,0.00005,1e-4,0.0005,1e-3,1e-2,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99,0.999,0.9999,0.99999]
     best_set={"threshold":0,"accuracy":0,"num_correct":0}
     for i in threshold_list:
-        num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, my_round_fun(predicted_Y_loaded_model,i,label)), tf.int32))
+        num_correct = tf.reduce_sum(tf.cast(tf.math.equal(true_Y, my_round_fun(predicted_Y_loaded_model,i,label,gathered_nodes_multi_classification_task=gathered_nodes_multi_classification_task)), tf.int32))
         accuracy = num_correct / len(predicted_Y_loaded_model)
         #print("threshold", i,"accuracy",float(accuracy))
         if num_correct>best_set["num_correct"]:
@@ -181,8 +181,8 @@ def set_threshold_by_ranks(true_Y,true_Y_by_file,predicted_Y_loaded_model,true_Y
     #print("top_percentage",top_percentage,"accuracy",float(accuracy))
     return {"top_percentage":top_percentage,"accuracy":float(accuracy)}
 
-def write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,label,benchmark):
-    best_set_threshold=set_threshold_by_roundings(true_Y, predicted_Y_loaded_model,label)
+def write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,label,benchmark,gathered_nodes_multi_classification_task):
+    best_set_threshold=set_threshold_by_roundings(true_Y, predicted_Y_loaded_model,label,gathered_nodes_multi_classification_task=gathered_nodes_multi_classification_task)
     parameters["best_threshold_set"]=best_set_threshold
     pickleWrite(parameters, benchmark+"-"+label+"-parameters","../src/trained_model/")
     return best_set_threshold
@@ -190,7 +190,7 @@ def write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,la
 def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",label="template_relevance",force_read=True,form_label=True,
                        json_type=".hyperEdgeGraph.JSON",graph_type="hyperEdgeGraph",verbose=False,
                        gathered_nodes_binary_classification_task=["template_relevance"],hyper_parameter={},
-                       set_max_nodes_per_batch=False,file_list=[],num_node_target_labels=2):
+                       set_max_nodes_per_batch=False,file_list=[],num_node_target_labels=2,gathered_nodes_multi_classification_task=[]):
 
     path = "../benchmarks/" + benchmark_fold + "/"
     benchmark_name = path[len("../benchmarks/"):-1]
@@ -228,7 +228,7 @@ def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",labe
     predicted_Y_loaded_model = loaded_model.predict(test_data)
 
     sigmoid_predicted_Y_loaded_model = tf.math.sigmoid(predicted_Y_loaded_model)
-    rounded_predicted_Y_loaded_model = my_round_fun(sigmoid_predicted_Y_loaded_model,threshold=0.5, label=label)
+    rounded_predicted_Y_loaded_model = my_round_fun(sigmoid_predicted_Y_loaded_model,threshold=0.5, label=label,gathered_nodes_multi_classification_task=gathered_nodes_multi_classification_task)
     print("label",label)
     if verbose==True:
         print("predicted_Y_loaded_model",predicted_Y_loaded_model)
@@ -258,7 +258,7 @@ def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",labe
                                       gathered_nodes_binary_classification_task)
     print("error_loaded_model",error_loaded_model)
     if label in gathered_nodes_binary_classification_task:
-        best_set_threshold = (lambda : hyper_parameter["best_threshold_set"] if hyper_parameter["read_best_threshold"] else write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,label,benchmark))()
+        best_set_threshold = (lambda : hyper_parameter["best_threshold_set"] if hyper_parameter["read_best_threshold"] else write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,label,benchmark,gathered_nodes_multi_classification_task))()
         best_set_ranks = (lambda : {"top_percentage":0,"accuracy":0} if hyper_parameter["read_best_threshold"] else wrapped_set_threshold_by_ranks(true_Y, true_Y_by_file, predicted_Y_loaded_model, true_Y_file_list))()
         print("----------", benchmark_fold, "-----", label, "----------")
         print(hyper_parameter)
@@ -286,43 +286,63 @@ def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",labe
                 "rounded_predicted_Y_loaded_model":rounded_predicted_Y_loaded_model,"predicted_Y_loaded_model": predicted_Y_loaded_model,"best_threshold":0.5}
 
 
-def predict_label(benchmark,max_nodes_per_batch,benchmark_fold,file_list,trained_model_path,use_test_threshold,label = "template_relevance",
-                  separateByPredicates="",verbose=True,num_node_target_labels=2,GPU=False,graph_type="hyperEdgeGraph"):
-    if separateByPredicates:
-        file_list=[]
+def predict_label(params):
+    '''
+    params["benchmark"]
+    params["max_nodes_per_batch"]
+    params["benchmark_fold"]
+    params["file_list"]
+    params["trained_model_path"]
+    params["use_test_threshold"]
+    params["label"]
+    params["separateByPredicates"]
+    params["verbose"]
+    params["num_node_target_labels"]
+    params["GPU"]
+    params["graph_type"]
+    params["gathered_nodes_binary_classification_task"]
+    params["gathered_nodes_multi_classification_task"]
+    '''
+    if params["separateByPredicates"]:
+        params["file_list"]=[]
     # read best threshold from pickle
-    parameters = pickleRead(benchmark + "-"+ graph_type + "-" + label + "-parameters", "../src/trained_model/")
+    parameters = pickleRead(params["benchmark"] + "-"+ params["graph_type"] + "-" + params["label"] + "-parameters", "../src/trained_model/")
     print("parameters",parameters)
-    hyper_parameter = {"max_nodes_per_batch": max_nodes_per_batch,
-                       "best_threshold_set": (lambda : parameters["best_threshold_set"] if use_test_threshold== True else {"threshold":0.5,"accuracy":0})(),
+    hyper_parameter = {"max_nodes_per_batch": params["max_nodes_per_batch"],
+                       "best_threshold_set": (lambda : parameters["best_threshold_set"] if params["use_test_threshold"]== True else {"threshold":0.5,"accuracy":0})(),
                        "read_best_threshold": True,"label_field":parameters["label_field"]}
-    json_type = "."+graph_type+".JSON"
+    json_type = "."+params["graph_type"]+".JSON"
     #graph_type = json_type[1:json_type.find(".JSON")]
-    gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
-                                                 "argument_upper_bound_existence", "argument_occurrence_binary",
-                                                 "template_relevance", "clause_occurrence_in_counter_examples_binary"]
+
     force_read = True
     form_label = True
-    GPU_switch(GPU)
-    result_dir = wrapped_prediction(trained_model_path=trained_model_path, benchmark=benchmark, benchmark_fold=benchmark_fold, force_read=force_read, form_label=form_label,
-                                    json_type=json_type, graph_type=graph_type, gathered_nodes_binary_classification_task=gathered_nodes_binary_classification_task, hyper_parameter=hyper_parameter,label=label,
-                                    set_max_nodes_per_batch=True,file_list=file_list,num_node_target_labels=num_node_target_labels)
+    GPU_switch(params["GPU"])
+    result_dir = wrapped_prediction(trained_model_path=params["trained_model_path"], benchmark=params["benchmark"],
+                                    benchmark_fold=params["benchmark_fold"], force_read=force_read, form_label=form_label,
+                                    json_type=json_type, graph_type=params["graph_type"],
+                                    gathered_nodes_binary_classification_task=params["gathered_nodes_binary_classification_task"],
+                                    hyper_parameter=hyper_parameter,label=params["label"],
+                                    set_max_nodes_per_batch=True,file_list=params["file_list"],
+                                    num_node_target_labels=params["num_node_target_labels"],gathered_nodes_multi_classification_task=params["gathered_nodes_multi_classification_task"])
     write_predicted_label_to_JSON_file(result_dir["dataset"], result_dir["rounded_predicted_Y_loaded_model"], json_type,
-                                       result_dir["best_threshold"],verbose=verbose,label=label)
+                                       result_dir["best_threshold"],verbose=params["verbose"],label=params["label"])
 
     plot_name="predicted"
-    if label in gathered_nodes_binary_classification_task+["argument_identify","scc_test"]: # confusion matrix on true y and predicted y
-        accuracy = get_classification_accuracy(result_dir["true_Y"], my_round_fun(result_dir["predicted_Y_loaded_model"],threshold=0.5,label=label), label,
-                                               result_dir["predicted_Y_loaded_model"], result_dir["predicted_Y_loaded_model"])
+    if params["label"] in params["gathered_nodes_binary_classification_task"]+["argument_identify","scc_test"]: # confusion matrix on true y and predicted y
+        accuracy = get_classification_accuracy(result_dir["true_Y"], my_round_fun(result_dir["predicted_Y_loaded_model"],threshold=0.5,
+                                                                                  label=params["label"]), params["label"],result_dir["predicted_Y_loaded_model"], result_dir["predicted_Y_loaded_model"],gathered_nodes_multi_classification_task=params["gathered_nodes_multi_classification_task"])
         saving_path_confusion_matrix="trained_model/" + plot_name+ "-confusion_matrix.png"
         saving_path_roc = "trained_model/" + plot_name + "-ROC.png"
-        recall,precision,f1_score,false_positive_rate=get_recall_and_precision(result_dir["true_Y"],my_round_fun(result_dir["predicted_Y_loaded_model"],threshold=0.5,label=label),verbose=True)
-        plot_confusion_matrix(result_dir["predicted_Y_loaded_model"],result_dir["true_Y"],saving_path_confusion_matrix,recall=recall,precision=precision,f1_score=f1_score,accuracy=accuracy)
+        recall,precision,f1_score,false_positive_rate=get_recall_and_precision(result_dir["true_Y"],
+                                                                               my_round_fun(result_dir["predicted_Y_loaded_model"],
+                                                                                            threshold=0.5,label=params["label"]),verbose=True,gathered_nodes_multi_classification_task=params["gathered_nodes_multi_classification_task"])
+        plot_confusion_matrix(result_dir["predicted_Y_loaded_model"],result_dir["true_Y"],saving_path_confusion_matrix,
+                              recall=recall,precision=precision,f1_score=f1_score,accuracy=accuracy,gathered_nodes_multi_classification_task=params["gathered_nodes_multi_classification_task"])
         plot_ROC(false_positive_rate,recall,saving_path_roc)
-    elif label=="node_multiclass":
+    elif params["label"] in params["gathered_nodes_multi_classification_task"]:
         saving_path_confusion_matrix = "trained_model/" + plot_name + "-confusion_matrix.png"
         plot_confusion_matrix(result_dir["predicted_Y_loaded_model"], result_dir["true_Y"], saving_path_confusion_matrix, recall="-",
-                              precision="-", f1_score="-",label="node_multiclass")
+                              precision="-", f1_score="-",label=params["label"],gathered_nodes_multi_classification_task=params["gathered_nodes_multi_classification_task"])
     else:
         plot_scatter(result_dir["true_Y"], result_dir["predicted_Y_loaded_model"], name="", range=[0, 0], x_label="True Values", y_label="Predictions")
 

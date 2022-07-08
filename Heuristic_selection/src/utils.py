@@ -114,6 +114,10 @@ def file_compress(inp_file_names, out_zip_file):
     finally:
         zf.close()
 
+def folder_compress(output_filename,dir_name):
+    import shutil
+    shutil.make_archive(output_filename, 'zip', dir_name)
+
 def get_recall_and_precision(true_label,predicted_label,verbose=False):
     truePositive, trueNegative, faslePositive, falseNegative = 0, 0, 0, 0
     for t, p in zip(true_label, predicted_label):
