@@ -12,7 +12,7 @@ from multiprocessing import Pool
 import shutil
 from utils import unzip_file,folder_compress
 import zipfile
-from utils_1 import delete_relative_files,copy_relative_files
+from utils_1 import delete_relative_files,copy_relative_files,get_file_list
 
 # def generate_JSON_field(rootdir, json_file_type=".layerHornGraph.JSON", eldarica_parameters="-getHornGraph"):
 #     for root, subdirs, files in os.walk(rootdir):
@@ -144,16 +144,11 @@ def shuffle_data_train_valid(rootdir):
             copy(f, os.path.join("../benchmarks/temp/", "valid_data"))
 
 
-def shuffle_data(rootdir, target_folder):
+def shuffle_data(folder,fold,file_type, target_folder):
     '''
     shuffle files in rootdir to shuffled_files
     '''
-    file_list = glob.glob(rootdir + "/*.smt2")
-    if len(file_list)==0:
-        file_list=[]
-        for f in glob.glob(rootdir + "/*.smt2.zip"):
-            if "normalized" not in f and "simplified" not in f:
-                file_list.append(f)
+    file_list = get_file_list(folder,fold,file_type)
     print("total file ", len(file_list))
     for i in range(5):
         random.shuffle(file_list)
@@ -182,7 +177,7 @@ def shuffle_data(rootdir, target_folder):
 
 
 def divide_data_to_threads(benchmark="", target_folder="", three_fold=True, chunk_number=17,
-                           datafold_list=["train_data", "valid_data", "test_data"]):
+                           datafold_list=["train_data", "valid_data", "test_data"],file_type="smt2"):
     target_folder=target_folder+"-"+str(chunk_number)
     root = "../benchmarks/" + benchmark
     make_dirct(os.path.join("../benchmarks", target_folder))
@@ -192,7 +187,7 @@ def divide_data_to_threads(benchmark="", target_folder="", three_fold=True, chun
         datafold_files_list = datafold_files_list + [os.path.join(root, "test_data_simple_generator")]
 
     for datafold, datafold_files in zip(datafold_list, datafold_files_list):
-        datafold_file_list = glob.glob(datafold_files + "/*.smt2.zip")
+        datafold_file_list = glob.glob(datafold_files + "/*."+file_type+".zip")
         print(datafold_files, len(datafold_file_list))
         chunk_size = round(len(datafold_file_list) / chunk_number)
         for i in range(0, chunk_number):
@@ -288,11 +283,11 @@ def main():
     #clean_extracted_data("linear-layer-CE-union-uppmax/extracted",total_file=3,edge_type="mono-layerHornGraph")
     # extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
-    # shuffle_data("../benchmarks/template_selection_train_non_linear/train_data",
+    # shuffle_data("template_selection_train_non_linear","train_data","smt2",
     #              "../benchmarks/template_selection_train_non_linear/shuffle")
-    divide_data_to_threads("Template-selection-non-Liner-dateset/unsolvable-8",
-                           "Template-selection-non-Liner-dateset/unsolvable-8-divided",three_fold=True,datafold_list=["train_data","valid_data","test_data"],
-                           chunk_number=410)#datafold_list=["test_data"]
+    # divide_data_to_threads("dillig/zipped",
+    #                        "dillig/zipped-divided",three_fold=True,datafold_list=["train_data","valid_data","test_data"],
+    #                        file_type="c",chunk_number=46)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -367,17 +362,32 @@ def main():
     # source_folder="Linear-dataset-pure-argument-identification-task"
     # select_files_with_condition(source_folder, source_folder+"-separate-by-node-number")
 
-    # compile_dataset("Template-selection-non-Liner-dateset-debug")
+    compile_dataset("Template-selection-non-Liner-compile-to-github")
+
+    #change_relative_file_names("non-linear-dataset/raw","train_data","smt2")
+
+
+def change_relative_file_names(folder,fold,file_type):
+    file_list=get_file_list(folder,fold,file_type)
+    for f in file_list:
+        for ff in glob.glob(f[:-len(".zip")]+"*"):
+            unzip_file(ff)
+            os.remove(ff)
+            old_name = ff[:-len(".zip")]
+            new_name = old_name.replace("chc-LIA-lin_","chc-LIA-non-lin_")
+            os.rename(old_name,new_name)
+            file_compress([new_name], new_name + ".zip")
+            os.remove(new_name)
+
 
 
 def compile_dataset(folder):
-    file_list=[]
-    for f in glob.glob("../benchmarks/" + folder +"/train_data/"+ "*.smt2.zip"):
-        if "normalized" not in f and "simplified" not in f:
-            file_list.append(f)
+    file_list=get_file_list(folder,"train_data","smt2")
+    make_dirct("../benchmarks/"+folder+"/compiled")
+
     for f in file_list:
         raw_file_name=f[f.rfind("/")+1:-len(".zip")]
-        file_folder=os.path.join("../benchmarks/"+folder ,raw_file_name)
+        file_folder=os.path.join("../benchmarks/"+folder+"/compiled" ,raw_file_name)
         os.mkdir(file_folder)
         copy_relative_files(f[:-len(".zip")],file_folder)
         unzip_all_file_folder(file_folder)

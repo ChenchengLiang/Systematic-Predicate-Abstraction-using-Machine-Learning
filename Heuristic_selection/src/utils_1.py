@@ -5,6 +5,7 @@ from multiprocessing import Pool
 import glob
 import os
 import time
+import pandas as pd
 from measurement_functions import read_measurement_from_JSON
 
 
@@ -48,7 +49,12 @@ def get_solvability_and_measurement_from_eldarica(params):
     # run_eldarica_with_shell_pool_with_file_list(params["thread_number"], run_eldarica_with_shell, file_list_for_solvability_check)
 
 
-
+def get_file_list(folder,fold,file_type):
+    file_list = []
+    for f in glob.glob("../benchmarks/" + folder + "/"+fold+"/" + "*."+file_type+".zip"):
+        if "normalized" not in f and "simplified" not in f:
+            file_list.append(f)
+    return file_list
 
 def read_solvability(filtered_file_list,benchmark_fold,splitClauses):
     json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
@@ -57,7 +63,7 @@ def read_solvability(filtered_file_list,benchmark_fold,splitClauses):
     solvability_summary = {
         op: {"solvable_number": 0, "solvable_list": [], "unique_solvable_number": 0, "unique_solvable_list": []} for op
         in abstract_option}
-    print("json_solvability_obj_list", json_solvability_obj_list)
+    #print("json_solvability_obj_list", json_solvability_obj_list)
     splitClauses_name = "_splitClauses_1" if splitClauses == "-splitClauses:1" else "_splitClauses_0"
     for f in json_solvability_obj_list:
         for op in abstract_option:
@@ -81,7 +87,7 @@ def read_solvability(filtered_file_list,benchmark_fold,splitClauses):
             solvability_summary[i]["unique_solvable_list"] = list(unique_solved_list)
 
     # write solvalbility summary to json file
-    print("solvability_summary",solvability_summary)
+    #print("solvability_summary",solvability_summary)
     summary_json_file_name = "../benchmarks/" + benchmark_fold + "/solvability_summary.JSON"
     import json
     with open(summary_json_file_name, 'w') as f:
@@ -89,13 +95,22 @@ def read_solvability(filtered_file_list,benchmark_fold,splitClauses):
 
 
     #write to spreadsheet
-    import pandas as pd
-    list1 = [10, 20, 30, 40]
-    list2 = [40, 30, 20, 10]
-    col1 = "X"
-    col2 = "Y"
-    data = pd.DataFrame({col1: list1, col2: list2})
-    data.to_excel("../benchmarks/" + benchmark_fold + "/solvability_summary.xlsx", sheet_name='sheet1', index=False)
+    fields=["solvingTime","cegarIterationNumber","generatedPredicateNumber","averagePredicateSize","predicateGeneratorTime","solvability"]
+    with pd.ExcelWriter("../benchmarks/" + benchmark_fold + "/solvability_summary.xlsx") as writer:
+        for op in abstract_option:
+            name_list=[]
+            field_dict = {field:[] for field in fields}
+            for f in json_solvability_obj_list:
+                name_list.append(f["file_name"][f["file_name"].rfind("/")+1:][:-len(".solvability.JSON")])
+            for f in json_solvability_obj_list:
+                for k in field_dict:
+                    field_dict[k].append(int(list(f[k+"_" + op + splitClauses_name])[0]))
+
+            final_dict={**{"name_list":name_list},**field_dict}
+            data=pd.DataFrame(final_dict)
+            data.to_excel(writer, sheet_name=op)
+
+
 
 
 def measurement_control_by_python(benchmark_fold):

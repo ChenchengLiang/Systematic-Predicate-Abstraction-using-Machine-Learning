@@ -212,7 +212,7 @@ def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",labe
     if form_label == True:
         params_form_GNN_inputs_and_labels={"label":label,"datafold":["test"],"benchmark":benchmark_name,"graph_type":graph_type,
                                            "gathered_nodes_binary_classification_task":gathered_nodes_binary_classification_task,
-                                           "use_class_weight":False,"num_node_target_labels":num_node_target_labels}
+                                           "use_class_weight":False,"num_node_target_labels":num_node_target_labels,"gathered_nodes_multi_classification_task":gathered_nodes_multi_classification_task}
         form_GNN_inputs_and_labels(params_form_GNN_inputs_and_labels)
 
 
@@ -255,7 +255,7 @@ def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",labe
 
 
     error_loaded_model = compute_loss(label, true_Y, predicted_Y_loaded_model, class_weight, from_logits,
-                                      gathered_nodes_binary_classification_task)
+                                      gathered_nodes_binary_classification_task,gathered_nodes_multi_classification_task)
     print("error_loaded_model",error_loaded_model)
     if label in gathered_nodes_binary_classification_task:
         best_set_threshold = (lambda : hyper_parameter["best_threshold_set"] if hyper_parameter["read_best_threshold"] else write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,label,benchmark,gathered_nodes_multi_classification_task))()

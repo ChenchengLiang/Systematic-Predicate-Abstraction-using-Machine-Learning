@@ -22,8 +22,10 @@ def predict_pipeline(fold_number=0):
 
     #/home/cheli243/PycharmProjects/HintsLearning/src/
     graph_type = "monoDirectionLayerGraph"  # "hyperEdgeGraph"
-    graph_type_model_pairs={"hyperEdgeGraph":"trained_model/GNN_Argument_selection__2022-07-06_00-19-33_best.pkl",
-                            "monoDirectionLayerGraph":"trained_model/GNN_Argument_selection__2022-07-06_04-59-34_best.pkl"}
+    graph_type_model_pairs={
+                            "hyperEdgeGraph":"trained_model/GNN_Argument_selection__2022-07-08_15-09-31_best.pkl",
+                            #"monoDirectionLayerGraph":"trained_model/GNN_Argument_selection__2022-07-06_04-59-34_best.pkl"
+    }
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
                                                  "argument_upper_bound_existence", "argument_occurrence_binary",
                                                  "template_relevance", "clause_occurrence_in_counter_examples_binary",
@@ -58,24 +60,24 @@ def predict_pipeline(fold_number=0):
         wrapped_generate_horn_graph(wrapped_generate_horn_graph_params)
 
     #
-    # #description: prediction
-    # for gt in graph_type_model_pairs:
-    #     predict_label_params={"benchmark":benchmark,"max_nodes_per_batch":max_nodes_per_batch,"benchmark_fold":benchmark_fold,
-    #                           "file_list":filtered_file_list,"trained_model_path":graph_type_model_pairs[gt],"use_test_threshold":use_test_threshold,
-    #                           "separateByPredicates":separateByPredicates,"label":label,"verbose":verbose,
-    #                           "num_node_target_labels":label_to_num_node_target_labels[label],"GPU":False,"graph_type":gt,
-    #                           "gathered_nodes_binary_classification_task":gathered_nodes_binary_classification_task,
-    #                           "gathered_nodes_multi_classification_task":gathered_nodes_multi_classification_task}
-    #     # description: predict label one by one
-    #     for f in filtered_file_list:
-    #         predict_label_params["file_list"]=[f]
-    #         print("file_name:",f)
-    #         predict_label(predict_label_params)#file_list
-    #         gc.collect()
-    #         tf.keras.backend.clear_session()
-    #
-    #     # description: predict label together
-    #     predict_label(predict_label_params)
+    #description: prediction
+    for gt in graph_type_model_pairs:
+        predict_label_params={"benchmark":benchmark,"max_nodes_per_batch":max_nodes_per_batch,"benchmark_fold":benchmark_fold,
+                              "file_list":filtered_file_list,"trained_model_path":graph_type_model_pairs[gt],"use_test_threshold":use_test_threshold,
+                              "separateByPredicates":separateByPredicates,"label":label,"verbose":verbose,
+                              "num_node_target_labels":label_to_num_node_target_labels[label],"GPU":False,"graph_type":gt,
+                              "gathered_nodes_binary_classification_task":gathered_nodes_binary_classification_task,
+                              "gathered_nodes_multi_classification_task":gathered_nodes_multi_classification_task}
+        # # description: predict label one by one
+        # for f in filtered_file_list:
+        #     predict_label_params["file_list"]=[f]
+        #     print("file_name:",f)
+        #     predict_label(predict_label_params)#file_list
+        #     gc.collect()
+        #     tf.keras.backend.clear_session()
+
+        # description: predict label together
+        predict_label(predict_label_params)
 
     # description: get solvability and measurement info with different predicate setting for unseen data
     # get_solvability_and_measurement_from_eldarica_params={"filtered_file_list":filtered_file_list,"thread_number":thread_number,"continuous_extracting":continuous_extracting,
@@ -87,7 +89,7 @@ def predict_pipeline(fold_number=0):
     # get_solvability_and_measurement_from_eldarica(get_solvability_and_measurement_from_eldarica_params)
 
     # description: read solvability results
-    read_solvability(filtered_file_list, benchmark_fold, splitClauses)
+    #read_solvability(filtered_file_list, benchmark_fold, splitClauses)
 
 
 
