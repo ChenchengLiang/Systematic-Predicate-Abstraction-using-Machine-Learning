@@ -496,11 +496,7 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
         if (GlobalParameters.get.rdm) {
           HintsSelection.randomLabelTemplates(combTemplates, 0.2)
         } else if (GlobalParameters.get.readTemplates) {
-          val fullTemplates =
-            if (new java.io.File(GlobalParameters.get.fileName +unlabeledPredicateFileName+ ".tpl").exists == true)
-              HintsSelection.wrappedReadHints(simplifiedClausesForGraph, unlabeledPredicateFileName)
-            else
-              combTemplates
+          val fullTemplates = HintsSelection.wrappedReadHintsCheckExistence(simplifiedClausesForGraph,unlabeledPredicateFileName,combTemplates)
           val predictedTemplates = HintsSelection.readPredictedHints(simplifiedClausesForGraph, fullTemplates)
           predictedTemplates
         } else if ((new java.io.File(GlobalParameters.get.fileName +labeledPredicateFileName+ ".tpl")).exists && GlobalParameters.get.readTrueLabel){
@@ -604,16 +600,16 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
 
   //test solvability
   if (GlobalParameters.get.getSolvingTime || GlobalParameters.get.checkSolvability){
-    getSolvability(simplifiedClausesForGraph,initialPredicatesForCEGAR.toInitialPredicates,predGenerator)
+    getSolvability(unsimplifiedClauses,simplifiedClausesForGraph,initialPredicatesForCEGAR.toInitialPredicates,predGenerator)
   }
 
   if(GlobalParameters.get.extractTemplates)
     mineTemplates(simplifiedClausesForGraph,simpHints.toInitialPredicates,predGenerator)
 
 
-  if (GlobalParameters.get.templateBasedInterpolationPrint &&
-    !simpHints.isEmpty)
-    ReaderMain.printHints(simpHints, name = "Manual verification hints:")
+  if (GlobalParameters.get.templateBasedInterpolationPrint && !simpHints.isEmpty)
+    AbsReader.printHints(simpHints)
+
 
   //////////////////////////////////////////////////////////////////////////////
 

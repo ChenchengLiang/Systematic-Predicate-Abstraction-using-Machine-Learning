@@ -95,7 +95,11 @@ def read_solvability(filtered_file_list,benchmark_fold,splitClauses):
 
 
     #write to spreadsheet
-    fields=["solvingTime","cegarIterationNumber","generatedPredicateNumber","averagePredicateSize","predicateGeneratorTime","solvability"]
+    fields=["solvingTime","cegarIterationNumber","generatedPredicateNumber","averagePredicateSize","predicateGeneratorTime","solvability",
+            "clauseNumberBeforeSimplification","clauseNumberAfterSimplification","smt2FileSizeByte","relationSymbolNumber",
+    "minedSingleVariableTemplatesNumber","minedBinaryVariableTemplatesNumber","minedTemplateNumber","minedTemplateRelationSymbolNumber",
+      "labeledSingleVariableTemplatesNumber","labeledBinaryVariableTemplatesNumber","labeledTemplateNumber","labeledTemplateRelationSymbolNumber",
+      "unlabeledSingleVariableTemplatesNumber","unlabeledBinaryVariableTemplatesNumber","unlabeledTemplateNumber","unlabeledTemplateRelationSymbolNumber"]
     with pd.ExcelWriter("../benchmarks/" + benchmark_fold + "/solvability_summary.xlsx") as writer:
         for op in abstract_option:
             name_list=[]
@@ -164,12 +168,13 @@ def measurement_control_by_python(benchmark_fold):
                                                 file_list_for_solvability_check)
 
 
-def get_solvability_log(data_fold, command_input):
+def get_solvability_log(data_fold, command_input,file_type):
     solvability_dict = {}
     benchmark_name = os.path.join("../benchmarks/", command_input)
     solvable_file_list = []
     for fold in data_fold:
-        solvable_file_list = solvable_file_list + glob.glob(benchmark_name + "/" + fold + "/*.smt2.zip")
+        solvable_file_list = get_file_list(benchmark_name, fold, file_type)
+        #solvable_file_list = solvable_file_list + glob.glob(benchmark_name + "/" + fold + "/*."+file_type+".zip")
     solvable_file_list = [os.path.basename(f) for f in solvable_file_list]
     solvability_dict["solvable-file"] = solvable_file_list
     folder_name_list, file_list = get_exceptions_folder_names()
