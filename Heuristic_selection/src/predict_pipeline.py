@@ -3,7 +3,7 @@ from utils import mutual_differences,flattenList
 from plot import get_recall_scatter,plot_scatter
 import tensorflow as tf
 import gc
-from predict_functions import predict_label
+from predict_functions import predict_label,merge_predicted_label
 from measurement_functions import read_measurement_from_JSON
 def main():
     fold_number_list=["solvability"]#test
@@ -21,10 +21,17 @@ def predict_pipeline(fold_number=0):
     max_nodes_per_batch = 10000
 
     #/home/cheli243/PycharmProjects/HintsLearning/src/
-    graph_type = "monoDirectionLayerGraph"  # "hyperEdgeGraph"
-    graph_type_model_pairs={
-                            "hyperEdgeGraph":"trained_model/GNN_Argument_selection__2022-07-08_15-09-31_best.pkl",
-                            #"monoDirectionLayerGraph":"trained_model/GNN_Argument_selection__2022-07-06_04-59-34_best.pkl"
+
+    graph_type_model_pairs = {"hyperEdgeGraph": {
+        "template_relevance_boolean_usefulness": "GNN_Argument_selection__2022-07-14_17-57-09_best.pkl", #1
+        "template_relevance_Eq_usefulness": "GNN_Argument_selection__2022-07-14_17-58-22_best.pkl", #3
+        #"node_multiclass": "GNN_Argument_selection__2022-07-14_21-31-26_best.pkl"
+    },
+        "monoDirectionLayerGraph": {
+            "template_relevance_boolean_usefulness": "GNN_Argument_selection__2022-07-14_17-57-44_best.pkl",#2
+            "template_relevance_Eq_usefulness": "GNN_Argument_selection__2022-07-14_17-59-00_best.pkl",#4
+            #"node_multiclass": "GNN_Argument_selection__2022-07-14_21-32-00_best.pkl"
+        }
     }
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
                                                  "argument_upper_bound_existence", "argument_occurrence_binary",
@@ -45,8 +52,7 @@ def predict_pipeline(fold_number=0):
     abstract = "-abstract:empty"#empty
     noIntervals=""
     splitClauses="-splitClauses:1"
-    label="node_multiclass"
-    num_node_target_labels=5
+    file_type="smt2"
     verbose=True
     timeout = 60*60*3
     shell_timeout=60*60*4
@@ -55,36 +61,42 @@ def predict_pipeline(fold_number=0):
     wrapped_generate_horn_graph_params={"benchmark_fold":benchmark_fold,"max_nodes_per_batch":max_nodes_per_batch,"separateByPredicates":separateByPredicates,
                                         "abstract":abstract,"move_file":move_file,"thread_number":thread_number,"generateSimplePredicates":generateSimplePredicates,
                                         "generateTemplates":generateTemplates,"data_fold":["test_data"],"horn_graph_folder":"","noIntervals":noIntervals,
-                                        "graph_type":graph_type,"splitClauses":splitClauses,"timeout":timeout}
+                                        "graph_type":"monoDirectionLayerGraph","splitClauses":splitClauses,"timeout":timeout,"file_type":file_type}
     filtered_file_list, file_list_with_horn_graph, file_list = \
         wrapped_generate_horn_graph(wrapped_generate_horn_graph_params)
 
-    #
     #description: prediction
     for gt in graph_type_model_pairs:
-        predict_label_params={"benchmark":benchmark,"max_nodes_per_batch":max_nodes_per_batch,"benchmark_fold":benchmark_fold,
-                              "file_list":filtered_file_list,"trained_model_path":graph_type_model_pairs[gt],"use_test_threshold":use_test_threshold,
-                              "separateByPredicates":separateByPredicates,"label":label,"verbose":verbose,
-                              "num_node_target_labels":label_to_num_node_target_labels[label],"GPU":False,"graph_type":gt,
-                              "gathered_nodes_binary_classification_task":gathered_nodes_binary_classification_task,
-                              "gathered_nodes_multi_classification_task":gathered_nodes_multi_classification_task}
-        # # description: predict label one by one
-        # for f in filtered_file_list:
-        #     predict_label_params["file_list"]=[f]
-        #     print("file_name:",f)
-        #     predict_label(predict_label_params)#file_list
-        #     gc.collect()
-        #     tf.keras.backend.clear_session()
+        for lb in graph_type_model_pairs[gt]:
+            predict_label_params={"benchmark":benchmark,"max_nodes_per_batch":max_nodes_per_batch,"benchmark_fold":benchmark_fold,
+                                  "file_list":filtered_file_list,"trained_model_path":"trained_model/"+graph_type_model_pairs[gt][lb],"use_test_threshold":use_test_threshold,
+                                  "separateByPredicates":separateByPredicates,"label":lb,"verbose":verbose,
+                                  "num_node_target_labels":label_to_num_node_target_labels[lb],"GPU":False,"graph_type":gt,
+                                  "gathered_nodes_binary_classification_task":gathered_nodes_binary_classification_task,
+                                  "gathered_nodes_multi_classification_task":gathered_nodes_multi_classification_task}
+            # description: predict label together
+            predict_label(predict_label_params)
+            # # description: predict label one by one
+            # for f in filtered_file_list:
+            #     predict_label_params["file_list"]=[f]
+            #     print("file_name:",f)
+            #     predict_label(predict_label_params)#file_list
+            #     gc.collect()
+            #     tf.keras.backend.clear_session()
 
-        # description: predict label together
-        predict_label(predict_label_params)
+
+    for gt in graph_type_model_pairs:
+        if "template_relevance_boolean_usefulness" in graph_type_model_pairs[gt] and "template_relevance_Eq_usefulness"in graph_type_model_pairs[gt]:
+            merge_predicted_label_params = {"file_list": filtered_file_list, "graph_type": gt}
+            merge_predicted_label(merge_predicted_label_params)
+
 
     # description: get solvability and measurement info with different predicate setting for unseen data
     # get_solvability_and_measurement_from_eldarica_params={"filtered_file_list":filtered_file_list,"thread_number":thread_number,"continuous_extracting":continuous_extracting,
     #                                                       "move_file":move_file,"checkSolvability":"-checkSolvability","generateTemplates":generateTemplates,
     #                                                       "measurePredictedPredicates":"","onlyInitialPredicates":"","abstract":abstract,"noIntervals":noIntervals,
     #                                                       "separateByPredicates":separateByPredicates,"solvabilityTimeout":"300",
-    #                                                       "timeout":timeout,"splitClauses":splitClauses,"getHornGraph":"-getHornGraph:"+graph_type,
+    #                                                       "timeout":timeout,"splitClauses":splitClauses,"getHornGraph":"-getHornGraph:"+"monoDirectionLayerGraph",
     #                                                       "shell_timeout":shell_timeout}#"solvabilityTimeout":"3600","timeout":60*60*4
     # get_solvability_and_measurement_from_eldarica(get_solvability_and_measurement_from_eldarica_params)
 

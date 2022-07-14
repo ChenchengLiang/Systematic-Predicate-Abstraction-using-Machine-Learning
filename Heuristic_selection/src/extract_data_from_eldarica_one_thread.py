@@ -14,8 +14,8 @@ def extract_data_by_shell():
     data_fold = ["train_data", "test_data", "valid_data"]
     benchmark_name = sys.argv[1]  # "temp-debug"
     thread_number = 1
-    shell_timeout = 60*60*4
-    eldarica_timeout= 60*60*3
+    shell_timeout = 60*60*2
+    eldarica_timeout= 60*60*1
     parameters_solvability_1 = "-moveFile -splitClauses:0 -abstract:oct -t:"+str(eldarica_timeout)
     parameters_solvability_2 = "-moveFile -splitClauses:0 -abstract:term -t:" + str(eldarica_timeout)
     parameters_solvability_3 = "-moveFile -splitClauses:0 -abstract:relEqs -t:" + str(eldarica_timeout)
@@ -83,18 +83,18 @@ def extract_data_by_shell():
     # parameters_pipeline.append("-checkSolvability  -abstract:oct -t:" + str(eldarica_timeout) )
     # parameters_pipeline.append("-checkSolvability  -abstract:relEqs -t:" + str(eldarica_timeout) )
     # parameters_pipeline.append( "-checkSolvability  -abstract:relIneqs -t:" + str(eldarica_timeout) )
-    parameters_pipeline.append("-checkSolvability  -abstract:mined -t:" + str(eldarica_timeout) )
+    #parameters_pipeline.append("-checkSolvability  -abstract:mined -t:" + str(eldarica_timeout) )
 
 
 
     #no multi-threads
     file_type = "smt2"
+    # file_type =  "c"
     for eldarica_parameters in parameters_pipeline:
         runtime=1
         move_file=False if "getSolvingTime" in eldarica_parameters else True
         split_clause_option="splitClauses_1" #todo: try splitClause1 to see if all no-minded predicates
         fold="train_data"
-        #file_type =  "c"
         file_list=get_file_list(benchmark_name,fold,file_type)
 
         for file in file_list:

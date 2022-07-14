@@ -25,15 +25,9 @@ def add_JSON_field(fileName="",file_type=".layerHornGraph.JSON",old_field=[],new
     json_file = fileName + file_type
     json_obj = {}
     with open(json_file) as f:
-        loaded_graph = json.load(f)
-        for field in old_field:
-            json_obj[field] = loaded_graph[field]
-    # add more field
-    with open(json_file) as f:
-        #loaded_graph = json.load(f)
-        for field,content in zip(new_field,new_field_content):
-            json_obj[field] = content
-    # write json object to JSON file
+        json_obj = json.load(f)
+    for field,content in zip(new_field,new_field_content):
+        json_obj[field] = content
     clear_file(json_file)
     with open(json_file, 'w') as f:
         json.dump(json_obj, f, sort_keys=True)

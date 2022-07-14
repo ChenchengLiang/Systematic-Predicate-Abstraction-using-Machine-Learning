@@ -1042,10 +1042,12 @@ val unlabeledPredicateFileName=".unlabeledPredicates"
         else VerificationHints(Map())
       }
     }
-    if (GlobalParameters.get.debugLog == true)
-      Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName + ".predictedHints.tpl")) {
-        AbsReader.printHints(predictedHints)
-      }
+    if (GlobalParameters.get.debugLog == true) {
+      println("----------predicted Hints----------")
+      predictedHints.pretyPrintHints()
+      //Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName + ".predictedHints.tpl")) {AbsReader.printHints(predictedHints)}
+    }
+
     predictedHints
   }
 
@@ -1093,6 +1095,8 @@ val unlabeledPredicateFileName=".unlabeledPredicates"
   def readPredicateLabelFromJSON(fileName:String, initialHints:Seq[(Predicate, Seq[VerifHintElement])],
                                  readLabel:String="predictedLabel"): Map[Predicate, Seq[VerifHintElement]]={
     val input_file=fileName+"."+GlobalParameters.get.hornGraphType.toString+".JSON"
+
+    println("read predicted label from "+input_file)
     if(detectIfAJSONFieldExists(readLabel,fileName)==true){
       val json_content = scala.io.Source.fromFile(input_file).mkString
       val json_data = Json.parse(json_content)

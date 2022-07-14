@@ -285,9 +285,9 @@ def main():
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
     # shuffle_data("template_selection_train_non_linear","train_data","smt2",
     #              "../benchmarks/template_selection_train_non_linear/shuffle")
-    divide_data_to_threads("Template-selection-non-Liner-dateset/solvable-sat-mined-templates",
-                           "Template-selection-non-Liner-dateset/solvable-sat-mined-templates-divided",three_fold=True,datafold_list=["train_data","valid_data","test_data"],
-                           file_type="smt2",chunk_number=437)#datafold_list=["test_data"]
+    # divide_data_to_threads("Template-selection-non-Liner-dateset/solvable-sat-mined-templates",
+    #                        "Template-selection-non-Liner-dateset/solvable-sat-mined-templates-divided",three_fold=True,datafold_list=["train_data","valid_data","test_data"],
+    #                        file_type="smt2",chunk_number=437)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -342,8 +342,8 @@ def main():
     #     for fold in ["train_data"]:
     #         unzip_all_file_folder("all-LIA-Lin-train-unsolvable-predicted-measurement-2/temp-1-divided/thread_"+str(i)+"/"+fold)
 
-    # for fold in ["train_data"]:
-    #     compress_all_file_folder("template_selection_lin_test_1"+"/"+fold)
+    # for fold in ["test_data"]:
+    #     compress_all_file_folder("template_selection_train_non_linear-unsolvable-predicted-solvability"+"/"+fold)
 
 
     # for i in range(0,17):
@@ -362,7 +362,7 @@ def main():
     # source_folder="Linear-dataset-pure-argument-identification-task"
     # select_files_with_condition(source_folder, source_folder+"-separate-by-node-number")
 
-    #compile_dataset("Template-selection-non-Liner-compile-to-github")
+    compile_dataset("Template-selection-non-Liner-dateset-mined-templates-statistics")
 
     #change_relative_file_names("Template-selection-non-Liner-dateset-change-name","train_data","smt2")
 

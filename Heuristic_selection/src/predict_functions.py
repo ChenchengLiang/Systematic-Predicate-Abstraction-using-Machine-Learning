@@ -4,12 +4,13 @@ import tensorflow as tf
 import tf2_gnn
 from tf2_gnn.data import DataFold
 from utils import call_eldarica
-from Miscellaneous import add_JSON_field, GPU_switch, pickleRead, pickleWrite
+from Miscellaneous import add_JSON_field, GPU_switch, pickleRead, pickleWrite,clear_file
 from horn_dataset import write_graph_to_pickle, form_GNN_inputs_and_labels, get_test_loss_with_class_weight, \
     compute_loss, HornGraphDataset
 from plot import plot_scatter
 from utils import file_compress, unzip_file,get_recall_and_precision
 from utils_tf import get_classification_accuracy,my_round_fun,plot_confusion_matrix,plot_ROC
+import json
 
 def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score_list,graph_type=".layerHornGraph.JSON"):
     # write predicted_argument_score to JSON file
@@ -61,7 +62,47 @@ def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score
         # clear_file(json_file)
         # with open(json_file, 'w') as f:
         #     json.dump(json_obj, f,indent=4)
-def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_type,threshold,verbose=True,label=""):
+
+
+def merge_predicted_label(params):
+    for fileName in params["file_list"]:
+        json_file = fileName +"."+params["graph_type"]+".JSON"
+        print("json_file", json_file)
+        if os.path.exists(json_file + ".zip"):
+            unzip_file(json_file + ".zip")
+            os.remove(json_file + ".zip")
+
+            with open(json_file) as f:
+                json_obj = json.load(f)
+
+            temp_predictedLabel=[]
+            boolean_counter=0
+            non_boolean_counter=0
+            for b in json_obj["templateRelevanceBooleanTypeList"]:
+                if b==0:# non-boolean tempaltes
+                    temp_predictedLabel.append(json_obj["predictedLabel_template_relevance_Eq_usefulness"][non_boolean_counter])
+                    non_boolean_counter=non_boolean_counter+1
+                else:#boolean tempaltes
+                    l=json_obj["predictedLabel_template_relevance_boolean_usefulness"][boolean_counter]
+                    if l==1: #map back to 0 and 4
+                        temp_predictedLabel.append(4)
+                    else:
+                        temp_predictedLabel.append(0)
+                    boolean_counter=boolean_counter+1
+
+            json_obj["predictedLabel"] = temp_predictedLabel
+            print(os.path.basename(fileName),"temp_predictedLabel",temp_predictedLabel)
+
+
+            clear_file(json_file)
+            with open(json_file, 'w') as f:
+                json.dump(json_obj, f, sort_keys=True)
+
+            file_compress([json_file], json_file + ".zip")
+            os.remove(json_file)
+
+
+def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_type,threshold,verbose=True,label="",gathered_nodes_multi_classification_task=[]):
     current_positon=0
     for g,file_name in zip(dataset._loaded_data[DataFold.TEST],dataset._file_list["test"]):
         predicted_label=predicted_Y_loaded_model[current_positon:current_positon+len(g._node_label)]
@@ -70,7 +111,7 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
         true_Y_list=np.array(g._node_label)
         transfored_predicted_Y_loaded_model=predicted_label
 
-        if label == "node_multiclass":
+        if label in gathered_nodes_multi_classification_task:
             true_Y_list=[np.argmax(y) for y in true_Y_list]
             transfored_predicted_Y_loaded_model=[np.argmax(y) for y in transfored_predicted_Y_loaded_model]
         for y, predicted_Y in zip(true_Y_list, transfored_predicted_Y_loaded_model):
@@ -101,7 +142,7 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
                      "unknownEdges", "argumentIDList", "argumentNameList",
                      "argumentOccurrence", "predicateIndices", "predicateOccurrenceInClause",
                      "predicateStrongConnectedComponent",
-                     "argumentBoundList", "argumentBinaryOccurrenceList", "templateIndices", "templateRelevanceLabel", #"templateCostLabel",
+                     "argumentBoundList", "argumentBinaryOccurrenceList", "templateIndices", "templateRelevanceLabel","templateRelevanceBooleanTypeList", "templateCostLabel",
                      "verifHintTplPredEdges", "verifHintTplPredPosNegEdges", "verifHintTplEqTermEdges",
                      "verifHintTplInEqTermEdges", "verifHintTplInEqTermPosNegEdges", "templateEdges",
                      "clauseIndices","clauseBinaryOccurrenceInCounterExampleList",
@@ -109,7 +150,8 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
                      "ternaryAdjacencyList",
                      "dummyFiled"]
 
-        if graph_type[1:-5]=="hyperEdgeGraph":
+
+        if graph_type[1:-len(".JSON")]=="hyperEdgeGraph":
             old_field=old_field+["argumentEdges","guardASTEdges","dataFlowASTEdges","templateASTEdges","controlFlowHyperEdges","dataFlowHyperEdges",
                                  "ASTEdges","AST_1Edges","AST_2Edges", "templateEdges","verifHintTplEqTermEdges","verifHintTplInEqTermEdges","verifHintTplPredPosNegEdges",
                                  "controlLocationEdgeForSCC","predicateTransitiveEdges"]
@@ -121,14 +163,17 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
             unzip_file(json_file_name + ".zip")
             os.remove(json_file_name + ".zip")
 
-        new_field = ["predictedLabel"]
-        new_filed_content=[[int(x) for x in transfored_predicted_Y_loaded_model]]
-        #print("new_filed_content",new_filed_content)
+
+        if label=="template_relevance_boolean_usefulness":
+            predicted_label_suffix = "_template_relevance_boolean_usefulness"
+        elif label =="template_relevance_Eq_usefulness":
+            predicted_label_suffix = "_template_relevance_Eq_usefulness"
+        else:
+            predicted_label_suffix=""
+
+        new_field = ["predictedLabel"+predicted_label_suffix,"predictedLabelLogit"+predicted_label_suffix]
+        new_filed_content=[[int(x) for x in transfored_predicted_Y_loaded_model],[str(np.round(l,2)) for l in predicted_label]]
         add_JSON_field(file_name,graph_type,old_field,new_field,new_filed_content)
-        old_field=old_field+["predictedLabel"]
-        new_field = ["predictedLabelLogit"]
-        new_filed_content = [[str(np.round(l,2)) for l in predicted_label]]
-        add_JSON_field(file_name, graph_type, old_field, new_field, new_filed_content)
 
         file_compress([json_file_name],json_file_name+".zip")
         os.remove(json_file_name)
@@ -188,7 +233,7 @@ def write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,la
     return best_set_threshold
 
 def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",label="template_relevance",force_read=True,form_label=True,
-                       json_type=".hyperEdgeGraph.JSON",graph_type="hyperEdgeGraph",verbose=False,
+                       json_type=".hyperEdgeGraph.JSON",graph_type="hyperEdgeGraph",verbose=True,
                        gathered_nodes_binary_classification_task=["template_relevance"],hyper_parameter={},
                        set_max_nodes_per_batch=False,file_list=[],num_node_target_labels=2,gathered_nodes_multi_classification_task=[]):
 
@@ -196,6 +241,7 @@ def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",labe
     benchmark_name = path[len("../benchmarks/"):-1]
     parameters = pickleRead(benchmark + "-" +graph_type+"-"+ label + "-parameters", "../src/trained_model/")
     parameters["benchmark"] = benchmark_name
+    parameters["gathered_nodes_multi_classification_task"]=gathered_nodes_multi_classification_task
     print("vocabulary size:", parameters["node_vocab_size"])
 
     if set_max_nodes_per_batch==True:
@@ -286,6 +332,7 @@ def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",labe
                 "rounded_predicted_Y_loaded_model":rounded_predicted_Y_loaded_model,"predicted_Y_loaded_model": predicted_Y_loaded_model,"best_threshold":0.5}
 
 
+
 def predict_label(params):
     '''
     params["benchmark"]
@@ -325,7 +372,7 @@ def predict_label(params):
                                     set_max_nodes_per_batch=True,file_list=params["file_list"],
                                     num_node_target_labels=params["num_node_target_labels"],gathered_nodes_multi_classification_task=params["gathered_nodes_multi_classification_task"])
     write_predicted_label_to_JSON_file(result_dir["dataset"], result_dir["rounded_predicted_Y_loaded_model"], json_type,
-                                       result_dir["best_threshold"],verbose=params["verbose"],label=params["label"])
+                                       result_dir["best_threshold"],verbose=params["verbose"],label=params["label"],gathered_nodes_multi_classification_task=params["gathered_nodes_multi_classification_task"])
 
     plot_name="predicted"
     if params["label"] in params["gathered_nodes_binary_classification_task"]+["argument_identify","scc_test"]: # confusion matrix on true y and predicted y
@@ -335,7 +382,7 @@ def predict_label(params):
         saving_path_roc = "trained_model/" + plot_name + "-ROC.png"
         recall,precision,f1_score,false_positive_rate=get_recall_and_precision(result_dir["true_Y"],
                                                                                my_round_fun(result_dir["predicted_Y_loaded_model"],
-                                                                                            threshold=0.5,label=params["label"]),verbose=True,gathered_nodes_multi_classification_task=params["gathered_nodes_multi_classification_task"])
+                                                                                            threshold=0.5,label=params["label"],gathered_nodes_multi_classification_task=params["gathered_nodes_multi_classification_task"]),verbose=True)
         plot_confusion_matrix(result_dir["predicted_Y_loaded_model"],result_dir["true_Y"],saving_path_confusion_matrix,
                               recall=recall,precision=precision,f1_score=f1_score,accuracy=accuracy,gathered_nodes_multi_classification_task=params["gathered_nodes_multi_classification_task"])
         plot_ROC(false_positive_rate,recall,saving_path_roc)

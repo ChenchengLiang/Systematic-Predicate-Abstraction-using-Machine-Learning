@@ -421,7 +421,7 @@ class raw_graph_inputs():
 class parsed_graph_data:
     def __init__(self,graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
                  graphs_argument_scores,total_number_of_node,graph_control_location_indices,file_name_list,skipped_file_list,parsed_arguments,
-                 graphs_node_symbols,graphs_label_indices,graphs_learning_labels,vocabulary_set, token_map):
+                 graphs_node_symbols,graphs_label_indices,graphs_learning_labels,vocabulary_set, token_map,template_relevance_boolean_type_list):
         self.graphs_node_label_ids=graphs_node_label_ids
         self.graphs_argument_indices=graphs_argument_indices
         self.graphs_adjacency_lists=graphs_adjacency_lists
@@ -436,6 +436,7 @@ class parsed_graph_data:
         self.graphs_label_indices=graphs_label_indices
         self.graphs_learning_labels=graphs_learning_labels
         self.skipped_file_list=skipped_file_list
+        self.template_relevance_boolean_type_list=template_relevance_boolean_type_list
 
 def write_graph_to_pickle(params):
     '''
@@ -469,6 +470,7 @@ def write_graph_to_pickle(params):
         graphs_control_location_indices = []
         graphs_label_indices = []
         graphs_learning_labels = []
+        template_relevance_boolean_type_list=[]
         total_number_of_node = 0
         file_name_list = []
         skipped_file_list=[]
@@ -542,16 +544,17 @@ def write_graph_to_pickle(params):
                     elif params["label"]=="template_relevance_boolean_usefulness":
                         graphs_label_indices.append(loaded_graph["templateIndices"])
                         graphs_learning_labels.append(loaded_graph["templateRelevanceLabel"])
+                        template_relevance_boolean_type_list.append(loaded_graph["templateRelevanceBooleanTypeList"])
                     elif params["label"]=="template_relevance_Eq_usefulness":
                         graphs_label_indices.append(loaded_graph["templateIndices"])
                         graphs_learning_labels.append(loaded_graph["templateRelevanceLabel"])
+                        template_relevance_boolean_type_list.append(loaded_graph["templateRelevanceBooleanTypeList"])
+                        if len(loaded_graph["templateRelevanceLabel"]) != len(loaded_graph["templateRelevanceBooleanTypeList"]):
+                            print("debug:", fileName)
                     elif params["label"]=="node_multiclass":
                         graphs_label_indices.append(loaded_graph["templateIndices"])
                         #graphs_learning_labels.append(loaded_graph[params["label_field"]])
                         graphs_learning_labels.append(loaded_graph["templateRelevanceLabel"])
-                        #todo: find label 4
-                        if 4 in loaded_graph["templateRelevanceLabel"]:
-                            print("debug",fileName)
                     elif params["label"]=="clause_occurrence_in_counter_examples_binary":
                         if params['graph_type'] =="hyperEdgeGraph":
                             graphs_label_indices.append(loaded_graph["guardIndices"])
@@ -772,7 +775,7 @@ def write_graph_to_pickle(params):
         pickle_data=parsed_graph_data(graphs_node_label_ids,graphs_argument_indices,graphs_adjacency_lists,
                                       graphs_argument_scores,total_number_of_node,graphs_control_location_indices,file_name_list,
                                       skipped_file_list,parsed_arguments,graphs_node_symbols,graphs_label_indices,
-                                      graphs_learning_labels,vocabulary_set, token_map)
+                                      graphs_learning_labels,vocabulary_set, token_map,template_relevance_boolean_type_list)
         pickleWrite(pickle_data, "train-" +params["label"]+"-"+ params["graph_type"] +"-"+benchmark_name + "-gnnInput_" + df + "_data")
 
 
@@ -799,6 +802,7 @@ def form_GNN_inputs_and_labels(params):
                 "total_number_of_node": parsed_dot_file.total_number_of_node,
                 "vocabulary_set": parsed_dot_file.vocabulary_set,
                 "token_map": parsed_dot_file.token_map, "file_name_list": parsed_dot_file.file_name_list,
+                "template_relevance_boolean_type_list":parsed_dot_file.template_relevance_boolean_type_list,
                 "skipped_file_list": parsed_dot_file.skipped_file_list, "benchmark": params["benchmark"],
                 "df": df, "graphs_argument_indices": parsed_dot_file.graphs_argument_indices,
                 "graphs_label_indices": parsed_dot_file.graphs_label_indices,
@@ -853,6 +857,7 @@ def form_predicate_occurrence_related_label_graph_sample(params):
     params["total_number_of_node"]
     params["vocabulary_set"]
     params["token_map"]
+    params["template_relevance_boolean_type_list"]
     params["file_name_list"]
     params["skipped_file_list"]
     params["benchmark"]
@@ -884,17 +889,19 @@ def form_predicate_occurrence_related_label_graph_sample(params):
             graphs_learning_labels_temp.append(tf.one_hot(indices=one_graph_learning_labels, depth=params["num_node_target_labels"]))
             non_one_hot_encoding_label.append(one_graph_learning_labels)
         params["graphs_learning_labels"]=graphs_learning_labels_temp
+
     elif params["label"] == "template_relevance_boolean_usefulness":
+        #params["template_relevance_boolean_type_list"]
         graphs_learning_labels_temp = []
         graphs_node_indices_temp=[]
-        for one_graph_learning_labels, one_graph_indices in zip(params["graphs_learning_labels"],graphs_node_indices):
+        for one_graph_learning_labels, one_graph_indices, one_graph_template_relevance_boolean_type_list in zip(params["graphs_learning_labels"],graphs_node_indices,params["template_relevance_boolean_type_list"]):
             one_graph_indices_temp = []
             one_graph_labels_temp=[]
-            for l,i in zip(one_graph_learning_labels,one_graph_indices):
-                if l==0:
+            for l,i,b in zip(one_graph_learning_labels,one_graph_indices,one_graph_template_relevance_boolean_type_list):
+                if b==1 and l==0:
                     one_graph_labels_temp.append(0)
                     one_graph_indices_temp.append(i)
-                if l == 4:
+                if b==1 and l == 4:
                     one_graph_labels_temp.append(1)
                     one_graph_indices_temp.append(i)
             graphs_learning_labels_temp.append(one_graph_labels_temp)
@@ -903,13 +910,14 @@ def form_predicate_occurrence_related_label_graph_sample(params):
         params["graphs_learning_labels"] = graphs_learning_labels_temp
 
     elif params["label"] == "template_relevance_Eq_usefulness":
+
         graphs_node_indices_temp = []
         graphs_learning_labels_temp = []
-        for one_graph_learning_labels,one_graph_indices in zip(params["graphs_learning_labels"],graphs_node_indices):
+        for one_graph_learning_labels,one_graph_indices,one_graph_template_relevance_boolean_type_list in zip(params["graphs_learning_labels"],graphs_node_indices,params["template_relevance_boolean_type_list"]):
             one_graph_indices_temp = []
             one_graph_labels_temp = []
-            for l, i in zip(one_graph_learning_labels, one_graph_indices):
-                if l != 4:
+            for l, i,b in zip(one_graph_learning_labels, one_graph_indices,one_graph_template_relevance_boolean_type_list):
+                if b==0 and l != 4:
                     one_graph_indices_temp.append(i)
                     one_graph_labels_temp.append(l)
             graphs_node_indices_temp.append(one_graph_indices_temp)

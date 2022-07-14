@@ -67,7 +67,7 @@ def main():
             hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers,
                                 "regression_hidden_layer_size": [64, 64],
                                 "threshold": 0.5, "max_nodes_per_batch": 10000,
-                                "max_epochs": 100, "patience": 10, "num_node_target_labels": label_to_num_node_target_labels[label],
+                                "max_epochs": 10, "patience": 10, "num_node_target_labels": label_to_num_node_target_labels[label],
                                 "fix_y_axis": False}
             parameter_list.append(parameters(relative_path=relative_path,
                           absolute_path=absolute_path,
@@ -80,9 +80,9 @@ def main():
             #     parameters(relative_path=relative_path,
             #                absolute_path=absolute_path,
             #                json_type=".concretizedHyperedgeGraph.JSON", label=label))
-            # parameter_list.append(parameters(relative_path=relative_path,
-            #                absolute_path=absolute_path,
-            #                json_type=".monoDirectionLayerGraph.JSON", label=label,label_field=label_pairs[label]))
+            parameter_list.append(parameters(relative_path=relative_path,
+                           absolute_path=absolute_path,
+                           json_type=".monoDirectionLayerGraph.JSON", label=label,label_field=label_pairs[label]))
             # parameter_list.append(
             #     parameters(relative_path=relative_path,
             #                absolute_path=absolute_path,

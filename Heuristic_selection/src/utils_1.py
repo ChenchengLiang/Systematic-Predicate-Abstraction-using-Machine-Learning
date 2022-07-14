@@ -170,10 +170,10 @@ def measurement_control_by_python(benchmark_fold):
 
 def get_solvability_log(data_fold, command_input,file_type):
     solvability_dict = {}
-    benchmark_name = os.path.join("../benchmarks/", command_input)
+    #benchmark_name = os.path.join("../benchmarks/", command_input)
     solvable_file_list = []
     for fold in data_fold:
-        solvable_file_list = get_file_list(benchmark_name, fold, file_type)
+        solvable_file_list = get_file_list(command_input, fold, file_type)
         #solvable_file_list = solvable_file_list + glob.glob(benchmark_name + "/" + fold + "/*."+file_type+".zip")
     solvable_file_list = [os.path.basename(f) for f in solvable_file_list]
     solvability_dict["solvable-file"] = solvable_file_list
@@ -201,18 +201,13 @@ def get_exceptions_folder_names():
 def wrapped_generate_horn_graph(params):
     file_list=[]
     for fold in params["data_fold"]:
-        current_folder="../benchmarks/" + params["benchmark_fold"] + "/"+fold
-        current_file_list=[]
-        for f in glob.glob(current_folder+"/*.smt2.zip"):
-            if "normalized" not in f and "simplified" not in f:
-                current_file_list.append(f)
+        current_file_list=get_file_list(params["benchmark_fold"] ,fold,params["file_type"])
         file_list = file_list + current_file_list
         # if horn_graph_folder!="": #before continous genereate horn graphs, copy from prepared horn graph
         #     for f in current_file_list:
         #         graph_file=f+".hyperEdgeHornGraph.JSON"
         #         if not os.path.exists(graph_file):
         #             shutil.copy(os.path.join("../benchmarks/",horn_graph_folder)+"/"+graph_file,current_folder)
-
     initial_file_number = len(file_list)
     print("file_list " + str(initial_file_number))
     file_list=[f[:-len(".zip")] for f in file_list]
@@ -307,7 +302,7 @@ def filter_file_list_by_max_node(file_list,max_nodes_per_batch,separateByPredica
         with open(file_name) as f:
             loaded_graph = json.load(f)
             if len(loaded_graph["nodeIds"]) < max_nodes_per_batch:
-                filtered_file_list.append(file[:file.rfind("smt2") + 4])
+                filtered_file_list.append(file)
         if os.path.exists(file_name+".zip"):
             os.remove(file_name)
 

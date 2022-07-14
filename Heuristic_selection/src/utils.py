@@ -130,7 +130,13 @@ def get_recall_and_precision(true_label,predicted_label,verbose=False):
         elif t == 1 and p == 0:
             falseNegative = falseNegative + 1
 
-    falsePositiveRate=faslePositive/(faslePositive+trueNegative)
+    if (faslePositive + trueNegative) == 0:
+        print("debug-info: faslePositive + trueNegative =0")
+        revised_faslePositive_trueNegative = 1
+    else:
+        revised_faslePositive_trueNegative = faslePositive + trueNegative
+    falsePositiveRate=faslePositive/(revised_faslePositive_trueNegative)
+
     precision = (lambda : 0 if truePositive==0 else round(truePositive / (truePositive + faslePositive),2))()
     '''
     precision is  true positive results divided by the number of all positive results, including those not identified correctly
