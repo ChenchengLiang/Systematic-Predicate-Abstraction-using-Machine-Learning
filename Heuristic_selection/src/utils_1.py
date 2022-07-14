@@ -173,7 +173,7 @@ def get_solvability_log(data_fold, command_input,file_type):
     #benchmark_name = os.path.join("../benchmarks/", command_input)
     solvable_file_list = []
     for fold in data_fold:
-        solvable_file_list = get_file_list(command_input, fold, file_type)
+        solvable_file_list = solvable_file_list+get_file_list(command_input, fold, file_type)
         #solvable_file_list = solvable_file_list + glob.glob(benchmark_name + "/" + fold + "/*."+file_type+".zip")
     solvable_file_list = [os.path.basename(f) for f in solvable_file_list]
     solvability_dict["solvable-file"] = solvable_file_list
