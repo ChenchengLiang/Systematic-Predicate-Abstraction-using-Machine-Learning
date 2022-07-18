@@ -22,7 +22,7 @@ from utils_tf import get_classification_accuracy,my_round_fun,plot_confusion_mat
 
 def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train_n_times=1,path="../",file_type=".smt2",
                     json_type=".JSON",form_label=False,GPU=False,pickle=True,use_class_weight=False,label_field="templateRelevanceLabel",verbose=False,
-                    hyper_parameters={}):
+                    hyper_parameters={},path_to_models="trained_model"):
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
                                                  "argument_upper_bound_existence", "argument_occurrence_binary",
                                                  "template_relevance", "clause_occurrence_in_counter_examples_binary",
@@ -88,7 +88,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         if force_read==True:
             params_for_write_graph_to_pickle={"benchmark":benchmark_name,"data_fold":["train", "valid", "test"],"label":label,"path":path,
                                               "file_type":file_type,"max_nodes_per_batch":parameters['max_nodes_per_batch'],
-                                              "graph_type":graph_type,"file_list":[],"vocabulary_name":"","label_field":label_field}
+                                              "graph_type":graph_type,"file_list":[],"vocabulary_name":"","label_field":label_field,"path_to_models":path_to_models}
             write_graph_to_pickle(params_for_write_graph_to_pickle)
         else:
             print("Use pickle data for training")
@@ -449,15 +449,16 @@ def write_graph_to_pickle(params):
     params["vocabulary_name"]=""
     params["file_list"]=[]
     params["label_field"]="templateRelevanceLabel"
+    params["path_to_models"]="trained_model/"
     '''
     json_type="."+params["graph_type"]+".JSON"
     if len(params["data_fold"])==1:
-        voc=pickleRead(params["vocabulary_name"] +"-"+ params["graph_type"] +"-" + params["label"] + "-vocabulary","../src/trained_model/")
+        voc=pickleRead(params["vocabulary_name"] +"-"+ params["graph_type"] +"-" + params["label"] + "-vocabulary",params["path_to_models"])
         vocabulary_set, token_map = voc[0],voc[1]
     else:
         vocabulary_set, token_map = build_vocabulary(datafold=["train", "valid", "test"], path=params["path"],json_type=json_type,
                                                      max_nodes_per_batch=params["max_nodes_per_batch"])
-        pickleWrite([list(vocabulary_set), token_map], params["benchmark"] +"-"+ params["graph_type"] + "-" + params["label"] + "-vocabulary", "../src/trained_model/")
+        pickleWrite([list(vocabulary_set), token_map], params["benchmark"] +"-"+ params["graph_type"] + "-" + params["label"] + "-vocabulary", params["path_to_models"])
     benchmark_name = params["benchmark"].replace("/", "-")
     for df in params["data_fold"]:
         print("write data_fold to pickle data:", df)
@@ -502,16 +503,16 @@ def write_graph_to_pickle(params):
                     # for f in glob.glob(path+df+"_data/"+fileName + "*"):
                     #     shutil.copy(f, "../benchmarks/problem_cases/")
                     #     os.remove(f)
-                elif len(loaded_graph["nodeIds"]) >= params["max_nodes_per_batch"]: #
+                elif len(loaded_graph["nodeIds"]) > params["max_nodes_per_batch"]+1: #
                     print("more than " + str(params["max_nodes_per_batch"]) + " nodes","skip",fileName,"skip count:",len(skipped_file_list))
                     skipped_file_list.append(file_name_with_path)
                 elif len(loaded_graph[params["label_field"]])==0:
                     print(params["label_field"]+"==0", " skip ", fileName,"skip count:",len(skipped_file_list))
                     skipped_file_list.append(file_name_with_path)
-                elif params["label"]=="template_relevance_boolean_usefulness" and 0 not in loaded_graph[params["label_field"]] and 4 not in loaded_graph[params["label_field"]]:
+                elif params["label"]=="template_relevance_boolean_usefulness" and 1 not in loaded_graph["templateRelevanceBooleanTypeList"]:
                     print(params["label"] + "==0", " skip ", fileName, "skip count:", len(skipped_file_list))
                     skipped_file_list.append(file_name_with_path)
-                elif params["label"]=="template_relevance_Eq_usefulness" and 0 not in loaded_graph[params["label_field"]] and 1 not in loaded_graph[params["label_field"]] and 2 not in loaded_graph[params["label_field"]] and 3 not in loaded_graph[params["label_field"]]:
+                elif params["label"]=="template_relevance_Eq_usefulness" and 0 not in loaded_graph["templateRelevanceBooleanTypeList"]:
                     print(params["label"] + "==0", " skip ", fileName, "skip count:", len(skipped_file_list))
                     skipped_file_list.append(file_name_with_path)
 
@@ -576,6 +577,9 @@ def write_graph_to_pickle(params):
                     # add dummy edge if that edge is empty
                     dummy_biary_edge = [0, 0]
                     dummy_ternary_edge = [0, 0, 0]
+                    #todo: find len(loaded_graph["verifHintTplPredPosNegEdges"]) == 0
+                    # if len(loaded_graph["verifHintTplPredPosNegEdges"])!=0:
+                    #     print("debug:",loaded_graph["verifHintTplPredPosNegEdges"],fileName)
                     templateEdges_verifHintTplPredEdges = np.array([dummy_biary_edge]) if len(
                         loaded_graph["verifHintTplPredEdges"]) == 0 else np.array(
                         loaded_graph["verifHintTplPredEdges"])
@@ -1427,12 +1431,3 @@ def compute_loss(label, true_Y, predicted_Y_loaded_model, class_weight, from_log
         return loss
     else:
         return tf.keras.losses.MSE(true_Y, predicted_Y_loaded_model)
-class parameters():
-    def __init__(self, relative_path,absolute_path,json_type,label,label_field):
-        self.relative_path=relative_path
-        self.absolute_path=absolute_path
-        self.json_type=json_type
-        self.label=label
-        self.label_field=label_field
-    def benchmark_name(self):
-        return self.absolute_path[self.absolute_path.find("/benchmarks/") + len("/benchmarks/"):-1]

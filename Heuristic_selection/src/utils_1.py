@@ -96,7 +96,7 @@ def read_solvability(filtered_file_list,benchmark_fold,splitClauses):
 
     #write to spreadsheet
     fields=["solvingTime","cegarIterationNumber","generatedPredicateNumber","averagePredicateSize","predicateGeneratorTime","solvability",
-            "clauseNumberBeforeSimplification","clauseNumberAfterSimplification","smt2FileSizeByte","relationSymbolNumber",
+            "clauseNumberBeforeSimplification","clauseNumberAfterSimplification","smt2FileSizeByte","relationSymbolNumberBeforeSimplification","relationSymbolNumberAfterSimplification",
     "minedSingleVariableTemplatesNumber","minedBinaryVariableTemplatesNumber","minedTemplateNumber","minedTemplateRelationSymbolNumber",
       "labeledSingleVariableTemplatesNumber","labeledBinaryVariableTemplatesNumber","labeledTemplateNumber","labeledTemplateRelationSymbolNumber",
       "unlabeledSingleVariableTemplatesNumber","unlabeledBinaryVariableTemplatesNumber","unlabeledTemplateNumber","unlabeledTemplateRelationSymbolNumber"]
@@ -213,8 +213,7 @@ def wrapped_generate_horn_graph(params):
     file_list=[f[:-len(".zip")] for f in file_list]
 
     # description: generate horn graph
-    generate_horn_graph_params={"file_list":file_list,"max_nodes_per_batch":params["max_nodes_per_batch"],"move_file":params["move_file"],"timeout":params["timeout"],
-                                "thread_number":params["thread_number"],"generateSimplePredicates":params["generateSimplePredicates"],
+    generate_horn_graph_params={"file_list":file_list,"max_nodes_per_batch":params["max_nodes_per_batch"],"move_file":params["move_file"],"timeout":params["timeout"],"generateSimplePredicates":params["generateSimplePredicates"],
                                 "generateTemplates":params["generateTemplates"],"separateByPredicates":params["separateByPredicates"],
                                 "abstract":params["abstract"],"noIntervals":params["noIntervals"],"graph_type":params["graph_type"],"splitClauses":params["splitClauses"]}
     generate_horn_graph(generate_horn_graph_params)

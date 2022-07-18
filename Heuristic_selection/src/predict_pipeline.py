@@ -12,7 +12,7 @@ def main():
 
 def predict_pipeline(fold_number=0):
     # description: parameter settings
-    benchmark = "template_selection_train_non_linear"#sys.argv[1]
+    benchmark = "Template-selection-Liner-dateset-train"#sys.argv[1]
 
     #benchmark_fold = benchmark + "-" + "unsolvable"#sys.argv[2]
 
@@ -22,15 +22,17 @@ def predict_pipeline(fold_number=0):
 
     #/home/cheli243/PycharmProjects/HintsLearning/src/
 
+    path_to_models="trained_model/"
+    #path_to_models = "../benchmarks/Template-selection-non-linear-dateset-train/non-linear-models/"
     graph_type_model_pairs = {"hyperEdgeGraph": {
-        "template_relevance_boolean_usefulness": "GNN_Argument_selection__2022-07-14_17-57-09_best.pkl", #1
-        "template_relevance_Eq_usefulness": "GNN_Argument_selection__2022-07-14_17-58-22_best.pkl", #3
-        #"node_multiclass": "GNN_Argument_selection__2022-07-14_21-31-26_best.pkl"
+        "template_relevance_boolean_usefulness": path_to_models + "GNN_Argument_selection__2022-07-18_17-09-45_best.pkl",# 1
+        "template_relevance_Eq_usefulness": path_to_models + "GNN_Argument_selection__2022-07-18_17-12-42_best.pkl",# 3
+         #"node_multiclass": path_to_models+"GNN_Argument_selection__2022-07-16_11-51-06_best.pkl"
     },
         "monoDirectionLayerGraph": {
-            "template_relevance_boolean_usefulness": "GNN_Argument_selection__2022-07-14_17-57-44_best.pkl",#2
-            "template_relevance_Eq_usefulness": "GNN_Argument_selection__2022-07-14_17-59-00_best.pkl",#4
-            #"node_multiclass": "GNN_Argument_selection__2022-07-14_21-32-00_best.pkl"
+            "template_relevance_boolean_usefulness": path_to_models + "GNN_Argument_selection__2022-07-18_17-11-04_best.pkl",# 2
+            "template_relevance_Eq_usefulness": path_to_models + "GNN_Argument_selection__2022-07-18_17-14-03_best.pkl",# 4
+            #"node_multiclass": path_to_models+"GNN_Argument_selection__2022-07-16_12-13-07_best.pkl"
         }
     }
     gathered_nodes_binary_classification_task = ["predicate_occurrence_in_SCG", "argument_lower_bound_existence",
@@ -41,7 +43,6 @@ def predict_pipeline(fold_number=0):
     # binary classification and regression's num_node_target_labels is arbitrary
     label_to_num_node_target_labels = {"template_relevance_boolean_usefulness": 1,
                                        "template_relevance_Eq_usefulness": 4, "node_multiclass": 5}
-    thread_number = 4
     continuous_extracting=True
     move_file = False
     out_of_test_set=True
@@ -53,13 +54,13 @@ def predict_pipeline(fold_number=0):
     noIntervals=""
     splitClauses="-splitClauses:1"
     file_type="smt2"
-    verbose=True
+    verbose=False
     timeout = 60*60*3
     shell_timeout=60*60*4
 
     # description: generate both graphs
     wrapped_generate_horn_graph_params={"benchmark_fold":benchmark_fold,"max_nodes_per_batch":max_nodes_per_batch,"separateByPredicates":separateByPredicates,
-                                        "abstract":abstract,"move_file":move_file,"thread_number":thread_number,"generateSimplePredicates":generateSimplePredicates,
+                                        "abstract":abstract,"move_file":move_file,"generateSimplePredicates":generateSimplePredicates,
                                         "generateTemplates":generateTemplates,"data_fold":["test_data"],"horn_graph_folder":"","noIntervals":noIntervals,
                                         "graph_type":"monoDirectionLayerGraph","splitClauses":splitClauses,"timeout":timeout,"file_type":file_type}
     filtered_file_list, file_list_with_horn_graph, file_list = \
@@ -69,11 +70,12 @@ def predict_pipeline(fold_number=0):
     for gt in graph_type_model_pairs:
         for lb in graph_type_model_pairs[gt]:
             predict_label_params={"benchmark":benchmark,"max_nodes_per_batch":max_nodes_per_batch,"benchmark_fold":benchmark_fold,
-                                  "file_list":filtered_file_list,"trained_model_path":"trained_model/"+graph_type_model_pairs[gt][lb],"use_test_threshold":use_test_threshold,
+                                  "file_list":filtered_file_list,"trained_model_path":graph_type_model_pairs[gt][lb],"use_test_threshold":use_test_threshold,
                                   "separateByPredicates":separateByPredicates,"label":lb,"verbose":verbose,
                                   "num_node_target_labels":label_to_num_node_target_labels[lb],"GPU":False,"graph_type":gt,
                                   "gathered_nodes_binary_classification_task":gathered_nodes_binary_classification_task,
-                                  "gathered_nodes_multi_classification_task":gathered_nodes_multi_classification_task}
+                                  "gathered_nodes_multi_classification_task":gathered_nodes_multi_classification_task,
+                                  "path_to_models":path_to_models}
             # description: predict label together
             predict_label(predict_label_params)
             # # description: predict label one by one
@@ -86,13 +88,14 @@ def predict_pipeline(fold_number=0):
 
 
     for gt in graph_type_model_pairs:
+        #print("-"*10,gt,"-"*10)
         if "template_relevance_boolean_usefulness" in graph_type_model_pairs[gt] and "template_relevance_Eq_usefulness"in graph_type_model_pairs[gt]:
-            merge_predicted_label_params = {"file_list": filtered_file_list, "graph_type": gt}
+            merge_predicted_label_params = {"file_list": filtered_file_list, "graph_type": gt,"verbose":verbose}
             merge_predicted_label(merge_predicted_label_params)
 
 
     # description: get solvability and measurement info with different predicate setting for unseen data
-    # get_solvability_and_measurement_from_eldarica_params={"filtered_file_list":filtered_file_list,"thread_number":thread_number,"continuous_extracting":continuous_extracting,
+    # get_solvability_and_measurement_from_eldarica_params={"filtered_file_list":filtered_file_list,"continuous_extracting":continuous_extracting,
     #                                                       "move_file":move_file,"checkSolvability":"-checkSolvability","generateTemplates":generateTemplates,
     #                                                       "measurePredictedPredicates":"","onlyInitialPredicates":"","abstract":abstract,"noIntervals":noIntervals,
     #                                                       "separateByPredicates":separateByPredicates,"solvabilityTimeout":"300",
@@ -106,7 +109,7 @@ def predict_pipeline(fold_number=0):
 
 
     # description: read measurement JSON file
-    # param_get_solvability_and_measurement_from_eldarica={"filtered_file_list":filtered_file_list,"thread_number":thread_number,
+    # param_get_solvability_and_measurement_from_eldarica={"filtered_file_list":filtered_file_list,
     #                                                      "continuous_extracting":continuous_extracting,"move_file":move_file,
     #                                                      "checkSolvability":"-checkSolvability","onlyInitialPredicates":"",
     #                                                      "generateTemplates":generateTemplates,

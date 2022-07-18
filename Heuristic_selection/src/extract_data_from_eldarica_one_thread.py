@@ -61,7 +61,7 @@ def extract_data_by_shell():
     #parameters_pipeline.append(parameters_extract_train_data_for_template_selection_without_graph) #label templates and generate simplified smt2
     #description: draw two graphs
     parameters_pipeline.append(parameters_draw_CG_using_labeled_templates) #draw constraint graph
-    #parameters_pipeline.append(parameters_draw_CDHG_using_labeled_templates) # draw hyperedge graph
+    parameters_pipeline.append(parameters_draw_CDHG_using_labeled_templates) # draw hyperedge graph
     # description: get smt2 file
     #parameters_pipeline.append(parameters_get_smt2)#generate normalized smt2
 

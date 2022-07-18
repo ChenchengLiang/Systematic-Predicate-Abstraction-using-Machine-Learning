@@ -67,7 +67,6 @@ def write_predicted_argument_score_to_json_file(dataset,predicted_argument_score
 def merge_predicted_label(params):
     for fileName in params["file_list"]:
         json_file = fileName +"."+params["graph_type"]+".JSON"
-        print("json_file", json_file)
         if os.path.exists(json_file + ".zip"):
             unzip_file(json_file + ".zip")
             os.remove(json_file + ".zip")
@@ -91,7 +90,15 @@ def merge_predicted_label(params):
                     boolean_counter=boolean_counter+1
 
             json_obj["predictedLabel"] = temp_predictedLabel
-            print(os.path.basename(fileName),"temp_predictedLabel",temp_predictedLabel)
+            if params["verbose"]==True:
+                print(os.path.basename(fileName),"temp_predictedLabel",temp_predictedLabel)
+                print(os.path.basename(fileName),"true_label", json_obj["templateRelevanceLabel"] )
+                wrong_predicted_counting=0
+                for p,t in zip(temp_predictedLabel,json_obj["templateRelevanceLabel"]):
+                    if p!=t:
+                        wrong_predicted_counting=wrong_predicted_counting+1
+                print("wrong_predicted_counting",wrong_predicted_counting)
+
 
 
             clear_file(json_file)
@@ -102,15 +109,16 @@ def merge_predicted_label(params):
             os.remove(json_file)
 
 
-def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_type,threshold,verbose=True,label="",gathered_nodes_multi_classification_task=[]):
+def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,rounded_predicted_Y_loaded_model,graph_type,threshold,verbose=True,label="",gathered_nodes_multi_classification_task=[]):
     current_positon=0
     for g,file_name in zip(dataset._loaded_data[DataFold.TEST],dataset._file_list["test"]):
-        predicted_label=predicted_Y_loaded_model[current_positon:current_positon+len(g._node_label)]
-        current_positon=current_positon+len(g._node_label)
         corrected_label = 0
         true_Y_list=np.array(g._node_label)
-        transfored_predicted_Y_loaded_model=predicted_label
-
+        # if label in gathered_nodes_multi_classification_task:
+        #     predicted_Y_loaded_model=predicted_Y_loaded_model[0]
+        predicted_label = predicted_Y_loaded_model[current_positon:current_positon + len(g._node_label)]
+        transfored_predicted_Y_loaded_model=rounded_predicted_Y_loaded_model[current_positon:current_positon+len(g._node_label)]
+        current_positon = current_positon + len(g._node_label)
         if label in gathered_nodes_multi_classification_task:
             true_Y_list=[np.argmax(y) for y in true_Y_list]
             transfored_predicted_Y_loaded_model=[np.argmax(y) for y in transfored_predicted_Y_loaded_model]
@@ -172,7 +180,8 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,graph_ty
             predicted_label_suffix=""
 
         new_field = ["predictedLabel"+predicted_label_suffix,"predictedLabelLogit"+predicted_label_suffix]
-        new_filed_content=[[int(x) for x in transfored_predicted_Y_loaded_model],[str(np.round(l,2)) for l in predicted_label]]
+
+        new_filed_content=[[int(x) for x in transfored_predicted_Y_loaded_model],[np.round(l,2).tolist() for l in predicted_label]]
         add_JSON_field(file_name,graph_type,old_field,new_field,new_filed_content)
 
         file_compress([json_file_name],json_file_name+".zip")
@@ -235,11 +244,11 @@ def write_best_threshod_to_pickle(parameters,true_Y, predicted_Y_loaded_model,la
 def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",label="template_relevance",force_read=True,form_label=True,
                        json_type=".hyperEdgeGraph.JSON",graph_type="hyperEdgeGraph",verbose=True,
                        gathered_nodes_binary_classification_task=["template_relevance"],hyper_parameter={},
-                       set_max_nodes_per_batch=False,file_list=[],num_node_target_labels=2,gathered_nodes_multi_classification_task=[]):
+                       set_max_nodes_per_batch=False,file_list=[],num_node_target_labels=2,gathered_nodes_multi_classification_task=[],path_to_models="../src/trained_model/"):
 
     path = "../benchmarks/" + benchmark_fold + "/"
     benchmark_name = path[len("../benchmarks/"):-1]
-    parameters = pickleRead(benchmark + "-" +graph_type+"-"+ label + "-parameters", "../src/trained_model/")
+    parameters = pickleRead(benchmark + "-" +graph_type+"-"+ label + "-parameters", path_to_models)
     parameters["benchmark"] = benchmark_name
     parameters["gathered_nodes_multi_classification_task"]=gathered_nodes_multi_classification_task
     print("vocabulary size:", parameters["node_vocab_size"])
@@ -250,7 +259,7 @@ def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",labe
     if force_read == True:
         params_write_graph_to_pickle={"benchmark":benchmark_name,"data_fold":["test"],"label":label,"path":path,"graph_type":graph_type,
                                       "max_nodes_per_batch":hyper_parameter["max_nodes_per_batch"],"vocabulary_name":benchmark,
-                                      "file_list":file_list,"file_type":".smt2","label_field":hyper_parameter["label_field"]}
+                                      "file_list":file_list,"file_type":".smt2","label_field":hyper_parameter["label_field"],"path_to_models":path_to_models}
         write_graph_to_pickle(params_write_graph_to_pickle)
     else:
         print("Use pickle data for training")
@@ -353,7 +362,7 @@ def predict_label(params):
     if params["separateByPredicates"]:
         params["file_list"]=[]
     # read best threshold from pickle
-    parameters = pickleRead(params["benchmark"] + "-"+ params["graph_type"] + "-" + params["label"] + "-parameters", "../src/trained_model/")
+    parameters = pickleRead(params["benchmark"] + "-"+ params["graph_type"] + "-" + params["label"] + "-parameters", params["path_to_models"])
     print("parameters",parameters)
     hyper_parameter = {"max_nodes_per_batch": params["max_nodes_per_batch"],
                        "best_threshold_set": (lambda : parameters["best_threshold_set"] if params["use_test_threshold"]== True else {"threshold":0.5,"accuracy":0})(),
@@ -370,8 +379,10 @@ def predict_label(params):
                                     gathered_nodes_binary_classification_task=params["gathered_nodes_binary_classification_task"],
                                     hyper_parameter=hyper_parameter,label=params["label"],
                                     set_max_nodes_per_batch=True,file_list=params["file_list"],
-                                    num_node_target_labels=params["num_node_target_labels"],gathered_nodes_multi_classification_task=params["gathered_nodes_multi_classification_task"])
-    write_predicted_label_to_JSON_file(result_dir["dataset"], result_dir["rounded_predicted_Y_loaded_model"], json_type,
+                                    num_node_target_labels=params["num_node_target_labels"],
+                                    gathered_nodes_multi_classification_task=params["gathered_nodes_multi_classification_task"],
+                                    path_to_models=params["path_to_models"],verbose=params["verbose"])
+    write_predicted_label_to_JSON_file(result_dir["dataset"], result_dir["predicted_Y_loaded_model"],result_dir["rounded_predicted_Y_loaded_model"], json_type,
                                        result_dir["best_threshold"],verbose=params["verbose"],label=params["label"],gathered_nodes_multi_classification_task=params["gathered_nodes_multi_classification_task"])
 
     plot_name="predicted"

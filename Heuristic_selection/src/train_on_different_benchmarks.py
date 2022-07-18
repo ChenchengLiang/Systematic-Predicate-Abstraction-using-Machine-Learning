@@ -1,7 +1,5 @@
 import os.path
-
 import tensorflow as tf
-from horn_dataset import parameters
 from Miscellaneous import GPU_switch
 from horn_dataset import train_on_graphs
 
@@ -21,7 +19,7 @@ def main():
     label_to_num_node_target_labels={"template_relevance_boolean_usefulness":1,
                                      "template_relevance_Eq_usefulness":4,"node_multiclass":5}
 
-    parameter_list = []
+
     label_list=[]
     #label = "occurrence"
     #label = "rank"
@@ -39,8 +37,8 @@ def main():
     # label_list.append("argument_upper_bound")
     #label_list.append("argument_occurrence_binary")
     #label_list.append("template_relevance")
-    #label_list.append("template_relevance_boolean_usefulness")
-    #label_list.append("template_relevance_Eq_usefulness")
+    label_list.append("template_relevance_boolean_usefulness")
+    label_list.append("template_relevance_Eq_usefulness")
     label_list.append("node_multiclass")
 
     # json_type = ".hyperEdgeGraph.JSON"
@@ -51,7 +49,11 @@ def main():
     GPU=False
     use_class_weight=False
     pickle = True
-    benchmark_name = "template_selection_train_non_linear/" #"template_selection_train/"
+    benchmark_name = "Template-selection-Liner-dateset-train"+"/"
+    path_to_models="trained_model/"
+    relative_path = os.path.join("../benchmarks/", benchmark_name)
+    absolute_path = os.path.join("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/", benchmark_name)
+    GPU_switch(GPU)
 
     # random.seed(0)
     # np.random.seed(0)
@@ -60,18 +62,17 @@ def main():
     num_layers_list=[8]
 
     for num_layers in num_layers_list:
-
-        relative_path = os.path.join("../benchmarks/", benchmark_name)
-        absolute_path = os.path.join("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/", benchmark_name)
         for label in label_list:
+            parameter_list = []
             hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers,
                                 "regression_hidden_layer_size": [64, 64],
                                 "threshold": 0.5, "max_nodes_per_batch": 10000,
-                                "max_epochs": 10, "patience": 10, "num_node_target_labels": label_to_num_node_target_labels[label],
+                                "max_epochs": 500, "patience": 100, "num_node_target_labels": label_to_num_node_target_labels[label],
                                 "fix_y_axis": False}
-            parameter_list.append(parameters(relative_path=relative_path,
-                          absolute_path=absolute_path,
-                          json_type=".hyperEdgeGraph.JSON", label=label,label_field=label_pairs[label]))#templateRelevanceLabel,templateCostLabel,argumentIndices
+            # parameter_list.append(parameters(relative_path=relative_path,
+            #               absolute_path=absolute_path,
+            #               json_type=".hyperEdgeGraph.JSON", label=label,label_field=label_pairs[label]))#templateRelevanceLabel,templateCostLabel,argumentIndices
+            parameter_list.append({"relative_path":relative_path,"absolute_path":absolute_path,"json_type":".hyperEdgeGraph.JSON","label":label,"label_field":label_pairs[label]})  # templateRelevanceLabel,templateCostLabel,argumentIndices
             # parameter_list.append(
             #     parameters(relative_path=relative_path,
             #                absolute_path=absolute_path,
@@ -80,9 +81,12 @@ def main():
             #     parameters(relative_path=relative_path,
             #                absolute_path=absolute_path,
             #                json_type=".concretizedHyperedgeGraph.JSON", label=label))
-            parameter_list.append(parameters(relative_path=relative_path,
-                           absolute_path=absolute_path,
-                           json_type=".monoDirectionLayerGraph.JSON", label=label,label_field=label_pairs[label]))
+            # parameter_list.append(parameters(relative_path=relative_path,
+            #                absolute_path=absolute_path,
+            #                json_type=".monoDirectionLayerGraph.JSON", label=label,label_field=label_pairs[label]))
+            parameter_list.append(
+                {"relative_path": relative_path, "absolute_path": absolute_path, "json_type": ".monoDirectionLayerGraph.JSON",
+                 "label": label, "label_field": label_pairs[label]})
             # parameter_list.append(
             #     parameters(relative_path=relative_path,
             #                absolute_path=absolute_path,
@@ -100,24 +104,23 @@ def main():
             #                absolute_path=absolute_path,
             #                json_type=".fineGrainedEdgeTypeLayerGraph.JSON", label=label))
 
-        GPU_switch(GPU)
+            for param in parameter_list:
+                #print("debug",param["json_type"],param["label"],hyper_parameters["num_node_target_labels"])
+                tf.keras.backend.clear_session()
+                if pickle==False:
+                    train_on_graphs(benchmark_name=param["absolute_path"][param["absolute_path"].find("/benchmarks/")+len("/benchmarks/"):-1], label=param["label"],
+                                    force_read=force_read,
+                                    train_n_times=1,path=param["absolute_path"], file_type=file_type, form_label=form_label,
+                                    json_type=param["json_type"],GPU=GPU,pickle=pickle,use_class_weight=use_class_weight,label_field=param["label_field"],
+                                    hyper_parameters=hyper_parameters,path_to_models=path_to_models)
+                else:
+                    train_on_graphs(benchmark_name=param["absolute_path"][param["absolute_path"].find("/benchmarks/")+len("/benchmarks/"):-1],
+                                    label=param["label"], force_read=force_read,
+                                    train_n_times=1, path=param["relative_path"], file_type=file_type, form_label=form_label,
+                                    json_type=param["json_type"], GPU=GPU, pickle=pickle,use_class_weight=use_class_weight,label_field=param["label_field"],
+                                    hyper_parameters=hyper_parameters,path_to_models=path_to_models)
 
 
-        for param in parameter_list:
-            tf.keras.backend.clear_session()
-            if pickle==False:
-                train_on_graphs(benchmark_name=param.absolute_path[param.absolute_path.find("/benchmarks/")+len("/benchmarks/"):-1], label=param.label, force_read=force_read,
-                                train_n_times=1,path=param.absolute_path, file_type=file_type, form_label=form_label,
-                                json_type=param.json_type,GPU=GPU,pickle=pickle,use_class_weight=use_class_weight,label_field=param.label_field,
-                                hyper_parameters=hyper_parameters)
-            else:
-                train_on_graphs(benchmark_name=param.benchmark_name(),
-                                label=param.label, force_read=force_read,
-                                train_n_times=1, path=param.relative_path, file_type=file_type, form_label=form_label,
-                                json_type=param.json_type, GPU=GPU, pickle=pickle,use_class_weight=use_class_weight,label_field=param.label_field,
-                                hyper_parameters=hyper_parameters)
 
-
-        parameter_list=[]
 
 main()
