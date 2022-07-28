@@ -75,14 +75,17 @@ def merge_predicted_label(params):
                 json_obj = json.load(f)
 
             temp_predictedLabel=[]
+            temp_predictedLabelLogit=[]
             boolean_counter=0
             non_boolean_counter=0
             for b in json_obj["templateRelevanceBooleanTypeList"]:
                 if b==0:# non-boolean tempaltes
                     temp_predictedLabel.append(json_obj["predictedLabel_template_relevance_Eq_usefulness"][non_boolean_counter])
+                    temp_predictedLabelLogit.append(max(json_obj["predictedLabelLogit_template_relevance_Eq_usefulness"][non_boolean_counter]))
                     non_boolean_counter=non_boolean_counter+1
                 else:#boolean tempaltes
                     l=json_obj["predictedLabel_template_relevance_boolean_usefulness"][boolean_counter]
+                    temp_predictedLabelLogit.append(json_obj["predictedLabelLogit_template_relevance_boolean_usefulness"][boolean_counter])
                     if l==1: #map back to 0 and 4
                         temp_predictedLabel.append(4)
                     else:
@@ -90,6 +93,7 @@ def merge_predicted_label(params):
                     boolean_counter=boolean_counter+1
 
             json_obj["predictedLabel"] = temp_predictedLabel
+            json_obj["predictedLabelLogit"] = temp_predictedLabelLogit
             if params["verbose"]==True:
                 print(os.path.basename(fileName),"temp_predictedLabel",temp_predictedLabel)
                 print(os.path.basename(fileName),"true_label", json_obj["templateRelevanceLabel"] )
@@ -111,11 +115,12 @@ def merge_predicted_label(params):
 
 def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,rounded_predicted_Y_loaded_model,graph_type,threshold,verbose=True,label="",gathered_nodes_multi_classification_task=[]):
     current_positon=0
+    if label in gathered_nodes_multi_classification_task:
+        predicted_Y_loaded_model = predicted_Y_loaded_model[0]
+
     for g,file_name in zip(dataset._loaded_data[DataFold.TEST],dataset._file_list["test"]):
         corrected_label = 0
         true_Y_list=np.array(g._node_label)
-        # if label in gathered_nodes_multi_classification_task:
-        #     predicted_Y_loaded_model=predicted_Y_loaded_model[0]
         predicted_label = predicted_Y_loaded_model[current_positon:current_positon + len(g._node_label)]
         transfored_predicted_Y_loaded_model=rounded_predicted_Y_loaded_model[current_positon:current_positon+len(g._node_label)]
         current_positon = current_positon + len(g._node_label)
@@ -180,7 +185,6 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,rounded_
             predicted_label_suffix=""
 
         new_field = ["predictedLabel"+predicted_label_suffix,"predictedLabelLogit"+predicted_label_suffix]
-
         new_filed_content=[[int(x) for x in transfored_predicted_Y_loaded_model],[np.round(l,2).tolist() for l in predicted_label]]
         add_JSON_field(file_name,graph_type,old_field,new_field,new_filed_content)
 
@@ -259,7 +263,7 @@ def wrapped_prediction(trained_model_path="",benchmark="",benchmark_fold="",labe
     if force_read == True:
         params_write_graph_to_pickle={"benchmark":benchmark_name,"data_fold":["test"],"label":label,"path":path,"graph_type":graph_type,
                                       "max_nodes_per_batch":hyper_parameter["max_nodes_per_batch"],"vocabulary_name":benchmark,
-                                      "file_list":file_list,"file_type":".smt2","label_field":hyper_parameter["label_field"],"path_to_models":path_to_models}
+                                      "file_list":file_list,"file_type":".smt2","label_field":hyper_parameter["label_field"],"path_to_models":path_to_models,"train":False}
         write_graph_to_pickle(params_write_graph_to_pickle)
     else:
         print("Use pickle data for training")

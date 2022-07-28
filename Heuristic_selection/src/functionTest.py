@@ -241,22 +241,34 @@ def main():
     # plt.clf()
 
 
-    print(np.unique(np.array([[0,0],[0,0],[0,1]]), axis=0))
+    # print(np.unique(np.array([[0,0],[0,0],[0,1]]), axis=0))
+    #
+    # with open("../benchmarks/align-lin+non-lin-predict/wrong_predicted/chc-LIA-lin_495.smt2.hyperEdgeGraph.JSON") as f:
+    #     loaded_graph = json.load(f)
+    #     nodeIds=loaded_graph["nodeIds"]
+    #     AST_1Edges = loaded_graph["AST_1Edges"]
+    #     AST_2Edges=loaded_graph["AST_2Edges"]
+    #     nodeSymbolList = loaded_graph["nodeSymbolList"]
+    #     print("AST_1Edges",len(AST_1Edges),len(np.unique(AST_1Edges, axis=0)))
+    #     print("AST_2Edges",len(AST_2Edges),len(np.unique(AST_2Edges, axis=0)))
+    #     print(nodeSymbolList[AST_1Edges[0][0]],nodeSymbolList[AST_1Edges[0][1]])
+    #     print(nodeSymbolList[AST_2Edges[0][0]], nodeSymbolList[AST_2Edges[0][1]])
+    #
+    #     argument_identify_labels=[1 if x in loaded_graph["argumentIndices"]  else 0 for x in nodeIds]
+    #     print("nodeIds",len(loaded_graph["argumentIndices"] ),nodeIds)
+    #     print("nodeIds",sum(argument_identify_labels),argument_identify_labels)
 
-    with open("../benchmarks/align-lin+non-lin-predict/wrong_predicted/chc-LIA-lin_495.smt2.hyperEdgeGraph.JSON") as f:
+    with open("../benchmarks/Template-selection-non-Liner-dateset-debug/benchmark_info_merged.JSON") as f:
         loaded_graph = json.load(f)
-        nodeIds=loaded_graph["nodeIds"]
-        AST_1Edges = loaded_graph["AST_1Edges"]
-        AST_2Edges=loaded_graph["AST_2Edges"]
-        nodeSymbolList = loaded_graph["nodeSymbolList"]
-        print("AST_1Edges",len(AST_1Edges),len(np.unique(AST_1Edges, axis=0)))
-        print("AST_2Edges",len(AST_2Edges),len(np.unique(AST_2Edges, axis=0)))
-        print(nodeSymbolList[AST_1Edges[0][0]],nodeSymbolList[AST_1Edges[0][1]])
-        print(nodeSymbolList[AST_2Edges[0][0]], nodeSymbolList[AST_2Edges[0][1]])
+        print(len(loaded_graph["solvable-file"]))
+        print(len(set(loaded_graph["solvable-file"])))
+        file_list=glob.glob("../benchmarks/Template-selection-non-Liner-dateset/non-linear-unsolvable-graphs/train_data/*.smt2.zip")
+        print(len(file_list))
 
-        argument_identify_labels=[1 if x in loaded_graph["argumentIndices"]  else 0 for x in nodeIds]
-        print("nodeIds",len(loaded_graph["argumentIndices"] ),nodeIds)
-        print("nodeIds",sum(argument_identify_labels),argument_identify_labels)
+        #for gfn in file_list:
+        for fn in sorted(loaded_graph["solvable-file"]):
+            if fn not in [os.path.basename(ff) for ff in file_list]:
+                print(fn)
 
 
 

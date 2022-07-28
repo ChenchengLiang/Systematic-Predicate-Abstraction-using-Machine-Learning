@@ -7,7 +7,7 @@ import os
 import time
 import pandas as pd
 from measurement_functions import read_measurement_from_JSON
-
+from plot import plot_scatter_statistics
 
 
 def get_solvability_and_measurement_from_eldarica(params):
@@ -94,13 +94,14 @@ def read_solvability(filtered_file_list,benchmark_fold,splitClauses):
         json.dump(solvability_summary, f, indent=4, sort_keys=True)
 
 
-    #write to spreadsheet
+    #description: write to spreadsheet
+    abstract_option_fields_dict={}
     fields=["solvingTime","cegarIterationNumber","generatedPredicateNumber","averagePredicateSize","predicateGeneratorTime","solvability",
             "clauseNumberBeforeSimplification","clauseNumberAfterSimplification","smt2FileSizeByte","relationSymbolNumberBeforeSimplification","relationSymbolNumberAfterSimplification",
     "minedSingleVariableTemplatesNumber","minedBinaryVariableTemplatesNumber","minedTemplateNumber","minedTemplateRelationSymbolNumber",
       "labeledSingleVariableTemplatesNumber","labeledBinaryVariableTemplatesNumber","labeledTemplateNumber","labeledTemplateRelationSymbolNumber",
       "unlabeledSingleVariableTemplatesNumber","unlabeledBinaryVariableTemplatesNumber","unlabeledTemplateNumber","unlabeledTemplateRelationSymbolNumber"]
-    with pd.ExcelWriter("../benchmarks/" + benchmark_fold + "/solvability_summary.xlsx") as writer:
+    with pd.ExcelWriter("../benchmarks/" + benchmark_fold + "/solvability_statistics.xlsx") as writer:
         for op in abstract_option:
             name_list=[]
             field_dict = {field:[] for field in fields}
@@ -111,8 +112,23 @@ def read_solvability(filtered_file_list,benchmark_fold,splitClauses):
                     field_dict[k].append(int(list(f[k+"_" + op + splitClauses_name])[0]))
 
             final_dict={**{"name_list":name_list},**field_dict}
+            abstract_option_fields_dict[op]=final_dict
             data=pd.DataFrame(final_dict)
             data.to_excel(writer, sheet_name=op)
+
+    #description: draw scatters
+    for field in ["solvingTime","cegarIterationNumber","generatedPredicateNumber","averagePredicateSize","predicateGeneratorTime"]:
+        current_folder = "../benchmarks/" + benchmark_fold + "/" + field + "-scatter"
+        make_dirct(current_folder)
+        for k in abstract_option_fields_dict:
+            if k != "Mined":
+                X = abstract_option_fields_dict["Mined"][field]
+                Y = abstract_option_fields_dict[k][field]
+                x_label = "Mined " + field
+                y_label = k + " " + field
+                for scale in ["linear","log"]:
+                    saving_file_name = current_folder + "/" + k + "-" + "Mined" + "-" + field + "-" + scale
+                    plot_scatter_statistics(X, Y, x_label, y_label, saving_file_name + ".png", scale=scale)
 
 
 
@@ -608,6 +624,10 @@ def unzip_file(zip_file):
         print("zip file "+zip_file+" not existed")
 
 
-
+def make_dirct(d):
+    try:
+        os.mkdir(d)
+    except:
+        print(str(d),"folder existed")
 
 

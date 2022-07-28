@@ -42,7 +42,7 @@ import scala.collection.mutable.ListBuffer
 
 object StaticAbstractionBuilder {
   object AbstractionType extends Enumeration {
-    val Empty, Term, Octagon, RelationalEqs, RelationalIneqs,All,Random,Unlabeled,Labeled,PredictedCG,PredictedCDHG,Mined = Value
+    val Empty, Term, Octagon, RelationalEqs, RelationalIneqs,All,Random,Unlabeled,Labeled,PredictedCG,PredictedCDHG,Mined,Combined = Value
   }
 }
 
@@ -269,6 +269,10 @@ class StaticAbstractionBuilder(
       case AbstractionType.PredictedCDHG => predictedCDHGAbstractions
       case _ => emptyAbstractions
     }
+
+  if (GlobalParameters.get.debugLog)
+      HintsSelection.writeTemplatesToFile(abstractionHints,abstractionType.toString)
+
 
   if (GlobalParameters.get.templateBasedInterpolationPrint)
     AbsReader printHints abstractionHints

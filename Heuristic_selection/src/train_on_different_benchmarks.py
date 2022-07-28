@@ -49,7 +49,7 @@ def main():
     GPU=False
     use_class_weight=False
     pickle = True
-    benchmark_name = "Template-selection-Liner-dateset-train"+"/"
+    benchmark_name = "Template-selection-non-linear-dateset-train"+"/"
     path_to_models="trained_model/"
     relative_path = os.path.join("../benchmarks/", benchmark_name)
     absolute_path = os.path.join("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/", benchmark_name)

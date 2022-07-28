@@ -25,13 +25,13 @@ def predict_pipeline(fold_number=0):
     path_to_models="trained_model/"
     #path_to_models = "../benchmarks/Template-selection-non-linear-dateset-train/non-linear-models/"
     graph_type_model_pairs = {"hyperEdgeGraph": {
-        "template_relevance_boolean_usefulness": path_to_models + "GNN_Argument_selection__2022-07-18_17-09-45_best.pkl",# 1
-        "template_relevance_Eq_usefulness": path_to_models + "GNN_Argument_selection__2022-07-18_17-12-42_best.pkl",# 3
+        "template_relevance_boolean_usefulness": path_to_models + "GNN_Argument_selection__2022-07-18_17-40-03_best.pkl",# 1
+        "template_relevance_Eq_usefulness": path_to_models + "GNN_Argument_selection__2022-07-18_18-27-27_best.pkl",# 3
          #"node_multiclass": path_to_models+"GNN_Argument_selection__2022-07-16_11-51-06_best.pkl"
     },
         "monoDirectionLayerGraph": {
-            "template_relevance_boolean_usefulness": path_to_models + "GNN_Argument_selection__2022-07-18_17-11-04_best.pkl",# 2
-            "template_relevance_Eq_usefulness": path_to_models + "GNN_Argument_selection__2022-07-18_17-14-03_best.pkl",# 4
+            "template_relevance_boolean_usefulness": path_to_models + "GNN_Argument_selection__2022-07-18_17-58-53_best.pkl",# 2
+            "template_relevance_Eq_usefulness": path_to_models + "GNN_Argument_selection__2022-07-18_19-06-40_best.pkl",# 4
             #"node_multiclass": path_to_models+"GNN_Argument_selection__2022-07-16_12-13-07_best.pkl"
         }
     }

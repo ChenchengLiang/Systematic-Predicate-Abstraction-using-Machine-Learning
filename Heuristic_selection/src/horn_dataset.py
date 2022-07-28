@@ -88,7 +88,7 @@ def train_on_graphs(benchmark_name="unknown",label="rank",force_read=False,train
         if force_read==True:
             params_for_write_graph_to_pickle={"benchmark":benchmark_name,"data_fold":["train", "valid", "test"],"label":label,"path":path,
                                               "file_type":file_type,"max_nodes_per_batch":parameters['max_nodes_per_batch'],
-                                              "graph_type":graph_type,"file_list":[],"vocabulary_name":"","label_field":label_field,"path_to_models":path_to_models}
+                                              "graph_type":graph_type,"file_list":[],"vocabulary_name":"","label_field":label_field,"path_to_models":path_to_models,"train":True}
             write_graph_to_pickle(params_for_write_graph_to_pickle)
         else:
             print("Use pickle data for training")
@@ -450,6 +450,7 @@ def write_graph_to_pickle(params):
     params["file_list"]=[]
     params["label_field"]="templateRelevanceLabel"
     params["path_to_models"]="trained_model/"
+    params["train"]=True
     '''
     json_type="."+params["graph_type"]+".JSON"
     if len(params["data_fold"])==1:

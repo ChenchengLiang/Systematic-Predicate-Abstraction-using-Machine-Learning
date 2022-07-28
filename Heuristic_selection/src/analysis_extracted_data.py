@@ -12,7 +12,7 @@ from multiprocessing import Pool
 import shutil
 from utils import unzip_file,folder_compress
 import zipfile
-from utils_1 import delete_relative_files,copy_relative_files,get_file_list
+from utils_1 import delete_relative_files,copy_relative_files,get_file_list,make_dirct
 
 # def generate_JSON_field(rootdir, json_file_type=".layerHornGraph.JSON", eldarica_parameters="-getHornGraph"):
 #     for root, subdirs, files in os.walk(rootdir):
@@ -283,11 +283,11 @@ def main():
     #clean_extracted_data("linear-layer-CE-union-uppmax/extracted",total_file=3,edge_type="mono-layerHornGraph")
     # extract_train_data_templates_pool("../benchmarks/small-dataset-sat-datafold-same-train-valid-test")
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
-    shuffle_data("Template-selection-non-Liner-dateset-CDHG+CG-differentiate-boolean-tempalte-by-edge","train_data","smt2",
-                 "../benchmarks/Template-selection-non-Liner-dateset-CDHG+CG-differentiate-boolean-tempalte-by-edge/shuffle")
-    # divide_data_to_threads("Template-selection-non-Liner-dateset/non-linear-unsolvable",
-    #                        "Template-selection-non-Liner-dateset/non-linear-unsolvable-divided",three_fold=True,datafold_list=["train_data","valid_data","test_data"],
-    #                        file_type="smt2",chunk_number=205)#datafold_list=["test_data"]
+    # shuffle_data("Template-selection-non-Liner-dateset-CDHG+CG-differentiate-boolean-tempalte-by-edge","train_data","smt2",
+    #              "../benchmarks/Template-selection-non-Liner-dateset-CDHG+CG-differentiate-boolean-tempalte-by-edge/shuffle")
+    divide_data_to_threads("Template-selection-non-Liner-dateset/non-linear-final-solvable-unsolvable/unsolvable",
+                           "Template-selection-non-Liner-dateset/non-linear-final-solvable-unsolvable/unsolvable-divided",three_fold=True,datafold_list=["train_data","valid_data","test_data"],
+                           file_type="smt2",chunk_number=361)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -362,10 +362,89 @@ def main():
     # source_folder="Linear-dataset-pure-argument-identification-task"
     # select_files_with_condition(source_folder, source_folder+"-separate-by-node-number")
 
-    #compile_dataset("Template-selection-non-Liner-dateset-mined-templates-statistics")
+    #compile_dataset("Template-selection-Liner-dateset/solvable-sat-mined-templates-statistics")
 
-    #change_relative_file_names("Template-selection-non-Liner-dateset-change-name","train_data","smt2")
+    #change_relative_file_names("Template-selection-non-Liner-dateset/solvable-sat-mined-templates/exceptions","empty-mined-label","smt2")
+    # collect_relative_files("Template-selection-non-Liner-dateset/solvable-sat-mined-templates/non-linear-empty-mined-label",
+    #                        "Template-selection-non-Liner-dateset/solvable-sat-solving-time","smt2")
 
+    # collect_solvable_list_from_unsolvable_set("../benchmarks/Template-selection-non-Liner-dateset/non-linear-unsolvable-graphs-predicted-solvability/solvability_summary.JSON",
+    #                                           "../benchmarks/Template-selection-non-Liner-dateset/non-linear-unsolvable","train_data")
+
+    #check_solving_time_JSON("Template-selection-Liner-dateset/solvable-sat-solving-time","train_data","smt2")
+    #check_solvability_JSON("Template-selection-Liner-dateset/linear-unsolvable-1","train_data","smt2")
+
+def check_solvability_JSON(folder,fold,file_type):
+    # collect solvable cases from unsolvable set
+    abstract_option = ["Empty","Term", "Octagon", "RelationalEqs", "RelationalIneqs"]#["Empty", "Term", "Octagon", "RelationalEqs", "RelationalIneqs", "Random", "Unlabeled", "Labeled","PredictedCG", "PredictedCDHG", "Mined"]
+    file_list = get_file_list(folder, fold, file_type)
+    solvable_folder_name="../benchmarks/"+folder + "/solvable"
+    make_dirct(solvable_folder_name)
+    solvable_problems=[]
+    with open("../benchmarks/"+folder+"/solvability_summary.JSON") as f:
+        loaded_graph = json.load(f)
+        for ao in abstract_option:
+            #print("-"*10,ao,"-"*10)
+            for ff in loaded_graph[ao]["solvable_list"]:
+                solvable_problems.append(ff)
+    solvable_problems=set(solvable_problems)
+    print(len(solvable_problems))
+    print(solvable_problems)
+    for f in solvable_problems:
+        copy_relative_files("../benchmarks/"+folder+"/"+"train_data/"+f,solvable_folder_name)
+        delete_relative_files("../benchmarks/"+folder+"/"+"train_data/"+f)
+
+def check_solving_time_JSON(folder,fold,file_type):
+    #collect unsolvable cases from solvable set
+    file_list=get_file_list(folder, fold, file_type)
+    unsolvable_list=[]
+    for f in file_list:
+        solving_time_json_file=f[:-len(".zip")]+".solvingTime.JSON"
+        unzip_file(solving_time_json_file+".zip")
+        os.remove(solving_time_json_file+".zip")
+        with open(solving_time_json_file) as st:
+            loaded_json = json.load(st)
+            counter=0
+            for k in loaded_json:
+                if len(loaded_json[k])!=0 and loaded_json[k][0]!=10800000:
+                    counter=counter+1
+            #print(counter,os.path.basename(f))
+            if counter==0:
+                print("*"*10,"unsolvable",os.path.basename(f),"*"*10)
+                unsolvable_list.append(f)
+        file_compress([solving_time_json_file], solving_time_json_file + ".zip")
+        os.remove(solving_time_json_file)
+
+    unsolvable_folder="../benchmarks/"+folder+"/"+"unsolvable"
+    make_dirct(unsolvable_folder)
+    for f in unsolvable_list:
+        print(f,unsolvable_folder)
+        copy_relative_files(f[:-len(".zip")],unsolvable_folder)
+        delete_relative_files(f[:-len(".zip")])
+
+
+def collect_solvable_list_from_unsolvable_set(json_file,unsolvable_folder,fold):
+    abstract_option = ["Empty", "Term", "Octagon", "RelationalEqs", "RelationalIneqs", "Random", "Unlabeled", "Labeled",
+                       "PredictedCG", "PredictedCDHG", "Mined"]
+    make_dirct(os.path.dirname(json_file)+"/collected_solvable_files")
+    with open(json_file) as f:
+        loaded_graph = json.load(f)
+        for ao in abstract_option:
+            abstract_option_folder=os.path.dirname(json_file)+"/collected_solvable_files/"+ao
+            make_dirct(abstract_option_folder)
+            for ff in loaded_graph[ao]["solvable_list"]:
+                print(ff)
+                copy_relative_files(unsolvable_folder+"/"+fold+"/"+ff[:-len(".zip")],abstract_option_folder)
+
+
+
+def collect_relative_files(folder,from_folder,file_type):
+    file_list = get_file_list(folder, "train_data", file_type)
+    file_list_with_relative_files = get_file_list(from_folder, "train_data", file_type)
+    for f in file_list:
+        for ff in file_list_with_relative_files:
+            if os.path.basename(f) == os.path.basename(ff):
+                copy_relative_files(ff[:-len(".zip")],os.path.dirname(f))
 
 def change_relative_file_names(folder,fold,file_type):
     file_list=get_file_list(folder,fold,file_type)
@@ -531,18 +610,16 @@ def separate_extracted_and_left_data(benchmark="",folder=""):
 def file_compress(inp_file_names, out_zip_file):
     import zipfile
     compression = zipfile.ZIP_DEFLATED
-
-    print(f" *** Input File name passed for zipping - {inp_file_names}")
-
+    #print(f" *** Input File name passed for zipping - {inp_file_names}")
     # create the zip file first parameter path/name, second mode
-    print(f' *** out_zip_file is - {out_zip_file}')
+    #print(f' *** out_zip_file is - {out_zip_file}')
     zf = zipfile.ZipFile(out_zip_file, mode="w")
 
     try:
         for file_to_write in inp_file_names:
         # Add file to the zip file
         # first parameter file to zip, second filename in zip
-            print(f' *** Processing file {file_to_write}')
+            #print(f' *** Processing file {file_to_write}')
             zf.write(file_to_write, os.path.basename(out_zip_file)[:-len(".zip")], compress_type=compression)
 
     except FileNotFoundError as e:
@@ -785,11 +862,6 @@ def read_benchmark_exception_json(folder_name):
         loaded_graph = json.load(f)
     return loaded_graph
 
-def make_dirct(d):
-    try:
-        os.mkdir(d)
-    except:
-        print(str(d),"folder existed")
 
 
 class AnalysisJsonFile:

@@ -334,7 +334,7 @@ def read_data_and_train(params, hyper_parameters):
         params_for_write_graph_to_pickle={"benchmark":params["benchmark"],"data_fold":["train", "valid", "test"],
                                           "label":params["label"],"path":"../benchmarks/" + params["benchmark"] + "/",
                                           "file_type":params["file_type"],"max_nodes_per_batch":parameters['max_nodes_per_batch'],
-                                          "graph_type":params["graph_type"],"file_list":[],"vocabulary_name":"","label_field":params["label_field"]}
+                                          "graph_type":params["graph_type"],"file_list":[],"vocabulary_name":"","label_field":params["label_field"],"train":True}
         write_graph_to_pickle(params_for_write_graph_to_pickle)
     else:
         print("Use pickle data for training")

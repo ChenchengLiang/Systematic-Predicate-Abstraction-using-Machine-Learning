@@ -21,7 +21,7 @@ def main():
                         new_dict[fold]= (lambda : new_dict[fold]+loaded_content[fold] if new_dict.get(fold)!=None else loaded_content[fold])()
                         new_dict[fold]=list(set(new_dict[fold]))
             except:
-                get_solvability_log(["train_data","valid_data","test_data"], "thread_"+str(t))
+                get_solvability_log(["train_data","valid_data","test_data"], "thread_"+str(t),"smt2")
 
         sorted_dict={}
         for fold in benchmark_folds:
@@ -51,7 +51,7 @@ def main():
                                          timeout=timeout, thread=thread_number,runtime=runtime)
 
         # get sovability file logs
-        get_solvability_log(data_fold,command_input)
+        get_solvability_log(data_fold,command_input,"smt2")
 
 def compress_files_in_exceptions():
     print("compressing ...")

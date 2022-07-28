@@ -14,8 +14,8 @@ def extract_data_by_shell():
     data_fold = ["train_data", "test_data", "valid_data"]
     benchmark_name = sys.argv[1]  # "temp-debug"
     thread_number = 1
-    shell_timeout = 60*60*2
-    eldarica_timeout= 60*60*1
+    shell_timeout = 60*60*3.5
+    eldarica_timeout= 60*60*3
     parameters_solvability_1 = "-moveFile -splitClauses:0 -abstract:oct -t:"+str(eldarica_timeout)
     parameters_solvability_2 = "-moveFile -splitClauses:0 -abstract:term -t:" + str(eldarica_timeout)
     parameters_solvability_3 = "-moveFile -splitClauses:0 -abstract:relEqs -t:" + str(eldarica_timeout)
@@ -24,13 +24,13 @@ def extract_data_by_shell():
     parameters_solvability_6 = "-moveFile -splitClauses:1 -abstract:term -t:" + str(eldarica_timeout)
     parameters_solvability_7 = "-moveFile -splitClauses:1 -abstract:relEqs -t:" + str(eldarica_timeout)
     parameters_solvability_8 = "-moveFile -splitClauses:1 -abstract:relIneqs -t:" + str(eldarica_timeout)
-    parameters_generate_unlabeled_templates= "-moveFile -extractTemplates -generateTemplates -getHornGraph:monoDirectionLayerGraph -t:" + str(eldarica_timeout)
+    parameters_generate_unlabeled_templates= "-moveFile -extractTemplates -generateTemplates -t:" + str(eldarica_timeout)
     parameters_extract_train_data_for_template_selection_without_graph="-moveFile -extractTemplates -t:" + str(eldarica_timeout)
 
     parameters_get_smt2="-getSMT2 -abstract:off"
     parameters_abstract_off="-moveFile -abstract:off -splitClauses:1 -t:180 "
-    parameters_draw_CG_using_labeled_templates="-moveFile -getHornGraph:monoDirectionLayerGraph -maxNode:10000"
-    parameters_draw_CDHG_using_labeled_templates = "-moveFile -getHornGraph:hyperEdgeGraph -maxNode:10000"
+    parameters_draw_CG_using_labeled_templates="-moveFile -getHornGraph:monoDirectionLayerGraph -maxNode:10000 -abstract:off"
+    parameters_draw_CDHG_using_labeled_templates = "-moveFile -getHornGraph:hyperEdgeGraph -maxNode:10000 -abstract:off"
     parameters_generate_horn_graph_for_unsolvable_data_template_selection = "-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -generateTemplates -t:"+str(eldarica_timeout)+" -maxNode:10000"
     parameters_extract_train_data_for_first_three_graph_hyperedge = "-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -t:" + str(
         eldarica_timeout) + " -maxNode:10000"
@@ -57,33 +57,46 @@ def extract_data_by_shell():
     #                                "-splitClauses:1 -abstract:relEqs -getSolvingTime -t:"+str(eldarica_timeout),
     #                                "-splitClauses:1 -abstract:relIneqs -getSolvingTime -t:"+str(eldarica_timeout),
     #                       ]
+    parameters_pipeline.append("-checkSolvability  -abstract:empty -splitClauses:0 -t:" + str(eldarica_timeout))
+    parameters_pipeline.append("-checkSolvability  -abstract:term -splitClauses:0 -t:" + str(eldarica_timeout))
+    parameters_pipeline.append("-checkSolvability  -abstract:oct -splitClauses:0 -t:" + str(eldarica_timeout))
+    parameters_pipeline.append("-checkSolvability  -abstract:relEqs -splitClauses:0 -t:" + str(eldarica_timeout))
+    parameters_pipeline.append("-checkSolvability  -abstract:relIneqs -splitClauses:0 -t:" + str(eldarica_timeout))
+    parameters_pipeline.append("-checkSolvability  -abstract:empty -splitClauses:1 -t:" + str(eldarica_timeout))
+    parameters_pipeline.append("-checkSolvability  -abstract:term -splitClauses:1 -t:" + str(eldarica_timeout))
+    parameters_pipeline.append("-checkSolvability  -abstract:oct -splitClauses:1 -t:" + str(eldarica_timeout))
+    parameters_pipeline.append("-checkSolvability  -abstract:relEqs -splitClauses:1 -t:" + str(eldarica_timeout))
+    parameters_pipeline.append("-checkSolvability  -abstract:relIneqs -splitClauses:1 -t:" + str(eldarica_timeout))
+
     #description: mine templates
     #parameters_pipeline.append(parameters_extract_train_data_for_template_selection_without_graph) #label templates and generate simplified smt2
     #description: draw two graphs
-    parameters_pipeline.append(parameters_draw_CG_using_labeled_templates) #draw constraint graph
-    parameters_pipeline.append(parameters_draw_CDHG_using_labeled_templates) # draw hyperedge graph
+    # parameters_pipeline.append(parameters_generate_unlabeled_templates)
+    #parameters_pipeline.append(parameters_draw_CG_using_labeled_templates) #draw constraint graph
+    #parameters_pipeline.append(parameters_draw_CDHG_using_labeled_templates) # draw hyperedge graph
+
     # description: get smt2 file
     #parameters_pipeline.append(parameters_get_smt2)#generate normalized smt2
 
 
     #description:get horn graph for unsolvable problems
-    # parameters_pipeline.append("-getHornGraph:monoDirectionLayerGraph -extractTemplates -generateTemplates -maxNode:10000 -abstract:empty " ) #get unlabeled.tpl
-    # parameters_pipeline.append("-getHornGraph:monoDirectionLayerGraph -maxNode:10000 -abstract:empty ")
-    # parameters_pipeline.append("-getHornGraph:hyperEdgeGraph -maxNode:10000  -abstract:empty ")
+    # parameters_pipeline.append(parameters_generate_unlabeled_templates)
+    # parameters_pipeline.append(parameters_draw_CG_using_labeled_templates) #draw constraint graph
+    # parameters_pipeline.append(parameters_draw_CDHG_using_labeled_templates) # draw hyperedge graph
     #parameters_pipeline.append("-getSMT2 -abstract:empty ")
 
     #description: get solvability
-    #parameters_pipeline.append("-checkSolvability  -abstract:empty -t:" + str(eldarica_timeout) )
-    # parameters_pipeline.append("-checkSolvability  -abstract:unlabeled -t:" + str(eldarica_timeout) )
-    # parameters_pipeline.append("-checkSolvability  -abstract:labeled -t:" + str(eldarica_timeout) )
-    # parameters_pipeline.append("-checkSolvability  -abstract:predictedCG -t:" + str(eldarica_timeout) )
-    # parameters_pipeline.append("-checkSolvability  -abstract:predictedCDHG -t:" + str(eldarica_timeout) )
-    # parameters_pipeline.append( "-checkSolvability  -abstract:random -t:" + str(eldarica_timeout) )
+    # parameters_pipeline.append("-checkSolvability  -abstract:empty -t:" + str(eldarica_timeout) )
     # parameters_pipeline.append("-checkSolvability  -abstract:term -t:" + str(eldarica_timeout) )
     # parameters_pipeline.append("-checkSolvability  -abstract:oct -t:" + str(eldarica_timeout) )
     # parameters_pipeline.append("-checkSolvability  -abstract:relEqs -t:" + str(eldarica_timeout) )
     # parameters_pipeline.append( "-checkSolvability  -abstract:relIneqs -t:" + str(eldarica_timeout) )
-    #parameters_pipeline.append("-checkSolvability  -abstract:mined -t:" + str(eldarica_timeout) )
+    # parameters_pipeline.append("-checkSolvability  -abstract:unlabeled -t:" + str(eldarica_timeout) )
+    # parameters_pipeline.append("-checkSolvability  -abstract:labeled -t:" + str(eldarica_timeout) )
+    # #parameters_pipeline.append("-checkSolvability  -abstract:predictedCG -t:" + str(eldarica_timeout) )
+    # #parameters_pipeline.append("-checkSolvability  -abstract:predictedCDHG -t:" + str(eldarica_timeout) )
+    # parameters_pipeline.append( "-checkSolvability  -abstract:random -fixRandomSeed -t:" + str(eldarica_timeout) )
+    # parameters_pipeline.append("-checkSolvability  -abstract:mined -t:" + str(eldarica_timeout) )
 
 
 
@@ -92,15 +105,15 @@ def extract_data_by_shell():
     # file_type =  "c"
     for eldarica_parameters in parameters_pipeline:
         runtime=1
-        move_file=False if "getSolvingTime" in eldarica_parameters else True
+        move_file=False if ("getSolvingTime" in eldarica_parameters or "checkSolvability" in eldarica_parameters) else True
         split_clause_option="splitClauses_1" #todo: try splitClause1 to see if all no-minded predicates
-        fold="train_data"
-        file_list=get_file_list(benchmark_name,fold,file_type)
+        for fold in data_fold:
+            file_list=get_file_list(benchmark_name,fold,file_type)
 
-        for file in file_list:
-            file=file[:-len(".zip")]
-            file_and_param=[file,eldarica_parameters,shell_timeout,move_file,runtime,split_clause_option]
-            run_eldarica_with_shell(file_and_param)
+            for file in file_list:
+                file=file[:-len(".zip")]
+                file_and_param=[file,eldarica_parameters,shell_timeout,move_file,runtime,split_clause_option]
+                run_eldarica_with_shell(file_and_param)
 
 
     get_solvability_log(data_fold, benchmark_name,file_type)

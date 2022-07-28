@@ -89,6 +89,20 @@ def plot_scatter(true_Y,predicted_Y,name="",range=[0,0],x_label="True Values",y_
     plt.savefig("trained_model/" + name+ "-scatter.png")
     plt.clf()
 
+def plot_scatter_statistics(X,Y,x_label,y_label,saving_file_name,scale="linear"):
+    upperBound = max(X+Y)
+    plt.scatter(X, Y, marker="x", s=20)  # s=10,marker="x"
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.xscale(scale) #"linear", "log", "symlog", "logit"
+    plt.yscale(scale)
+    plt.grid(linewidth=0.5)
+    plt.plot([0, upperBound], [0, upperBound], color="black", linewidth=0.5)
+    plt.xlim([0, upperBound])
+    plt.ylim([0, upperBound])
+    plt.savefig(saving_file_name)
+    plt.clf()
+
 def drawLabelPieChart(learning_label,label,graph_type,benchmark_name,df,multi_label=2):
     label_list=[x for x in range(multi_label)]
     flat_list = [item for sublist in learning_label for item in sublist]

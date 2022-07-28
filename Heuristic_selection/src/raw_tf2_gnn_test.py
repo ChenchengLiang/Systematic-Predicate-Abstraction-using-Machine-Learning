@@ -95,7 +95,7 @@ def main():
                                         "file_type": file_type,
                                         "max_nodes_per_batch": parameters['max_nodes_per_batch'],
                                         "graph_type": graph_type, "file_list": [], "vocabulary_name": "",
-                                        "label_field": label_field}
+                                        "label_field": label_field,"train":True}
     write_graph_to_pickle(params_for_write_graph_to_pickle)
     params_form_GNN_inputs_and_labels = {"label": label, "datafold": ["train", "valid", "test"],
                                          "benchmark": benchmark_name, "graph_type": graph_type,

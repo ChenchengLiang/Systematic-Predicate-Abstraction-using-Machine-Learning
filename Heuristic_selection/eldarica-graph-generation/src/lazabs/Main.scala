@@ -73,7 +73,9 @@ class GlobalParameters extends Cloneable {
   var withoutGraphJSON=false
   var checkSolvability=false
   var readCost=false
+  var readCostType : String = ""
   var rdm=false
+  var fixRandomSeed=false
   var onlyInitialPredicates=false
   var generateSimplePredicates=false
   var generateTemplates=false
@@ -201,6 +203,7 @@ class GlobalParameters extends Cloneable {
     that.in = this.in
     that.fileName = this.fileName
     that.funcName = this.funcName
+    that.readCostType=this.readCostType
     that.solFileName = this.solFileName
     that.timeout = this.timeout
     that.spuriousness = this.spuriousness
@@ -416,6 +419,7 @@ object Main {
       case "-readTrueLabel" :: rest => readTrueLabel = true; arguments(rest)
       case "-readCost" :: rest => readCost = true; arguments(rest)
       case "-rdm" :: rest => rdm = true; arguments(rest)
+      case "-fixRandomSeed" :: rest => fixRandomSeed = true; arguments(rest)
       case "-readHints" :: rest => readHints = true; arguments(rest)
       case "-readTemplates" :: rest => readTemplates = true; arguments(rest)
       case "-getSMT2" :: rest => getSMT2 = true; arguments(rest)
@@ -498,6 +502,11 @@ object Main {
       case "-abstract:empty" :: rest => {
         templateBasedInterpolation = true
         templateBasedInterpolationType = AbstractionType.Empty
+        arguments(rest)
+      }
+      case "-abstract:combined" :: rest => {
+        templateBasedInterpolation = true
+        templateBasedInterpolationType = AbstractionType.Combined
         arguments(rest)
       }
       case "-abstract:all" :: rest => {
@@ -600,6 +609,11 @@ object Main {
 
       case tFile :: rest if (tFile.startsWith("-pPredicates:")) => {
         predicateOutputFile = tFile drop 13
+        arguments(rest)
+      }
+
+      case rCostType :: rest if (rCostType.startsWith("-readCostType:")) => {
+        readCostType = rCostType drop "-readCostType:".length
         arguments(rest)
       }
 
@@ -753,6 +767,7 @@ object Main {
           " -readTrueLabel \t read tru label\n"+
           " -readCost \t read template cost from file\n"+
           " -rdm \t random label initial templates\n"+
+          " -fixRandomSeed \t fix random seed by 42\n"+
           " -absTimeout:time\t set timeout for labeling hints\n"+
           " -solvabilityTimeout:time\t set timeout for solvability\n"+
           " -rank:n\t use top n or score above n ranked hints read from file\n"+
