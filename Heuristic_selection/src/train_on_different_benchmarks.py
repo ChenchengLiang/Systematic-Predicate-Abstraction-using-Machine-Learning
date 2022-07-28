@@ -37,19 +37,19 @@ def main():
     # label_list.append("argument_upper_bound")
     #label_list.append("argument_occurrence_binary")
     #label_list.append("template_relevance")
-    label_list.append("template_relevance_boolean_usefulness")
-    label_list.append("template_relevance_Eq_usefulness")
+    #label_list.append("template_relevance_boolean_usefulness")
+    #label_list.append("template_relevance_Eq_usefulness")
     label_list.append("node_multiclass")
 
     # json_type = ".hyperEdgeGraph.JSON"
     # json_type = ".monoDirectionLayerGraph.JSON"
     force_read = True
     form_label = True
-    file_type = ".smt2"
+    file_type = ".c"
     GPU=False
     use_class_weight=False
     pickle = True
-    benchmark_name = "Template-selection-non-linear-dateset-train"+"/"
+    benchmark_name = "Template_selection_one_example-train"+"/"
     path_to_models="trained_model/"
     relative_path = os.path.join("../benchmarks/", benchmark_name)
     absolute_path = os.path.join("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/", benchmark_name)
@@ -67,11 +67,9 @@ def main():
             hyper_parameters = {"nodeFeatureDim": 64, "num_layers": num_layers,
                                 "regression_hidden_layer_size": [64, 64],
                                 "threshold": 0.5, "max_nodes_per_batch": 10000,
-                                "max_epochs": 500, "patience": 100, "num_node_target_labels": label_to_num_node_target_labels[label],
+                                "max_epochs": 10, "patience": 10, "num_node_target_labels": label_to_num_node_target_labels[label],
                                 "fix_y_axis": False}
-            # parameter_list.append(parameters(relative_path=relative_path,
-            #               absolute_path=absolute_path,
-            #               json_type=".hyperEdgeGraph.JSON", label=label,label_field=label_pairs[label]))#templateRelevanceLabel,templateCostLabel,argumentIndices
+
             parameter_list.append({"relative_path":relative_path,"absolute_path":absolute_path,"json_type":".hyperEdgeGraph.JSON","label":label,"label_field":label_pairs[label]})  # templateRelevanceLabel,templateCostLabel,argumentIndices
             # parameter_list.append(
             #     parameters(relative_path=relative_path,
@@ -81,9 +79,6 @@ def main():
             #     parameters(relative_path=relative_path,
             #                absolute_path=absolute_path,
             #                json_type=".concretizedHyperedgeGraph.JSON", label=label))
-            # parameter_list.append(parameters(relative_path=relative_path,
-            #                absolute_path=absolute_path,
-            #                json_type=".monoDirectionLayerGraph.JSON", label=label,label_field=label_pairs[label]))
             parameter_list.append(
                 {"relative_path": relative_path, "absolute_path": absolute_path, "json_type": ".monoDirectionLayerGraph.JSON",
                  "label": label, "label_field": label_pairs[label]})
