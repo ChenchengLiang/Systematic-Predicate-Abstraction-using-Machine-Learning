@@ -86,17 +86,17 @@ def extract_data_by_shell():
     #parameters_pipeline.append("-getSMT2 -abstract:empty ")
 
     #description: get solvability
-    # parameters_pipeline.append("-checkSolvability  -abstract:empty -t:" + str(eldarica_timeout) )
+    #parameters_pipeline.append("-checkSolvability  -abstract:empty -t:" + str(eldarica_timeout) )
     # parameters_pipeline.append("-checkSolvability  -abstract:term -t:" + str(eldarica_timeout) )
     # parameters_pipeline.append("-checkSolvability  -abstract:oct -t:" + str(eldarica_timeout) )
     # parameters_pipeline.append("-checkSolvability  -abstract:relEqs -t:" + str(eldarica_timeout) )
     # parameters_pipeline.append( "-checkSolvability  -abstract:relIneqs -t:" + str(eldarica_timeout) )
-    # parameters_pipeline.append("-checkSolvability  -abstract:unlabeled -t:" + str(eldarica_timeout) )
-    # parameters_pipeline.append("-checkSolvability  -abstract:labeled -t:" + str(eldarica_timeout) )
-    # #parameters_pipeline.append("-checkSolvability  -abstract:predictedCG -t:" + str(eldarica_timeout) )
-    # #parameters_pipeline.append("-checkSolvability  -abstract:predictedCDHG -t:" + str(eldarica_timeout) )
-    # parameters_pipeline.append( "-checkSolvability  -abstract:random -fixRandomSeed -t:" + str(eldarica_timeout) )
-    # parameters_pipeline.append("-checkSolvability  -abstract:mined -t:" + str(eldarica_timeout) )
+    #parameters_pipeline.append("-checkSolvability  -abstract:unlabeled -t:" + str(eldarica_timeout) )
+    #parameters_pipeline.append("-checkSolvability  -abstract:labeled -t:" + str(eldarica_timeout) )
+    #parameters_pipeline.append("-checkSolvability  -abstract:predictedCG -t:" + str(eldarica_timeout) )
+    #parameters_pipeline.append("-checkSolvability  -abstract:predictedCDHG -t:" + str(eldarica_timeout) )
+    #parameters_pipeline.append( "-checkSolvability  -abstract:random -fixRandomSeed -t:" + str(eldarica_timeout) )
+    #parameters_pipeline.append("-checkSolvability  -abstract:mined -t:" + str(eldarica_timeout) )
 
 
 

@@ -285,9 +285,9 @@ def main():
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
     # shuffle_data("Template-selection-non-Liner-dateset-CDHG+CG-differentiate-boolean-tempalte-by-edge","train_data","smt2",
     #              "../benchmarks/Template-selection-non-Liner-dateset-CDHG+CG-differentiate-boolean-tempalte-by-edge/shuffle")
-    divide_data_to_threads("Template-selection-non-Liner-dateset/non-linear-final-solvable-unsolvable/unsolvable",
-                           "Template-selection-non-Liner-dateset/non-linear-final-solvable-unsolvable/unsolvable-divided",three_fold=True,datafold_list=["train_data","valid_data","test_data"],
-                           file_type="smt2",chunk_number=361)#datafold_list=["test_data"]
+    divide_data_to_threads("Template-selection-non-Liner-dateset/non-linear-solvable-unsolvable-check",
+                           "Template-selection-non-Liner-dateset/non-linear-solvable-unsolvable-check-divided",three_fold=True,datafold_list=["train_data","valid_data","test_data"],
+                           file_type="smt2",chunk_number=3060)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -342,8 +342,8 @@ def main():
     #     for fold in ["train_data"]:
     #         unzip_all_file_folder("all-LIA-Lin-train-unsolvable-predicted-measurement-2/temp-1-divided/thread_"+str(i)+"/"+fold)
 
-    # for fold in ["test_data"]:
-    #     compress_all_file_folder("template_selection_train_non_linear-unsolvable-predicted-solvability"+"/"+fold)
+
+    #compress_file_in_folder("Template-selection-non-Liner-dateset-unsolvable-solvability-check-uppmax/train_data")
 
 
     # for i in range(0,17):
@@ -362,7 +362,7 @@ def main():
     # source_folder="Linear-dataset-pure-argument-identification-task"
     # select_files_with_condition(source_folder, source_folder+"-separate-by-node-number")
 
-    #compile_dataset("Template-selection-Liner-dateset/solvable-sat-mined-templates-statistics")
+    #compile_dataset("Template-selection-non-Liner-dateset/solvable-sat-mined-templates-statistics/non-empty-mined-label")
 
     #change_relative_file_names("Template-selection-non-Liner-dateset/solvable-sat-mined-templates/exceptions","empty-mined-label","smt2")
     # collect_relative_files("Template-selection-non-Liner-dateset/solvable-sat-mined-templates/non-linear-empty-mined-label",
@@ -371,11 +371,11 @@ def main():
     # collect_solvable_list_from_unsolvable_set("../benchmarks/Template-selection-non-Liner-dateset/non-linear-unsolvable-graphs-predicted-solvability/solvability_summary.JSON",
     #                                           "../benchmarks/Template-selection-non-Liner-dateset/non-linear-unsolvable","train_data")
 
-    #check_solving_time_JSON("Template-selection-Liner-dateset/solvable-sat-solving-time","train_data","smt2")
-    #check_solvability_JSON("Template-selection-Liner-dateset/linear-unsolvable-1","train_data","smt2")
+    #check_solvability_JSON("Template-selection-non-Liner-dateset-unsolvable-solvability-check-uppmax","temp","smt2")
+    #check_solvability_summary_JSON("Template-selection-Liner-dateset-solvable-solvability-check","train_data","smt2")
 
-def check_solvability_JSON(folder,fold,file_type):
-    # collect solvable cases from unsolvable set
+def check_solvability_summary_JSON(folder,fold,file_type):
+    # separate unsolvable from summary
     abstract_option = ["Empty","Term", "Octagon", "RelationalEqs", "RelationalIneqs"]#["Empty", "Term", "Octagon", "RelationalEqs", "RelationalIneqs", "Random", "Unlabeled", "Labeled","PredictedCG", "PredictedCDHG", "Mined"]
     file_list = get_file_list(folder, fold, file_type)
     solvable_folder_name="../benchmarks/"+folder + "/solvable"
@@ -394,22 +394,23 @@ def check_solvability_JSON(folder,fold,file_type):
         copy_relative_files("../benchmarks/"+folder+"/"+"train_data/"+f,solvable_folder_name)
         delete_relative_files("../benchmarks/"+folder+"/"+"train_data/"+f)
 
-def check_solving_time_JSON(folder,fold,file_type):
-    #collect unsolvable cases from solvable set
+def check_solvability_JSON(folder,fold,file_type):
+    #separate unsolvable by json file
     file_list=get_file_list(folder, fold, file_type)
     unsolvable_list=[]
     for f in file_list:
-        solving_time_json_file=f[:-len(".zip")]+".solvingTime.JSON"
+        solving_time_json_file=f[:-len(".zip")]+".solvability.JSON"
         unzip_file(solving_time_json_file+".zip")
         os.remove(solving_time_json_file+".zip")
         with open(solving_time_json_file) as st:
             loaded_json = json.load(st)
-            counter=0
+            solvable_counter=0
             for k in loaded_json:
-                if len(loaded_json[k])!=0 and loaded_json[k][0]!=10800000:
-                    counter=counter+1
-            #print(counter,os.path.basename(f))
-            if counter==0:
+                if len(loaded_json[k])!=0 and "solvingTime" in k and int(loaded_json[k][0])!=10800000:
+                    #print(os.path.basename(f),k,loaded_json[k][0])
+                    solvable_counter=solvable_counter+1
+            print(solvable_counter,os.path.basename(f))
+            if solvable_counter==0:
                 print("*"*10,"unsolvable",os.path.basename(f),"*"*10)
                 unsolvable_list.append(f)
         file_compress([solving_time_json_file], solving_time_json_file + ".zip")
@@ -462,6 +463,7 @@ def change_relative_file_names(folder,fold,file_type):
 
 def compile_dataset(folder):
     file_list=get_file_list(folder,"train_data","smt2")
+    print("file_list",len(file_list))
     make_dirct("../benchmarks/"+folder+"/compiled")
 
     for f in file_list:
@@ -497,9 +499,9 @@ def select_files_with_condition(source_folder_name,target_folder_name):
             else:
                 #print(file,"nodeIDs < 100, move to "+target_folder_2_fold)
                 copy_relative_files(file,target_folder_2_fold)
-        compress_all_file_folder(source_folder)
-        compress_all_file_folder(target_folder_1_fold)
-        compress_all_file_folder(target_folder_2_fold)
+        compress_file_in_folder(source_folder)
+        compress_file_in_folder(target_folder_1_fold)
+        compress_file_in_folder(target_folder_2_fold)
 
 
 def collect_common_files(folder1,folder2,out_put_folder):
@@ -541,7 +543,7 @@ def rename_files_in_benchmarks(benchmark=""):
                 os.remove(file)
         for file in glob.glob("../benchmarks/" + benchmark + "/" + fold+"/*"):
             rename_file(file)
-        compress_all_file_folder(benchmark+"/"+fold)
+        compress_file_in_folder(benchmark+"/"+fold)
 
 
 def rename_file(x):
@@ -552,11 +554,12 @@ def rename_file(x):
         base_name=os.path.basename(x)
         os.rename(os.path.join(dir_name,base_name),reassemble_name)
 
-def compress_all_file_folder(benchmark=""):
+def compress_file_in_folder(benchmark=""):
     from utils import file_compress
     for f in glob.glob("../benchmarks/"+benchmark+"/*"):
-        file_compress([f],f+".zip")
-        os.remove(f)
+        if f[-4:]!=".zip":
+            file_compress([f],f+".zip")
+            os.remove(f)
 
 def unzip_all_file_folder(benchmark=""):
     import zipfile

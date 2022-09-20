@@ -90,6 +90,7 @@ def plot_scatter(true_Y,predicted_Y,name="",range=[0,0],x_label="True Values",y_
     plt.clf()
 
 def plot_scatter_statistics(X,Y,x_label,y_label,saving_file_name,scale="linear"):
+    lowerBound = 1 if scale=="log" else 0
     upperBound = max(X+Y)
     plt.scatter(X, Y, marker="x", s=20)  # s=10,marker="x"
     plt.xlabel(x_label)
@@ -98,8 +99,8 @@ def plot_scatter_statistics(X,Y,x_label,y_label,saving_file_name,scale="linear")
     plt.yscale(scale)
     plt.grid(linewidth=0.5)
     plt.plot([0, upperBound], [0, upperBound], color="black", linewidth=0.5)
-    plt.xlim([0, upperBound])
-    plt.ylim([0, upperBound])
+    plt.xlim([lowerBound, upperBound])
+    plt.ylim([lowerBound, upperBound])
     plt.savefig(saving_file_name)
     plt.clf()
 

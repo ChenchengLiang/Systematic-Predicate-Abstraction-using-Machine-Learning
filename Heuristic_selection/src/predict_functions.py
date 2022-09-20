@@ -187,8 +187,8 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,rounded_
         new_field = ["predictedLabel"+predicted_label_suffix,"predictedLabelLogit"+predicted_label_suffix]
         #new_filed_content=[[int(x) for x in transfored_predicted_Y_loaded_model],[np.round(l,2).tolist() for l in predicted_label]]
         new_filed_content = [[int(x) for x in transfored_predicted_Y_loaded_model],
-                             [max(np.round(l,2).tolist()) for l in predicted_label]]
-        print("new_filed_content",new_filed_content)
+                             [max(np.array(l).tolist()) for l in predicted_label]]
+
         add_JSON_field(file_name,graph_type,old_field,new_field,new_filed_content)
 
         file_compress([json_file_name],json_file_name+".zip")

@@ -57,20 +57,30 @@ def get_file_list(folder,fold,file_type):
     return file_list
 
 def read_solvability(filtered_file_list,benchmark_fold,splitClauses):
+    # todo: include splitClauses 0 and 1
+    # splitClauses_name = "_splitClauses_1" if splitClauses == "-splitClauses:1" else "_splitClauses_0"
+    splitClauses_name = ["_splitClauses_0", "_splitClauses_1"]
     json_solvability_obj_list = read_measurement_from_JSON(filtered_file_list, ".solvability.JSON")
     abstract_option = ["Empty", "Term", "Octagon", "RelationalEqs", "RelationalIneqs", "Random", "Unlabeled", "Labeled",
                        "PredictedCG", "PredictedCDHG", "Mined"]
-    solvability_summary = {
-        op: {"solvable_number": 0, "solvable_list": [], "unique_solvable_number": 0, "unique_solvable_list": []} for op
-        in abstract_option}
+    # solvability_summary = {
+    #     op: {"solvable_number": 0, "solvable_list": [], "unique_solvable_number": 0, "unique_solvable_list": []} for op
+    #     in abstract_option}
+    solvability_summary={}
+
+    for op in abstract_option:
+        for sn in splitClauses_name:
+            solvability_summary[op+sn]={"solvable_number": 0, "solvable_list": [], "unique_solvable_number": 0, "unique_solvable_list": []}
     #print("json_solvability_obj_list", json_solvability_obj_list)
-    splitClauses_name = "_splitClauses_1" if splitClauses == "-splitClauses:1" else "_splitClauses_0"
+
+
     for f in json_solvability_obj_list:
         for op in abstract_option:
-            if list(f["solvability_" + op + splitClauses_name])[0] == "1":
-                solvability_summary[op]["solvable_number"] = solvability_summary[op]["solvable_number"] + 1
-                solvability_summary[op]["solvable_list"].append(
-                    f["file_name"][f["file_name"].rfind("/") + 1:-len(".solvability.JSON")])
+            for sn in splitClauses_name:
+                if list(f["solvability_" + op + sn])[0] == "1":
+                    solvability_summary[op+sn]["solvable_number"] = solvability_summary[op+sn]["solvable_number"] + 1
+                    solvability_summary[op+sn]["solvable_list"].append(
+                        f["file_name"][f["file_name"].rfind("/") + 1:-len(".solvability.JSON")])
 
     # get unique solved list by differernt abstract option
     for i in solvability_summary:
@@ -103,32 +113,38 @@ def read_solvability(filtered_file_list,benchmark_fold,splitClauses):
       "unlabeledSingleVariableTemplatesNumber","unlabeledBinaryVariableTemplatesNumber","unlabeledTemplateNumber","unlabeledTemplateRelationSymbolNumber"]
     with pd.ExcelWriter("../benchmarks/" + benchmark_fold + "/solvability_statistics.xlsx") as writer:
         for op in abstract_option:
-            name_list=[]
-            field_dict = {field:[] for field in fields}
-            for f in json_solvability_obj_list:
-                name_list.append(f["file_name"][f["file_name"].rfind("/")+1:][:-len(".solvability.JSON")])
-            for f in json_solvability_obj_list:
-                for k in field_dict:
-                    field_dict[k].append(int(list(f[k+"_" + op + splitClauses_name])[0]))
+            for sn in splitClauses_name:
+                name_list=[]
+                field_dict = {field:[] for field in fields}
+                for f in json_solvability_obj_list:
+                    name_list.append(f["file_name"][f["file_name"].rfind("/")+1:][:-len(".solvability.JSON")])
+                for f in json_solvability_obj_list:
+                    for k in field_dict:
+                        field_dict[k].append(int(list(f[k+"_" + op + sn])[0]))
 
-            final_dict={**{"name_list":name_list},**field_dict}
-            abstract_option_fields_dict[op]=final_dict
-            data=pd.DataFrame(final_dict)
-            data.to_excel(writer, sheet_name=op)
+                final_dict={**{"name_list":name_list},**field_dict}
+                abstract_option_fields_dict[op+sn]=final_dict
+                data=pd.DataFrame(final_dict)
+                data.to_excel(writer, sheet_name=op+sn)
 
     #description: draw scatters
+    compare_to_option="RelationalEqs"
     for field in ["solvingTime","cegarIterationNumber","generatedPredicateNumber","averagePredicateSize","predicateGeneratorTime"]:
         current_folder = "../benchmarks/" + benchmark_fold + "/" + field + "-scatter"
         make_dirct(current_folder)
-        for k in abstract_option_fields_dict:
-            if k != "Mined":
-                X = abstract_option_fields_dict["Mined"][field]
-                Y = abstract_option_fields_dict[k][field]
-                x_label = "Mined " + field
-                y_label = k + " " + field
-                for scale in ["linear","log"]:
-                    saving_file_name = current_folder + "/" + k + "-" + "Mined" + "-" + field + "-" + scale
-                    plot_scatter_statistics(X, Y, x_label, y_label, saving_file_name + ".png", scale=scale)
+        for sn in splitClauses_name:
+            for k in abstract_option_fields_dict:
+                if compare_to_option not in k and sn in k:
+                    X = abstract_option_fields_dict[compare_to_option+sn][field]
+                    Y = abstract_option_fields_dict[k][field]
+                    x_label = compare_to_option+sn+" " + field
+                    y_label = k + " " + field
+                    for scale in ["linear","log"]:
+                        saving_file_name = current_folder + "/" + k + "-" + compare_to_option + sn + "-" + field + "-" + scale
+                        plot_scatter_statistics(X, Y, x_label, y_label, saving_file_name + ".png", scale=scale)
+                        # print("saving_file_name",saving_file_name)
+                        # print("X",X)
+                        # print("Y",Y)
 
 
 
