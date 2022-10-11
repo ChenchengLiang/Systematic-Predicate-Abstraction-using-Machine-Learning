@@ -30,32 +30,28 @@
 
 package lazabs.horn.bottomup
 
-import lazabs.horn.abstractions.{AbsLattice, TermSubsetLattice, ProductLattice,
-                                 TermExtendingLattice, MUXSearcher,
-                                 TermIneqLattice, PredicateLattice,
-                                 AbstractionRecord}
+import lazabs.horn.abstractions.{AbsLattice, AbstractionRecord, MUXSearcher, PredicateLattice, ProductLattice, TermExtendingLattice, TermIneqLattice, TermSubsetLattice}
 import AbstractionRecord.AbstractionMap
-
 import ap.basetypes.IdealInt
 import ap.parser._
 import ap.theories.TheoryCollector
-import ap.terfor.{ConstantTerm, TermOrder, TerForConvenience, Term, OneTerm, Formula}
+import ap.terfor.{ConstantTerm, Formula, OneTerm, TerForConvenience, Term, TermOrder}
 import ap.terfor.conjunctions.{Conjunction, ReduceWithConjunction}
-import ap.terfor.preds.{Predicate, Atom}
+import ap.terfor.preds.{Atom, Predicate}
 import ap.terfor.equations.ReduceWithEqs
 import ap.terfor.substitutions.{ConstantSubst, VariableSubst}
 import ap.proof.{ModelSearchProver, QuantifierElimProver}
 import ap.util.Seqs
 import ap.util.Timeout
-
-import lazabs.prover.{Tree, Leaf}
+import lazabs.prover.{Leaf, Tree}
 import Util._
 import DisjInterpolator._
 
-import scala.collection.mutable.{HashMap => MHashMap, HashSet => MHashSet,
-                                 LinkedHashMap, LinkedHashSet, ArrayBuffer}
+import scala.collection.mutable.{ArrayBuffer, LinkedHashMap, LinkedHashSet, HashMap => MHashMap, HashSet => MHashSet}
 import ap.SimpleAPI
 import SimpleAPI.{ProverStatus, TimeoutException}
+
+import scala.collection.immutable.List
 
 
 object TemplateInterpolator {
@@ -108,13 +104,13 @@ object TemplateInterpolator {
                                       true) _
 
   private def abstractInterpolatingPredicateGen(
-                constraintGen : Tree[Either[NormClause, RelationSymbol]] =>
-                                Option[(Tree[Seq[ConstantTerm]],
-                                        Seq[(Tree[Conjunction], TermOrder)])],
+                constraintGen : Tree[Either[NormClause, RelationSymbol]] => //clauseTree
+                                Option[(Tree[Seq[ConstantTerm]], //vocabularyTree
+                                        Seq[(Tree[Conjunction], TermOrder)])], //constraintTrees
                 alwaysAddOrdinaryInterpolants : Boolean)
-                (clauseDag : Dag[AndOrNode[NormClause, Unit]])
-                     : Either[Seq[(Predicate, Seq[Conjunction])],
-                              Dag[(IAtom, NormClause)]] =
+                (clauseDag : Dag[AndOrNode[NormClause, Unit]]) //?
+                     : Either[Seq[(Predicate, Seq[Conjunction])], //new predicate
+                              Dag[(IAtom, NormClause)]] = //counter-example
     DagInterpolator.cexGuidedExpansion(DagInterpolator.stripOrNodes(clauseDag)) match {
       case Left(partialTree) => {
         // let's try some abstraction ...

@@ -56,7 +56,7 @@ import lazabs.horn.bottomup.Util.Dag
 import lazabs.horn.bottomup.{HornClauses, _}
 import lazabs.horn.concurrency.DrawHornGraph.HornGraphType
 import lazabs.horn.concurrency.GraphTranslator.getBatchSize
-import lazabs.horn.concurrency.TemplateSelectionUtils.outputPrologFile
+import lazabs.horn.concurrency.TemplateSelectionUtils.{CombineTemplateStrategy, outputPrologFile}
 import lazabs.horn.preprocessor.{ConstraintSimplifier, HornPreprocessor, SymbolSplitter}
 import lazabs.horn.preprocessor.HornPreprocessor.{Clauses, NameFactory, VerificationHints, simplify}
 import lazabs.horn.preprocessor.SymbolSplitter.{BoolSort, ClausePropagator, concreteArguments, wrapBool}
@@ -92,11 +92,18 @@ object HintsSelection {
     val predGenerator = Console.withErr(outStream) {
       if (lazabs.GlobalParameters.get.templateBasedInterpolation) {
         val fullAbstractionMap =absMaps.reduce(AbstractionRecord.mergeMaps(_,_))
-        if (fullAbstractionMap.isEmpty)
+        if (fullAbstractionMap.isEmpty) {
           DagInterpolator.interpolatingPredicateGenCEXAndOr _
-        else
-          TemplateInterpolator.interpolatingPredicateGenCEXAbsGen(
-            fullAbstractionMap,
+          //randomPredicateGenerator
+        } else if(GlobalParameters.get.combineTemplateStrategy==CombineTemplateStrategy.random) {
+          TemplateSelectionUtils.randomPredicateGenerator(absMaps.head, absMaps.tail.head,
+            lazabs.GlobalParameters.get.templateBasedInterpolationTimeout,GlobalParameters.get.explorationRate) _
+        } else if (GlobalParameters.get.combineTemplateStrategy==CombineTemplateStrategy.union){
+
+          TemplateSelectionUtils.combinedPredicateGenerator(absMaps.head,absMaps.tail.head,
+            lazabs.GlobalParameters.get.templateBasedInterpolationTimeout) _
+        } else
+          TemplateInterpolator.interpolatingPredicateGenCEXAbsGen(fullAbstractionMap,
             lazabs.GlobalParameters.get.templateBasedInterpolationTimeout)
       } else {
         DagInterpolator.interpolatingPredicateGenCEXAndOr _
@@ -109,13 +116,11 @@ object HintsSelection {
     //simplified to false<-false
     if (simplifiedClausesForGraph.length==1 && simplifiedClausesForGraph.head.body.isEmpty){
       HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/exceptions/no-simplified-clauses/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"), GlobalParameters.get.fileName.length), message = "no-simplified-clauses")
-      sys.exit()
     }
     //no argument
 //    val argumentList=(for (c<-simplifiedClausesForGraph;a<-c.allAtoms) yield {a.args}).flatten
 //    if (argumentList.length==0){
 //      HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/exceptions/no-dataflow/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"), GlobalParameters.get.fileName.length), message = "no-dataflow")
-//      sys.exit()
 //    }
 
   }
@@ -142,7 +147,6 @@ object HintsSelection {
     if (totalNodeNumebr >= GlobalParameters.get.maxNode) {
       HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/exceptions/exceed-max-node/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"), GlobalParameters.get.fileName.length), message = "node number >= maxNode")
       //HintsSelection.removeRelativeFiles(GlobalParameters.get.fileName)
-      sys.exit()
     }
 
   }
@@ -222,6 +226,10 @@ object HintsSelection {
   }
 
   def generateCombinationTemplates(simplifiedClauses: Clauses, onlyLoopHead: Boolean = true): VerificationHints = {
+    //1. single boolean terms
+    //2. single positive and negative integer terms
+    //3. Eq: integer_term1 +/- integer_term2 =0
+    //3. InEq: +/- (integer_term1 +/- integer_term2) >=0
     val predicatesForCombTemplateGeneration =
       if (onlyLoopHead)
         getLoopHeadsWithSort(simplifiedClauses)
@@ -231,7 +239,6 @@ object HintsSelection {
 
     if (predicatesForCombTemplateGeneration.isEmpty) {
       HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/exceptions/loop-head-empty/" + getFileName(), "loopHeads is empty")
-      sys.exit()
     }
     VerificationHints((for ((pred, args) <- predicatesForCombTemplateGeneration) yield {
       val singleBooleanTerms = for ((a, i) <- args.zipWithIndex; if a._2 == Sort.MultipleValueBool) yield IVariable(i, a._2)
@@ -441,22 +448,14 @@ val unlabeledPredicateFileName=".unlabeledPredicates"
           cegarGeneratedPredicates = transformPredicatesToCanonical(cegar.relevantPredicates, simplePredicatesGeneratorClauses)
         }
         case Right(b) => {
-          println(Console.RED + "-" * 10 + "unsat" + "-" * 10)
-          if (moveFile == true)
-            HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/exceptions/unsat/" + fileName)
-          if (exit == true)
-            sys.exit()
+            HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/exceptions/unsat/" + fileName,message="unsat")
         }
       }
-
     }
     catch {
       case lazabs.Main.TimeoutException => {
         println(Console.RED + "-" * 10 + moveFileFolder + "-" * 10)
-        if (moveFile == true)
           HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/exceptions/" + moveFileFolder + "/" + fileName)
-        if (exit == true)
-          sys.exit() //throw TimeoutException
         //solveTime = ((currentTimeMillis - startTime) / 1000).toInt
       }
       case _ => println(Console.RED + "-" * 10 + "solvability-debug" + "-" * 10)
@@ -1050,11 +1049,11 @@ val unlabeledPredicateFileName=".unlabeledPredicates"
         else VerificationHints(Map())
       }
     }
-    if (GlobalParameters.get.debugLog == true) {
-      println("----------predicted Hints----------")
-      predictedHints.pretyPrintHints()
-      //Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName + ".predictedHints.tpl")) {AbsReader.printHints(predictedHints)}
-    }
+//    if (GlobalParameters.get.debugLog == true)
+//      predictedHints.pretyPrintHints("predicted templates")
+//
+//    if (GlobalParameters.get.writeTemplateToFile)
+//      Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName + "."+GlobalParameters.get.hornGraphType.toString+"PredictedHints.tpl")) {AbsReader.printHints(predictedHints)}
 
     predictedHints
   }
@@ -1179,7 +1178,7 @@ val unlabeledPredicateFileName=".unlabeledPredicates"
   }
 
   def getCostbyTemplateShape(e:IExpression): Int ={
-    100 - SymbolCollector.variables(e).size
+    2 - SymbolCollector.variables(e).size
   }
   def getCostByLogitValue(logitValue:Double):Int={
     100 - (logitValue*100).toInt
@@ -1712,6 +1711,7 @@ val unlabeledPredicateFileName=".unlabeledPredicates"
       } else {
         println(s"could NOT move the file $sourceFilename")
       }
+      sys.exit()
     }
   }
   def removeRelativeFiles(fileName:String,removeSourceFile:Boolean=false): Unit ={

@@ -9,22 +9,27 @@ import ap.terfor.conjunctions.Conjunction
 import ap.terfor.preds.Predicate
 import ap.terfor.substitutions.ConstantSubst
 import lazabs.GlobalParameters
+import lazabs.horn.abstractions.AbstractionRecord.AbstractionMap
 import lazabs.horn.abstractions.StaticAbstractionBuilder.AbstractionType
 import lazabs.horn.abstractions.{AbsReader, StaticAbstractionBuilder, VerificationHints}
 import lazabs.horn.bottomup.CEGAR.Counterexample
 import lazabs.horn.bottomup.DisjInterpolator.AndOrNode
 import lazabs.horn.bottomup.HornClauses.Clause
 import lazabs.horn.bottomup.Util.Dag
-import lazabs.horn.bottomup.{AbstractState, CEGAR, HornClauses, HornPredAbs, HornPredAbsContext, HornTranslator, HornWrapper, NormClause, PredicateMiner, PredicateStore}
+import lazabs.horn.bottomup.{AbstractState, CEGAR, HornClauses, HornPredAbs, HornPredAbsContext, HornTranslator, HornWrapper, NormClause, PredicateMiner, PredicateStore, TemplateInterpolator}
 import lazabs.horn.concurrency.DrawHornGraph.{HornGraphType, addQuotes}
 import lazabs.horn.concurrency.HintsSelection.{detectIfAJSONFieldExists, generateCombinationTemplates, getArgumentInfo, getParametersFromVerifHintElement, getPredGenerator, termContains, wrappedReadHintsCheckExistence}
 import lazabs.horn.preprocessor.HornPreprocessor.Clauses
 import play.api.libs.json.{JsSuccess, JsValue, Json}
-import scala.util.Random
 
+import scala.util.Random
 import java.io.{File, PrintWriter}
 
 object TemplateSelectionUtils{
+
+  object CombineTemplateStrategy extends Enumeration {
+    val union, random = Value
+  }
 
   def outputPrologFile(normalizedClauses:Seq[Clause],typeName:String="normalized"): Unit ={
     val writerGraph = new PrintWriter(new File(GlobalParameters.get.fileName + "."+typeName+".prolog"))
@@ -173,69 +178,76 @@ object TemplateSelectionUtils{
     val labeledTemplatesStatistics=HintsSelection.getVerificationHintsStatistics(labeledTemplates)
     val minedTemplates = wrappedReadHintsCheckExistence(simplifiedClausesForGraph,".minedPredicates",VerificationHints(Map()))
     val minedTemplatesStatistics=HintsSelection.getVerificationHintsStatistics(minedTemplates)
-
     val jsonFileName= if (GlobalParameters.get.getSolvingTime) "solvingTime" else if (GlobalParameters.get.checkSolvability) "solvability" else ""
     val solvingTimeFileName = GlobalParameters.get.fileName + "." + jsonFileName + ".JSON"
+    val fixedFields:Map[String,Int]=Map("clauseNumberBeforeSimplification"->unsimplifiedClauses.length,
+      "clauseNumberAfterSimplification"->simplifiedClausesForGraph.length,
+      "smt2FileSizeByte"->new File(GlobalParameters.get.fileName).length().toInt, //bytes,
+      "relationSymbolNumberBeforeSimplification"->unsimplifiedClauses.map(_.allAtoms.length).reduce(_+_),
+      "relationSymbolNumberAfterSimplification"->
+        (if(simplifiedClausesForGraph.size!=0) simplifiedClausesForGraph.map(_.allAtoms.length).reduce(_+_) else 0),
+      "minedSingleVariableTemplatesNumber"->minedTemplatesStatistics._1,
+      "minedBinaryVariableTemplatesNumber"->minedTemplatesStatistics._2,
+      "minedTemplateNumber"->minedTemplatesStatistics._3,
+      "minedTemplateRelationSymbolNumber"->minedTemplatesStatistics._4,
+      "labeledSingleVariableTemplatesNumber"->labeledTemplatesStatistics._1,
+      "labeledBinaryVariableTemplatesNumber"->labeledTemplatesStatistics._2,
+      "labeledTemplateNumber"->labeledTemplatesStatistics._3,
+      "labeledTemplateRelationSymbolNumber"->labeledTemplatesStatistics._4,
+      "unlabeledSingleVariableTemplatesNumber"->unlabeledTemplatesStatistics._1,
+      "unlabeledBinaryVariableTemplatesNumber"->unlabeledTemplatesStatistics._2,
+      "unlabeledTemplateNumber"->unlabeledTemplatesStatistics._3,
+      "unlabeledTemplateRelationSymbolNumber"->unlabeledTemplatesStatistics._4)
     val meansureFields=Seq("solvingTime","cegarIterationNumber","generatedPredicateNumber",
-      "averagePredicateSize","predicateGeneratorTime","solvability",
-      "clauseNumberBeforeSimplification","clauseNumberAfterSimplification","smt2FileSizeByte","relationSymbolNumberBeforeSimplification","relationSymbolNumberAfterSimplification",
-    "minedSingleVariableTemplatesNumber","minedBinaryVariableTemplatesNumber","minedTemplateNumber","minedTemplateRelationSymbolNumber",
-      "labeledSingleVariableTemplatesNumber","labeledBinaryVariableTemplatesNumber","labeledTemplateNumber","labeledTemplateRelationSymbolNumber",
-      "unlabeledSingleVariableTemplatesNumber","unlabeledBinaryVariableTemplatesNumber","unlabeledTemplateNumber","unlabeledTemplateRelationSymbolNumber")
-    val AbstractionTypeFields=AbstractionType.values.toSeq
+      "averagePredicateSize","predicateGeneratorTime","satisfiability")
+    val combianedOptions=Seq("Term","Octagon","RelationalEqs","RelationalIneqs","Mined")
+    val explorationRate=Seq(0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9)
+    val combinedAbstractTypeFields=for(g<-Seq("_hyperEdgeGraph_union_","_monoDirectionLayerGraph_union_");a<-combianedOptions) yield a+g+"0.0"
+    val randomAbstractTypeFields=for(g<-Seq("_hyperEdgeGraph_random_","_monoDirectionLayerGraph_random_");e<-explorationRate.map(_.toString);a<-combianedOptions) yield a+g+e
+    val AbstractionTypeFields=AbstractionType.values.map(_.toString).toSeq ++ combinedAbstractTypeFields ++ randomAbstractTypeFields
     val splitClausesOption=Seq("splitClauses_0","splitClauses_1")
-    val initialFieldsSeq= (for (m<-meansureFields;a<-AbstractionTypeFields;s<-splitClausesOption) yield (m+"_"+a+"_"+s->(m,a,s))).toMap
+    val costOption=Seq("cost_shape","cost_logit","cost_same")
+    val initialFieldsSeq= (for (m<-meansureFields;a<-AbstractionTypeFields;s<-splitClausesOption;c<-costOption) yield (m+"_"+a+"_"+s+"_"+c)->(m,a,s,c)).toMap
+    val timeout = 60 * 60 * 3 * 1000 //milliseconds
+    val initialFields: Map[String, Int] = (for ((k, v) <- initialFieldsSeq) yield k -> timeout) ++ fixedFields
     if(!jsonFileName.isEmpty && !new java.io.File(solvingTimeFileName).exists){
-      //create solving time JSON file
-      val timeout = 60 * 60 * 3 * 1000 //milliseconds
-      //val initialFields: Map[String, Int] = (for (e<-initialFieldsSeq) yield e->timeout).toMap
-      val initialFields: Map[String, Int] = (
-        for ((k,v)<-initialFieldsSeq) yield v._1 match {
-          case "clauseNumberBeforeSimplification"=>k->{unsimplifiedClauses.length}
-          case "clauseNumberAfterSimplification"=>k->{simplifiedClausesForGraph.length}
-          case "smt2FileSizeByte"=>k->new File(GlobalParameters.get.fileName).length().toInt//bytes
-          case "relationSymbolNumberBeforeSimplification"=>k->unsimplifiedClauses.map(_.allAtoms.length).reduce(_+_)
-          case "relationSymbolNumberAfterSimplification"=>k->simplifiedClausesForGraph.map(_.allAtoms.length).reduce(_+_)
-          case "minedSingleVariableTemplatesNumber"=> k->minedTemplatesStatistics._1
-          case "minedBinaryVariableTemplatesNumber"=> k->minedTemplatesStatistics._2
-          case "minedTemplateNumber"=>k->minedTemplatesStatistics._3
-          case "minedTemplateRelationSymbolNumber"=>k->minedTemplatesStatistics._4
-          case "labeledSingleVariableTemplatesNumber"=> k->labeledTemplatesStatistics._1
-          case "labeledBinaryVariableTemplatesNumber"=> k->labeledTemplatesStatistics._2
-          case "labeledTemplateNumber"=>k->labeledTemplatesStatistics._3
-          case "labeledTemplateRelationSymbolNumber"=>k->labeledTemplatesStatistics._4
-          case "unlabeledSingleVariableTemplatesNumber"=> k->unlabeledTemplatesStatistics._1
-          case "unlabeledBinaryVariableTemplatesNumber"=> k->unlabeledTemplatesStatistics._2
-          case "unlabeledTemplateNumber"=>k->unlabeledTemplatesStatistics._3
-          case "unlabeledTemplateRelationSymbolNumber"=>k->unlabeledTemplatesStatistics._4
-          case _=>k->timeout
-          }
-        ).toMap
       writeSolvingTimeToJSON(solvingTimeFileName, initialFields.mapValues(_.toString))
     }
+
     val outStream = Console.err
     val predAbs = Console.withOut(outStream) {
-      if (GlobalParameters.get.templateBasedInterpolationType == AbstractionType.Combined) {
-        //todo rewrite predGenerator.
         new HornPredAbs(simplifiedClausesForGraph, initialPredicatesForCEGAR, predGenerator)
-      }
-      else {
-        new HornPredAbs(simplifiedClausesForGraph, initialPredicatesForCEGAR, predGenerator)
-      }
     }
 
 
     if (new java.io.File(solvingTimeFileName).exists){ //update the solving time for current abstract option in JSON file
-      val solvingTime=(predAbs.cegar.cegarEndTime - predAbs.cegar.cegarStartTime)//milliseconds
+      val satisfiability= predAbs.result match {
+        case Left(res) =>1 //SAT
+        case Right(cex)=>0 //UNSAT
+      }
+      val solvingTime=(predAbs.cegar.cegarEndTime - predAbs.cegar.cegarStartTime) //milliseconds
       val cegarIterationNumber=predAbs.cegar.iterationNum
       val generatedPredicateNumber=predAbs.cegar.generatedPredicateNumber
       val averagePredicateSize=predAbs.cegar.averagePredicateSize
       val predicateGeneratorTime=predAbs.cegar.predicateGeneratorTime
-      val solvability=1
       val resultList=Seq(solvingTime,cegarIterationNumber,generatedPredicateNumber,
-        averagePredicateSize,predicateGeneratorTime,solvability).map(_.toInt).map(_.toString)
+        averagePredicateSize,predicateGeneratorTime,satisfiability).map(_.toInt).map(_.toString)
       for ((m,v)<-meansureFields.zip(resultList)) {
-        writeSolvingTimeToJSON(solvingTimeFileName,readJSONFieldToMap(solvingTimeFileName,fieldNames=initialFieldsSeq.keys.toSeq).updated(m+"_"+GlobalParameters.get.templateBasedInterpolationType.toString+"_splitClauses_"+GlobalParameters.get.splitClauses.toString,v))
+        val newField=
+        if (GlobalParameters.get.combineTemplates)
+          (m + "_" + GlobalParameters.get.templateBasedInterpolationType+"_"+GlobalParameters.get.hornGraphType + "_"+GlobalParameters.get.combineTemplateStrategy +"_"+GlobalParameters.get.explorationRate+ "_splitClauses_" + GlobalParameters.get.splitClauses.toString + "_cost_" + GlobalParameters.get.readCostType, v)
+        else {
+          //println(m+"_"+GlobalParameters.get.templateBasedInterpolationType.toString+"_splitClauses_"+GlobalParameters.get.splitClauses.toString+"_cost_"+GlobalParameters.get.readCostType,v)
+          (m+"_"+GlobalParameters.get.templateBasedInterpolationType.toString+"_splitClauses_"+GlobalParameters.get.splitClauses.toString+"_cost_"+GlobalParameters.get.readCostType,v)
+        }
+        val oldFields=readJSONFieldToMap(solvingTimeFileName, fieldNames = initialFields.keys.toSeq)
+        val updatedFields=
+        if (oldFields.map(_._1).toSeq.contains(newField._1))
+          oldFields.updated(newField._1, newField._2)
+        else
+          (oldFields.toSeq++Seq((newField._1,newField._2))).toMap
+        writeSolvingTimeToJSON(solvingTimeFileName, updatedFields)
+
       }
     }
     sys.exit()
@@ -246,12 +258,12 @@ object TemplateSelectionUtils{
       Dag[(IAtom, NormClause)]]): Unit ={
     //full code in TrainDataGeneratorTemplatesSmt2.scala
 
-    if (GlobalParameters.get.generateTemplates){
-      val unlabeledPredicateFileName=".unlabeledPredicates"
-      val generatedTpl = generateCombinationTemplates(simplifiedClausesForGraph, onlyLoopHead = true) //false
-      Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName + unlabeledPredicateFileName + ".tpl")) {AbsReader.printHints(generatedTpl)}
-      sys.exit()
-    }
+//    if (GlobalParameters.get.generateTemplates){
+//      val unlabeledPredicateFileName=".unlabeledPredicates"
+//      val generatedTpl = generateCombinationTemplates(simplifiedClausesForGraph, onlyLoopHead = true) //false
+//      Console.withOut(new java.io.FileOutputStream(GlobalParameters.get.fileName + unlabeledPredicateFileName + ".tpl")) {AbsReader.printHints(generatedTpl)}
+//      sys.exit()
+//    }
 
     val predAbs =
       new HornPredAbs(simplifiedClausesForGraph, initialPredicatesForCEGAR, predGenerator)
@@ -280,7 +292,6 @@ object TemplateSelectionUtils{
       }
 //      if(filteredPositiveTemplates.isEmpty){
 //        HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/empty-mined-label/"+HintsSelection.getFileName(),"empty-mined-label")
-//        sys.exit()
 //      }
       val labeledTemplates=VerificationHints(for ((kp,vp)<-unlabeledTemplates.predicateHints;
                                                   (kf,vf)<-filteredPositiveTemplates.predicateHints;
@@ -303,7 +314,6 @@ object TemplateSelectionUtils{
 
 //    if(labeledTemplates.totalPredicateNumber==0){
 //      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/no-predicates-selected/"+HintsSelection.getFileName(),"labeledPredicates is empty")
-//      sys.exit()
 //    }
     HintsSelection.writeTemplatesToFile(unlabeledTemplates,"unlabeledPredicates")
     HintsSelection.writeTemplatesToFile(labeledTemplates,"labeledPredicates")
@@ -326,7 +336,6 @@ object TemplateSelectionUtils{
     val unlabeledTemplates=HintsSelection.wrappedReadHintsCheckExistence(simplifiedClausesForGraph,".unlabeledPredicates",generateCombinationTemplates(simplifiedClausesForGraph, onlyLoopHead = true) )
     if (unlabeledTemplates.totalPredicateNumber == 0 ) {
       HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/exceptions/no-initial-predicates/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"), GlobalParameters.get.fileName.length), message = "no initial predicates")
-      sys.exit()
     }
     val truePredicates = if (new java.io.File(GlobalParameters.get.fileName + ".labeledPredicates" + ".tpl").exists)
       HintsSelection.wrappedReadHints(simplifiedClausesForGraph, ".labeledPredicates")
@@ -360,7 +369,77 @@ object TemplateSelectionUtils{
     sys.exit()
   }
 
+  def randomPredicateGenerator(template: AbstractionMap, templateGNN: AbstractionMap, timeout: Long,explorationRate:Float)
+                              (clauseDag: Dag[AndOrNode[NormClause, Unit]])
+  : Either[Seq[(Predicate, Seq[Conjunction])], //new predicate
+    Dag[(IAtom, NormClause)]] = {
+    val predgen1 = TemplateInterpolator.interpolatingPredicateGenCEXAbsGen(template, timeout)
+    val predgen2 = TemplateInterpolator.interpolatingPredicateGenCEXAbsGen(templateGNN, timeout)
+    (predgen1(clauseDag), predgen2(clauseDag)) match {
+      case (Left(newPredicate1), Left(newPredicate2)) => {
+//        if (newPredicate1!=newPredicate2){
+//          for (p <- newPredicate1)
+//            println(Console.BLUE + p)
+//          for (p <- newPredicate2)
+//            println(Console.GREEN + p)
+//        }
 
+        val random = new Random
+        if (GlobalParameters.get.fixRandomSeed)
+          random.setSeed(42)
+
+        if (random.nextInt(10)<10*explorationRate) {
+//          for (p <- newPredicate2)
+//            println(Console.CYAN_B + p)
+          Left(newPredicate2)
+        } else {
+//          for (p <- newPredicate1)
+//            println(Console.CYAN_B + p)
+          Left(newPredicate1)
+        }
+
+      }
+      case (Right(cex1), Right(cex2)) => {
+        Right(cex1)
+      }
+    }
+  }
+
+  def combinedPredicateGenerator(template: AbstractionMap, templateGNN: AbstractionMap, timeout: Long)
+                                           (clauseDag: Dag[AndOrNode[NormClause, Unit]])
+  : Either[Seq[(Predicate, Seq[Conjunction])], //new predicate
+    Dag[(IAtom, NormClause)]] = {
+    val predgen1 = TemplateInterpolator.interpolatingPredicateGenCEXAbsGen(template, timeout)
+    val predgen2 = TemplateInterpolator.interpolatingPredicateGenCEXAbsGen(templateGNN, timeout)
+
+    (predgen1(clauseDag), predgen2(clauseDag)) match {
+      case (Left(newPredicate1), Left(newPredicate2)) => {
+
+//        if (newPredicate1!=newPredicate2){
+//          println()
+//          for (p <- newPredicate1)
+//            println(Console.BLUE + p)
+//          for (p <- newPredicate2)
+//            println(Console.GREEN + p)
+//
+//        }
+        val commonHead = (for (p1 <- newPredicate1; p2 <- newPredicate2; if p1._1 == p2._1) yield {
+          (p1._1, (p1._2 ++ p2._2).distinct)
+        }).distinct
+        val p1Unique = for (p1 <- newPredicate1; if !newPredicate2.map(_._1).contains(p1._1)) yield p1
+        val p2Unique = for (p2 <- newPredicate2; if !newPredicate1.map(_._1).contains(p2._1)) yield p2
+        val mergedPredicates = commonHead ++ p1Unique ++ p2Unique
+
+//        for (p <- mergedPredicates)
+//          println(Console.CYAN_B + p)
+
+        Left(mergedPredicates)
+      }
+      case (Right(cex1), Right(cex2)) => {
+        Right(cex1)
+      }
+    }
+  }
 
   def getRandomElement[A](seq: Seq[A]): A =
     {

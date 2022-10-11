@@ -138,6 +138,7 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,rounded_
             # print("predicted_label", np.array(transfored_predicted_Y_loaded_model))
             print("threshold", threshold)
             print("true_Y_list", true_Y_list)
+            print("predicted_label",predicted_label)
             print("transfored_predicted_Y_loaded_model", np.array(transfored_predicted_Y_loaded_model))
             print("corrected label:" + str(corrected_label) + "/" + str(len(g._node_label)))
             if corrected_label<len(g._node_label):
@@ -185,9 +186,10 @@ def write_predicted_label_to_JSON_file(dataset,predicted_Y_loaded_model,rounded_
             predicted_label_suffix=""
 
         new_field = ["predictedLabel"+predicted_label_suffix,"predictedLabelLogit"+predicted_label_suffix]
+
         #new_filed_content=[[int(x) for x in transfored_predicted_Y_loaded_model],[np.round(l,2).tolist() for l in predicted_label]]
         new_filed_content = [[int(x) for x in transfored_predicted_Y_loaded_model],
-                             [max(np.array(l).tolist()) for l in predicted_label]]
+                             [float(np.round(l,2)) if type(l) == np.float32 else [float(max(l))] for l in predicted_label.numpy()]]
 
         add_JSON_field(file_name,graph_type,old_field,new_field,new_filed_content)
 

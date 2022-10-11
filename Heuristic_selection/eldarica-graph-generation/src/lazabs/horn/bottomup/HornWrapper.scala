@@ -457,7 +457,6 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
 
   if (simplifiedClausesForGraph.isEmpty) {
     HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/exceptions/no-simplified-clauses/" + HintsSelection.getFileName(), message = "no simplified clauses")
-    sys.exit()
   }
 
   if (GlobalParameters.get.debugLog)
@@ -476,9 +475,9 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
   val unlabeledPredicateFileName=".unlabeledPredicates"//"-"+HintsSelection.getClauseType()+ ".unlabeledPredicates"
   val labeledPredicateFileName=".labeledPredicates"//"-"+HintsSelection.getClauseType()+ ".labeledPredicates"
   val minedPredicateFileName=".minedPredicates"
+  val combTemplates = generateCombinationTemplates(simplifiedClausesForGraph,onlyLoopHead = false)
   private val predGenerator =
     if (GlobalParameters.get.generateTemplates == true) {
-      val combTemplates = generateCombinationTemplates(simplifiedClausesForGraph,onlyLoopHead = false)
       val initialTemplates =
         if (GlobalParameters.get.rdm) {
           HintsSelection.randomLabelTemplates(combTemplates, 0.2)
@@ -494,8 +493,11 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
         println("initialTemplates")
         initialTemplates.pretyPrintHints()
       }
-
       getPredGenerator(Seq(absBuilder.loopDetector.hints2AbstractionRecord(initialTemplates)), outStream)
+    } else if (GlobalParameters.get.combineTemplates) {
+      val fullTemplates = HintsSelection.wrappedReadHintsCheckExistence(simplifiedClausesForGraph, unlabeledPredicateFileName, combTemplates)
+      val predictedTemplates = HintsSelection.readPredictedHints(simplifiedClausesForGraph, fullTemplates)
+      getPredGenerator(Seq(autoAbstraction,absBuilder.loopDetector.hints2AbstractionRecord(predictedTemplates)), outStream)
     } else {
       getPredGenerator(Seq(hintsAbstraction, autoAbstraction), outStream)
     }
@@ -552,7 +554,6 @@ class InnerHornWrapper(unsimplifiedClauses: Seq[Clause],
 
     if (initialPredicates.totalPredicateNumber == 0 && (GlobalParameters.get.generateSimplePredicates == true||GlobalParameters.get.generateTemplates==true)) {
       HintsSelection.moveRenameFile(GlobalParameters.get.fileName, "../benchmarks/exceptions/no-initial-predicates/" + GlobalParameters.get.fileName.substring(GlobalParameters.get.fileName.lastIndexOf("/"), GlobalParameters.get.fileName.length), message = "no initial predicates")
-      sys.exit()
     }
 
     val argumentInfo = HintsSelection.getArgumentLabel(simplifiedClausesForGraph,simpHints,predGenerator,disjunctive,
