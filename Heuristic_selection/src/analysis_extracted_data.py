@@ -285,9 +285,9 @@ def main():
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
     # shuffle_data("Template-selection-Liner-dateset/UNSAT","train_data","smt2",
     #              "../benchmarks/Template-selection-Liner-dateset/UNSAT/shuffle")
-    # divide_data_to_threads("100+benchmarks/linear/non-unsat-bench",
-    #                        "100+benchmarks/linear/non-unsat-bench-divided",three_fold=True,datafold_list=["train_data","valid_data","test_data"],
-    #                        file_type="smt2",chunk_number=109)#datafold_list=["test_data"]
+    divide_data_to_threads("Template-selection-non-Liner-dateset/solvable-sat-mined-templates/non-empty-labled",
+                           "Template-selection-non-Liner-dateset/solvable-sat-mined-templates/non-empty-labled-divided",three_fold=True,datafold_list=["train_data","valid_data","test_data"],
+                           file_type="smt2",chunk_number=1748)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -346,18 +346,17 @@ def main():
     #compress_file_in_folder("Template-selection-Linear-solvability-check-uppmax-2/solvable")
 
 
-    # for i in range(0,17):
-    #     rename_files_in_benchmarks("LIA-Lin+sv-comp/LIA-Lin+sv-comp-divided/thread_"+str(i))
-    #
+    #rename_files_in_benchmarks("Linear-dataset-4-tasks-dataset")
+
     # compress_exception("exceptions")
 
     # for data_fold in ["train_data","valid_data","test_data"]:
     #     collect_common_files("Linear-dataset/first-three-task-extractable/extractable-raw/"+data_fold,"Linear-dataset/separated_benchmark-abstract-empty/exceptions/unsat","Linear-dataset/counter-example-task-extractable")
 
     #change_relative_file_names("non-linear-hyperedge-CE-common-1-uppmax", "train_data", "smt2")
-    collect_common_files(folder1="100+benchmarks/linear/unsolvable",
-                         folder2="Template-selection-Linear-solvability-check-uppmax-3/unsolvable",
-                         out_put_folder="100+benchmarks/linear/common-unsolvable")
+    # collect_common_files(folder1="100+benchmarks/linear/unsolvable",
+    #                      folder2="Template-selection-Linear-solvability-check-uppmax-3/unsolvable",
+    #                      out_put_folder="100+benchmarks/linear/common-unsolvable")
     # collect_common_files(folder1="align-lin+non-lin/fifth-task-union-hyperedge-linear+nonlinear",
     #                      folder2="align-lin+non-lin/fifth-task-union-layer-linear+nonlinear",
     #                      out_put_folder="align-lin+non-lin/fifth-task-union-hyperedge+layer-linear+nonlinear")
@@ -648,12 +647,14 @@ def rename_files_in_benchmarks(benchmark=""):
 
 
 def rename_file(x):
-    if (x.find(".smt2")!=x.rfind(".smt2")):
-        middle_name=x[x.find(".smt2")+len(".smt2"):x.rfind(".smt2")]
-        reassemble_name=x[:x.find(".smt2")]+middle_name+".smt2"
-        dir_name=os.path.dirname(x)
-        base_name=os.path.basename(x)
-        os.rename(os.path.join(dir_name,base_name),reassemble_name)
+    # if (x.find(".smt2")!=x.rfind(".smt2")):
+    #     middle_name=x[x.find(".smt2")+len(".smt2"):x.rfind(".smt2")]
+    #     reassemble_name=x[:x.find(".smt2")]+middle_name+".smt2"
+    #     dir_name=os.path.dirname(x)
+    #     base_name=os.path.basename(x)
+    #     os.rename(os.path.join(dir_name,base_name),reassemble_name)
+    new_name=x.replace("hyperEdgeHornGraph","hyperEdgeGraph")
+    os.rename(x,new_name)
 
 def compress_file_in_folder(benchmark=""):
     from utils import file_compress

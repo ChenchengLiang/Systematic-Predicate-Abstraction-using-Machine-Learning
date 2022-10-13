@@ -14,29 +14,29 @@ def extract_data_by_shell():
     data_fold = ["train_data", "test_data", "valid_data"]
     benchmark_name = sys.argv[1]  # "temp-debug"
     thread_number = 1
-    shell_timeout = 60*60*3.5
-    eldarica_timeout= 60*60*3
-    # shell_timeout = 60 * 7
-    # eldarica_timeout = 60 * 5
+    # shell_timeout = 60*60*3.5
+    # eldarica_timeout= 60*60*3
+    shell_timeout = 60 * 12
+    eldarica_timeout = 60 * 10
     parameters_generate_unlabeled_templates= "-writeTemplateToFile -terminateEarly -abstract:unlabeled  -t:" + str(eldarica_timeout)
     parameters_extract_train_data_for_template_selection_without_graph="-moveFile -extractTemplates -t:" + str(eldarica_timeout)
 
     parameters_get_smt2="-getSMT2 -abstract:off"
     parameters_abstract_off="-moveFile -abstract:off -splitClauses:1 -t:180 "
-    parameters_draw_CG_using_labeled_templates="-moveFile -getHornGraph:monoDirectionLayerGraph -maxNode:10000 -abstract:off"
-    parameters_draw_CDHG_using_labeled_templates = "-moveFile -getHornGraph:hyperEdgeGraph -maxNode:10000 -abstract:off"
-    parameters_generate_horn_graph_for_unsolvable_data_template_selection = "-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -generateTemplates -t:"+str(eldarica_timeout)+" -maxNode:10000"
-    parameters_extract_train_data_for_first_three_graph_hyperedge = "-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -t:" + str(
+    parameters_draw_CG_using_labeled_templates="-moveFile -getHornGraph:CG -abstract:off"
+    parameters_draw_CDHG_using_labeled_templates = "-moveFile -getHornGraph:CDHG -abstract:off"
+    parameters_generate_horn_graph_for_unsolvable_data_template_selection = "-moveFile -abstract:empty -getHornGraph:CDHG -generateTemplates -t:"+str(eldarica_timeout)+" -maxNode:10000"
+    parameters_extract_train_data_for_first_three_graph_hyperedge = "-moveFile -abstract:empty -getHornGraph:CDHG -t:" + str(
         eldarica_timeout) + " -maxNode:10000"
     parameters_extract_train_data_for_counter_example_graph_hyperedge = "-moveFile -abstract:empty -getLabelFromCounterExample -t:"+str(60*20)+" -maxNode:10000"
     parameters_extract_train_data_for_counter_example_graph_hyperedge_union = "-moveFile -abstract:empty -getLabelFromCounterExample:union -t:"+str(60*20)+" -maxNode:10000"
-    parameters_extract_train_data_for_counter_example_graph_layer = "-moveFile -abstract:empty -getLabelFromCounterExample -getHornGraph:monoDirectionLayerGraph -t:"+str(60*20)+" -maxNode:10000"
-    parameters_extract_train_data_for_counter_example_graph_layer_union = "-moveFile -abstract:empty -getLabelFromCounterExample:union -getHornGraph:monoDirectionLayerGraph -t:"+str(60*20)+" -maxNode:10000"
-    parameters_extract_train_data_for_first_three_graph_mono_layer = "-moveFile -abstract:empty -getHornGraph:monoDirectionLayerGraph -t:1800 -maxNode:10000"
+    parameters_extract_train_data_for_counter_example_graph_layer = "-moveFile -abstract:empty -getLabelFromCounterExample -getHornGraph:CG -t:"+str(60*20)+" -maxNode:10000"
+    parameters_extract_train_data_for_counter_example_graph_layer_union = "-moveFile -abstract:empty -getLabelFromCounterExample:union -getHornGraph:CG -t:"+str(60*20)+" -maxNode:10000"
+    parameters_extract_train_data_for_first_three_graph_mono_layer = "-moveFile -abstract:empty -getHornGraph:CG -t:1800 -maxNode:10000"
     parameters_extract_train_data_for_first_three_graph_bi_layer = "-moveFile -abstract:empty -getHornGraph:biDirectionLayerGraph -t:1800 -maxNode:10000"
-    parameters_extract_train_data_for_argument_bound_graph_hyperedge = "-moveFile -abstract:empty -getHornGraph:hyperEdgeGraph -argumentBoundLabel -boundsAnalysis -t:" + str(
+    parameters_extract_train_data_for_argument_bound_graph_hyperedge = "-moveFile -abstract:empty -getHornGraph:CDHG -argumentBoundLabel -boundsAnalysis -t:" + str(
         60*60*3) + " -boundsAnalysisTO:3 -maxNode:10000"
-    parameters_extract_train_data_for_argument_bound_graph_layer = "-moveFile -abstract:empty -getHornGraph:monoDirectionLayerGraph -argumentBoundLabel -boundsAnalysis -t:" + str(
+    parameters_extract_train_data_for_argument_bound_graph_layer = "-moveFile -abstract:empty -getHornGraph:CG -argumentBoundLabel -boundsAnalysis -t:" + str(
         60*60*3) + " -boundsAnalysisTO:3 -maxNode:10000"
 
     parameters_pipeline=[]
@@ -57,8 +57,8 @@ def extract_data_by_shell():
     #parameters_pipeline.append(parameters_extract_train_data_for_template_selection_without_graph) #label templates and generate simplified smt2
     #description: draw two graphs
     # parameters_pipeline.append(parameters_generate_unlabeled_templates)
-    # parameters_pipeline.append(parameters_draw_CG_using_labeled_templates) #draw constraint graph
-    # parameters_pipeline.append(parameters_draw_CDHG_using_labeled_templates) # draw hyperedge graph
+    parameters_pipeline.append(parameters_draw_CG_using_labeled_templates) #draw constraint graph
+    parameters_pipeline.append(parameters_draw_CDHG_using_labeled_templates) # draw hyperedge graph
 
     # description: get smt2 file
     #parameters_pipeline.append(parameters_get_smt2)#generate normalized smt2
@@ -84,7 +84,7 @@ def extract_data_by_shell():
     #parameters_pipeline.append("-checkSolvability  -abstract:mined -t:" + str(eldarica_timeout) )
 
     #description: combine GNN prediction and existed strategies
-    parameters_pipeline,shell_timeout=combineGNNtemplates()
+    #parameters_pipeline,shell_timeout=combineGNNtemplates()
 
     #description: write templates to files
     # for a in abstract_original_options+abstract_GNN_options:
@@ -119,7 +119,7 @@ def combineGNNtemplates():
     cost_options = [" -readCostType:" + x + " " for x in ["shape", "logit", "same"]]
     abstract_original_options = [" -abstract:" + x + " " for x in ["term", "oct", "relEqs", "relIneqs"]]
     abstract_GNN_options = [" -abstract:" + x + " " for x in ["predictedCG", "predictedCDHG"]]
-    graphs_options = [" -hyperGraph ", " "]
+    graphs_options = [" -CDHG ", " "]
     abstract_option_for_solvables = [" -abstract:" + x + " " for x in ["mined", "labeled"]]
     abstract_additional_options = [" -abstract:" + x + " " for x in ["empty", "random", "unlabeled"]]
     exploration_rate_list = [0.5]

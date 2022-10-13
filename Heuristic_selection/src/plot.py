@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from utils import  read_minimizedPredicateFromCegar
 plt.style.use("ggplot")
 import numpy as np
+import plotly.graph_objects as go
 def plotHistory(history,fileName,show=True):
     parenDir = os.path.abspath(os.path.pardir)
     print(history.history.keys())
@@ -125,4 +126,54 @@ def drawLabelPieChart(learning_label,label,graph_type,benchmark_name,df,multi_la
     plt.savefig("trained_model/" + label + "-" + graph_type +"-" + df + "-" + benchmark_name + "pie_chart.png")
     plt.clf()
 
+
+
+def plot_cactus(summary_folder,solvability_summary):
+    max_time=np.max(np.max(np.array([item["solving_time_list"] for item in solvability_summary.values()]))) / 1000
+    print("max_time s",max_time)
+    cactus={}
+    time_limit=int(max_time)+1
+    for option in solvability_summary:
+        cactus[option]=[0]
+        solved_index=0
+        for t in range(0,time_limit):
+            solved_counter = 0
+            for st in solvability_summary[option]["solving_time_list"]:
+                if st/1000 < t:
+                    solved_counter=solved_counter+1
+                if solved_counter>solved_index:
+                    cactus[option].append(t)
+                    solved_index=solved_counter
+
+    # key_words=["Term","Octagon","RelationalEqs","RelationalIneqs"]
+    # for k in key_words:
+    #     draw_one_cactus(summary_folder,cactus,k)
+
+    #draw_one_cactus(summary_folder, cactus, "")
+    draw_one_cactus_plotly(summary_folder, cactus, key_word="", scale="linear")
+    draw_one_cactus_plotly(summary_folder, cactus, key_word="",scale="log")
+
+def draw_one_cactus_plotly(summary_folder,cactus,key_word,scale=""):
+    #sort lines by solved problems for the highest time limit
+    lines=[]
+    for k in cactus:
+        if key_word in k:
+            lines.append((len(cactus[k]),k,cactus[k]))
+    lines.sort(reverse=True)
+
+    fig = go.Figure()
+    for line in lines:
+        if key_word in line[1]:
+            fig.add_trace(go.Scatter(
+                x=list(range(len(line[2]))),
+                y=line[2],
+                name=line[1]
+            ))
+
+    fig.update_layout(#legend_title_text='Trend',
+                    title='',
+                   xaxis_title='solved benchmarks',
+                   yaxis_title='time limit (s)')
+    fig.update_yaxes(type=scale)
+    fig.write_html(summary_folder + "/"+key_word+"-"+scale+"-cactus.html")
 
