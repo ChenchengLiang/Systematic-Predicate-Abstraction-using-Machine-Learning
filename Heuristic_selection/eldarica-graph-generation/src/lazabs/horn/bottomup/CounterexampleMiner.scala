@@ -1,20 +1,20 @@
 /**
  * Copyright (c) 2021-2022 Philipp Ruemmer. All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * * Redistributions of source code must retain the above copyright notice, this
  *   list of conditions and the following disclaimer.
- * 
+ *
  * * Redistributions in binary form must reproduce the above copyright notice,
  *   this list of conditions and the following disclaimer in the documentation
  *   and/or other materials provided with the distribution.
- * 
+ *
  * * Neither the name of the authors nor the names of their
  *   contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -45,10 +45,10 @@ import lattopt._
 import scala.collection.mutable.ArrayBuffer
 
 class CounterexampleMiner[CC <% HornClauses.ConstraintClause]
-      (iClauses : Seq[CC],
-       predicateGenerator : Dag[AndOrNode[NormClause, Unit]] =>
-        Either[Seq[(Predicate, Seq[Conjunction])],
-               Dag[(IAtom, NormClause)]]) {
+(iClauses : Seq[CC],
+ predicateGenerator : Dag[AndOrNode[NormClause, Unit]] =>
+   Either[Seq[(Predicate, Seq[Conjunction])],
+     Dag[(IAtom, NormClause)]]) {
 
   val clauseFlags =
     for ((_, n) <- iClauses.zipWithIndex) yield new Predicate("f_" + n, 0)
@@ -71,9 +71,9 @@ class CounterexampleMiner[CC <% HornClauses.ConstraintClause]
                                 localVariables : Seq[ConstantTerm],
                                 sig : Signature) : Conjunction =
         clause.instantiateConstraint(headArguments,
-                                     bodyArguments.init,
-                                     localVariables,
-                                     sig)
+          bodyArguments.init,
+          localVariables,
+          sig)
 
       override def collectTheories(coll : TheoryCollector) : Unit =
         clause collectTheories coll
@@ -81,9 +81,9 @@ class CounterexampleMiner[CC <% HornClauses.ConstraintClause]
 
   val solver =
     new IncrementalHornPredAbs(augmentedClauses,
-                               Map(),
-                               clauseFlags.toSet,
-                               predicateGenerator)
+      Map(),
+      clauseFlags.toSet,
+      predicateGenerator)
 
   private implicit val randomData = new SeededRandomDataSource(123)
 
@@ -98,10 +98,10 @@ class CounterexampleMiner[CC <% HornClauses.ConstraintClause]
         checks = checks + 1
         val subst =
           (for (p <- clauseFlags)
-           yield (p -> (if (testedSet contains p)
-                          Conjunction.TRUE
-                        else
-                          Conjunction.FALSE))).toMap
+            yield (p -> (if (testedSet contains p)
+              Conjunction.TRUE
+            else
+              Conjunction.FALSE))).toMap
         solver.checkWithSubstitution(subst) match {
           case Left(sol) =>
             optInfeasible(_ => false)
@@ -111,7 +111,7 @@ class CounterexampleMiner[CC <% HornClauses.ConstraintClause]
               (for ((_, clause) <- cex.iterator;
                     p <- clause.predicates.iterator;
                     if clauseFlagsSet contains p)
-               yield p).toSet
+              yield p).toSet
             optFeasible(set2 => usedFlags subsetOf set2)
           }
         }
@@ -126,9 +126,9 @@ class CounterexampleMiner[CC <% HornClauses.ConstraintClause]
   val commonCounterexampleIndexs=
   {
     val j = cexLattice.njoin(
-              (for (obj <- cexLattice.succ(cexLattice.bottom);
-                    if !cexLattice.isFeasible(obj))
-               yield obj).toList : _*)
+      (for (obj <- cexLattice.succ(cexLattice.bottom);
+            if !cexLattice.isFeasible(obj))
+      yield obj).toList : _*)
     val notNeeded = cexLattice getLabel j
     val needed = (clauseFlags filterNot notNeeded).toSet
     val neededIndexs=flagsToIndexes(needed)

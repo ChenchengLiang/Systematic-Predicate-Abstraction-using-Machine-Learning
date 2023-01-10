@@ -31,18 +31,16 @@ package lazabs.horn.abstractions
 
 import lazabs.GlobalParameters
 import lazabs.horn.bottomup.HornClauses
-import lazabs.horn.concurrency.{HintsSelection, ReaderMain}
+import lazabs.horn.concurrency.ReaderMain
 import ap.basetypes.IdealInt
 import ap.theories.nia.GroebnerMultiplication
 import ap.parser._
-import play.api.libs.json.{JsSuccess, JsValue}
-import play.api.libs.json.JsValue.jsValueToJsLookup
-import lazabs.horn.concurrency.DrawHornGraph.{HornGraphType}
-import scala.collection.mutable.ListBuffer
+import lazabs.horn.graphs.HornGraphType
+import lazabs.horn.graphs.TemplateUtils.{randomLabelTemplates, readTemplateFromFile,readTemplateLabelFromJSON}
 
 object StaticAbstractionBuilder {
   object AbstractionType extends Enumeration {
-    val Empty, Term, Octagon, RelationalEqs, RelationalIneqs,All,Random,Unlabeled,Labeled,PredictedCG,PredictedCDHG,Mined,Combined = Value
+    val Empty, Term, Octagon, RelationalEqs, RelationalIneqs,PredictedCG,PredictedCDHG,Random,Unlabeled,Mined = Value
   }
 }
 
@@ -60,7 +58,29 @@ class StaticAbstractionBuilder(
 
   val loopDetector = new LoopDetector(clauses)
 
-  //Console.err.println("Loop heads:")
+  Console.err.println("Loop heads:")
+
+  //////////////////////////////////////////////////////////////////////////////
+
+  def minedAbstractions = readTemplateFromFile(clauses, "mined")
+
+  def unlabeledAbstractions = readTemplateFromFile(clauses, "unlabeled")
+
+  def randomAbstractions = {
+    if (new java.io.File(GlobalParameters.get.fileName + ".unlabeledPredicates" + ".tpl").exists == true) {}
+    val unlabeledTempaltes = readTemplateFromFile(clauses, "unlabeled")
+    randomLabelTemplates(unlabeledTempaltes, 0.2)
+  }
+
+  def predictedCGAbstractions = {
+    GlobalParameters.get.hornGraphType = HornGraphType.CG
+    readTemplateLabelFromJSON(clauses)
+  }
+
+  def predictedCDHGAbstractions = {
+    GlobalParameters.get.hornGraphType = HornGraphType.CDHG
+    readTemplateLabelFromJSON(clauses)
+  }
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -138,8 +158,6 @@ class StaticAbstractionBuilder(
 
   //////////////////////////////////////////////////////////////////////////////
 
-
-
   def emptyAbstractions = VerificationHints(
     for ((head, _) <- loopDetector.loopBodies) yield {
       Console.err.println("   " + head +
@@ -147,34 +165,6 @@ class StaticAbstractionBuilder(
       // just create some unit lattice (with exactly one element)
       (head, List())
     })
-  def minedAbstractions = if (new java.io.File(GlobalParameters.get.fileName +".minedPredicates"+ ".tpl").exists == true)
-    HintsSelection.wrappedReadHints(clauses, ".minedPredicates")
-  else VerificationHints(Map())
-  def unlabeledAbstractions = if (new java.io.File(GlobalParameters.get.fileName +".unlabeledPredicates"+ ".tpl").exists == true)
-    HintsSelection.wrappedReadHints(clauses, ".unlabeledPredicates")
-  else VerificationHints(Map())
-  def labeledAbstractions = if (new java.io.File(GlobalParameters.get.fileName +".labeledPredicates"+ ".tpl").exists == true)
-    HintsSelection.wrappedReadHints(clauses, ".labeledPredicates")
-  else VerificationHints(Map())
-
-  def randomAbstractions = if (new java.io.File(GlobalParameters.get.fileName +".unlabeledPredicates"+ ".tpl").exists == true) {
-    val unlabeledTempaltes=HintsSelection.wrappedReadHints(clauses, ".unlabeledPredicates")
-    HintsSelection.randomLabelTemplates(unlabeledTempaltes, 0.2)
-  } else VerificationHints(Map())
-
-  def predictedCGAbstractions = if (new java.io.File(GlobalParameters.get.fileName +".unlabeledPredicates"+ ".tpl").exists == true) {
-    import lazabs.horn.concurrency.DrawHornGraph.{HornGraphType}
-    val unlabeledTempaltes=HintsSelection.wrappedReadHints(clauses, ".unlabeledPredicates")
-    GlobalParameters.get.hornGraphType=HornGraphType.monoDirectionLayerGraph
-    HintsSelection.readPredictedHints(clauses, unlabeledTempaltes)
-  } else VerificationHints(Map())
-  def predictedCDHGAbstractions = if (new java.io.File(GlobalParameters.get.fileName +".unlabeledPredicates"+ ".tpl").exists == true) {
-    import lazabs.horn.concurrency.DrawHornGraph.{HornGraphType}
-    val unlabeledTempaltes=HintsSelection.wrappedReadHints(clauses, ".unlabeledPredicates")
-    GlobalParameters.get.hornGraphType=HornGraphType.hyperEdgeGraph
-    HintsSelection.readPredictedHints(clauses, unlabeledTempaltes)
-  } else VerificationHints(Map())
-
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -242,12 +232,11 @@ class StaticAbstractionBuilder(
          for ((t, c) <- allCosts) yield VerifHintTplEqTerm(t, c))
     })
 
-
   //////////////////////////////////////////////////////////////////////////////
 
   import StaticAbstractionBuilder._
 
-  val abstractionHints: VerificationHints =
+  val abstractionHints : VerificationHints =
     abstractionType match {
       case AbstractionType.Empty =>
         emptyAbstractions
@@ -259,29 +248,12 @@ class StaticAbstractionBuilder(
         relationAbstractions(false)
       case AbstractionType.RelationalIneqs =>
         relationAbstractions(true)
-      case AbstractionType.All =>
-        termAbstractions ++ octagonAbstractions ++ relationAbstractions(false)
       case AbstractionType.Mined => minedAbstractions
       case AbstractionType.Unlabeled => unlabeledAbstractions
-      case AbstractionType.Labeled => labeledAbstractions
       case AbstractionType.Random => randomAbstractions
       case AbstractionType.PredictedCG => predictedCGAbstractions
       case AbstractionType.PredictedCDHG => predictedCDHGAbstractions
-      case AbstractionType.Combined=> emptyAbstractions //todo
-      case _ => emptyAbstractions
     }
-
-  if (GlobalParameters.get.debugLog)
-    abstractionHints.pretyPrintHints(abstractionType.toString)
-
-  if (GlobalParameters.get.writeTemplateToFile) {
-    println("write template to file")
-    abstractionHints.pretyPrintHints(abstractionType.toString)
-    HintsSelection.writeTemplatesToFile(abstractionHints,abstractionType.toString)
-    if (GlobalParameters.get.terminateEarly)
-      sys.exit()
-  }
-
 
   if (GlobalParameters.get.templateBasedInterpolationPrint)
     AbsReader printHints abstractionHints

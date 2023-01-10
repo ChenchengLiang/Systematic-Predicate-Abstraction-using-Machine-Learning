@@ -29,18 +29,26 @@
  */
 
 package lazabs
-import ap.util.{Debug, Timeout}
+
+import java.io.{FileInputStream, FileNotFoundException, InputStream}
+import parser._
+import lazabs.art._
 import lazabs.art.SearchMethod._
-import lazabs.horn.abstractions.StaticAbstractionBuilder.AbstractionType
-import lazabs.horn.concurrency.DrawHornGraph.HornGraphType
-import lazabs.horn.concurrency.HintsSelection.getFileName
-import lazabs.horn.concurrency.TemplateSelectionUtils.CombineTemplateStrategy
-import lazabs.horn.concurrency.{CCReader, HintsSelection}
-import lazabs.nts._
+import lazabs.horn.graphs.EvaluateUtils.CombineTemplateStrategy
+import lazabs.horn.graphs.{HornGraphLabelType, HornGraphType}
+import lazabs.horn.graphs.counterExampleUtils.CounterExampleMiningOption
 import lazabs.prover._
 import lazabs.viewer._
+import lazabs.utils.Inline._
+//import lazabs.utils.PointerAnalysis
+//import lazabs.cfg.MakeCFG
+import lazabs.nts._
+import lazabs.horn.parser.HornReader
+import lazabs.horn.abstractions.AbsLattice
+import lazabs.horn.abstractions.StaticAbstractionBuilder.AbstractionType
+import lazabs.horn.concurrency.CCReader
 
-import java.io.{FileInputStream, InputStream}
+import ap.util.Debug
 
 object GlobalParameters {
   object InputFormat extends Enumeration {
@@ -64,47 +72,6 @@ object GlobalParameters {
 }
 
 class GlobalParameters extends Cloneable {
-  //var printHints=VerificationHints(Map())
-  var argumentOccurenceLabel=false
-  var argumentBoundLabel=false
-  var getLabelFromCounterExample=false
-  var unionOption=false
-  var readTrueLabel=false
-  var separateMultiplePredicatesInBody=false
-  var withoutGraphJSON=false
-  var checkSolvability=false
-  var readCost=false
-  var readCostType : String = "same"
-  var rdm=false
-  var fixRandomSeed=false
-  var onlyInitialPredicates=false
-  var generateSimplePredicates=false
-  var generateTemplates=false
-  var combineTemplates=false
-  var moveFile = false
-  var maxNode=1000000
-  var threadTimeout = 60*60*1000
-  var solvabilityTimeout=60*60*1000
-  var mainTimeout=60*60*1000
-  var extractTemplates=false
-  var extractPredicates=false
-  var separateByPredicates=false
-  var separateByPredicatesBatchSize=200
-  var measurePredictedPredicates=false
-  var singleMeasurement=false
-  var labelSimpleGeneratedPredicates=false
-  var varyGeneratedPredicates=false
-  var readHints=false
-  var readTemplates=false
-  var rank=0.0
-  var explorationRate: Float=0
-  var getSMT2=false
-  var readSMT2=false
-  var getSolvingTime=false
-  var getHornGraph=false
-  var getAllHornGraph=false
-  var hornGraphType:HornGraphType.Value=HornGraphType.monoDirectionLayerGraph
-  var combineTemplateStrategy:CombineTemplateStrategy.Value=CombineTemplateStrategy.union
   var in: InputStream = null
   var fileName = ""
   var funcName = "main"
@@ -119,8 +86,7 @@ class GlobalParameters extends Cloneable {
   var slicing = true
   var intervals = true
   var prettyPrint = false
-  var smtPrettyPrint = false
-  var graphPrettyPrint = false
+  var smtPrettyPrint = false  
 //  var interpolation = false
   var ntsPrint = false
   var printIntermediateClauseSets = false
@@ -136,6 +102,20 @@ class GlobalParameters extends Cloneable {
   var templateBasedInterpolation = true
   var templateBasedInterpolationType : AbstractionType.Value =
     AbstractionType.RelationalEqs
+  var getHornGraph = false
+  var mineCounterExample =  false
+  var visualizeHornGraph=false
+  var generateTemplates = false
+  var fixRandomSeed = false
+  var getSolvability = false
+  var mineTemplates = false
+  var hornGraphType : HornGraphType.Value = HornGraphType.CDHG
+  var hornGraphLabelType : HornGraphLabelType.Value = HornGraphLabelType.template
+  var ceMiningOption : CounterExampleMiningOption.Value = CounterExampleMiningOption.union
+  var combineTemplateStrategy:CombineTemplateStrategy.Value=CombineTemplateStrategy.off
+  var readCostType : String = "same"
+  var explorationRate: Float=0
+  var unsatCoreThreshold:Double=0.5
   var templateBasedInterpolationTimeout = 2000
   var portfolio = GlobalParameters.Portfolio.None
   var templateBasedInterpolationPrint = false
@@ -156,13 +136,10 @@ class GlobalParameters extends Cloneable {
   var dumpInterpolationQuery = false
   var babarew = false
   var log = false
-  var debugLog= false
   var logCEX = false
   var logStat = false
   var printHornSimplified = false
   var printHornSimplifiedSMT = false
-  var writeTemplateToFile=false
-  var terminateEarly=false
   var dotSpec = false
   var dotFile : String = null
   var pngNo = true;
@@ -173,10 +150,6 @@ class GlobalParameters extends Cloneable {
   var assertions = false
   var verifyInterpolants = false
   var minePredicates = false
-  var mineCounterexamples = false
-  var boundsAnalysis = false
-  var boundsAnalysisTO = 5000
-  var visualizeLowerBound = false
   var timeoutChecker : () => Unit = () => ()
 
   def needFullSolution = assertions || displaySolutionProlog || displaySolutionSMT
@@ -209,7 +182,6 @@ class GlobalParameters extends Cloneable {
     that.in = this.in
     that.fileName = this.fileName
     that.funcName = this.funcName
-    that.readCostType=this.readCostType
     that.solFileName = this.solFileName
     that.timeout = this.timeout
     that.spuriousness = this.spuriousness
@@ -221,7 +193,6 @@ class GlobalParameters extends Cloneable {
     that.intervals = this.intervals
     that.prettyPrint = this.prettyPrint
     that.smtPrettyPrint = this.smtPrettyPrint
-    that. graphPrettyPrint = this.graphPrettyPrint
     that.ntsPrint = this.ntsPrint
     that.printIntermediateClauseSets = this.printIntermediateClauseSets
     that.horn = this.horn
@@ -235,6 +206,20 @@ class GlobalParameters extends Cloneable {
     that.didIncompleteTransformation = this.didIncompleteTransformation
     that.templateBasedInterpolation = this.templateBasedInterpolation
     that.templateBasedInterpolationType = this.templateBasedInterpolationType
+    that.getHornGraph = this.getHornGraph
+    that.mineCounterExample = this.mineCounterExample
+    that.visualizeHornGraph = this.visualizeHornGraph
+    that.generateTemplates = this.generateTemplates
+    that.fixRandomSeed = this.fixRandomSeed
+    that.getSolvability = this.getSolvability
+    that.combineTemplateStrategy = this.combineTemplateStrategy
+    that.readCostType = this.readCostType
+    that.explorationRate = this.explorationRate
+    that.unsatCoreThreshold = this.unsatCoreThreshold
+    that.mineTemplates = this.mineTemplates
+    that.hornGraphType = this.hornGraphType
+    that.hornGraphLabelType = this.hornGraphLabelType
+    that.ceMiningOption = this.ceMiningOption
     that.templateBasedInterpolationTimeout = this.templateBasedInterpolationTimeout
     that.portfolio = this.portfolio
     that.templateBasedInterpolationPrint = this.templateBasedInterpolationPrint
@@ -252,14 +237,11 @@ class GlobalParameters extends Cloneable {
     that.template = this.template
     that.dumpInterpolationQuery = this.dumpInterpolationQuery
     that.babarew = this.babarew
-    that.debugLog=this.debugLog
     that.log = this.log
     that.logCEX = this.logCEX
     that.logStat = this.logStat
     that.printHornSimplified = this.printHornSimplified
     that.printHornSimplifiedSMT = this.printHornSimplifiedSMT
-    that.writeTemplateToFile = this.writeTemplateToFile
-    that.terminateEarly = this.terminateEarly
     that.dotSpec = this.dotSpec
     that.dotFile = this.dotFile
     that.pngNo = this.pngNo
@@ -270,56 +252,12 @@ class GlobalParameters extends Cloneable {
     that.assertions = this.assertions
     that.verifyInterpolants = this.verifyInterpolants
     that.timeoutChecker = this.timeoutChecker
-    that.threadTimeout = this.threadTimeout
-    that.maxNode = this.maxNode
-    that.solvabilityTimeout=this.solvabilityTimeout
-    that.mainTimeout=this.mainTimeout
-    that.rank = this.rank
-    that.explorationRate = this.explorationRate
-    //that.printHints = this.printHints
-    that.extractTemplates=this.extractTemplates
-    that.extractPredicates=this.extractPredicates
-    that.separateByPredicates=this.separateByPredicates
-    that.separateByPredicatesBatchSize=this.separateByPredicatesBatchSize
-    that.measurePredictedPredicates=this.measurePredictedPredicates
-    that.singleMeasurement=this.singleMeasurement
-    that.labelSimpleGeneratedPredicates=this.labelSimpleGeneratedPredicates
-    that.varyGeneratedPredicates=this.varyGeneratedPredicates
-    that.readHints=this.readHints
-    that.readTemplates=this.readTemplates
-    that.getSMT2=this.getSMT2
-    that.readSMT2=this.readSMT2
-    that.getSolvingTime=this.getSolvingTime
-    that.getHornGraph=this.getHornGraph
-    that.getAllHornGraph=this.getAllHornGraph
-    that.getLabelFromCounterExample=this.getLabelFromCounterExample
-    that.unionOption=this.unionOption
-    that.argumentOccurenceLabel=this.argumentOccurenceLabel
-    that.argumentBoundLabel=this.argumentBoundLabel
-    that.generateSimplePredicates=this.generateSimplePredicates
-    that.generateTemplates=this.generateTemplates
-    that.combineTemplates=this.combineTemplates
-    that.onlyInitialPredicates=this.onlyInitialPredicates
-    that.checkSolvability=this.checkSolvability
-    that.withoutGraphJSON=this.withoutGraphJSON
-    that.separateMultiplePredicatesInBody=this.separateMultiplePredicatesInBody
-    that.readTrueLabel=this.readTrueLabel
-    that.readCost=this.readCost
-    that.rdm=this.rdm
-    that.moveFile = this.moveFile
-    that.minePredicates = this.minePredicates
-    that.mineCounterexamples = this.mineCounterexamples
-    that.boundsAnalysis = this.boundsAnalysis
-    that.boundsAnalysisTO = this.boundsAnalysisTO
-    that.visualizeLowerBound = this.visualizeLowerBound
-
-
   }
 
   override def clone : GlobalParameters = {
     val res = new GlobalParameters
     this copyTo res
-    res
+    res    
   }
 
   def withAndWOTemplates : Seq[GlobalParameters] =
@@ -347,7 +285,7 @@ class GlobalParameters extends Cloneable {
       case _ => as
     }
   }
-
+  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -357,7 +295,6 @@ object Main {
 
   class MainException(msg : String) extends Exception(msg)
   object TimeoutException extends MainException("timeout")
-  object MainTimeoutException extends MainException("mainTimeOut")
   object StoppedException extends MainException("stopped")
   object PrintingFinishedException extends Exception
 
@@ -392,7 +329,7 @@ object Main {
   def main(args: Array[String]) : Unit = doMain(args, false)
 
   //def main(args: Array[String]) : Unit = lazabs.horn.FatTest(args(0))
-
+  
 
   val greeting =
     "Eldarica v2.0.8.\n(C) Copyright 2012-2022 Hossein Hojjat and Philipp Ruemmer"
@@ -405,8 +342,8 @@ object Main {
     // work-around: make the Princess wrapper thread-safe
     lazabs.prover.PrincessWrapper.newWrapper
 
-    import GlobalParameters.InputFormat
     import params._
+    import GlobalParameters.InputFormat
 
     def arguments(args: List[String]): Boolean = args match {
       case Nil => true
@@ -414,93 +351,9 @@ object Main {
       //case "-r" :: rest => drawRTree = true; arguments(rest)
       case "-f" :: rest => absInFile = true; arguments(rest)
       case "-p" :: rest => prettyPrint = true; arguments(rest)
-      case "-extractTemplates" :: rest => extractTemplates = true; arguments(rest)
-      case "-extractPredicates" :: rest => extractPredicates = true; arguments(rest)
-      case "-measurePredictedPredicates" :: rest=> measurePredictedPredicates=true; arguments(rest)
-      case "-singleMeasurement" :: rest=> singleMeasurement=true; arguments(rest)
-      case "-labelSimpleGeneratedPredicates"::rest => labelSimpleGeneratedPredicates = true; arguments(rest)
-      case "-varyGeneratedPredicates":: rest => varyGeneratedPredicates =true; arguments(rest)
-      case "-generateSimplePredicates" :: rest => generateSimplePredicates = true; arguments(rest)
-      case "-generateTemplates" :: rest => generateTemplates = true; arguments(rest)
-      case "-onlyInitialPredicates" :: rest => onlyInitialPredicates = true; arguments(rest)
-      case "-moveFile" :: rest => moveFile = true; arguments(rest)
-      case "-checkSolvability" :: rest => checkSolvability = true; arguments(rest)
-      case "-withoutGraphJSON" :: rest => withoutGraphJSON = true; arguments(rest)
-      case "-separateMultiplePredicatesInBody" :: rest => separateMultiplePredicatesInBody = true; arguments(rest)
-      case "-readTrueLabel" :: rest => readTrueLabel = true; arguments(rest)
-      case "-readCost" :: rest => readCost = true; arguments(rest)
-      case "-rdm" :: rest => rdm = true; arguments(rest)
-      case "-fixRandomSeed" :: rest => fixRandomSeed = true; arguments(rest)
-      case "-readHints" :: rest => readHints = true; arguments(rest)
-      case "-readTemplates" :: rest => readTemplates = true; arguments(rest)
-      case "-getSMT2" :: rest => getSMT2 = true; arguments(rest)
-      case "-readSMT2" :: rest => readSMT2 = true; arguments(rest)
-      case "-getSolvingTime" :: rest => getSolvingTime = true; arguments(rest)
-      case "-debugLog" :: rest => debugLog = true; arguments(rest)
-      case "-hyperGraph" :: rest => hornGraphType = HornGraphType.hyperEdgeGraph; arguments(rest)
-      case "-getLabelFromCounterExample":: rest =>getLabelFromCounterExample = true; arguments(rest)
-      case "-getLabelFromCounterExample:union":: rest =>{getLabelFromCounterExample = true; unionOption = true; arguments(rest)}
-      case "-argumentOccurenceLabel":: rest =>argumentOccurenceLabel = true; arguments(rest)
-      case "-argumentBoundLabel":: rest =>argumentBoundLabel = true; arguments(rest)
-      case "-combineTemplates:union" :: rest => {
-        combineTemplates = true
-        combineTemplateStrategy=CombineTemplateStrategy.union
-        arguments(rest)
-      }
-      case "-combineTemplates:random" :: rest => {
-        combineTemplates = true
-        combineTemplateStrategy = CombineTemplateStrategy.random
-        arguments(rest)
-      }
-      case "-getHornGraph" :: rest => {
-        getHornGraph = true
-        getAllHornGraph = true
-        arguments(rest)
-      }
-      case "-getHornGraph:monoDirectionLayerGraph" :: rest => {
-        getHornGraph = true
-        hornGraphType = HornGraphType.monoDirectionLayerGraph
-        arguments(rest)
-      }
-      case "-getHornGraph:biDirectionLayerGraph" :: rest => {
-        getHornGraph = true
-        hornGraphType = HornGraphType.biDirectionLayerGraph
-        arguments(rest)
-      }
-      case "-getHornGraph:hybridDirectionLayerGraph" :: rest => {
-        getHornGraph = true
-        hornGraphType = HornGraphType.hybridDirectionLayerGraph
-        arguments(rest)
-      }
-      case "-getHornGraph:clauseRelatedTaskLayerGraph" :: rest => {
-        getHornGraph = true
-        hornGraphType = HornGraphType.clauseRelatedTaskLayerGraph
-        arguments(rest)
-      }
-      case "-getHornGraph:fineGrainedEdgeTypeLayerGraph" :: rest => {
-        getHornGraph = true
-        hornGraphType = HornGraphType.fineGrainedEdgeTypeLayerGraph
-        arguments(rest)
-      }
-      case "-getHornGraph:hyperEdgeGraph" :: rest => {
-        getHornGraph = true
-        hornGraphType = HornGraphType.hyperEdgeGraph
-        arguments(rest)
-      }
-      case "-getHornGraph:equivalentHyperedgeGraph" :: rest => {
-        getHornGraph = true
-        hornGraphType = HornGraphType.equivalentHyperedgeGraph
-        arguments(rest)
-      }
-      case "-getHornGraph:concretizedHyperedgeGraph" :: rest => {
-        getHornGraph = true
-        hornGraphType = HornGraphType.concretizedHyperedgeGraph
-        arguments(rest)
-      }
       case "-pIntermediate" :: rest => printIntermediateClauseSets = true; arguments(rest)
       case "-sp" :: rest => smtPrettyPrint = true; arguments(rest)
-      case "-gp" :: rest => graphPrettyPrint = true; arguments(rest)
-//      case "-pnts" :: rest => ntsPrint = true; arguments(rest)
+      //      case "-pnts" :: rest => ntsPrint = true; arguments(rest)
       case "-horn" :: rest => horn = true; arguments(rest)
       case "-glb" :: rest => global = true; arguments(rest)
       case "-disj" :: rest => disjunctive = true; arguments(rest)
@@ -511,59 +364,133 @@ object Main {
       case "-conc" :: rest => format = InputFormat.ConcurrentC; arguments(rest)
       case "-hin" :: rest => format = InputFormat.Prolog; arguments(rest)
       case "-hsmt" :: rest => format = InputFormat.SMTHorn; arguments(rest)
-//      case "-uppog" :: rest => format = InputFormat.UppaalOG; arguments(rest)
-//      case "-upprg" :: rest => format = InputFormat.UppaalRG; arguments(rest)
-//      case "-upprel" :: rest => format = InputFormat.UppaalRelational; arguments(rest)
-//      case "-bip" :: rest =>  format = InputFormat.Bip; arguments(rest)
+      //      case "-uppog" :: rest => format = InputFormat.UppaalOG; arguments(rest)
+      //      case "-upprg" :: rest => format = InputFormat.UppaalRG; arguments(rest)
+      //      case "-upprel" :: rest => format = InputFormat.UppaalRelational; arguments(rest)
+      //      case "-bip" :: rest =>  format = InputFormat.Bip; arguments(rest)
 
       case "-abstract" :: rest => templateBasedInterpolation = true; arguments(rest)
       case "-abstractPO" :: rest => {
         portfolio = GlobalParameters.Portfolio.Template
         arguments(rest)
       }
-      case "-abstract:empty" :: rest => {
-        templateBasedInterpolation = true
-        templateBasedInterpolationType = AbstractionType.Empty
-        arguments(rest)
-      }
-      case "-abstract:combined" :: rest => {
-        templateBasedInterpolation = true
-        templateBasedInterpolationType = AbstractionType.Combined
-        arguments(rest)
-      }
-      case "-abstract:all" :: rest => {
-        templateBasedInterpolation = true
-        templateBasedInterpolationType = AbstractionType.All
-        arguments(rest)}
-      case "-abstract:unlabeled" :: rest => {
-        templateBasedInterpolation = true
-        templateBasedInterpolationType = AbstractionType.Unlabeled
-        arguments(rest)}
-      case "-abstract:labeled" :: rest => {
-        templateBasedInterpolation = true
-        templateBasedInterpolationType = AbstractionType.Labeled
-        arguments(rest)}
-      case "-abstract:predictedCG" :: rest => {
-        templateBasedInterpolation = true
-        templateBasedInterpolationType = AbstractionType.PredictedCG
-        arguments(rest)}
-      case "-abstract:predictedCDHG" :: rest => {
-        templateBasedInterpolation = true
-        templateBasedInterpolationType = AbstractionType.PredictedCDHG
-        arguments(rest)}
-      case "-abstract:mined" :: rest => {
-        templateBasedInterpolation = true
-        templateBasedInterpolationType = AbstractionType.Mined
-        arguments(rest)}
-      case "-abstract:random" :: rest => {
-        templateBasedInterpolation = true
-        templateBasedInterpolationType = AbstractionType.Random
-        arguments(rest)}
       case "-portfolio" :: rest => {
         portfolio = GlobalParameters.Portfolio.General
         arguments(rest)
       }
+      case "-mineTemplates" :: rest => {
+        mineTemplates = true
+        arguments(rest)
+      }
+      case _explorationRate :: rest if (_explorationRate.startsWith("-explorationRate:")) =>{
+        explorationRate =
+          (java.lang.Float.parseFloat(_explorationRate.drop("-explorationRate:".length)));
+        arguments(rest)
+    }
+      case _unsatCoreThreshold :: rest if (_unsatCoreThreshold.startsWith("-unsatCoreThreshold:")) => {
+        unsatCoreThreshold =
+          (java.lang.Float.parseFloat(_unsatCoreThreshold.drop("-unsatCoreThreshold:".length)));
+        arguments(rest)
+      }
+      case _readCostType :: rest if (_readCostType.startsWith("-readCostType:")) => {
+        readCostType = _readCostType drop "-readCostType:".length
+        arguments(rest)
+      }
+      case "-combineTemplateStrategy:off"::rest=>{
+        combineTemplateStrategy = CombineTemplateStrategy.off
+        arguments(rest)
+      }
+      case "-combineTemplateStrategy:union" :: rest => {
+        combineTemplateStrategy = CombineTemplateStrategy.union
+        arguments(rest)
+      }
+      case "-combineTemplateStrategy:random" :: rest => {
+        combineTemplateStrategy = CombineTemplateStrategy.random
+        arguments(rest)
+      }
+      case "-getSolvability" :: rest => {
+        getSolvability = true
+        arguments(rest)
+      }
+      case "-fixRandomSeed" :: rest => {
+        fixRandomSeed = true
+        arguments(rest)
+      }
+      case "-generateTemplates" :: rest => {
+        generateTemplates = true
+        arguments(rest)
+      }
+      case "-visualizeHornGraph" :: rest => {
+        visualizeHornGraph = true
+        arguments(rest)
+      }
+      case "-mineCounterExample:union" :: rest => {
+        mineCounterExample = true
+        ceMiningOption = CounterExampleMiningOption.union
+        arguments(rest)
+      }
+      case "-mineCounterExample:common" :: rest => {
+        mineCounterExample = true
+        ceMiningOption = CounterExampleMiningOption.common
+        arguments(rest)
+      }
+      case "-getHornGraph:CDHG" :: rest => {
+        getHornGraph = true
+        hornGraphType = HornGraphType.CDHG
+        arguments(rest)
+      }
+      case "-getHornGraph:CG" :: rest => {
+        getHornGraph = true
+        hornGraphType = HornGraphType.CG
+        arguments(rest)
+      }
+      case "-hornGraphLabelType:template" :: rest => {
+        hornGraphLabelType = HornGraphLabelType.template
+        arguments(rest)
+      }
+      case "-hornGraphLabelType:unsatCore" :: rest => {
+        hornGraphLabelType = HornGraphLabelType.unsatCore
+        arguments(rest)
+      }
+      case "-hornGraphType:CG" :: rest => {
+        hornGraphType = HornGraphType.CG
+        arguments(rest)
+      }
+      case "-hornGraphType:CDHG" :: rest => {
+        hornGraphType = HornGraphType.CDHG
+        arguments(rest)
+      }
+      case "-abstract:predictedCG" :: rest => {
+        templateBasedInterpolation = true
+        templateBasedInterpolationType = AbstractionType.PredictedCG
+        arguments(rest)
+      }
+      case "-abstract:predictedCDHG" :: rest => {
+        templateBasedInterpolation = true
+        templateBasedInterpolationType = AbstractionType.PredictedCDHG
+        arguments(rest)
+      }
+      case "-abstract:mined" :: rest => {
+        templateBasedInterpolation = true
+        templateBasedInterpolationType = AbstractionType.Mined
+        arguments(rest)
+      }
+      case "-abstract:unlabeled" :: rest => {
+        templateBasedInterpolation = true
+        templateBasedInterpolationType = AbstractionType.Unlabeled
+        arguments(rest)
+      }
+      case "-abstract:random" :: rest => {
+        templateBasedInterpolation = true
+        templateBasedInterpolationType = AbstractionType.Random
+        arguments(rest)
+      }
       case "-abstract:manual" :: rest => {
+        templateBasedInterpolation = true
+        templateBasedInterpolationType = AbstractionType.Empty
+        arguments(rest)
+      }
+      case "-abstract:empty" :: rest => {
         templateBasedInterpolation = true
         templateBasedInterpolationType = AbstractionType.Empty
         arguments(rest)
@@ -596,33 +523,6 @@ object Main {
         templateBasedInterpolationTimeout =
           (java.lang.Float.parseFloat(tTimeout.drop(12)) * 1000).toInt;
         arguments(rest)
-      case _threadTimeout :: rest if (_threadTimeout.startsWith("-absTimeout:")) =>
-        threadTimeout =
-          (java.lang.Float.parseFloat(_threadTimeout.drop("-absTimeout:".length)) *1000).toInt;
-        arguments(rest)
-      case _maxNode :: rest if (_maxNode.startsWith("-maxNode:")) =>
-        maxNode = java.lang.Integer.parseInt(_maxNode.drop("-maxNode:".length));
-        arguments(rest)
-      case _separateByPredicates :: rest if (_separateByPredicates.startsWith("-separateByPredicates:")) => {
-        separateByPredicates = true;
-        separateByPredicatesBatchSize = java.lang.Integer.parseInt(_separateByPredicates.drop("-separateByPredicates:".length))
-        arguments(rest)}
-      case _solvabilityTimeout :: rest if (_solvabilityTimeout.startsWith("-solvabilityTimeout:")) =>
-        solvabilityTimeout =
-          (java.lang.Float.parseFloat(_solvabilityTimeout.drop("-solvabilityTimeout:".length))*1000 ).toInt;
-        arguments(rest)
-      case _mainTimeout :: rest if (_mainTimeout.startsWith("-mainTimeout:")) =>
-        mainTimeout =
-          (java.lang.Float.parseFloat(_mainTimeout.drop("-mainTimeout:".length)) *1000).toInt;
-        arguments(rest)
-      case _rank :: rest if (_rank.startsWith("-rank:")) =>
-        rank =
-          (java.lang.Float.parseFloat(_rank.drop("-rank:".length))); //parse input string
-        arguments(rest)
-      case _explorationRate :: rest if (_explorationRate.startsWith("-explorationRate:")) =>
-        explorationRate =
-          (java.lang.Float.parseFloat(_explorationRate.drop("-explorationRate:".length)));
-        arguments(rest)
 
       case tFile :: rest if (tFile.startsWith("-hints:")) => {
         cegarHintsFile = tFile drop 7
@@ -638,31 +538,14 @@ object Main {
         arguments(rest)
       }
 
-      case rCostType :: rest if (rCostType.startsWith("-readCostType:")) => {
-        readCostType = rCostType drop "-readCostType:".length
-        arguments(rest)
-      }
-
       case "-pHints" :: rest => templateBasedInterpolationPrint = true; arguments(rest)
 
       case "-minePredicates" :: rest => minePredicates = true; arguments(rest)
-
-      case "-mineCounterexamples" :: rest => mineCounterexamples = true; arguments(rest)
-
-      case "-boundsAnalysis" :: rest => boundsAnalysis = true; arguments(rest)
-
-      case "-visualizeLowerBound" :: rest => visualizeLowerBound = true; arguments(rest)
-
-      case tTimeout :: rest if (tTimeout.startsWith("-boundsAnalysisTO:")) =>
-        boundsAnalysisTO =
-          (java.lang.Float.parseFloat(tTimeout.drop(18)) * 1000).toInt;
-        arguments(rest)
 
       case splitMode :: rest if (splitMode startsWith "-splitClauses:") => {
         splitClauses = splitMode.drop(14).toInt
         arguments(rest)
       }
-
 
       case arithMode :: rest if (arithMode startsWith "-arithMode:") => {
         arithmeticMode = arithMode match {
@@ -712,8 +595,6 @@ object Main {
         setLogLevel((logOption drop 5).toInt); arguments(rest)
       case "-logSimplified" :: rest => printHornSimplified = true; arguments(rest)
       case "-logSimplifiedSMT" :: rest => printHornSimplifiedSMT = true; arguments(rest)
-      case "-writeTemplateToFile" :: rest => writeTemplateToFile = true; arguments(rest)
-      case "-terminateEarly" :: rest => terminateEarly = true; arguments(rest)
       case "-dot" :: str :: rest => dotSpec = true; dotFile = str; arguments(rest)
       case "-pngNo" :: rest => pngNo = true; arguments(rest)
       case "-dotCEX" :: rest => pngNo = false; arguments(rest)
@@ -727,10 +608,9 @@ object Main {
           "General options:\n" +
           " -h\t\tShow this information\n" +
           " -assert\tEnable assertions in Eldarica\n" +
-          " -log\t\tDisplay progress and found invariants\n" +
-          " -debugLog\t\tDisplay debug info\n" +
-          " -log:n\t\tDisplay progress with verbosity n (currently 0 <= n <= 3)\n" +
-          " -statistics\tDisplay statistics (implied by -log)\n" +
+          " -log\t\tDisplay progress and found invariants\n" + 
+          " -log:n\t\tDisplay progress with verbosity n (currently 0 <= n <= 3)\n" + 
+          " -statistics\tDisplay statistics (implied by -log)\n" + 
           " -t:time\tSet timeout (in seconds)\n" +
           " -cex\t\tShow textual counterexamples\n" + 
           " -scex\t\tShow textual counterexamples in SMT-LIB format\n" + 
@@ -739,11 +619,13 @@ object Main {
           " -m:func\tUse function func as entry point (default: main)\n" +
           "\n" +
           "Horn engine:\n" +
-          " -horn\t\tEnable this engine\n" +
+          " -horn\t\tEnable this engine\n" + 
           " -p\t\tPretty Print Horn clauses\n" +
-          " -sp\t\tPretty print the Horn clauses in SMT-LIB format\n" +
-          " -sol\t\tShow solution in Prolog format\n" +
-          " -ssol\t\tShow solution in SMT-LIB format\n" +
+          " -sp\t\tPretty print the Horn clauses in SMT-LIB format\n" + 
+          " -sol\t\tShow solution in Prolog format\n" + 
+          " -ssol\t\tShow solution in SMT-LIB format\n" + 
+          " -logSimplified\tShow clauses after preprocessing in Prolog format\n" +
+          " -logSimplifiedSMT\tShow clauses after preprocessing in SMT-LIB format\n" +
           " -disj\t\tUse disjunctive interpolation\n" +
           " -stac\t\tStatic acceleration of loops\n" +
           " -lbe\t\tDisable preprocessor (e.g., clause inlining)\n" +
@@ -761,12 +643,12 @@ object Main {
           "            \t                     relEqs (default), relIneqs\n" +
           " -abstractTO:t\tTimeout (s) for abstraction search (default: 2.0)\n" +
           " -abstractPO\tRun with and w/o interpolation abstraction in parallel\n" +
-
           " -portfolio\tRun different standard configurations in parallel\n" +
           " -splitClauses:n\tAggressiveness when splitting disjunctions in clauses\n" +
           "                \t                     (0 <= n <= 2, default: 1)\n" +
+          
           "\n" +
-          " -hin\t\tExpect input in Prolog Horn format\n" +
+          " -hin\t\tExpect input in Prolog Horn format\n" +  
           " -hsmt\t\tExpect input in Horn SMT-LIB format\n" +
           " -ints\t\tExpect input in integer NTS format\n" +
           " -conc\t\tExpect input in C/C++/TA format\n" +
@@ -776,42 +658,8 @@ object Main {
 //          " -upprel\tExpect UPPAAL file using Relational Encoding\n"
           "\n" +
           "C/C++/TA front-end:\n" +
-          " -arithMode:t\t Integer semantics: math (default), ilp32, lp64, llp64\n" +
-          " -pIntermediate\t Dump Horn clauses encoding concurrent programs\n"+
-          " -extractTemplates\t extract templates training data\n"+
-          " -extractPredicates\t extract predicates from CEGAR process\n"+
-          " -separateByPredicates\t separate horn graph by predicates\n"+
-          " -measurePredictedPredicates\t output predicted predicate measurements\n"+
-          " -singleMeasurement\t single measurements for current option\n"+
-          " -labelSimpleGeneratedPredicates\t label simple generated predicates by selected predicates\n"+
-          " -varyGeneratedPredicates\t vary generated predicates from CEGAR process without change of logic mearnings\n"+
-          " -generateSimplePredicates\t generate simple predicates\n"+
-          " -generateTemplates\t generate templates\n"+
-          " -combineTemplates:union, random\t combine predicted and existed templates\n"+
-          " -onlyInitialPredicates\t extract predicates using initial predicates only\n"+
-          " -moveFile\t if exception occur, move file to excepion directory\n"+
-          " -checkSolvability \t check solvability for different initial predicate settings\n"+
-          " -withoutGraphJSON \t don't output JSON file for graph\n"+
-          " -separateMultiplePredicatesInBody \t don't output JSON file for graph\n"+
-          " -readTrueLabel \t read tru label\n"+
-          " -readCost \t read template cost from file\n"+
-          " -rdm \t random label initial templates\n"+
-          " -fixRandomSeed \t fix random seed by 42\n"+
-          " -absTimeout:time\t set timeout for labeling hints\n"+
-          " -solvabilityTimeout:time\t set timeout for solvability\n"+
-          " -rank:n\t use top n or score above n ranked hints read from file\n"+
-          " -maxNode:n\t if the node number exceeded this number, stop drawing\n"+
-          " -getSMT2\t get SMT2 file\n"+
-          " -readSMT2\t read SMT2 file without preprocessing\n"+
-          " -getSolvingTime\t get Solving time in JSON file\n"+
-          " -getLabelFromCounterExample:option\t  Interp. union. predicate occurrence in counter example\n"+
-          " -argumentOccurenceLabel\t  argument occurrence in hints\n"+
-          " -argumentBoundLabel\t  get argument lower and upper bound\n"+
-          " -getHornGraph\t get all types of horn graph file and GNN input\n"+
-          " -getHornGraph:t\t Interp. getHornGraph: monoDirectionLayerGraph, biDirectionLayerGraph, hybridDirectionLayerGraph,clauseRelatedTaskLayerGraph, fineGrainedEdgeTypeLayerGraph, hyperEdgeGraph, equivalentHyperedgeGraph, concretizedHyperedgeGraph\n" +
-          " -getLabelFromCE \t get label from counter example\n"
-
-
+          " -arithMode:t\tInteger semantics: math (default), ilp32, lp64, llp64\n" +
+          " -pIntermediate\tDump Horn clauses encoding concurrent programs\n"
           )
           false
       case fn :: rest => fileName = fn;  openInputFile; arguments(rest)
@@ -831,7 +679,6 @@ object Main {
 
     timeoutChecker = timeout match {
       case Some(to) => () => {
-        //println("time check point", ((System.currentTimeMillis - startTime)/1000).toString+"/"+(to/1000).toString)
         if (System.currentTimeMillis - startTime > to.toLong)
           throw TimeoutException
         if (stoppingCond)
@@ -842,7 +689,7 @@ object Main {
           throw StoppedException
       }
     }
-
+    
     GlobalParameters.get.setupApUtilDebug
 
     if(princess) Prover.setProver(lazabs.prover.TheoremProver.PRINCESS)
@@ -856,8 +703,8 @@ object Main {
         } else if (fileName endsWith ".nts") {
           format = InputFormat.Nts
           // then also choose -horn by default
-          horn = true
-        }
+          horn = true         
+        } 
 //        else if (fileName endsWith ".scala")
 //          format = InputFormat.Scala
 //        else if (fileName endsWith ".bip")
@@ -877,28 +724,29 @@ object Main {
     format match {
       case InputFormat.Prolog | InputFormat.SMTHorn //| InputFormat.Bip |
            //InputFormat.UppaalOG | InputFormat.UppaalRG |
-           //InputFormat.UppaalRelational
+           //InputFormat.UppaalRelational 
       =>
         // those formats can only be handled in Horn mode
         horn = true
       case _ =>
         // nothing
     }
-
+    
     if (horn) {
-
+      
 /*      format match {
         case InputFormat.Bip =>
           // BIP mode
 //          lazabs.bip.HornBip.apply(fileName)
           return
         case InputFormat.UppaalRelational =>
-          // uses iterative relational encoding to solve the system
+          // uses iterative relational encoding to solve the system 
           lazabs.upp.Relational.apply(fileName, log)
           return
         case _ =>
           // nothing
       }*/
+
       val (clauseSet, absMap) = try { format match {
         case InputFormat.Prolog =>
           (lazabs.horn.parser.HornReader.apply(fileName), None)
@@ -921,7 +769,6 @@ object Main {
 
       if(prettyPrint) {
         println(HornPrinter(clauseSet))
-
         //println(clauseSet.map(lazabs.viewer.HornPrinter.printDebug(_)).mkString("\n\n"))
         return
       }
@@ -930,32 +777,6 @@ object Main {
         println(HornSMTPrinter(clauseSet))
         return
       }
-
-      if (extractPredicates) {
-        try {
-          lazabs.horn.concurrency.TrainDataGeneratorPredicatesSmt2(clauseSet, absMap, global, disjunctive,
-            drawRTree, lbe) //generate train data.  clauseSet error may caused by import package
-        } catch {
-          case x:Any => {
-            println(Console.RED + x.toString)
-            throw MainTimeoutException
-          }
-        }
-        return
-      }
-//      if (extractTemplates) {
-//        try {
-//          lazabs.horn.concurrency.TrainDataGeneratorTemplatesSmt2(clauseSet, absMap, global, disjunctive,
-//            drawRTree, lbe) //generate train data.  clauseSet error may caused by import package
-//        } catch {
-//          case x:Any => {
-//            println(Console.RED + x.toString)
-//            throw MainTimeoutException
-//          }
-//        }
-//        return
-//      }
-
 
       if(solFileName != "") {
         val solution = lazabs.horn.parser.HornReader.apply(solFileName)
@@ -967,8 +788,12 @@ object Main {
         case _ => false
       }*/
 
-      lazabs.horn.Solve(clauseSet, absMap, global, disjunctive,
-                        drawRTree, lbe)
+      try {
+        lazabs.horn.Solve(clauseSet, absMap, global, disjunctive,
+                          drawRTree, lbe)
+      } catch {
+        case PrintingFinishedException => // nothing more to do
+      }
         
       return
 
@@ -992,18 +817,13 @@ object Main {
         lazabs.horn.concurrency.ReaderMain.printClauses(system)
 
       val smallSystem = system.mergeLocalTransitions
+
       if (prettyPrint) {
         println
         println("After simplification:")
         lazabs.horn.concurrency.ReaderMain.printClauses(smallSystem)
         return
       }
-
-//      if(extractTemplates){
-//        val systemGraphs=new lazabs.horn.concurrency.TrainDataGenerator(smallSystem,system) //generate train data by templates
-//        return
-//      }
-
 
       val result = try {
         Console.withOut(outStream) {
@@ -1031,11 +851,7 @@ object Main {
           }
         }
       }
-//      println
-//      println("-----Optimized Hints------")
-//      println("!@@@@")
-//      printHints.pretyPrintHints()
-//      println("@@@@!")
+
       return
     }
 
@@ -1064,35 +880,14 @@ object Main {
     //if(drawRTree) DrawGraph(rTree, absInFile)
 
   } catch {
-    case TimeoutException | StoppedException =>{
-      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/time-out-exception/" + getFileName)
-      printError(" timeout", GlobalParameters.get.format)
-    }
-    case  MainTimeoutException =>{
-      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/time-out-exception/" + getFileName())
-      printError("main timeout", GlobalParameters.get.format)
-    }
+    case TimeoutException | StoppedException =>
       // nothing
-    case _ : java.lang.OutOfMemoryError =>{
-      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/out-of-memory/" + getFileName())
+    case _ : java.lang.OutOfMemoryError =>
       printError("out of memory", GlobalParameters.get.format)
-    }
-    case _ : java.lang.StackOverflowError =>{
-      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/stack-overflow/" + getFileName())
+    case _ : java.lang.StackOverflowError =>
       printError("stack overflow", GlobalParameters.get.format)
-    }
-    case t : Exception =>{
+    case t : Exception =>
       printError(t.getMessage, GlobalParameters.get.format)
-      t.printStackTrace()
-      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/other-error/" + getFileName())
-    }
-    case x:Any=>{
-      printError("other-error", GlobalParameters.get.format)
-      println(Console.RED + x.toString)
-      HintsSelection.moveRenameFile(GlobalParameters.get.fileName,"../benchmarks/exceptions/other-error/" + getFileName())
-    }
-
-
   }
 
   private def printError(message : String,

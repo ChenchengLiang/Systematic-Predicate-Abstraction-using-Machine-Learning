@@ -42,14 +42,12 @@ import ap.types.{Sort, MonoSortedPredicate}
 
 import Util._
 import DisjInterpolator._
-import lazabs.GlobalParameters
 
 object HornPredAbs {
 
   import HornClauses._
   import TerForConvenience._
   import SymbolFactory.normalPreprocSettings
-
 
   def predArgumentSorts(pred : Predicate) : Seq[Sort] =
     MonoSortedPredicate argumentSorts pred
@@ -117,7 +115,6 @@ class HornPredAbs[CC <% HornClauses.ConstraintClause]
   val hornPredAbsStartTime = System.currentTimeMillis
 
   lazabs.GlobalParameters.get.setupApUtilDebug
-
   
   val context : HornPredAbsContext[CC] = new HornPredAbsContextImpl(iClauses)
   import context._
@@ -132,7 +129,7 @@ class HornPredAbs[CC <% HornClauses.ConstraintClause]
 
   //////////////////////////////////////////////////////////////////////////////
   
-  lazy val cegar = new CEGAR(context, predStore,
+  val cegar = new CEGAR(context, predStore,
                         predicateGenerator, counterexampleMethod)
   import cegar._
   import CEGAR._
@@ -216,5 +213,6 @@ class HornPredAbs[CC <% HornClauses.ConstraintClause]
     case Right(trace) =>
       Right(trace)
   }
+
 }
 

@@ -14,10 +14,10 @@ def extract_data_by_shell():
     data_fold = ["train_data", "test_data", "valid_data"]
     benchmark_name = sys.argv[1]  # "temp-debug"
     thread_number = 1
-    # shell_timeout = 60*60*3.5
-    # eldarica_timeout= 60*60*3
-    shell_timeout = 60 * 12
-    eldarica_timeout = 60 * 10
+    shell_timeout = 60*60*3.5
+    eldarica_timeout= 60*60*3
+    #shell_timeout = 60 * 12
+    #eldarica_timeout = 60 * 10
     parameters_generate_unlabeled_templates= "-writeTemplateToFile -terminateEarly -abstract:unlabeled  -t:" + str(eldarica_timeout)
     parameters_extract_train_data_for_template_selection_without_graph="-moveFile -extractTemplates -t:" + str(eldarica_timeout)
 
@@ -54,11 +54,11 @@ def extract_data_by_shell():
     # parameters_pipeline.append("-checkSolvability  -abstract:relIneqs -splitClauses:1 -t:" + str(eldarica_timeout))
 
     #description: mine templates
-    #parameters_pipeline.append(parameters_extract_train_data_for_template_selection_without_graph) #label templates and generate simplified smt2
+    parameters_pipeline.append(parameters_extract_train_data_for_template_selection_without_graph) #label templates and generate simplified smt2
     #description: draw two graphs
     # parameters_pipeline.append(parameters_generate_unlabeled_templates)
-    parameters_pipeline.append(parameters_draw_CG_using_labeled_templates) #draw constraint graph
-    parameters_pipeline.append(parameters_draw_CDHG_using_labeled_templates) # draw hyperedge graph
+    # parameters_pipeline.append(parameters_draw_CG_using_labeled_templates) #draw constraint graph
+    # parameters_pipeline.append(parameters_draw_CDHG_using_labeled_templates) # draw hyperedge graph
 
     # description: get smt2 file
     #parameters_pipeline.append(parameters_get_smt2)#generate normalized smt2

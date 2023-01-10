@@ -16,7 +16,7 @@ def main():
                  "template_relevance_boolean_usefulness":"templateRelevanceLabel",
                  "template_relevance_Eq_usefulness":"templateRelevanceLabel"}
     #binary classification and regression's num_node_target_labels is arbitrary
-    label_to_num_node_target_labels={"template_relevance_boolean_usefulness":1,
+    label_to_num_node_target_labels={"clause_occurrence_in_counter_examples_binary":1,"template_relevance_boolean_usefulness":1,
                                      "template_relevance_Eq_usefulness":4,"node_multiclass":5}
 
 
@@ -31,7 +31,7 @@ def main():
     #label_list.append("scc_test")
     #label_list.append("argument_lower_bound_existence")
     #label_list.append("argument_upper_bound_existence")
-    #label_list.append("clause_occurrence_in_counter_examples_binary")
+    label_list.append("clause_occurrence_in_counter_examples_binary")
     # label="argument_bound"
     #label_list.append("argument_lower_bound")
     # label_list.append("argument_upper_bound")
@@ -39,17 +39,17 @@ def main():
     #label_list.append("template_relevance")
     #label_list.append("template_relevance_boolean_usefulness")
     #label_list.append("template_relevance_Eq_usefulness")
-    label_list.append("node_multiclass")
+    #label_list.append("node_multiclass")
 
     # json_type = ".hyperEdgeGraph.JSON"
     # json_type = ".monoDirectionLayerGraph.JSON"
     force_read = True
     form_label = True
-    file_type = ".c"
+    file_type = ".smt2"
     GPU=False
     use_class_weight=False
     pickle = True
-    benchmark_name = "Template_selection_one_example-train"+"/"
+    benchmark_name = "unsatcore-union"+"/"
     path_to_models="trained_model/"
     relative_path = os.path.join("../benchmarks/", benchmark_name)
     absolute_path = os.path.join("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/", benchmark_name)
@@ -70,7 +70,7 @@ def main():
                                 "max_epochs": 10, "patience": 10, "num_node_target_labels": label_to_num_node_target_labels[label],
                                 "fix_y_axis": False}
 
-            parameter_list.append({"relative_path":relative_path,"absolute_path":absolute_path,"json_type":".hyperEdgeGraph.JSON","label":label,"label_field":label_pairs[label]})  # templateRelevanceLabel,templateCostLabel,argumentIndices
+            #parameter_list.append({"relative_path":relative_path,"absolute_path":absolute_path,"json_type":".hyperEdgeHornGraph.JSON","label":label,"label_field":label_pairs[label]})  # templateRelevanceLabel,templateCostLabel,argumentIndices
             # parameter_list.append(
             #     parameters(relative_path=relative_path,
             #                absolute_path=absolute_path,
@@ -80,7 +80,7 @@ def main():
             #                absolute_path=absolute_path,
             #                json_type=".concretizedHyperedgeGraph.JSON", label=label))
             parameter_list.append(
-                {"relative_path": relative_path, "absolute_path": absolute_path, "json_type": ".monoDirectionLayerGraph.JSON",
+                {"relative_path": relative_path, "absolute_path": absolute_path, "json_type": ".mono-layerHornGraph.JSON",
                  "label": label, "label_field": label_pairs[label]})
             # parameter_list.append(
             #     parameters(relative_path=relative_path,

@@ -33,13 +33,11 @@ package lazabs.horn
 import lazabs.ast.ASTree._
 import global._
 import bottomup._
-
 import bottomup.RelationSymbol
 import abstractions.AbsLattice
 import lazabs.horn.bottomup.Util.Dag
 
 import ap.parser._
-
 
 object Solve {
   def apply(clauseSet: Seq[HornClause], 
@@ -48,7 +46,6 @@ object Solve {
             disjunctive : Boolean, 
             drawRTree: Boolean, 
             lbe: Boolean) = {
-
 
     val log = lazabs.GlobalParameters.get.log
 

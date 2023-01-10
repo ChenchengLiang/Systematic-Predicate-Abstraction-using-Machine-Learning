@@ -285,9 +285,9 @@ def main():
     # gather_data_to_one_file(os.path.join("../benchmarks/","sv-comp-clauses"),os.path.join("../benchmarks","shuffleFile"))
     # shuffle_data("Template-selection-Liner-dateset/UNSAT","train_data","smt2",
     #              "../benchmarks/Template-selection-Liner-dateset/UNSAT/shuffle")
-    divide_data_to_threads("Template-selection-non-Liner-dateset/solvable-sat-mined-templates/non-empty-labled",
-                           "Template-selection-non-Liner-dateset/solvable-sat-mined-templates/non-empty-labled-divided",three_fold=True,datafold_list=["train_data","valid_data","test_data"],
-                           file_type="smt2",chunk_number=1748)#datafold_list=["test_data"]
+    divide_data_to_threads("Template-selection-non-Liner-dateset-new/splitClause1/unsolvable",
+                           "Template-selection-non-Liner-dateset-new/splitClause1/unsolvable-divided",three_fold=True,datafold_list=["train_data","valid_data","test_data"],
+                           file_type="smt2",chunk_number=249)#datafold_list=["test_data"]
 
     # moveIncompletedExtractionsToTemp("../benchmarks/new-full-dataset-with-and")
 
@@ -343,7 +343,7 @@ def main():
     #         unzip_all_file_folder("all-LIA-Lin-train-unsolvable-predicted-measurement-2/temp-1-divided/thread_"+str(i)+"/"+fold)
 
 
-    #compress_file_in_folder("Template-selection-Linear-solvability-check-uppmax-2/solvable")
+    # compress_file_in_folder("uppmax-linear-solvability/unzip_files")
 
 
     #rename_files_in_benchmarks("Linear-dataset-4-tasks-dataset")
@@ -354,9 +354,9 @@ def main():
     #     collect_common_files("Linear-dataset/first-three-task-extractable/extractable-raw/"+data_fold,"Linear-dataset/separated_benchmark-abstract-empty/exceptions/unsat","Linear-dataset/counter-example-task-extractable")
 
     #change_relative_file_names("non-linear-hyperedge-CE-common-1-uppmax", "train_data", "smt2")
-    # collect_common_files(folder1="100+benchmarks/linear/unsolvable",
-    #                      folder2="Template-selection-Linear-solvability-check-uppmax-3/unsolvable",
-    #                      out_put_folder="100+benchmarks/linear/common-unsolvable")
+    # collect_common_files(folder1="Template-selection-non-Liner-dateset/solvable-sat-mined-templates/non-empty-labled/train_data",
+    #                      folder2="Template-selection-non-Liner-dateset-debug/train_data",
+    #                      out_put_folder="Template-selection-non-Liner-dateset-debug/common")
     # collect_common_files(folder1="align-lin+non-lin/fifth-task-union-hyperedge-linear+nonlinear",
     #                      folder2="align-lin+non-lin/fifth-task-union-layer-linear+nonlinear",
     #                      out_put_folder="align-lin+non-lin/fifth-task-union-hyperedge+layer-linear+nonlinear")
@@ -373,7 +373,7 @@ def main():
     # collect_solvable_list_from_unsolvable_set("../benchmarks/Template-selection-non-Liner-dateset/non-linear-unsolvable-graphs-predicted-solvability/solvability_summary.JSON",
     #                                           "../benchmarks/Template-selection-non-Liner-dateset/non-linear-unsolvable","train_data")
 
-    #separate_by_solvability_JSON("100+benchmarks-linear-solvability-check-uppmax","solvable","smt2")
+    #separate_by_solvability_JSON("uppmax-non-linear-solvable-UNSAT-divided-3668.zip","solvable","smt2")
     #check_solvability_summary_JSON("Template-selection-Liner-dateset-solvable-solvability-check","train_data","smt2")
 
     #check_cluster_log_files("Template-selection-Linear-solvability-check-uppmax","log","out","gz","chc-LIA-Lin_7910.smt2")

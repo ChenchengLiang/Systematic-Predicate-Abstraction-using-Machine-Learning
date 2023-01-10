@@ -60,6 +60,7 @@ def read_solvability(filtered_file_list, benchmark_fold, folder):
 
     # print("json_solvability_obj_list", json_solvability_obj_list)
 
+    #fill in each option by iterating the solvability list
     for f in json_solvability_obj_list:
         for op in non_predicted_abstract_option:
             for sn in splitClauses_name:

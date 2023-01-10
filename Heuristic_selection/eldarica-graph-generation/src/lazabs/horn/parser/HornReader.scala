@@ -444,30 +444,6 @@ class SMTHornReader protected[parser] (
         }))
       throw new Exception ("Uninterpreted functions are not supported")
 
-
-    signature.theories match {
-      case theories if (theories forall {
-                          case _ : SimpleArray  => true
-                          case _ : ExtArray     => true
-                          case _ : ADT          => true
-                          case _ : MulTheory    => true
-                          case TypeTheory       => true
-                          case ModuloArithmetic => true
-                          case _                => false
-                        }) =>
-        // ok
-      case theories if (theories forall {
-                          case _ : SimpleArray => true
-                          case _ : ExtArray    => true
-                          case TypeTheory      => true
-                          case _               => false
-                        }) =>
-        // ok
-      case _ =>
-        throw new Exception ("Combination of theories is not supported")
-    }
-
-
     clause =
       if (elimArrays) {
         // need full preprocessing, in particular to introduce triggers
@@ -547,6 +523,7 @@ class SMTHornReader protected[parser] (
       while (!litsTodo.isEmpty) {
         val lit = litsTodo.head
         litsTodo = litsTodo.tail
+
         lit match {
           case INot(a@IAtom(p, _)) if (TheoryRegistry lookupSymbol p).isEmpty =>
             body = translateAtom(a) :: body
